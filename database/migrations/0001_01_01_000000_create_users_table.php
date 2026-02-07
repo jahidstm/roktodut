@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('role')->default(UserRole::DONOR->value);
             $table->string('blood_group');
             $table->string('district');
-            $table->string('thana')->nullable();
+            $table->string('upazila')->nullable();
             $table->text('address')->nullable();
             $table->string('gender')->nullable();
             $table->date('date_of_birth')->nullable();
