@@ -2,29 +2,19 @@
 
 namespace App\Enums;
 
-enum UserRole: string
+enum BloodGroup: string
 {
-    case DONOR     = 'donor';
-    case RECIPIENT = 'recipient';
-    case ORG_ADMIN = 'org_admin';
-    case ADMIN     = 'admin';
+    case A_POS = 'A+';
+    case A_NEG = 'A-';
+    case B_POS = 'B+';
+    case B_NEG = 'B-';
+    case AB_POS = 'AB+';
+    case AB_NEG = 'AB-';
+    case O_POS = 'O+';
+    case O_NEG = 'O-';
 
     public function label(): string
     {
-        return match ($this) {
-            self::DONOR     => 'রক্তদাতা',
-            self::RECIPIENT => 'গ্রহীতা',
-            self::ORG_ADMIN => 'প্রতিষ্ঠান প্রশাসক',
-            self::ADMIN     => 'কর্তৃপক্ষ',
-        };
-    }
-
-    public function dashboardRoute(): string
-    {
-        return match ($this) {
-            self::ADMIN     => 'admin.dashboard',
-            self::ORG_ADMIN => 'org.dashboard',
-            default         => 'dashboard',
-        };
+        return $this->value; // ব্লাড গ্রুপ ইংরেজিতেই সুন্দর দেখায়
     }
 }
