@@ -28,21 +28,25 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">জেলা <span class="text-red-600">*</span></label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    জেলা <span class="text-red-600">*</span>
+                                </label>
                                 <select name="district" id="district" class="w-full rounded-md border-gray-300" required>
                                     <option value="">সিলেক্ট করুন</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">উপজেলা/এরিয়া</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">উপজেলা/এরিয়া</label>
                                 <select name="upazila" id="upazila" class="w-full rounded-md border-gray-300">
                                     <option value="">সব এলাকা</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">রক্তের গ্রুপ <span class="text-red-600">*</span></label>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    রক্তের গ্রুপ <span class="text-red-600">*</span>
+                                </label>
                                 <select name="blood_group" class="w-full rounded-md border-gray-300" required>
                                     <option value="">সিলেক্ট করুন</option>
                                     @foreach ($bloodGroups as $bg)
@@ -61,7 +65,7 @@
                             </div>
                         </div>
 
-                        {{-- Keep selected values (helps when JS loads) --}}
+                        {{-- Keep selected values --}}
                         <input type="hidden" id="selectedDivision" value="{{ $query['division'] ?? '' }}">
                         <input type="hidden" id="selectedDistrict" value="{{ $query['district'] ?? '' }}">
                         <input type="hidden" id="selectedUpazila" value="{{ $query['upazila'] ?? '' }}">
@@ -99,7 +103,9 @@
                                             <div class="text-sm text-gray-600">
                                                 {{ $donor->district }}{{ $donor->upazila ? ', '.$donor->upazila : '' }}
                                             </div>
-                                            <div class="text-sm text-gray-600">গ্রুপ: <span class="font-semibold">{{ $donor->blood_group }}</span></div>
+                                            <div class="text-sm text-gray-600">
+                                                গ্রুপ: <span class="font-semibold">{{ $donor->blood_group }}</span>
+                                            </div>
 
                                             <div class="mt-2 flex flex-wrap gap-2 text-xs">
                                                 @if($donor->is_ready_now)
@@ -122,11 +128,15 @@
                                         </div>
                                     </div>
 
-                                    {{-- Reveal Flow 1 --}}
+                                    {{-- Reveal Flow --}}
                                     @if(!$revealedPhone)
                                         <div class="mt-3">
                                             @if($target == $donorId && is_array($challenge))
-                                                <form method="POST" action="{{ route('donors.reveal.verify', $donorId) }}" class="flex flex-col sm:flex-row gap-2 items-end">
+                                                {{-- Challenge Verify (AJAX) --}}
+                                                <form method="POST"
+                                                      action="{{ route('donors.reveal.verify', $donorId) }}"
+                                                      class="flex flex-col sm:flex-row gap-2 items-end"
+                                                      onsubmit="return window.__revealVerify(event, this);">
                                                     @csrf
                                                     <div class="flex-1">
                                                         <label class="block text-sm text-gray-700 mb-1">
@@ -145,13 +155,12 @@
                                                     </button>
                                                 </form>
                                             @else
-                                                <form method="POST" action="{{ route('donors.reveal.start', $donorId) }}">
-                                                    @csrf
-                                                    <button type="submit"
-                                                        class="px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-50">
-                                                        ফোন দেখুন
-                                                    </button>
-                                                </form>
+                                                {{-- Start Reveal (AJAX button) --}}
+                                                <button type="button"
+                                                    onclick="return window.__revealStart(event, '{{ route('donors.reveal.start', $donorId) }}');"
+                                                    class="px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-50">
+                                                    ফোন দেখুন
+                                                </button>
                                             @endif
                                         </div>
                                     @endif
@@ -166,81 +175,170 @@
     </div>
 
     <script>
+        // ---------- Reveal: helpers ----------
+        window.__csrfToken = function () {
+            return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
+        };
+
+        window.__revealStart = async function (event, url) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+
+            const csrf = window.__csrfToken();
+
+            let res;
+            try {
+                res = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrf,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    credentials: 'same-origin',
+                });
+            } catch (err) {
+                console.error('Reveal start network error:', err);
+                alert('সার্ভার এরর বা নেটওয়ার্ক সমস্যা!');
+                return false;
+            }
+
+            console.log('Reveal start response:', res.status);
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                // কন্ট্রোলার থেকে আসা JSON এরর মেসেজ শো করবে
+                alert(data.message || 'কোথাও কোনো সমস্যা হয়েছে!');
+                return false;
+            }
+
+            // Force refresh so session-based challenge appears
+            window.location.reload();
+            return false;
+        };
+
+        window.__revealVerify = async function (event, form) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+
+            const csrf = window.__csrfToken();
+            const formData = new FormData(form);
+
+            let res;
+            try {
+                res = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': csrf,
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    credentials: 'same-origin',
+                    body: formData,
+                });
+            } catch (err) {
+                console.error('Reveal verify network error:', err);
+                alert('সার্ভার এরর বা নেটওয়ার্ক সমস্যা!');
+                return false;
+            }
+
+            console.log('Reveal verify response:', res.status);
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                // কন্ট্রোলার থেকে আসা JSON এরর মেসেজ শো করবে (যেমন: ভুল উত্তর)
+                alert(data.message || 'ভুল উত্তর বা সময় শেষ!');
+                return false;
+            }
+
+            // Success (200 OK) -> Phone will be unmasked
+            window.location.reload();
+            return false;
+        };
+
+        // ---------- Locations ----------
         (async function () {
             try {
                 const res = await fetch('/data/bd_locations.json', { cache: 'no-store' });
+                if (!res.ok) throw new Error('Locations JSON fetch failed: ' + res.status);
+
                 const data = await res.json();
 
                 const divisionEl = document.getElementById('division');
                 const districtEl = document.getElementById('district');
                 const upazilaEl = document.getElementById('upazila');
 
-                const selectedDivision = document.getElementById('selectedDivision').value;
-                const selectedDistrict = document.getElementById('selectedDistrict').value;
-                const selectedUpazila  = document.getElementById('selectedUpazila').value;
+                const selectedDivision = document.getElementById('selectedDivision').value || '';
+                const selectedDistrict = document.getElementById('selectedDistrict').value || '';
+                const selectedUpazila  = document.getElementById('selectedUpazila').value || '';
 
-                // Populate divisions
-                (data.divisions || []).forEach(d => {
-                    const opt = document.createElement('option');
-                    opt.value = d.name;
-                    opt.textContent = d.name;
-                    if (d.name === selectedDivision) opt.selected = true;
-                    divisionEl.appendChild(opt);
-                });
+                const divisionsMap = (data && data.divisions && typeof data.divisions === 'object')
+                    ? data.divisions
+                    : {};
 
-                function getSelectedDivisionObj() {
-                    return (data.divisions || []).find(x => x.name === divisionEl.value);
+                function setOptions(el, placeholder, values, selectedValue = '') {
+                    el.innerHTML = '';
+                    const ph = document.createElement('option');
+                    ph.value = '';
+                    ph.textContent = placeholder;
+                    el.appendChild(ph);
+
+                    values.forEach(v => {
+                        const opt = document.createElement('option');
+                        opt.value = v;
+                        opt.textContent = v;
+                        if (v === selectedValue) opt.selected = true;
+                        el.appendChild(opt);
+                    });
+                }
+
+                function getDistrictsMapForSelectedDivision() {
+                    const division = divisionEl.value;
+                    const d = divisionsMap?.[division];
+                    return (d && typeof d === 'object') ? d : {};
+                }
+
+                function populateDivisions() {
+                    const divisionNames = Object.keys(divisionsMap);
+                    setOptions(divisionEl, 'সিলেক্ট করুন', divisionNames, selectedDivision);
                 }
 
                 function populateDistricts() {
-                    districtEl.innerHTML = '<option value="">সিলেক্ট করুন</option>';
-                    upazilaEl.innerHTML = '<option value="">সব এলাকা</option>';
+                    const districtsMap = getDistrictsMapForSelectedDivision();
+                    const districtNames = Object.keys(districtsMap);
 
-                    const div = getSelectedDivisionObj();
-                    const districts = div ? (div.districts || []) : [];
-                    districts.forEach(dd => {
-                        const opt = document.createElement('option');
-                        opt.value = dd.name;
-                        opt.textContent = dd.name;
-                        if (dd.name === selectedDistrict) opt.selected = true;
-                        districtEl.appendChild(opt);
-                    });
+                    setOptions(districtEl, 'সিলেক্ট করুন', districtNames, selectedDistrict);
+                    setOptions(upazilaEl, 'সব এলাকা', [], selectedUpazila);
                 }
 
                 function populateUpazilas() {
-                    upazilaEl.innerHTML = '<option value="">সব এলাকা</option>';
+                    const division = divisionEl.value;
+                    const district = districtEl.value;
 
-                    const div = getSelectedDivisionObj();
-                    const dist = div?.districts?.find(x => x.name === districtEl.value);
-                    const upazilas = dist ? (dist.upazilas || []) : [];
-                    upazilas.forEach(u => {
-                        const opt = document.createElement('option');
-                        opt.value = u;
-                        opt.textContent = u;
-                        if (u === selectedUpazila) opt.selected = true;
-                        upazilaEl.appendChild(opt);
-                    });
+                    const districtsMap = divisionsMap?.[division] ?? {};
+                    const upazilas = Array.isArray(districtsMap?.[district]) ? districtsMap[district] : [];
+
+                    setOptions(upazilaEl, 'সব এলাকা', upazilas, selectedUpazila);
                 }
 
                 divisionEl.addEventListener('change', () => {
-                    // reset selected district/upazila on change
+                    document.getElementById('selectedDistrict').value = '';
+                    document.getElementById('selectedUpazila').value = '';
                     populateDistricts();
-                    populateUpazilas();
                 });
 
                 districtEl.addEventListener('change', () => {
+                    document.getElementById('selectedUpazila').value = '';
                     populateUpazilas();
                 });
 
-                // Initialize
-                if (!divisionEl.value && (data.divisions || []).length) {
-                    divisionEl.value = selectedDivision || data.divisions[0].name;
-                }
+                populateDivisions();
                 populateDistricts();
-                if (selectedDistrict) districtEl.value = selectedDistrict;
                 populateUpazilas();
-                if (selectedUpazila) upazilaEl.value = selectedUpazila;
-
             } catch (e) {
                 console.error('Failed to load locations JSON', e);
             }

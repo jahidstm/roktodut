@@ -1,15 +1,42 @@
 <?php
 
+use App\Http\Controllers\DonorRevealController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Donor/Recipient dashboard only
 Route::get('/dashboard', function () {
     return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+})->middleware(['auth', 'verified', 'role:donor,recipient'])->name('dashboard');
+
+// Admin dashboard
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard');
+})->middleware(['auth', 'verified', 'role:admin'])->name('admin.dashboard');
+
+// Org Admin dashboard
+Route::get('/org/dashboard', function () {
+    return view('org.dashboard');
+})->middleware(['auth', 'verified', 'role:org_admin'])->name('org.dashboard');
+
+// Search (AUTH_REQUIRED)
+Route::get('/search', [SearchController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('search');
+
+// Reveal endpoints (AUTH_REQUIRED)
+Route::post('/donors/{donor}/reveal/start', [DonorRevealController::class, 'start'])
+    ->middleware(['auth', 'verified'])
+    ->name('donors.reveal.start');
+
+Route::post('/donors/{donor}/reveal/verify', [DonorRevealController::class, 'verify'])
+    ->middleware(['auth', 'verified'])
+    ->name('donors.reveal.verify');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
