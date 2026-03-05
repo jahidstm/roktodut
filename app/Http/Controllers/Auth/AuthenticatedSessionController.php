@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
@@ -25,10 +26,17 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        $role = $request->user()?->role;
+
+        // Defensive Check: Handle both Enum object and string gracefully
+        $roleValue = $role instanceof UserRole ? $role->value : (string) ($role ?? '');
+
+        // Fetch route name from Enum method, fallback to default 'dashboard'
+        $routeName = UserRole::tryFrom($roleValue)?->dashboardRoute() ?? 'dashboard';
+
+        return redirect()->intended(route($routeName, absolute: false));
     }
 
     /**
@@ -39,7 +47,6 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');
