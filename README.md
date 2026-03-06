@@ -1,59 +1,72 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🩸 RoktoDut (রক্তদূত)
+> **বিশ্বাসযোগ্য রক্তদাতা খোঁজার একটি স্মার্ট, প্রাইভেসি-ফোকাসড ও অটোমেটেড প্ল্যাটফর্ম।**
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+[![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://mysql.com)
 
-## About Laravel
+## 📝 প্রজেক্ট ওভারভিউ
+**RoktoDut** প্রচলিত কোনো সাধারণ ব্লাড ব্যাংক ওয়েবসাইট নয়; এটি একটি ডাটা-ড্রিভেন স্মার্ট ইকোসিস্টেম। আমাদের মূল লক্ষ্য হলো ইমার্জেন্সি মুহূর্তে লগিন বা রেজিস্ট্রেশনের ঝামেলা ছাড়াই রোগীর সাথে ডোনারের যোগাযোগ করিয়ে দেওয়া, ডেটা স্ক্র্যাপিং থেকে ডোনারদের প্রাইভেসি রক্ষা করা এবং পুরো ডোনেশন প্রক্রিয়াটিকে অটোমেশনের মাধ্যমে নির্ভুল রাখা।
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🌟 বিস্তারিত ফিচার লিস্ট (Key Features)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### ১. ইউজার রোল ও এক্সেস কন্ট্রোল (User Ecosystem)
+সিস্টেমটি ৪ ধরনের ব্যবহারকারী দ্বারা পরিচালিত হবে:
+- **Donor (রক্তদাতা):** প্রোফাইল ম্যানেজ করবেন, রক্ত দিয়ে পয়েন্ট ও ব্যাজ অর্জন করবেন এবং রিয়েল-টাইম রিকোয়েস্ট পাবেন।
+- **Recipient (গ্রহীতা):** লগিন ছাড়াই রক্ত খুঁজবেন এবং রিকোয়েস্ট ক্রিয়েট করে ডোনারের সাথে যোগাযোগ করবেন।
+- **Org Admin (অর্গানাইজেশন):** ব্লাড ক্লাব বা হাসপাতাল তাদের মেম্বারদের ভেরিফাই ও ম্যানেজ করবেন।
+- **System Admin (কর্তৃপক্ষ):** এনআইডি ভেরিফিকেশন, রিপোর্ট মনিটরিং এবং সিস্টেম মেইনটেন্যান্স করবেন।
 
-## Learning Laravel
+### ২. স্মার্ট সার্চ ইঞ্জিন ও ইমার্জেন্সি রেসপন্স 🚑
+- **ওপেন এক্সেস (No Login Required):** ইমার্জেন্সি মুহূর্তে সময় বাঁচাতে লগিন ছাড়াই জেলা ও রক্তের গ্রুপ দিয়ে ডোনার খোঁজা যাবে।
+- **স্মার্ট সর্টিং অ্যালগরিদম (Priority Logic):** সার্চ রেজাল্ট এলোমেলো আসবে না। লিস্টটি নির্ভরতার ভিত্তিতে সাজানো হবে:
+    1. **Ready Now:** যারা রক্ত দিতে সম্পূর্ণ প্রস্তুত এবং অ্যাভেইলেবল।
+    2. **Org Verified:** ভেরিফাইড ব্লাড ক্লাব বা হাসপাতালের লিস্টেড মেম্বার।
+    3. **NID Verified:** এনআইডি ভেরিফিকেশন সম্পন্ন করা ট্রাস্টেড ডোনার।
+    4. **Regular:** সাধারণ ডোনার।
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### ৩. প্রাইভেসি শিল্ড ও সিকিউর কলিং 🛡️
+- **Data Privacy:** ডোনারের মোবাইল নম্বর পাবলিকলি সরাসরি দেখা যাবে না (যেমন: `017******89`)।
+- **Math Challenge:** নম্বর দেখার জন্য ব্যবহারকারীকে একটি ম্যাথ চ্যালেঞ্জ সমাধান করতে হবে। এটি স্প্যামিং এবং ডেটা স্ক্র্যাপার বট প্রতিরোধ করবে।
+- **Rate Limiting:** সুরক্ষার জন্য ১৫ মিনিটে সর্বোচ্চ ৫ বার ফোন নম্বর রিভিল করার লিমিটেশন সেট করা আছে।
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### ৪. ডাটা অটোমেশন ও ফ্রেশনেস লজিক (The Brain) 🧠
+- **Welcome Back Check:** ডোনার ৩০ দিনের বেশি সময় পর লগিন করলে একটি পপ-আপ প্রম্পট আসবে, যার মাধ্যমে তার সর্বশেষ স্ট্যাটাস আপডেট করা হবে।
+- **Auto Cooldown:** রক্তদানের পর ডোনারের স্ট্যাটাস অটোমেটিক **৪ মাসের জন্য Unavailable** হয়ে যাবে।
+- **Silent Approval:** ডোনেশন ক্লেইম করার ২৪ ঘণ্টার মধ্যে গ্রহীতা কোনো ডিসপুট (Dispute) না করলে, সিস্টেম সেটিকে সফল ডোনেশন হিসেবে অটো-অ্যাপ্রুভ করে নেবে।
 
-## Laravel Sponsors
+### ৫. অর্গানাইজেশন ম্যানেজমেন্ট প্যানেল 🏥
+- **Member Approval:** অর্গানাইজেশন অ্যাডমিন তাদের ক্লাবের মেম্বারদের প্রোফাইল রিভিউ এবং ভেরিফাই করতে পারবেন।
+- **Verified Tag:** সার্চ লিস্টে মেম্বারদের নামের পাশে ক্লাবের ট্রাস্ট ট্যাগ প্রদর্শিত হবে।
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### ৬. গেমফিকেশন: লিডারবোর্ড ও ব্যাজ 🏆
+- **ডায়নামিক লিডারবোর্ড:** কে কতবার রক্ত দিয়েছেন, তার ওপর ভিত্তি করে জাতীয় এবং জেলাভিত্তিক (National & District) লিডারবোর্ড।
+- **পয়েন্ট ও ব্যাজ সিস্টেম:** সফল ডোনেশন এবং সিস্টেম এনগেজমেন্টের ওপর ভিত্তি করে ডোনারদের পয়েন্ট ও বিভিন্ন মাইলস্টোন ব্যাজ প্রদান।
 
-### Premium Partners
+### ৭. ট্রাস্ট ও স্মার্ট ভেরিফিকেশন ✅
+- **NID Verification:** এনআইডি কার্ড আপলোড ও অ্যাডমিন ভেরিফিকেশনের মাধ্যমে প্রোফাইল ব্লু-ব্যাজ ভেরিফিকেশন।
+- **QR Code Smart Card:** ডোনারদের জন্য ডিজিটাল আইডেন্টিটি কার্ড এবং কিউআর কোড ইস্যু করা।
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### ৮. কমিউনিটি ও সাকসেস স্টোরি ❤️
+- **Success Stories:** রোগী এবং ডোনার রক্তদানের মুহূর্তের ছবি ও অভিজ্ঞতার গল্প শেয়ার করতে পারবেন।
+- **Health Blog:** রক্তদানের উপকারিতা ও স্বাস্থ্য সচেতনতা নিয়ে ডেডিকেটেড ব্লগ সেকশন।
 
-## Contributing
+---
 
-Thank you for considering contributing to the Laravel framework! The contribution guide in the [Laravel documentation](https://laravel.com/docs/contributions).
+## 🛠️ টেকনোলজি স্ট্যাক (Tech Stack)
+- **Backend Framework:** Laravel 11 (PHP 8.x)
+- **Frontend:** Blade Templates, Tailwind CSS 3, Alpine.js 3
+- **Bundler:** Vite 5
+- **Database:** MySQL 8.0
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 👥 ডেভেলপমেন্ট টিম (Team Members)
+| Name | Role / Contribution | GitHub Profile |
+| :--- | :--- | :--- |
+| **Jahid Hasan** | Lead Backend, Database Architecture, Security | [@jahidstm](https://github.com/jahidstm) |
+| **Md. Alif Khan** | Frontend Refactoring, API Integration, UI Components | [@3alif](https://github.com/3alif) |
+| **Nohzat Tabassum** | UI/UX, OAuth Integration, System Documentation | [@NohzatTabassum](https://github.com/NohzatTabassum) |
+| **Mst. Moumita Rahman Meem** | Database Seeders, Localization, Demo Data | [@Meem-1137](https://github.com/Meem-1137) |
