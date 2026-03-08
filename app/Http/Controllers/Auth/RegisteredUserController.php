@@ -27,23 +27,30 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.\App\Models\User::class],
+            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+            'role' => ['required', 'string', 'in:donor,recipient'],
+            'phone' => ['required_if:role,donor', 'nullable', 'string', 'max:20'],
+            'blood_group' => ['required_if:role,donor', 'nullable', 'string', 'in:A+,A-,B+,B-,O+,O-,AB+,AB-'],
         ]);
 
-        $user = User::create([
+        $user = \App\Models\User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'role' => $request->role,
+            'phone' => $request->role === 'donor' ? $request->phone : null,
+            'blood_group' => $request->role === 'donor' ? $request->blood_group : null,
+            'is_onboarded' => true, // ম্যানুয়াল রেজিস্ট্রেশনে অনবোর্ডিং ট্রু
         ]);
 
-        event(new Registered($user));
+        event(new \Illuminate\Auth\Events\Registered($user));
 
-        Auth::login($user);
+        \Illuminate\Support\Facades\Auth::login($user);
 
         return redirect(route('dashboard', absolute: false));
     }

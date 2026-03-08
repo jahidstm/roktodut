@@ -4,6 +4,8 @@ use App\Http\Controllers\DonorRevealController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\Auth\OnboardingController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -44,4 +46,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+require DIR.'/auth.php';
+
+// সোশ্যাল লগইন রাউট
+Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');
+Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])->name('social.callback');
+
+// অনবোর্ডিং রাউট (লগইন করা ইউজারদের জন্য)
+Route::middleware(['auth'])->group(function () {
+    Route::get('/onboarding', [OnboardingController::class, 'show'])->name('onboarding.show');
+    Route::post('/onboarding', [OnboardingController::class, 'store'])->name('onboarding.store');
+});

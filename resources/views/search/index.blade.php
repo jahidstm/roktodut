@@ -132,11 +132,11 @@
                                     @if(!$revealedPhone)
                                         <div class="mt-3">
                                             @if($target == $donorId && is_array($challenge))
-                                                {{-- Challenge Verify (AJAX) --}}
+                                                {{-- Challenge Verify Form --}}
                                                 <form method="POST"
+                                                      data-reveal-verify
                                                       action="{{ route('donors.reveal.verify', $donorId) }}"
-                                                      class="flex flex-col sm:flex-row gap-2 items-end"
-                                                      onsubmit="return window.__revealVerify(event, this);">
+                                                      class="flex flex-col sm:flex-row gap-2 items-end">
                                                     @csrf
                                                     <div class="flex-1">
                                                         <label class="block text-sm text-gray-700 mb-1">
@@ -145,9 +145,6 @@
                                                         <input type="number" name="answer" required
                                                             class="w-full rounded-md border-gray-300"
                                                             placeholder="উত্তর লিখুন">
-                                                        @error('answer')
-                                                            <div class="text-sm text-red-600 mt-1">{{ $message }}</div>
-                                                        @enderror
                                                     </div>
                                                     <button type="submit"
                                                         class="px-4 py-2 bg-gray-900 text-white rounded-md hover:bg-black">
@@ -155,9 +152,9 @@
                                                     </button>
                                                 </form>
                                             @else
-                                                {{-- Start Reveal (AJAX button) --}}
+                                                {{-- Reveal Start Button --}}
                                                 <button type="button"
-                                                    onclick="return window.__revealStart(event, '{{ route('donors.reveal.start', $donorId) }}');"
+                                                    data-reveal-start="{{ route('donors.reveal.start', $donorId) }}"
                                                     class="px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-50">
                                                     ফোন দেখুন
                                                 </button>
@@ -173,175 +170,4 @@
 
         </div>
     </div>
-
-    <script>
-        // ---------- Reveal: helpers ----------
-        window.__csrfToken = function () {
-            return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
-        };
-
-        window.__revealStart = async function (event, url) {
-            event.preventDefault();
-            event.stopPropagation();
-            event.stopImmediatePropagation();
-
-            const csrf = window.__csrfToken();
-
-            let res;
-            try {
-                res = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrf,
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                    },
-                    credentials: 'same-origin',
-                });
-            } catch (err) {
-                console.error('Reveal start network error:', err);
-                alert('সার্ভার এরর বা নেটওয়ার্ক সমস্যা!');
-                return false;
-            }
-
-            console.log('Reveal start response:', res.status);
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                // কন্ট্রোলার থেকে আসা JSON এরর মেসেজ শো করবে
-                alert(data.message || 'কোথাও কোনো সমস্যা হয়েছে!');
-                return false;
-            }
-
-            // Force refresh so session-based challenge appears
-            window.location.reload();
-            return false;
-        };
-
-        window.__revealVerify = async function (event, form) {
-            event.preventDefault();
-            event.stopPropagation();
-            event.stopImmediatePropagation();
-
-            const csrf = window.__csrfToken();
-            const formData = new FormData(form);
-
-            let res;
-            try {
-                res = await fetch(form.action, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrf,
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json',
-                    },
-                    credentials: 'same-origin',
-                    body: formData,
-                });
-            } catch (err) {
-                console.error('Reveal verify network error:', err);
-                alert('সার্ভার এরর বা নেটওয়ার্ক সমস্যা!');
-                return false;
-            }
-
-            console.log('Reveal verify response:', res.status);
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                // কন্ট্রোলার থেকে আসা JSON এরর মেসেজ শো করবে (যেমন: ভুল উত্তর)
-                alert(data.message || 'ভুল উত্তর বা সময় শেষ!');
-                return false;
-            }
-
-            // Success (200 OK) -> Phone will be unmasked
-            window.location.reload();
-            return false;
-        };
-
-        // ---------- Locations ----------
-        (async function () {
-            try {
-                const res = await fetch('/data/bd_locations.json', { cache: 'no-store' });
-                if (!res.ok) throw new Error('Locations JSON fetch failed: ' + res.status);
-
-                const data = await res.json();
-
-                const divisionEl = document.getElementById('division');
-                const districtEl = document.getElementById('district');
-                const upazilaEl = document.getElementById('upazila');
-
-                const selectedDivision = document.getElementById('selectedDivision').value || '';
-                const selectedDistrict = document.getElementById('selectedDistrict').value || '';
-                const selectedUpazila  = document.getElementById('selectedUpazila').value || '';
-
-                const divisionsMap = (data && data.divisions && typeof data.divisions === 'object')
-                    ? data.divisions
-                    : {};
-
-                function setOptions(el, placeholder, values, selectedValue = '') {
-                    el.innerHTML = '';
-                    const ph = document.createElement('option');
-                    ph.value = '';
-                    ph.textContent = placeholder;
-                    el.appendChild(ph);
-
-                    values.forEach(v => {
-                        const opt = document.createElement('option');
-                        opt.value = v;
-                        opt.textContent = v;
-                        if (v === selectedValue) opt.selected = true;
-                        el.appendChild(opt);
-                    });
-                }
-
-                function getDistrictsMapForSelectedDivision() {
-                    const division = divisionEl.value;
-                    const d = divisionsMap?.[division];
-                    return (d && typeof d === 'object') ? d : {};
-                }
-
-                function populateDivisions() {
-                    const divisionNames = Object.keys(divisionsMap);
-                    setOptions(divisionEl, 'সিলেক্ট করুন', divisionNames, selectedDivision);
-                }
-
-                function populateDistricts() {
-                    const districtsMap = getDistrictsMapForSelectedDivision();
-                    const districtNames = Object.keys(districtsMap);
-
-                    setOptions(districtEl, 'সিলেক্ট করুন', districtNames, selectedDistrict);
-                    setOptions(upazilaEl, 'সব এলাকা', [], selectedUpazila);
-                }
-
-                function populateUpazilas() {
-                    const division = divisionEl.value;
-                    const district = districtEl.value;
-
-                    const districtsMap = divisionsMap?.[division] ?? {};
-                    const upazilas = Array.isArray(districtsMap?.[district]) ? districtsMap[district] : [];
-
-                    setOptions(upazilaEl, 'সব এলাকা', upazilas, selectedUpazila);
-                }
-
-                divisionEl.addEventListener('change', () => {
-                    document.getElementById('selectedDistrict').value = '';
-                    document.getElementById('selectedUpazila').value = '';
-                    populateDistricts();
-                });
-
-                districtEl.addEventListener('change', () => {
-                    document.getElementById('selectedUpazila').value = '';
-                    populateUpazilas();
-                });
-
-                populateDivisions();
-                populateDistricts();
-                populateUpazilas();
-            } catch (e) {
-                console.error('Failed to load locations JSON', e);
-            }
-        })();
-    </script>
 </x-app-layout>
