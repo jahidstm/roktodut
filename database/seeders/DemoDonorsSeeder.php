@@ -14,7 +14,11 @@ class DemoDonorsSeeder extends Seeder
 {
     public function run(): void
     {
-        $path = public_path('data/bd-locations.json');
+        // Fix A: Correct JSON file path
+        $path = public_path('data/bd_locations.json');
+        if (!File::exists($path)) {
+            throw new \RuntimeException('Location file not found at: ' . $path);
+        }
         $json = json_decode(File::get($path), true);
 
         $divisionsObj = $json['divisions'] ?? [];
@@ -38,7 +42,8 @@ class DemoDonorsSeeder extends Seeder
         }
 
         if (count($pairs) === 0) {
-            throw new \RuntimeException('No district/upazila pairs found in public/data/bd-locations.json');
+            // Fix A: Updated error message file name
+            throw new \RuntimeException('No district/upazila pairs found in public/data/bd_locations.json');
         }
 
         $bloodGroupValues = array_map(fn($c) => $c->value, BloodGroup::cases());
@@ -53,12 +58,16 @@ class DemoDonorsSeeder extends Seeder
                 [
                     'name' => "Demo Donor {$i}",
                     'password' => Hash::make('password'),
-                    'phone' => '01' . str_pad((string) (100000000 + $i), 9, '0', STR_PAD_LEFT),
+                    // Fix B: Valid BD phone format
+                    'phone' => '017' . str_pad((string) $i, 8, '0', STR_PAD_LEFT),
                     'role' => UserRole::DONOR->value,
 
                     'blood_group' => $bg,
                     'district' => $pair['district'],
                     'upazila' => $pair['upazila'],
+
+                    // Fix C: Onboarding gate bypass
+                    'is_onboarded' => true,
 
                     'is_available' => true,
                     'is_ready_now' => $i % 6 === 0,
@@ -83,10 +92,12 @@ class DemoDonorsSeeder extends Seeder
                 'phone' => '01700000000',
                 'role' => UserRole::RECIPIENT->value,
 
-                // REQUIRED non-null
                 'blood_group' => BloodGroup::O_POS->value,
                 'district' => 'ঢাকা',
                 'upazila' => 'ধানমন্ডি',
+
+                // Fix C: Onboarding gate bypass
+                'is_onboarded' => true,
 
                 'is_available' => false,
                 'last_login_at' => now(),
@@ -97,7 +108,7 @@ class DemoDonorsSeeder extends Seeder
         // --- VERIFIED ROLE USERS FOR ASSESSMENT DEMO ---
         $verifiedAt = now()->subDay();
 
-        // Admin (must include required non-null fields: blood_group, district)
+        // Admin
         User::updateOrCreate(
             ['email' => 'admin@demo.test'],
             [
@@ -106,10 +117,12 @@ class DemoDonorsSeeder extends Seeder
                 'phone' => '01700000001',
                 'role' => UserRole::ADMIN->value,
 
-                // REQUIRED non-null user fields
                 'blood_group' => BloodGroup::O_POS->value,
                 'district' => 'ঢাকা',
                 'upazila' => 'ধানমন্ডি',
+
+                // Fix C: Onboarding gate bypass
+                'is_onboarded' => true,
 
                 'email_verified_at' => $verifiedAt,
                 'last_login_at' => now(),
@@ -118,7 +131,7 @@ class DemoDonorsSeeder extends Seeder
             ]
         );
 
-        // Organization Admin (must include required non-null fields)
+        // Organization Admin
         User::updateOrCreate(
             ['email' => 'orgadmin@demo.test'],
             [
@@ -127,10 +140,12 @@ class DemoDonorsSeeder extends Seeder
                 'phone' => '01700000002',
                 'role' => UserRole::ORG_ADMIN->value,
 
-                // REQUIRED non-null user fields
                 'blood_group' => BloodGroup::A_POS->value,
                 'district' => 'ঢাকা',
                 'upazila' => 'ধানমন্ডি',
+
+                // Fix C: Onboarding gate bypass
+                'is_onboarded' => true,
 
                 'email_verified_at' => $verifiedAt,
                 'last_login_at' => now(),
@@ -151,6 +166,9 @@ class DemoDonorsSeeder extends Seeder
                 'blood_group' => BloodGroup::O_POS->value,
                 'district' => 'ঢাকা',
                 'upazila' => 'ধানমন্ডি',
+
+                // Fix C: Onboarding gate bypass
+                'is_onboarded' => true,
 
                 'is_available' => true,
                 'is_ready_now' => true,
@@ -176,6 +194,9 @@ class DemoDonorsSeeder extends Seeder
                 'blood_group' => BloodGroup::A_POS->value,
                 'district' => 'ঢাকা',
                 'upazila' => 'ধানমন্ডি',
+
+                // Fix C: Onboarding gate bypass
+                'is_onboarded' => true,
 
                 'is_available' => false,
                 'email_verified_at' => $verifiedAt,

@@ -41,6 +41,11 @@ class User extends Authenticatable
         'nid_status',
         'last_login_at',
         'welcome_back_checked',
+
+        // ✅ Needed for onboarding + demo seeding + verified demo users
+        'is_onboarded',
+        'email_verified_at',
+        'remember_token',
     ];
 
     protected $hidden = [
@@ -64,6 +69,9 @@ class User extends Authenticatable
             'cooldown_until'    => 'datetime',
             'last_login_at'     => 'datetime',
             'date_of_birth'     => 'date',
+
+            // ✅ Onboarding flag used by middleware + donor feed gating
+            'is_onboarded'      => 'boolean',
         ];
     }
 
@@ -79,9 +87,13 @@ class User extends Authenticatable
         return $this->hasMany(BloodRequest::class, 'requested_by');
     }
 
+    /**
+     * ✅ FIX: Our schema uses donor_user_id in blood_request_responses.
+     * (Previous donor_id would silently break queries.)
+     */
     public function bloodRequestResponses(): HasMany
     {
-        return $this->hasMany(BloodRequestResponse::class, 'donor_id');
+        return $this->hasMany(BloodRequestResponse::class, 'donor_user_id');
     }
 
     public function badges(): BelongsToMany
@@ -121,19 +133,23 @@ class User extends Authenticatable
 
     // ==================== Helper Methods ====================
 
+    /**
+     * Optional hardening: avoid enum/string ambiguity.
+     * Your role is cast to UserRole enum, so this is safe either way.
+     */
     public function isDonor(): bool
     {
-        return $this->role === UserRole::DONOR;
+        return ($this->role?->value ?? null) === UserRole::DONOR->value;
     }
 
     public function isAdmin(): bool
     {
-        return $this->role === UserRole::ADMIN;
+        return ($this->role?->value ?? null) === UserRole::ADMIN->value;
     }
 
     public function isOrgAdmin(): bool
     {
-        return $this->role === UserRole::ORG_ADMIN;
+        return ($this->role?->value ?? null) === UserRole::ORG_ADMIN->value;
     }
 
     public function isInCooldown(): bool
