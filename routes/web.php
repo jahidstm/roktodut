@@ -1,59 +1,84 @@
 <?php
 
+use App\Http\Controllers\Auth\OnboardingController;
+use App\Http\Controllers\Auth\SocialAuthController;
+use App\Http\Controllers\BloodRequestController;
 use App\Http\Controllers\DonorRevealController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Auth\SocialAuthController;
-use App\Http\Controllers\Auth\OnboardingController;
+use Illuminate\Support\Facades\Auth;
 
+// --- 1) Landing Page (Guest) / Redirect Logic (Auth) ---
 Route::get('/', function () {
-    return view('welcome');
+    if (!Auth::check()) {
+        return view('home');
+    }
+
+    $user = Auth::user();
+
+    if (!$user || empty($user->email_verified_at)) {
+        // Your app has this route: GET verify-email (verification.notice)
+        if (Route::has('verification.notice')) {
+            return redirect()->route('verification.notice');
+        }
+
+        // Fallback: match your actual path
+        return redirect('/verify-email');
+    }
+
+    return redirect()->route('requests.index');
+})->name('home');
+
+// --- 2) Built-in auth routes (Breeze/Jetstream/etc) ---
+require __DIR__ . '/auth.php';
+
+// --- 3) Social login routes ---
+Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])
+    ->name('social.redirect');
+
+Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])
+    ->name('social.callback');
+
+// --- 4) Onboarding routes (authenticated users) ---
+// NOTE: Onboarding is usually allowed before email verification.
+// If you want strict policy, change middleware to ['auth','verified'].
+Route::middleware(['auth'])->group(function () {
+    Route::get('/onboarding', [OnboardingController::class, 'show'])->name('onboarding.show');
+    Route::post('/onboarding', [OnboardingController::class, 'store'])->name('onboarding.store');
 });
 
-// Donor/Recipient dashboard only
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified', 'role:donor,recipient'])->name('dashboard');
+// --- 5) Verified app routes ---
+Route::middleware(['auth', 'verified'])->group(function () {
 
-// Admin dashboard
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
-})->middleware(['auth', 'verified', 'role:admin'])->name('admin.dashboard');
+    // Requests (donor/recipient)
+    Route::get('/requests', [BloodRequestController::class, 'index'])->name('requests.index');
 
-// Org Admin dashboard
-Route::get('/org/dashboard', function () {
-    return view('org.dashboard');
-})->middleware(['auth', 'verified', 'role:org_admin'])->name('org.dashboard');
+    // Search
+    Route::get('/search', [SearchController::class, 'index'])->name('search');
 
-// Search (AUTH_REQUIRED)
-Route::get('/search', [SearchController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('search');
+    // Reveal endpoints
+    Route::post('/donors/{donor}/reveal/start', [DonorRevealController::class, 'start'])
+        ->name('donors.reveal.start');
 
-// Reveal endpoints (AUTH_REQUIRED)
-Route::post('/donors/{donor}/reveal/start', [DonorRevealController::class, 'start'])
-    ->middleware(['auth', 'verified'])
-    ->name('donors.reveal.start');
+    Route::post('/donors/{donor}/reveal/verify', [DonorRevealController::class, 'verify'])
+        ->name('donors.reveal.verify');
 
-Route::post('/donors/{donor}/reveal/verify', [DonorRevealController::class, 'verify'])
-    ->middleware(['auth', 'verified'])
-    ->name('donors.reveal.verify');
-
-Route::middleware('auth')->group(function () {
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__ . '/auth.php';
+// --- 6) Dashboards (role-based) ---
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified', 'role:donor,recipient'])->name('dashboard');
 
-// সোশ্যাল লগইন রাউট
-Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');
-Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])->name('social.callback');
+Route::get('/admin/dashboard', function () {
+    return view('admin.dashboard');
+})->middleware(['auth', 'verified', 'role:admin'])->name('admin.dashboard');
 
-// অনবোর্ডিং রাউট (লগইন করা ইউজারদের জন্য)
-Route::middleware(['auth'])->group(function () {
-    Route::get('/onboarding', [OnboardingController::class, 'show'])->name('onboarding.show');
-    Route::post('/onboarding', [OnboardingController::class, 'store'])->name('onboarding.store');
-});
+Route::get('/org/dashboard', function () {
+    return view('org.dashboard');
+})->middleware(['auth', 'verified', 'role:org_admin'])->name('org.dashboard');
