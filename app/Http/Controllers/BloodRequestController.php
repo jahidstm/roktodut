@@ -12,6 +12,8 @@ class BloodRequestController extends Controller
         $requests = BloodRequest::query()
             ->with(['requester:id,name'])
             ->where('status', 'pending')
+            ->orderByRaw('needed_at is null asc')
+            ->orderBy('needed_at')
             ->orderByDesc('created_at')
             ->paginate(12);
 

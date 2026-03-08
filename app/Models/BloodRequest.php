@@ -19,13 +19,16 @@ class BloodRequest extends Model
         'blood_group',
         'bags_needed',
         'hospital',
+        'division',
         'district',
+        'upazila',
         'thana',
         'address',
         'contact_name',
         'contact_number',
         'urgency',
-        'needed_by',
+        'needed_by',   // legacy/support
+        'needed_at',   // canonical
         'status',
         'notes',
     ];
@@ -36,6 +39,7 @@ class BloodRequest extends Model
             'blood_group' => BloodGroup::class,
             'urgency'     => UrgencyLevel::class,
             'needed_by'   => 'date',
+            'needed_at'   => 'datetime',
         ];
     }
 
