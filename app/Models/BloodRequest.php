@@ -35,7 +35,8 @@ class BloodRequest extends Model
         return [
             'blood_group' => BloodGroup::class,
             'urgency'     => UrgencyLevel::class,
-            'needed_by'   => 'date',
+            // 🚨 এখানেই মেইন ফিক্স: needed_by পরিবর্তন করে needed_at এবং datetime করা হয়েছে
+            'needed_at'   => 'datetime', 
         ];
     }
 

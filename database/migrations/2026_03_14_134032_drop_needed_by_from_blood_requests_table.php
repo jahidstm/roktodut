@@ -18,7 +18,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('blood_requests', function (Blueprint $table) {
-            // Recreate as nullable to avoid breaking rollbacks
             if (!Schema::hasColumn('blood_requests', 'needed_by')) {
                 $table->dateTime('needed_by')->nullable()->after('urgency');
             }

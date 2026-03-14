@@ -2,16 +2,18 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BloodRequestResponse extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'blood_request_id',
-        'donor_id',
+        'user_id',
         'status',
-        'message',
     ];
 
     public function bloodRequest(): BelongsTo
@@ -19,8 +21,8 @@ class BloodRequestResponse extends Model
         return $this->belongsTo(BloodRequest::class);
     }
 
-    public function donor(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'donor_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

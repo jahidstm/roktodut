@@ -9,58 +9,45 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Support\Facades\Route;
 
-// --- 1. Landing Page (Always Home) ---
-Route::get('/', function () {
-    return view('home');
-})->name('home');
+Route::get('/', fn () => view('home'))->name('home');
 
-// --- 2. Built-in auth routes ---
 require __DIR__ . '/auth.php';
 
-// --- 3. Social login routes ---
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');
 Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])->name('social.callback');
 
-// --- 4. Onboarding routes ---
 Route::middleware(['auth'])->group(function () {
     Route::get('/onboarding', [OnboardingController::class, 'show'])->name('onboarding.show');
     Route::post('/onboarding', [OnboardingController::class, 'store'])->name('onboarding.store');
 });
 
-// --- 5. Verified app routes ---
 Route::middleware(['auth', 'verified'])->group(function () {
-    
-    // Blood Requests (Resource routes)
     Route::resource('requests', BloodRequestController::class)->only(['index', 'create', 'store', 'show']);
 
-    // Blood Requests Actions (Respond & Fulfill)
     Route::post('/requests/{bloodRequest}/respond', [BloodRequestResponseController::class, 'store'])
         ->name('requests.respond');
+
     Route::post('/requests/{bloodRequest}/fulfill', [BloodRequestController::class, 'fulfill'])
         ->name('requests.fulfill');
 
-    // Search
     Route::get('/search', [SearchController::class, 'index'])->name('search');
 
-    // Donor Reveal
     Route::post('/donors/{donor}/reveal/start', [DonorRevealController::class, 'start'])->name('donors.reveal.start');
     Route::post('/donors/{donor}/reveal/verify', [DonorRevealController::class, 'verify'])->name('donors.reveal.verify');
 
-    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// --- 6. Dashboards (role-based) [RESTORED] ---
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified', 'role:donor,recipient'])->name('dashboard');
+Route::get('/dashboard', fn () => view('dashboard'))
+    ->middleware(['auth', 'verified', 'role:donor,recipient'])
+    ->name('dashboard');
 
-Route::get('/admin/dashboard', function () {
-    return view('admin.dashboard');
-})->middleware(['auth', 'verified', 'role:admin'])->name('admin.dashboard');
+Route::get('/admin/dashboard', fn () => view('admin.dashboard'))
+    ->middleware(['auth', 'verified', 'role:admin'])
+    ->name('admin.dashboard');
 
-Route::get('/org/dashboard', function () {
-    return view('org.dashboard');
-})->middleware(['auth', 'verified', 'role:org_admin'])->name('org.dashboard');
+Route::get('/org/dashboard', fn () => view('org.dashboard'))
+    ->middleware(['auth', 'verified', 'role:org_admin'])
+    ->name('org.dashboard');

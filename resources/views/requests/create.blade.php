@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
-@section('title', 'নতুন রক্তের রিকোয়েস্ট — রক্তদূত')
+@section('title', 'নতুন রক্তের রিকোয়েস্ট — রক্তদূত')
 
 @section('content')
 <div class="max-w-3xl">
-    <h1 class="text-2xl font-extrabold tracking-tight">নতুন রক্তের রিকোয়েস্ট</h1>
+    <h1 class="text-2xl font-extrabold tracking-tight">নতুন রক্তের রিকোয়েস্ট</h1>
     <p class="text-slate-500 font-medium mt-1">সঠিক তথ্য দিলে দ্রুত ডোনার রেসপন্স পাবে।</p>
 
     <div class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -23,10 +23,9 @@
                     <label class="text-sm font-extrabold text-slate-800">রক্তের গ্রুপ *</label>
                     <select name="blood_group" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-200">
                         <option value="">সিলেক্ট করুন</option>
-                        <option value="A+">A+</option><option value="A-">A-</option>
-                        <option value="B+">B+</option><option value="B-">B-</option>
-                        <option value="AB+">AB+</option><option value="AB-">AB-</option>
-                        <option value="O+">O+</option><option value="O-">O-</option>
+                        @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $group)
+                            <option value="{{ $group }}" @selected(old('blood_group') === $group)>{{ $group }}</option>
+                        @endforeach
                     </select>
                     @error('blood_group') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
                 </div>
@@ -41,7 +40,7 @@
                 </div>
 
                 <div>
-                    <label class="text-sm font-extrabold text-slate-800">ব্যাগ প্রয়োজন *</label>
+                    <label class="text-sm font-extrabold text-slate-800">ব্যাগ প্রয়োজন *</label>
                     <input type="number" min="1" name="bags_needed" value="{{ old('bags_needed', 1) }}"
                            class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-200" />
                     @error('bags_needed') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
@@ -90,12 +89,14 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label class="text-sm font-extrabold text-slate-800">জরুরিতা *</label>
-                    <select name="urgency" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-200">
+                    <select name="urgency"
+                            class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-200">
                         <option value="">সিলেক্ট করুন</option>
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                        <option value="critical">Critical</option>
+                        @foreach (\App\Enums\UrgencyLevel::cases() as $case)
+                            <option value="{{ $case->value }}" @selected(old('urgency') === $case->value)>
+                                {{ $case->label() }}
+                            </option>
+                        @endforeach
                     </select>
                     @error('urgency') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
                 </div>
@@ -116,7 +117,7 @@
             </div>
 
             <div class="flex items-center gap-3">
-                <button class="inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-extrabold shadow-sm shadow-red-200">
+                <button type="submit" class="inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-extrabold shadow-sm shadow-red-200">
                     সাবমিট
                 </button>
                 <a href="{{ route('requests.index') }}" class="font-extrabold text-slate-700 hover:text-red-600">
