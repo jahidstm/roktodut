@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\OnboardingController;
 use App\Http\Controllers\Auth\SocialAuthController;
 use App\Http\Controllers\BloodRequestController;
+use App\Http\Controllers\BloodRequestResponseController;
 use App\Http\Controllers\DonorRevealController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
@@ -28,14 +29,24 @@ Route::middleware(['auth'])->group(function () {
 
 // --- 5. Verified app routes ---
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Blood Requests (UI expects these resource routes)
+    
+    // Blood Requests (Resource routes)
     Route::resource('requests', BloodRequestController::class)->only(['index', 'create', 'store', 'show']);
 
+    // Blood Requests Actions (Respond & Fulfill)
+    Route::post('/requests/{bloodRequest}/respond', [BloodRequestResponseController::class, 'store'])
+        ->name('requests.respond');
+    Route::post('/requests/{bloodRequest}/fulfill', [BloodRequestController::class, 'fulfill'])
+        ->name('requests.fulfill');
+
+    // Search
     Route::get('/search', [SearchController::class, 'index'])->name('search');
 
+    // Donor Reveal
     Route::post('/donors/{donor}/reveal/start', [DonorRevealController::class, 'start'])->name('donors.reveal.start');
     Route::post('/donors/{donor}/reveal/verify', [DonorRevealController::class, 'verify'])->name('donors.reveal.verify');
 
+    // Profile
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
