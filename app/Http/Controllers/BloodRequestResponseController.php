@@ -6,11 +6,14 @@ use App\Models\BloodRequest;
 use App\Models\BloodRequestResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Gate;
 
 class BloodRequestResponseController extends Controller
 {
     public function store(Request $request, BloodRequest $bloodRequest)
     {
+        Gate::authorize('respond', $bloodRequest);
+
         $data = $request->validate([
             'status' => ['required', 'string', Rule::in(['accepted', 'declined'])],
         ]);
