@@ -61,9 +61,7 @@ class SocialAuthController extends Controller
             return redirect()->intended(route('requests.index'));
 
         } catch (Exception $e) {
-            // প্রোডাকশনে এরর ট্র্যাক করার জন্য লগিং
-            Log::error("Social Login Failed: " . $e->getMessage());
-            return redirect()->route('login')->with('error', 'সোশ্যাল লগইন ব্যর্থ হয়েছে। দয়া করে আবার চেষ্টা করুন।');
+            dd($e->getMessage());
         }
     }
 }

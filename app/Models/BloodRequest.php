@@ -25,7 +25,7 @@ class BloodRequest extends Model
         'contact_name',
         'contact_number',
         'urgency',
-        'needed_by',
+        'needed_at',
         'status',
         'notes',
     ];

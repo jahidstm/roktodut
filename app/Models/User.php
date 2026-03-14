@@ -46,6 +46,10 @@ class User extends Authenticatable
         'is_onboarded',
         'email_verified_at',
         'remember_token',
+
+        // ✅ Added for Social Login (Google OAuth)
+        'provider',
+        'provider_id',
     ];
 
     protected $hidden = [
