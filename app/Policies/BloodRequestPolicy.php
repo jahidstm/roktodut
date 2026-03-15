@@ -7,14 +7,17 @@ use App\Models\User;
 
 class BloodRequestPolicy
 {
+    public function view(User $user, BloodRequest $bloodRequest): bool
+    {
+        return true;
+    }
+
     public function respond(User $user, BloodRequest $bloodRequest): bool
     {
-        // নিজের রিকোয়েস্টে নিজে respond করার দরকার নেই
         if ((int) $bloodRequest->requested_by === (int) $user->id) {
             return false;
         }
 
-        // fulfilled/expired হলে respond করা যাবে না
         if (in_array($bloodRequest->status, ['fulfilled', 'expired'], true)) {
             return false;
         }
@@ -24,16 +27,27 @@ class BloodRequestPolicy
 
     public function markFulfilled(User $user, BloodRequest $bloodRequest): bool
     {
-        // শুধু owner পারবে
         if ((int) $bloodRequest->requested_by !== (int) $user->id) {
             return false;
         }
 
-        // already fulfilled/expired হলে না
         if (in_array($bloodRequest->status, ['fulfilled', 'expired'], true)) {
             return false;
         }
 
         return true;
+    }
+
+    public function viewAcceptedDonors(User $user, BloodRequest $bloodRequest): bool
+    {
+        if ((int) $bloodRequest->requested_by === (int) $user->id) {
+            return true;
+        }
+
+        if (method_exists($user, 'hasRole') && ($user->hasRole('admin') || $user->hasRole('org_admin'))) {
+            return true;
+        }
+
+        return false;
     }
 }

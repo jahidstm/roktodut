@@ -26,7 +26,9 @@
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
                 <div class="flex items-start justify-between gap-3">
                     <div class="min-w-0">
-                        <div class="text-lg font-extrabold truncate">{{ $r->patient_name ?? 'রোগী' }}</div>
+                        <a href="{{ route('requests.show', $r) }}" class="text-lg font-extrabold truncate hover:text-red-600">
+                            {{ $r->patient_name ?? 'রোগী' }}
+                        </a>
                         <div class="text-sm text-slate-500 font-medium truncate mt-1">{{ $r->hospital ?? 'হাসপাতাল উল্লেখ নেই' }}</div>
                     </div>
 

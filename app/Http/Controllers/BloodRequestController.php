@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreBloodRequestRequest;
 use App\Models\BloodRequest;
 use Illuminate\Http\Request;
-// 👇 নিশ্চিত করো এই লাইনটি আছে
 use Illuminate\Support\Facades\Gate;
 
 class BloodRequestController extends Controller
@@ -57,7 +56,6 @@ class BloodRequestController extends Controller
     public function fulfill(Request $request, BloodRequest $bloodRequest)
     {
         // মডার্ন লারাভেল স্ট্যান্ডার্ড অনুযায়ী গেট অথোরাইজেশন
-        // পলিসিতে মেথডের নাম 'markFulfilled' তাই এখানেও সেটি ব্যবহার করা হয়েছে
         Gate::authorize('markFulfilled', $bloodRequest);
 
         $bloodRequest->update([
@@ -67,9 +65,32 @@ class BloodRequestController extends Controller
         return back()->with('success', 'অভিনন্দন! রিকোয়েস্টটি সম্পন্ন (Fulfilled) মার্ক করা হয়েছে।');
     }
 
-    public function show(BloodRequest $bloodRequest)
+    /**
+     * রিকোয়েস্ট ডিটেইলস এবং এক্সেপ্টেড ডোনার লিস্ট দেখানো
+     */
+    public function show(Request $request, BloodRequest $bloodRequest)
     {
-        $bloodRequest->load('requester:id,name');
-        return view('requests.show', ['request' => $bloodRequest]);
+        // আগের ভুলের পুনরাবৃত্তি এড়াতে $this->authorize এর বদলে Gate::authorize ব্যবহার করা হলো
+        Gate::authorize('view', $bloodRequest);
+
+        // N+1 কোয়েরি এড়াতে ইগার-লোডিং (Eager Loading)
+        $bloodRequest->load([
+            'requester:id,name,phone',
+            'responses.user:id,name,phone',
+        ]);
+
+        $accepted = $bloodRequest->responses->where('status', 'accepted');
+        $declined = $bloodRequest->responses->where('status', 'declined');
+
+        // পলিসি চেক: কারেন্ট ইউজার কি এক্সেপ্টেড ডোনারদের দেখতে পারবে?
+        $canViewAcceptedDonors = $request->user()->can('viewAcceptedDonors', $bloodRequest);
+
+        return view('requests.show', [
+            'request' => $bloodRequest,
+            'acceptedResponses' => $canViewAcceptedDonors ? $accepted : collect(),
+            'acceptedCount' => $accepted->count(),
+            'declinedCount' => $declined->count(),
+            'canViewAcceptedDonors' => $canViewAcceptedDonors,
+        ]);
     }
 }
