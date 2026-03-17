@@ -13,10 +13,10 @@ class PhoneRevealLog extends Model
     protected $fillable = [
         'blood_request_id',
         'viewer_user_id',
-        'donor_user_id',
-        'revealed_at',
+        'donor_id',
         'ip',
         'user_agent',
+        'revealed_at',
     ];
 
     protected $casts = [

@@ -35,25 +35,34 @@ class BloodRequest extends Model
         return [
             'blood_group' => BloodGroup::class,
             'urgency'     => UrgencyLevel::class,
-            // 🚨 এখানেই মেইন ফিক্স: needed_by পরিবর্তন করে needed_at এবং datetime করা হয়েছে
             'needed_at'   => 'datetime', 
         ];
     }
 
+    /**
+     * রিকোয়েস্টের মালিক (Requester)
+     */
     public function requester(): BelongsTo
     {
+        // ফরেন কি 'requested_by' স্পষ্টভাবে ডিফাইন করা আছে, যা একদম সঠিক।
         return $this->belongsTo(User::class, 'requested_by');
     }
 
+    /**
+     * এই রিকোয়েস্টের বিপরীতে আসা ডোনারদের রেসপন্স
+     */
     public function responses(): HasMany
     {
-        return $this->hasMany(BloodRequestResponse::class);
+        // 🚨 আপডেট: 'blood_request_id' স্পষ্টভাবে বলে দেওয়া হলো যাতে কোনো ম্যাজিকের ওপর নির্ভর করতে না হয়।
+        return $this->hasMany(BloodRequestResponse::class, 'blood_request_id');
     }
 
     public function donations(): HasMany
     {
         return $this->hasMany(Donation::class);
     }
+
+    // --- Status Helpers ---
 
     public function isPending(): bool
     {

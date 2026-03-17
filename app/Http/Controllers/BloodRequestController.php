@@ -68,28 +68,30 @@ class BloodRequestController extends Controller
     /**
      * রিকোয়েস্ট ডিটেইলস এবং এক্সেপ্টেড ডোনার লিস্ট দেখানো
      */
-    public function show(Request $request, BloodRequest $bloodRequest)
+    public function show(\Illuminate\Http\Request $httpRequest, \App\Models\BloodRequest $bloodRequest)
     {
-        // আগের ভুলের পুনরাবৃত্তি এড়াতে $this->authorize এর বদলে Gate::authorize ব্যবহার করা হলো
+        // ❌ $this->authorize('view', $bloodRequest); // এটি এরর দেবে
+        // ✅ সঠিক পদ্ধতি:
         Gate::authorize('view', $bloodRequest);
 
-        // N+1 কোয়েরি এড়াতে ইগার-লোডিং (Eager Loading)
+        // IMPORTANT: always load responses for this bloodRequest
         $bloodRequest->load([
-            'requester:id,name,phone',
+            'requester:id,name',
             'responses.user:id,name,phone',
         ]);
 
-        $accepted = $bloodRequest->responses->where('status', 'accepted');
-        $declined = $bloodRequest->responses->where('status', 'declined');
+        // values() ব্যবহার করার ফলে কালেকশনের ইনডেক্সগুলো নতুন করে 0, 1, 2 তে সাজানো হবে
+        $accepted = $bloodRequest->responses->where('status', 'accepted')->values();
+        $declined = $bloodRequest->responses->where('status', 'declined')->values();
 
-        // পলিসি চেক: কারেন্ট ইউজার কি এক্সেপ্টেড ডোনারদের দেখতে পারবে?
-        $canViewAcceptedDonors = $request->user()->can('viewAcceptedDonors', $bloodRequest);
+        $canViewAcceptedDonors = $httpRequest->user()->can('viewAcceptedDonors', $bloodRequest);
 
         return view('requests.show', [
-            'request' => $bloodRequest,
-            'acceptedResponses' => $canViewAcceptedDonors ? $accepted : collect(),
+            // 🚨 'request' এর বদলে 'bloodRequest' নাম দিলাম যাতে কনফ্লিক্ট না হয়
+            'bloodRequest' => $bloodRequest, 
             'acceptedCount' => $accepted->count(),
             'declinedCount' => $declined->count(),
+            'acceptedResponses' => $canViewAcceptedDonors ? $accepted : collect(),
             'canViewAcceptedDonors' => $canViewAcceptedDonors,
         ]);
     }
