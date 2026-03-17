@@ -4,9 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Models\BloodRequest;          // 👈 নতুন যুক্ত করা হয়েছে
+use App\Models\PhoneRevealLog;        // 👈 নতুন যুক্ত করা হয়েছে
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;  // 👈 নতুন যুক্ত করা হয়েছে
 
 class DonorRevealController extends Controller
 {
@@ -39,6 +42,10 @@ class DonorRevealController extends Controller
     {
         return $role instanceof UserRole ? $role->value : (string) ($role ?? '');
     }
+
+    // ==========================================
+    // Public Donor Directory Reveal Methods
+    // ==========================================
 
     public function start(Request $request, User $donor)
     {
@@ -122,5 +129,47 @@ class DonorRevealController extends Controller
         }
 
         return back()->with('reveal_target', $donor->id);
+    }
+
+    // ==========================================
+    // Blood Request Specific Reveal Method
+    // ==========================================
+
+    /**
+     * রিকোয়েস্টের মালিক কর্তৃক ডোনারের ফোন নাম্বার রিভিল করার লজিক
+     */
+    public function revealPhone(Request $request, BloodRequest $bloodRequest, User $donor)
+    {
+        // ১. পলিসি এনফোর্সমেন্ট: শুধুমাত্র মালিক বা অ্যাডমিন দেখতে পারবে
+        Gate::authorize('viewAcceptedDonors', $bloodRequest);
+
+        // ২. ভ্যালিডেশন: ডোনার কি আসলেই এই রিকোয়েস্টটি এক্সেপ্ট করেছে?
+        $hasAccepted = $bloodRequest->responses()
+            ->where('user_id', $donor->id)
+            ->where('status', 'accepted')
+            ->exists();
+
+        abort_unless($hasAccepted, 403, 'এই ডোনার এখনো রিকোয়েস্ট এক্সেপ্ট করেননি।');
+
+        // ৩. লগিং: কে কখন কার নাম্বার দেখল তার রেকর্ড রাখা
+        PhoneRevealLog::firstOrCreate(
+            [
+                'blood_request_id' => $bloodRequest->id,
+                'viewer_user_id'   => $request->user()->id,
+                'donor_user_id'    => $donor->id,
+            ],
+            [
+                'revealed_at' => now(),
+                'ip'          => $request->ip(),
+                'user_agent'  => substr((string) $request->userAgent(), 0, 255),
+            ]
+        );
+
+        // ৪. রেসপন্স: জেসন ডেটা রিটার্ন করা (ফ্রন্টএন্ডের জন্য success ফ্লাগ সহ)
+        return response()->json([
+            'success'       => true,
+            'donor_user_id' => $donor->id,
+            'phone'         => $donor->phone ?? 'নাম্বার দেওয়া নেই',
+        ]);
     }
 }

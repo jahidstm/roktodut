@@ -27,8 +27,10 @@ Route::middleware(['auth'])->group(function () {
 // ভেরিফাইড ইউজারদের জন্য কোর ফিচারস
 Route::middleware(['auth', 'verified'])->group(function () {
     
-    // ১. ব্লাড রিকোয়েস্ট ম্যানেজমেন্ট (index, create, store, show এখানে অন্তর্ভুক্ত)
-    Route::resource('requests', BloodRequestController::class)->only(['index', 'create', 'store', 'show']);
+    // ১. ব্লাড রিকোয়েস্ট ম্যানেজমেন্ট (এখানে parameters যুক্ত করা হয়েছে যাতে {bloodRequest} ঠিকমতো কাজ করে)
+    Route::resource('requests', BloodRequestController::class)
+        ->parameters(['requests' => 'bloodRequest'])
+        ->only(['index', 'create', 'store', 'show']);
 
     // ২. রিকোয়েস্ট রেসপন্স (Accept/Decline)
     Route::post('/requests/{bloodRequest}/respond', [BloodRequestResponseController::class, 'store'])
