@@ -9,12 +9,16 @@ return new class extends Migration {
     {
         Schema::create('phone_reveal_logs', function (Blueprint $table) {
             $table->id();
+            // নতুন কলামগুলো
+            $table->foreignId('blood_request_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('viewer_user_id')->nullable()->constrained('users')->cascadeOnDelete();
+            
             $table->foreignId('donor_id')->constrained('users')->cascadeOnDelete();
-            $table->string('ip', 45);
+            
+            $table->string('ip', 45)->nullable();
+            $table->string('user_agent')->nullable();
+            $table->timestamp('revealed_at')->nullable();
             $table->timestamps();
-
-            $table->index(['ip', 'created_at']);
-            $table->index(['donor_id', 'created_at']);
         });
     }
 

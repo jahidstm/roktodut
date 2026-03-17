@@ -54,7 +54,7 @@ class BloodRequest extends Model
     public function responses(): HasMany
     {
         // 🚨 আপডেট: 'blood_request_id' স্পষ্টভাবে বলে দেওয়া হলো যাতে কোনো ম্যাজিকের ওপর নির্ভর করতে না হয়।
-        return $this->hasMany(BloodRequestResponse::class, 'blood_request_id');
+        return $this->hasMany(BloodRequestResponse::class, 'request_id');
     }
 
     public function donations(): HasMany

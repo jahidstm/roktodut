@@ -156,7 +156,7 @@ class DonorRevealController extends Controller
             [
                 'blood_request_id' => $bloodRequest->id,
                 'viewer_user_id'   => $request->user()->id,
-                'donor_user_id'    => $donor->id,
+                'donor_id'    => $donor->id,
             ],
             [
                 'revealed_at' => now(),
