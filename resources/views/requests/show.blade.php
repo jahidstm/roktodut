@@ -4,16 +4,11 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto">
-    
-    {{-- 🚨 Temporary Debug Line: এবার দেখবে আসল ডেটা চলে এসেছে 🚨 --}}
-    <div class="text-sm text-red-700 font-extrabold mb-4 p-3 bg-red-100 border border-red-300 rounded-lg">
-        [DEBUG] auth_id = {{ auth()->id() }} | requested_by = {{ $bloodRequest->requested_by }} | request_id = {{ $bloodRequest->id }}
-    </div>
 
     <div class="flex items-start justify-between gap-4 mb-6">
         <div>
             <h1 class="text-2xl font-extrabold tracking-tight">রিকোয়েস্ট ডিটেইলস</h1>
-            <p class="text-slate-500 font-medium mt-1">Accepted ডোনার লিস্ট (Reveal-flow সহ)</p>
+            <p class="text-slate-500 font-medium mt-1">Accepted ডোনার লিস্ট</p>
         </div>
 
         <a href="{{ route('requests.index') }}"

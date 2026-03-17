@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('contact_name');
             $table->string('contact_number', 15);
             $table->string('urgency')->default(UrgencyLevel::NORMAL->value);
-            $table->date('needed_by')->nullable();
+            $table->date('needed_at')->nullable();
             $table->string('status')->default('pending'); // pending, in_progress, fulfilled, expired
             $table->text('notes')->nullable();
             $table->timestamps();
