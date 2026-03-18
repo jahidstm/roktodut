@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto">
-
+    
     <div class="flex items-start justify-between gap-4 mb-6">
         <div>
             <h1 class="text-2xl font-extrabold tracking-tight">রিকোয়েস্ট ডিটেইলস</h1>
@@ -118,6 +118,7 @@ document.addEventListener('click', async (e) => {
     const targetEl = document.getElementById(targetId);
 
     btn.disabled = true;
+    const originalText = btn.textContent;
     btn.textContent = 'Revealing...';
     btn.classList.add('opacity-75', 'cursor-not-allowed');
 
@@ -130,24 +131,23 @@ document.addEventListener('click', async (e) => {
             }
         });
 
-        if (!res.ok) throw new Error('Failed to reveal');
-
         const data = await res.json();
-        
-        if (data.success || data.phone) {
-            targetEl.textContent = data.phone ?? 'N/A';
-            btn.textContent = 'Revealed';
-            btn.classList.replace('bg-red-600', 'bg-slate-400');
-            btn.classList.replace('hover:bg-red-700', 'hover:bg-slate-500');
-            btn.classList.remove('opacity-75', 'cursor-not-allowed');
-        } else {
-            throw new Error(data.message || 'Unknown error');
+
+        if (!res.ok || !data.success) {
+            throw new Error(data.message || 'নাম্বার দেখতে সমস্যা হচ্ছে। আবার চেষ্টা করুন।');
         }
+        
+        targetEl.textContent = data.phone ?? 'N/A';
+        btn.textContent = 'Revealed';
+        btn.classList.replace('bg-red-600', 'bg-slate-400');
+        btn.classList.replace('hover:bg-red-700', 'hover:bg-slate-500');
+        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+
     } catch (err) {
         btn.disabled = false;
-        btn.textContent = 'Reveal';
+        btn.textContent = originalText;
         btn.classList.remove('opacity-75', 'cursor-not-allowed');
-        alert('নাম্বার দেখতে সমস্যা হচ্ছে। আবার চেষ্টা করুন।');
+        alert(err.message);
     }
 });
 </script>
