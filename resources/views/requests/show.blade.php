@@ -4,17 +4,31 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto">
-
+    
     <div class="flex items-start justify-between gap-4 mb-6">
         <div>
             <h1 class="text-2xl font-extrabold tracking-tight">রিকোয়েস্ট ডিটেইলস</h1>
             <p class="text-slate-500 font-medium mt-1">Accepted ডোনার লিস্ট</p>
         </div>
 
-        <a href="{{ route('requests.index') }}"
-           class="shrink-0 inline-flex items-center justify-center border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 px-4 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
-            ফিডে ফিরে যান
-        </a>
+        <div class="flex items-center gap-3">
+            {{-- 🚨 নতুন লজিক: শুধুমাত্র মালিক দেখবে এবং স্ট্যাটাস fulfilled না হলেই বাটন দেখাবে --}}
+            @if(auth()->id() === $bloodRequest->requested_by && strtolower($bloodRequest->status) !== 'fulfilled')
+                <form action="{{ route('requests.fulfill', $bloodRequest->id) }}" method="POST">
+                    @csrf
+                    <button type="submit" 
+                            onclick="return confirm('আপনি কি নিশ্চিত যে রক্ত ম্যানেজ হয়ে গেছে?')" 
+                            class="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
+                        ✓ Mark as Fulfilled
+                    </button>
+                </form>
+            @endif
+
+            <a href="{{ route('requests.index') }}"
+               class="shrink-0 inline-flex items-center justify-center border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 px-4 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
+                ফিডে ফিরে যান
+            </a>
+        </div>
     </div>
 
     <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -118,6 +132,7 @@ document.addEventListener('click', async (e) => {
     const targetEl = document.getElementById(targetId);
 
     btn.disabled = true;
+    const originalText = btn.textContent;
     btn.textContent = 'Revealing...';
     btn.classList.add('opacity-75', 'cursor-not-allowed');
 
@@ -130,24 +145,23 @@ document.addEventListener('click', async (e) => {
             }
         });
 
-        if (!res.ok) throw new Error('Failed to reveal');
-
         const data = await res.json();
-        
-        if (data.success || data.phone) {
-            targetEl.textContent = data.phone ?? 'N/A';
-            btn.textContent = 'Revealed';
-            btn.classList.replace('bg-red-600', 'bg-slate-400');
-            btn.classList.replace('hover:bg-red-700', 'hover:bg-slate-500');
-            btn.classList.remove('opacity-75', 'cursor-not-allowed');
-        } else {
-            throw new Error(data.message || 'Unknown error');
+
+        if (!res.ok || !data.success) {
+            throw new Error(data.message || 'নাম্বার দেখতে সমস্যা হচ্ছে। আবার চেষ্টা করুন।');
         }
+        
+        targetEl.textContent = data.phone ?? 'N/A';
+        btn.textContent = 'Revealed';
+        btn.classList.replace('bg-red-600', 'bg-slate-400');
+        btn.classList.replace('hover:bg-red-700', 'hover:bg-slate-500');
+        btn.classList.remove('opacity-75', 'cursor-not-allowed');
+
     } catch (err) {
         btn.disabled = false;
-        btn.textContent = 'Reveal';
+        btn.textContent = originalText;
         btn.classList.remove('opacity-75', 'cursor-not-allowed');
-        alert('নাম্বার দেখতে সমস্যা হচ্ছে। আবার চেষ্টা করুন।');
+        alert(err.message);
     }
 });
 </script>

@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Gate;
 class BloodRequestController extends Controller
 {
     /**
-     * সকল পেন্ডিং রিকোয়েস্ট দেখায় (Eager Loading সহ)
+     * সকল পেন্ডিং রিকোয়েস্ট দেখায় (Eager Loading এবং Filtering সহ)
      */
     public function index(Request $request)
     {
@@ -21,7 +21,8 @@ class BloodRequestController extends Controller
                 'requester:id,name', 
                 'responses' => fn ($q) => $q->where('user_id', $userId),
             ])
-            ->where('status', 'pending')
+            // 🚨 এই লাইনটিই ম্যাজিক! Fulfilled রিকোয়েস্টগুলো অটো হাইড হয়ে যাবে
+            ->where('status', 'pending') 
             ->orderByRaw('needed_at is null asc')
             ->orderBy('needed_at')
             ->orderByDesc('created_at')
@@ -55,7 +56,7 @@ class BloodRequestController extends Controller
      */
     public function fulfill(Request $request, BloodRequest $bloodRequest)
     {
-        // মডার্ন লারাভেল স্ট্যান্ডার্ড অনুযায়ী গেট অথোরাইজেশন
+        // পলিসি এনফোর্সমেন্ট: তুমি markFulfilled ব্যবহার করেছো, যা অত্যন্ত প্রফেশনাল
         Gate::authorize('markFulfilled', $bloodRequest);
 
         $bloodRequest->update([
@@ -68,26 +69,21 @@ class BloodRequestController extends Controller
     /**
      * রিকোয়েস্ট ডিটেইলস এবং এক্সেপ্টেড ডোনার লিস্ট দেখানো
      */
-    public function show(\Illuminate\Http\Request $httpRequest, \App\Models\BloodRequest $bloodRequest)
+    public function show(Request $request, BloodRequest $bloodRequest)
     {
-        // ❌ $this->authorize('view', $bloodRequest); // এটি এরর দেবে
-        // ✅ সঠিক পদ্ধতি:
         Gate::authorize('view', $bloodRequest);
 
-        // IMPORTANT: always load responses for this bloodRequest
         $bloodRequest->load([
             'requester:id,name',
             'responses.user:id,name,phone',
         ]);
 
-        // values() ব্যবহার করার ফলে কালেকশনের ইনডেক্সগুলো নতুন করে 0, 1, 2 তে সাজানো হবে
         $accepted = $bloodRequest->responses->where('status', 'accepted')->values();
         $declined = $bloodRequest->responses->where('status', 'declined')->values();
 
-        $canViewAcceptedDonors = $httpRequest->user()->can('viewAcceptedDonors', $bloodRequest);
+        $canViewAcceptedDonors = $request->user()->can('viewAcceptedDonors', $bloodRequest);
 
         return view('requests.show', [
-            // 🚨 'request' এর বদলে 'bloodRequest' নাম দিলাম যাতে কনফ্লিক্ট না হয়
             'bloodRequest' => $bloodRequest, 
             'acceptedCount' => $accepted->count(),
             'declinedCount' => $declined->count(),
