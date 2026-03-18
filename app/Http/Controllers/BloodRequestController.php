@@ -10,22 +10,37 @@ use Illuminate\Support\Facades\Gate;
 class BloodRequestController extends Controller
 {
     /**
-     * সকল পেন্ডিং রিকোয়েস্ট দেখায় (Eager Loading সহ)
+     * সকল পেন্ডিং রিকোয়েস্ট দেখায় (Advanced Filtering ও Eager Loading সহ)
      */
     public function index(Request $request)
     {
         $userId = $request->user()->id;
 
-        $requests = BloodRequest::query()
+        $query = BloodRequest::query()
             ->with([
                 'requester:id,name', 
                 'responses' => fn ($q) => $q->where('user_id', $userId),
             ])
-            ->where('status', 'pending')
-            ->orderByRaw('needed_at is null asc')
+            ->where('status', 'pending');
+
+        // 🎯 স্মার্ট ফিল্টারিং লজিক (First-principles approach)
+        $query->when($request->filled('blood_group'), function ($q) use ($request) {
+            $q->where('blood_group', $request->blood_group);
+        });
+
+        $query->when($request->filled('district'), function ($q) use ($request) {
+            $q->where('district', 'like', '%' . $request->district . '%');
+        });
+
+        $query->when($request->filled('thana'), function ($q) use ($request) {
+            $q->where('thana', 'like', '%' . $request->thana . '%');
+        });
+
+        $requests = $query->orderByRaw('needed_at is null asc')
             ->orderBy('needed_at')
             ->orderByDesc('created_at')
-            ->paginate(12);
+            ->paginate(12)
+            ->withQueryString(); // 🚨 পেজিনেশনের সাথে ফিল্টার ডেটা ধরে রাখার জন্য ম্যান্ডেটরি
 
         return view('requests.index', compact('requests'));
     }
@@ -35,9 +50,6 @@ class BloodRequestController extends Controller
         return view('requests.create');
     }
 
-    /**
-     * নতুন রিকোয়েস্ট তৈরি করা
-     */
     public function store(StoreBloodRequestRequest $request)
     {
         $data = $request->validated();
@@ -50,12 +62,8 @@ class BloodRequestController extends Controller
         return redirect()->route('requests.index')->with('success', 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে।');
     }
 
-    /**
-     * রিকোয়েস্টটি Fulfilled মার্ক করা (Security Enforced)
-     */
     public function fulfill(Request $request, BloodRequest $bloodRequest)
     {
-        // মডার্ন লারাভেল স্ট্যান্ডার্ড অনুযায়ী গেট অথোরাইজেশন
         Gate::authorize('markFulfilled', $bloodRequest);
 
         $bloodRequest->update([
@@ -65,29 +73,21 @@ class BloodRequestController extends Controller
         return back()->with('success', 'অভিনন্দন! রিকোয়েস্টটি সম্পন্ন (Fulfilled) মার্ক করা হয়েছে।');
     }
 
-    /**
-     * রিকোয়েস্ট ডিটেইলস এবং এক্সেপ্টেড ডোনার লিস্ট দেখানো
-     */
-    public function show(\Illuminate\Http\Request $httpRequest, \App\Models\BloodRequest $bloodRequest)
+    public function show(Request $request, BloodRequest $bloodRequest)
     {
-        // ❌ $this->authorize('view', $bloodRequest); // এটি এরর দেবে
-        // ✅ সঠিক পদ্ধতি:
         Gate::authorize('view', $bloodRequest);
 
-        // IMPORTANT: always load responses for this bloodRequest
         $bloodRequest->load([
             'requester:id,name',
             'responses.user:id,name,phone',
         ]);
 
-        // values() ব্যবহার করার ফলে কালেকশনের ইনডেক্সগুলো নতুন করে 0, 1, 2 তে সাজানো হবে
         $accepted = $bloodRequest->responses->where('status', 'accepted')->values();
         $declined = $bloodRequest->responses->where('status', 'declined')->values();
 
-        $canViewAcceptedDonors = $httpRequest->user()->can('viewAcceptedDonors', $bloodRequest);
+        $canViewAcceptedDonors = $request->user()->can('viewAcceptedDonors', $bloodRequest);
 
         return view('requests.show', [
-            // 🚨 'request' এর বদলে 'bloodRequest' নাম দিলাম যাতে কনফ্লিক্ট না হয়
             'bloodRequest' => $bloodRequest, 
             'acceptedCount' => $accepted->count(),
             'declinedCount' => $declined->count(),

@@ -4,12 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
 use App\Models\User;
-use App\Models\BloodRequest;          // 👈 নতুন যুক্ত করা হয়েছে
-use App\Models\PhoneRevealLog;        // 👈 নতুন যুক্ত করা হয়েছে
+use App\Models\BloodRequest;
+use App\Models\PhoneRevealLog;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;  // 👈 নতুন যুক্ত করা হয়েছে
+use Illuminate\Support\Facades\Gate;
 
 class DonorRevealController extends Controller
 {
@@ -44,7 +44,7 @@ class DonorRevealController extends Controller
     }
 
     // ==========================================
-    // Public Donor Directory Reveal Methods
+    // Public Donor Directory Reveal Methods (Legacy/General)
     // ==========================================
 
     public function start(Request $request, User $donor)
@@ -62,8 +62,6 @@ class DonorRevealController extends Controller
             'expires_at' => now()->addMinutes(5)->timestamp,
         ]);
 
-        // === THE ARCHITECTURAL FIX ===
-        // AJAX রিকোয়েস্টের ক্ষেত্রেও পেজ রিলোড হওয়ার পর Blade-কে জানাতে হবে কার চ্যালেঞ্জ ফর্ম দেখাতে হবে
         $request->session()->flash('reveal_target', $donor->id);
 
         if ($request->expectsJson()) {
@@ -97,7 +95,6 @@ class DonorRevealController extends Controller
             return $this->deny($request, (int)$donor->id, 'ভুল উত্তর। আবার চেষ্টা করুন।', 422);
         }
 
-        // Rate limit: max 5 successful reveals / 15 minutes / IP
         $ip = $request->ip() ?? 'unknown';
         $windowStart = Carbon::now()->subMinutes(15);
 
@@ -132,18 +129,15 @@ class DonorRevealController extends Controller
     }
 
     // ==========================================
-    // Blood Request Specific Reveal Method
+    // Blood Request Specific Secure Reveal Method
     // ==========================================
 
-    /**
-     * রিকোয়েস্টের মালিক কর্তৃক ডোনারের ফোন নাম্বার রিভিল করার লজিক
-     */
     public function revealPhone(Request $request, BloodRequest $bloodRequest, User $donor)
     {
-        // ১. পলিসি এনফোর্সমেন্ট: শুধুমাত্র মালিক বা অ্যাডমিন দেখতে পারবে
+        // ১. পলিসি এনফোর্সমেন্ট
         Gate::authorize('viewAcceptedDonors', $bloodRequest);
 
-        // ২. ভ্যালিডেশন: ডোনার কি আসলেই এই রিকোয়েস্টটি এক্সেপ্ট করেছে?
+        // ২. ভ্যালিডেশন
         $hasAccepted = $bloodRequest->responses()
             ->where('user_id', $donor->id)
             ->where('status', 'accepted')
@@ -151,12 +145,32 @@ class DonorRevealController extends Controller
 
         abort_unless($hasAccepted, 403, 'এই ডোনার এখনো রিকোয়েস্ট এক্সেপ্ট করেননি।');
 
-        // ৩. লগিং: কে কখন কার নাম্বার দেখল তার রেকর্ড রাখা
+        // ৩. স্মার্ট রেট লিমিটিং: ১৫ মিনিটে সর্বোচ্চ ৫ জন ইউনিক ডোনারের নাম্বার দেখতে পারবে
+        $viewerId = $request->user()->id;
+        
+        $recentUniqueReveals = PhoneRevealLog::where('viewer_user_id', $viewerId)
+            ->where('created_at', '>=', now()->subMinutes(15))
+            ->distinct('donor_id')
+            ->count('donor_id');
+
+        $hasSeenThisDonorRecently = PhoneRevealLog::where('viewer_user_id', $viewerId)
+            ->where('donor_id', $donor->id)
+            ->where('created_at', '>=', now()->subMinutes(15))
+            ->exists();
+
+        if ($recentUniqueReveals >= 5 && !$hasSeenThisDonorRecently) {
+            return response()->json([
+                'success' => false,
+                'message' => 'নিরাপত্তার স্বার্থে আপনি ১৫ মিনিটে সর্বোচ্চ ৫ জন ডোনারের নাম্বার দেখতে পারবেন। কিছুক্ষণ পর আবার চেষ্টা করুন।'
+            ], 429);
+        }
+
+        // ৪. লগিং
         PhoneRevealLog::firstOrCreate(
             [
                 'blood_request_id' => $bloodRequest->id,
-                'viewer_user_id'   => $request->user()->id,
-                'donor_id'    => $donor->id,
+                'viewer_user_id'   => $viewerId,
+                'donor_id'         => $donor->id,
             ],
             [
                 'revealed_at' => now(),
@@ -165,7 +179,7 @@ class DonorRevealController extends Controller
             ]
         );
 
-        // ৪. রেসপন্স: জেসন ডেটা রিটার্ন করা (ফ্রন্টএন্ডের জন্য success ফ্লাগ সহ)
+        // ৫. রেসপন্স
         return response()->json([
             'success'       => true,
             'donor_user_id' => $donor->id,
