@@ -71,17 +71,25 @@
                         </form>
                     @endif
 
-                    {{-- Respond Section: মালিক ছাড়া অন্যরা দেখবে --}}
-                    @if (Route::has('requests.respond') && !$isOwner && $r->status !== 'fulfilled')
+                    {{-- Respond Section: মালিক ছাড়া অন্যরা দেখবে --}}
+                    @if (Route::has('requests.respond') && !$isOwner && strtolower($r->status) !== 'fulfilled')
                         @if (!$myResponse)
                             {{-- এখনো রেসপন্স করেনি --}}
-                            <form method="POST" action="{{ route('requests.respond', $r) }}">
-                                @csrf
-                                <input type="hidden" name="status" value="accepted" />
-                                <button class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm transition">
+                            
+                            {{-- 🚨 Eligibility Check --}}
+                            @if(auth()->user()->is_eligible_to_donate)
+                                <form method="POST" action="{{ route('requests.respond', $r) }}">
+                                    @csrf
+                                    <input type="hidden" name="status" value="accepted" />
+                                    <button class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm transition">
+                                        Accept
+                                    </button>
+                                </form>
+                            @else
+                                <button disabled title="আপনি রক্তদানের যোগ্য নন (ড্যাশবোর্ড চেক করুন)" class="px-4 py-2 rounded-lg bg-slate-200 text-slate-400 font-extrabold text-sm cursor-not-allowed border border-slate-300">
                                     Accept
                                 </button>
-                            </form>
+                            @endif
 
                             <form method="POST" action="{{ route('requests.respond', $r) }}">
                                 @csrf
@@ -112,13 +120,20 @@
                                     Declined
                                 </span>
 
-                                <form method="POST" action="{{ route('requests.respond', $r) }}">
-                                    @csrf
-                                    <input type="hidden" name="status" value="accepted" />
-                                    <button class="text-xs text-emerald-600 hover:text-emerald-700 font-bold underline transition">
-                                        Change to Accept
-                                    </button>
-                                </form>
+                                {{-- 🚨 Eligibility Check for changing mind --}}
+                                @if(auth()->user()->is_eligible_to_donate)
+                                    <form method="POST" action="{{ route('requests.respond', $r) }}">
+                                        @csrf
+                                        <input type="hidden" name="status" value="accepted" />
+                                        <button class="text-xs text-emerald-600 hover:text-emerald-700 font-bold underline transition">
+                                            Change to Accept
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="text-xs text-slate-400 font-bold cursor-not-allowed" title="আপনি রক্তদানের যোগ্য নন">
+                                        Cannot Accept
+                                    </span>
+                                @endif
                             </div>
                         @endif
                     @endif
