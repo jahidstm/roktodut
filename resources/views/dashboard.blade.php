@@ -4,16 +4,59 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
+    
     <div class="mb-8">
         <h1 class="text-2xl font-extrabold text-slate-900">স্বাগতম, {{ auth()->user()->name }}!</h1>
-        <p class="text-slate-500 font-medium">আপনার রক্তদান এবং রিকোয়েস্টের সংক্ষিপ্ত সারসংক্ষেপ।</p>
+        <p class="text-slate-500 font-medium mt-1">আপনার রক্তদান এবং রিকোয়েস্টের বিস্তারিত ড্যাশবোর্ড।</p>
+    </div>
+
+    @php
+        $user = auth()->user();
+        $isEligible = $user->is_eligible_to_donate;
+        $nextDate = $user->next_eligible_date;
+    @endphp
+
+    <div class="mb-10 bg-white p-6 rounded-3xl border {{ $isEligible ? 'border-emerald-200 shadow-emerald-50' : 'border-amber-200 shadow-amber-50' }} shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full {{ $isEligible ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600' }}">
+                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                </svg>
+            </div>
+            <div>
+                <h3 class="text-xl font-extrabold {{ $isEligible ? 'text-emerald-700' : 'text-amber-700' }}">
+                    {{ $isEligible ? 'আপনি রক্তদানের জন্য যোগ্য (Eligible)' : 'আপনি আপাতত রক্তদানের জন্য যোগ্য নন' }}
+                </h3>
+                <p class="text-sm font-semibold text-slate-500 mt-1">
+                    @if(!$user->last_donated_at)
+                        আমাদের সিস্টেমে আপনার পূর্বের রক্তদানের কোনো রেকর্ড নেই।
+                    @elseif($isEligible)
+                        আপনার সর্বশেষ রক্তদানের পর ৯০ দিন পার হয়ে গেছে।
+                    @else
+                        পরবর্তী রক্তদানের তারিখ: <span class="text-slate-800 font-extrabold">{{ $nextDate->format('d M, Y') }}</span> 
+                        (আর মাত্র <span class="text-red-600 font-extrabold">{{ now()->diffInDays($nextDate) }} দিন</span> বাকি)
+                    @endif
+                </p>
+            </div>
+        </div>
+
+        <form action="{{ route('donation.record.update') }}" method="POST" class="flex items-end gap-3 w-full md:w-auto">
+            @csrf
+            <div class="flex-1 md:w-48">
+                <label class="block text-xs font-bold text-slate-500 mb-1">শেষ রক্তদানের তারিখ আপডেট করুন</label>
+                <input type="date" name="last_donated_at" value="{{ $user->last_donated_at?->format('Y-m-d') }}" max="{{ date('Y-m-d') }}" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+            </div>
+            <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
+                সেভ
+            </button>
+        </form>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <div class="text-slate-500 text-sm font-bold uppercase tracking-wider">মোট রিকোয়েস্ট</div>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-4xl font-black text-slate-900">{{ $totalRequestsMade }}</span>
+                <span class="text-4xl font-black text-slate-900">{{ $totalRequestsMade ?? 0 }}</span>
                 <span class="text-slate-400 font-bold text-sm">টি</span>
             </div>
         </div>
@@ -21,7 +64,7 @@
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <div class="text-emerald-600 text-sm font-bold uppercase tracking-wider">আপনার অবদান</div>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-4xl font-black text-emerald-600">{{ $totalContributions }}</span>
+                <span class="text-4xl font-black text-emerald-600">{{ $totalContributions ?? 0 }}</span>
                 <span class="text-emerald-400 font-bold text-sm">বার</span>
             </div>
         </div>
@@ -29,7 +72,7 @@
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <div class="text-red-600 text-sm font-bold uppercase tracking-wider">সফল রিকোয়েস্ট</div>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-4xl font-black text-red-600">{{ $fulfilledRequests }}</span>
+                <span class="text-4xl font-black text-red-600">{{ $fulfilledRequests ?? 0 }}</span>
                 <span class="text-red-400 font-bold text-sm">টি</span>
             </div>
         </div>
@@ -37,7 +80,7 @@
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <div class="text-blue-600 text-sm font-bold uppercase tracking-wider">সফলতার হার</div>
             <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-4xl font-black text-blue-600">{{ $successRate }}</span>
+                <span class="text-4xl font-black text-blue-600">{{ $successRate ?? 0 }}</span>
                 <span class="text-blue-400 font-bold text-sm">%</span>
             </div>
         </div>
@@ -55,13 +98,13 @@
         </a>
     </div>
 
+    @if(isset($recentRequests))
     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
             <div>
                 <h2 class="text-lg font-extrabold text-slate-900">আপনার সাম্প্রতিক রিকোয়েস্টসমূহ</h2>
                 <p class="text-sm text-slate-500 font-medium mt-1">সর্বশেষ ৫টি রিকোয়েস্টের আপডেট</p>
             </div>
-            <a href="{{ route('requests.index', ['my_requests' => 1]) }}" class="text-sm font-bold text-red-600 hover:text-red-700 transition">সব দেখুন →</a>
         </div>
 
         <div class="overflow-x-auto">
@@ -88,9 +131,9 @@
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-1.5">
-                                    <span class="font-extrabold text-emerald-600">{{ $req->accepted_responses }}</span>
+                                    <span class="font-extrabold text-emerald-600">{{ $req->accepted_responses ?? 0 }}</span>
                                     <span class="text-slate-400">/</span>
-                                    <span class="font-semibold text-slate-500">{{ $req->total_responses }} জন</span>
+                                    <span class="font-semibold text-slate-500">{{ $req->total_responses ?? 0 }} জন</span>
                                 </div>
                             </td>
                             <td class="px-6 py-4">
@@ -114,7 +157,6 @@
                         <tr>
                             <td colspan="5" class="px-6 py-10 text-center">
                                 <div class="text-slate-500 font-medium mb-2">আপনি এখনো কোনো রক্তের রিকোয়েস্ট করেননি।</div>
-                                <a href="{{ route('requests.create') }}" class="text-red-600 font-bold hover:underline">প্রথম রিকোয়েস্ট তৈরি করুন</a>
                             </td>
                         </tr>
                     @endforelse
@@ -122,5 +164,6 @@
             </table>
         </div>
     </div>
+    @endif
 </div>
 @endsection

@@ -59,6 +59,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // রক্তদানের রেকর্ড আপডেট
+    Route::post('/donation-record', [\App\Http\Controllers\DonationRecordController::class, 'update'])
+        ->name('donation.record.update');
 });
 
 // ড্যাশবোর্ড রাউটস (রোল ভিত্তিক)
