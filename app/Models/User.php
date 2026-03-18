@@ -73,6 +73,7 @@ class User extends Authenticatable
             'cooldown_until'    => 'datetime',
             'last_login_at'     => 'datetime',
             'date_of_birth'     => 'date',
+            'last_donated_at' => 'date',
 
             // ✅ Onboarding flag used by middleware + donor feed gating
             'is_onboarded'      => 'boolean',
@@ -159,5 +160,22 @@ class User extends Authenticatable
     public function isInCooldown(): bool
     {
         return $this->cooldown_until && $this->cooldown_until->isFuture();
+    }
+
+    public function getNextEligibleDateAttribute()
+    {
+        return $this->last_donated_at ? $this->last_donated_at->copy()->addDays(90) : null;
+    }
+
+    /**
+     * বর্তমানে রক্ত দেওয়ার যোগ্য কি না সেটি ট্রু/ফলস রিটার্ন করে
+     */
+    public function getIsEligibleToDonateAttribute()
+    {
+        if (!$this->last_donated_at) {
+            return true; // আগে কখনো রক্ত না দিলে সে যোগ্য
+        }
+        
+        return now()->greaterThanOrEqualTo($this->next_eligible_date);
     }
 }
