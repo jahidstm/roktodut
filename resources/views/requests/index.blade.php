@@ -15,10 +15,50 @@
     </a>
 </div>
 
+{{-- 🎯 Advanced Filter Section (নতুন অ্যাড করা হয়েছে) --}}
+<div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8">
+    <form action="{{ route('requests.index') }}" method="GET" class="flex flex-col md:flex-row gap-4 items-end">
+        
+        <div class="w-full md:w-1/4">
+            <label for="blood_group" class="block text-sm font-bold text-slate-700 mb-1">রক্তের গ্রুপ</label>
+            <select name="blood_group" id="blood_group" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+                <option value="">সব গ্রুপ</option>
+                @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bg)
+                    <option value="{{ $bg }}" {{ request('blood_group') == $bg ? 'selected' : '' }}>{{ $bg }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="w-full md:w-1/4">
+            <label for="district" class="block text-sm font-bold text-slate-700 mb-1">জেলা</label>
+            <input type="text" name="district" id="district" value="{{ request('district') }}" placeholder="যেমন: Dhaka" 
+                   class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+        </div>
+
+        <div class="w-full md:w-1/4">
+            <label for="thana" class="block text-sm font-bold text-slate-700 mb-1">থানা/উপজেলা</label>
+            <input type="text" name="thana" id="thana" value="{{ request('thana') }}" placeholder="যেমন: Savar" 
+                   class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+        </div>
+
+        <div class="w-full md:w-1/4 flex gap-2">
+            <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
+                খুঁজুন
+            </button>
+            @if(request()->hasAny(['blood_group', 'district', 'thana']))
+                <a href="{{ route('requests.index') }}" class="shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-lg font-extrabold transition-colors flex items-center justify-center">
+                    ক্লিয়ার
+                </a>
+            @endif
+        </div>
+
+    </form>
+</div>
+
 @if ($requests->isEmpty())
     <div class="rounded-2xl border border-slate-200 bg-white p-10 text-center">
         <div class="text-slate-900 font-extrabold text-lg">কোনো পেন্ডিং রিকোয়েস্ট পাওয়া যায়নি</div>
-        <div class="text-slate-500 text-sm mt-2 font-medium">নতুন রিকোয়েস্ট তৈরি হলে এখানে দেখাবে।</div>
+        <div class="text-slate-500 text-sm mt-2 font-medium">নতুন রিকোয়েস্ট তৈরি হলে এখানে দেখাবে। অথবা আপনার ফিল্টার পরিবর্তন করে দেখতে পারেন।</div>
     </div>
 @else
     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -33,7 +73,7 @@
                     </div>
 
                     <div class="shrink-0 px-3 py-1 rounded-lg bg-red-50 text-red-700 border border-red-100 font-extrabold">
-                        {{ $r->blood_group->label() ?? $r->blood_group }}
+                        {{ $r->blood_group?->value ?? (string) $r->blood_group }}
                     </div>
                 </div>
 
@@ -62,7 +102,7 @@
                     @endphp
 
                     {{-- Fulfill Button: শুধুমাত্র রিকোয়েস্টের মালিক দেখবে --}}
-                    @if (Route::has('requests.fulfill') && $isOwner && $r->status !== 'fulfilled')
+                    @if (Route::has('requests.fulfill') && $isOwner && strtolower($r->status) !== 'fulfilled')
                         <form method="POST" action="{{ route('requests.fulfill', $r) }}">
                             @csrf
                             <button class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-extrabold text-sm shadow-sm transition">
@@ -71,8 +111,8 @@
                         </form>
                     @endif
 
-                    {{-- Respond Section: মালিক ছাড়া অন্যরা দেখবে --}}
-                    @if (Route::has('requests.respond') && !$isOwner && $r->status !== 'fulfilled')
+                    {{-- Respond Section: মালিক ছাড়া অন্যরা দেখবে --}}
+                    @if (Route::has('requests.respond') && !$isOwner && strtolower($r->status) !== 'fulfilled')
                         @if (!$myResponse)
                             {{-- এখনো রেসপন্স করেনি --}}
                             <form method="POST" action="{{ route('requests.respond', $r) }}">
