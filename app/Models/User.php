@@ -41,6 +41,7 @@ class User extends Authenticatable
         'nid_status',
         'last_login_at',
         'welcome_back_checked',
+        'last_donated_at',
 
         // ✅ Needed for onboarding + demo seeding + verified demo users
         'is_onboarded',
@@ -131,10 +132,10 @@ class User extends Authenticatable
     }
 
     // ✅ Corrected Relationship for CustomNotification
-    public function notifications(): HasMany
-    {
-        return $this->hasMany(CustomNotification::class);
-    }
+    // public function notifications(): HasMany
+    // {
+    //     return $this->hasMany(CustomNotification::class);
+    // }
 
     // ==================== Helper Methods ====================
 
