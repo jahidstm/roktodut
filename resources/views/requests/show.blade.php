@@ -5,18 +5,35 @@
 @section('content')
 <div class="max-w-5xl mx-auto">
     
-    <div class="flex items-start justify-between gap-4 mb-6">
+    {{-- হেডার সেকশন --}}
+    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
         <div>
             <h1 class="text-2xl font-extrabold tracking-tight">রিকোয়েস্ট ডিটেইলস</h1>
             <p class="text-slate-500 font-medium mt-1">Accepted ডোনার লিস্ট</p>
         </div>
 
-        <a href="{{ route('requests.index') }}"
-           class="shrink-0 inline-flex items-center justify-center border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 px-4 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
-            ফিডে ফিরে যান
-        </a>
+        <div class="flex items-center gap-3 shrink-0">
+            {{-- ৩. রিকোয়েস্ট ফুলফিলমেন্ট বাটন (শুধুমাত্র রিকোয়েস্টের মালিক দেখবে) --}}
+            @if(auth()->id() === $bloodRequest->requested_by && strtolower($bloodRequest->status) !== 'fulfilled')
+                <form action="{{ route('requests.fulfill', $bloodRequest) }}" method="POST" onsubmit="return confirm('আপনি কি রক্ত পেয়েছেন? এটি কনফার্ম করলে রিকোয়েস্টটি ক্লোজ হয়ে যাবে।')">
+                    @csrf
+                    <button type="submit" class="inline-flex items-center px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-extrabold rounded-lg shadow-sm shadow-emerald-200 transition">
+                        <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                        ✓ Mark as Fulfilled
+                    </button>
+                </form>
+            @endif
+
+            <a href="{{ route('requests.index') }}"
+               class="inline-flex items-center justify-center border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 px-4 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
+                ফিডে ফিরে যান
+            </a>
+        </div>
     </div>
 
+    {{-- রিকোয়েস্ট কার্ড --}}
     <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
         <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
@@ -56,6 +73,7 @@
     </div>
 
     <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+        {{-- রেসপন্স সামারি --}}
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="text-lg font-extrabold">রেসপন্স সারাংশ</div>
             <div class="mt-3 text-sm font-semibold text-slate-700">
@@ -64,6 +82,7 @@
             </div>
         </div>
 
+        {{-- ডোনার লিস্ট --}}
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="text-lg font-extrabold">Accepted ডোনার</div>
 
@@ -108,6 +127,7 @@
     </div>
 </div>
 
+{{-- Reveal Phone Number Script --}}
 <script>
 document.addEventListener('click', async (e) => {
     const btn = e.target.closest('.reveal-btn');
