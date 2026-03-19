@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 
 class User extends Authenticatable
 {
@@ -41,14 +42,13 @@ class User extends Authenticatable
         'nid_status',
         'last_login_at',
         'welcome_back_checked',
-        'last_donated_at',
+        'last_donated_at', // পুরনো কলাম
+        'last_donation_date', // ✅ নতুন কলাম (ইনস্ট্রাকশন অনুযায়ী যোগ করা হয়েছে)
 
-        // ✅ Needed for onboarding + demo seeding + verified demo users
         'is_onboarded',
         'email_verified_at',
         'remember_token',
 
-        // ✅ Added for Social Login (Google OAuth)
         'provider',
         'provider_id',
     ];
@@ -74,9 +74,8 @@ class User extends Authenticatable
             'cooldown_until'    => 'datetime',
             'last_login_at'     => 'datetime',
             'date_of_birth'     => 'date',
-            'last_donated_at' => 'date',
-
-            // ✅ Onboarding flag used by middleware + donor feed gating
+            'last_donated_at'   => 'date',
+            'last_donation_date'=> 'date', // ✅ কাস্ট ফিক্সড
             'is_onboarded'      => 'boolean',
         ];
     }
@@ -93,10 +92,6 @@ class User extends Authenticatable
         return $this->hasMany(BloodRequest::class, 'requested_by');
     }
 
-    /**
-     * ✅ FIX: Our schema uses donor_user_id in blood_request_responses.
-     * (Previous donor_id would silently break queries.)
-     */
     public function bloodRequestResponses(): HasMany
     {
         return $this->hasMany(BloodRequestResponse::class, 'donor_user_id');
@@ -131,18 +126,8 @@ class User extends Authenticatable
         return $this->hasMany(Blog::class, 'author_id');
     }
 
-    // ✅ Corrected Relationship for CustomNotification
-    // public function notifications(): HasMany
-    // {
-    //     return $this->hasMany(CustomNotification::class);
-    // }
-
     // ==================== Helper Methods ====================
 
-    /**
-     * Optional hardening: avoid enum/string ambiguity.
-     * Your role is cast to UserRole enum, so this is safe either way.
-     */
     public function isDonor(): bool
     {
         return ($this->role?->value ?? null) === UserRole::DONOR->value;
@@ -163,20 +148,39 @@ class User extends Authenticatable
         return $this->cooldown_until && $this->cooldown_until->isFuture();
     }
 
-    public function getNextEligibleDateAttribute()
+    /**
+     * ✅ ইনস্ট্রাকশন অনুযায়ী যোগ করা ৯০-দিনের মেডিকেল চেক
+     */
+    public function canDonate(): bool
     {
-        return $this->last_donated_at ? $this->last_donated_at->copy()->addDays(90) : null;
+        if (!$this->last_donation_date) {
+            return true;
+        }
+        
+        return $this->last_donation_date->copy()->addDays(90)->isPast();
     }
 
     /**
-     * বর্তমানে রক্ত দেওয়ার যোগ্য কি না সেটি ট্রু/ফলস রিটার্ন করে
+     * ✅ পরবর্তী রক্তদানের কাউন্টডাউন
      */
-    public function getIsEligibleToDonateAttribute()
+    public function daysUntilNextDonation(): int
     {
-        if (!$this->last_donated_at) {
-            return true; // আগে কখনো রক্ত না দিলে সে যোগ্য
+        if (!$this->last_donation_date) {
+            return 0;
         }
         
-        return now()->greaterThanOrEqualTo($this->next_eligible_date);
+        $nextDonationDate = $this->last_donation_date->copy()->addDays(90);
+        return max(0, (int) now()->diffInDays($nextDonationDate, false));
+    }
+
+    // পূর্বের অ্যাট্রিবিউট গেটারগুলো রাখা হয়েছে সামঞ্জস্যের জন্য
+    public function getNextEligibleDateAttribute()
+    {
+        return $this->last_donation_date ? $this->last_donation_date->copy()->addDays(90) : null;
+    }
+
+    public function getIsEligibleToDonateAttribute()
+    {
+        return $this->canDonate();
     }
 }
