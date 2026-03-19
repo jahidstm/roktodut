@@ -42,8 +42,7 @@ class User extends Authenticatable
         'nid_status',
         'last_login_at',
         'welcome_back_checked',
-        'last_donated_at', // পুরনো কলাম
-        'last_donation_date', // ✅ নতুন কলাম (ইনস্ট্রাকশন অনুযায়ী যোগ করা হয়েছে)
+        'last_donated_at', // এটিই এখন আমাদের মেইন কলাম
 
         'is_onboarded',
         'email_verified_at',
@@ -74,8 +73,7 @@ class User extends Authenticatable
             'cooldown_until'    => 'datetime',
             'last_login_at'     => 'datetime',
             'date_of_birth'     => 'date',
-            'last_donated_at'   => 'date',
-            'last_donation_date'=> 'date', // ✅ কাস্ট ফিক্সড
+            'last_donated_at'   => 'date', // নিশ্চিত করা হলো এটি ডেট হিসেবে কাস্ট হচ্ছে
             'is_onboarded'      => 'boolean',
         ];
     }
@@ -149,34 +147,36 @@ class User extends Authenticatable
     }
 
     /**
-     * ✅ ইনস্ট্রাকশন অনুযায়ী যোগ করা ৯০-দিনের মেডিকেল চেক
+     * ✅ ফিক্সড: এখন এটি last_donated_at চেক করবে (৯০ দিনের রুল)
      */
     public function canDonate(): bool
     {
-        if (!$this->last_donation_date) {
+        if (!$this->last_donated_at) {
             return true;
         }
         
-        return $this->last_donation_date->copy()->addDays(90)->isPast();
+        return $this->last_donated_at->copy()->addDays(90)->isPast();
     }
 
     /**
-     * ✅ পরবর্তী রক্তদানের কাউন্টডাউন
+     * ✅ ফিক্সড: পরবর্তী রক্তদানের কাউন্টডাউন
      */
     public function daysUntilNextDonation(): int
     {
-        if (!$this->last_donation_date) {
+        if (!$this->last_donated_at) {
             return 0;
         }
         
-        $nextDonationDate = $this->last_donation_date->copy()->addDays(90);
+        $nextDonationDate = $this->last_donated_at->copy()->addDays(90);
         return max(0, (int) now()->diffInDays($nextDonationDate, false));
     }
 
-    // পূর্বের অ্যাট্রিবিউট গেটারগুলো রাখা হয়েছে সামঞ্জস্যের জন্য
+    /**
+     * ড্যাশবোর্ড এবং ফ্রন্টএন্ডের জন্য সহজ অ্যাক্সেসর
+     */
     public function getNextEligibleDateAttribute()
     {
-        return $this->last_donation_date ? $this->last_donation_date->copy()->addDays(90) : null;
+        return $this->last_donated_at ? $this->last_donated_at->copy()->addDays(90) : null;
     }
 
     public function getIsEligibleToDonateAttribute()
