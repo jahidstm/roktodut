@@ -8,6 +8,7 @@ use App\Http\Controllers\DonorRevealController;
 use App\Http\Controllers\NotificationController; // 👈 নতুন কন্ট্রোলার ইমপোর্ট
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 use Illuminate\Support\Facades\Route;
 
 // পাবলিক রাউটস
@@ -77,3 +78,7 @@ Route::get('/admin/dashboard', fn () => view('admin.dashboard'))
 Route::get('/org/dashboard', fn () => view('org.dashboard'))
     ->middleware(['auth', 'verified', 'role:org_admin'])
     ->name('org.dashboard');
+
+Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
+    ->middleware(['auth', 'verified', 'role:admin']) 
+    ->name('admin.dashboard');
