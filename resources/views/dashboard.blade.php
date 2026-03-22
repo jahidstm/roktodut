@@ -6,7 +6,22 @@
 <div class="max-w-7xl mx-auto">
     
     <div class="mb-8">
-        <h1 class="text-2xl font-extrabold text-slate-900">স্বাগতম, {{ auth()->user()->name }}!</h1>
+        <div class="flex items-center gap-3">
+            <h1 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                স্বাগতম, {{ auth()->user()->name }}!
+                
+                @if(auth()->user()->verified_badge)
+                    <div class="group relative flex items-center justify-center cursor-help">
+                        <svg class="w-7 h-7 text-blue-500 drop-shadow-sm" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2.5 py-1 bg-slate-800 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+                            ভেরিফাইড ডোনার
+                        </span>
+                    </div>
+                @endif
+            </h1>
+        </div>
         <p class="text-slate-500 font-medium mt-1">আপনার রক্তদান এবং রিকোয়েস্টের বিস্তারিত ড্যাশবোর্ড।</p>
     </div>
 
@@ -132,13 +147,13 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-1.5">
                                     <span class="font-extrabold text-emerald-600">{{ $req->accepted_responses ?? 0 }}</span>
-                                    <span class="text-slate-400">/</span>
-                                    <span class="font-semibold text-slate-500">{{ $req->total_responses ?? 0 }} জন</span>
+                                    <span class="text-slate-400 font-bold">/</span>
+                                    <span class="font-semibold text-slate-500">{{ $req->total_responses ?? 0 }}</span>
                                 </div>
                             </td>
                             <td class="px-6 py-4">
                                 @if(strtolower($req->status) === 'fulfilled')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 uppercase">
                                         Fulfilled
                                     </span>
                                 @else
@@ -155,9 +170,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-10 text-center">
-                                <div class="text-slate-500 font-medium mb-2">আপনি এখনো কোনো রক্তের রিকোয়েস্ট করেননি।</div>
-                            </td>
+                            <td colspan="5" class="px-6 py-10 text-center text-slate-500 font-medium">আপনি এখনো কোনো রক্তের রিকোয়েস্ট করেননি।</td>
                         </tr>
                     @endforelse
                 </tbody>
