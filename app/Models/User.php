@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 
 class User extends Authenticatable
@@ -182,5 +183,21 @@ class User extends Authenticatable
     public function getIsEligibleToDonateAttribute()
     {
         return $this->canDonate();
+    }
+
+    // ১. Organization Relationship
+    public function organization()
+    {
+        return $this->belongsTo(Organization::class, 'organization_id');
+    }
+
+    // ২. 🚨 Security Scope: শুধু নিজ অর্গানাইজেশনের ইউজারদের ফিল্টার করার জন্য
+    public function scopeInSameOrganization($query)
+    {
+        // Auth Facade ব্যবহার করলে এডিটর আর এরর দেখাবে না
+        if (Auth::check() && Auth::user()->role === 'org_admin') {
+            return $query->where('organization_id', Auth::user()->organization_id);
+        }
+        return $query;
     }
 }

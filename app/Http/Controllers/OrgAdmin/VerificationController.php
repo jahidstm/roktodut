@@ -4,57 +4,43 @@ namespace App\Http\Controllers\OrgAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Notifications\DonorVerificationStatusNotification; // 👈 নতুন নোটিফিকেশন ক্লাস
 use Illuminate\Http\Request;
 
 class VerificationController extends Controller
 {
-    /**
-     * ডোনারের এনআইডি এবং ইনফরমেশন প্রিভিউ করা
-     */
-    public function show($id)
-    {
-        $donor = User::findOrFail($id);
-        
-        // সিকিউরিটি চেক
-        abort_if($donor->nid_status !== 'pending', 404, 'এই ডোনারের ভেরিফিকেশন স্ট্যাটাস রিভিউ করার যোগ্য নয়।');
-        
-        return view('org.verify', compact('donor'));
-    }
+    // ... show method ...
 
-    /**
-     * ভেরিফিকেশন অ্যাপ্রুভ করা (ব্লু-ব্যাজ প্রদান)
-     */
-    public function approve($id)
+    public function approve(Request $request, $id)
     {
         $donor = User::findOrFail($id);
-        
+
+        // 🚨 Anti-Hacking Guard: Cross-Organization Breach Prevention
+        if ($donor->organization_id !== auth()->user()->organization_id) {
+            abort(403, 'Security Violation: আপনি অন্য অর্গানাইজেশনের ডোনারকে ভেরিফাই করতে পারবেন না।');
+        }
+
+        // ভেরিফাই করা হলো
         $donor->update([
-            'nid_status' => 'approved',
-            'verified_badge' => true,
+            'is_verified' => true,
+            'verified_by' => auth()->id(), // কে ভেরিফাই করলো তার রেকর্ড রাখা ভালো
+            'verified_at' => now(),
         ]);
 
-        // 🔔 ডোনারকে নোটিফিকেশন পাঠানো হচ্ছে
-        $donor->notify(new DonorVerificationStatusNotification('approved'));
-
-        return redirect()->route('org.dashboard')->with('success', "{$donor->name}-এর একাউন্ট সফলভাবে ভেরিফাই করা হয়েছে এবং ব্লু-ব্যাজ যুক্ত করা হয়েছে!");
+        return back()->with('success', 'ডোনার প্রোফাইল সফলভাবে ভেরিফাই করা হয়েছে।');
     }
 
-    /**
-     * ভেরিফিকেশন রিজেক্ট বা বাতিল করা
-     */
-    public function reject($id)
+    public function reject(Request $request, $id)
     {
         $donor = User::findOrFail($id);
-        
-        $donor->update([
-            'nid_status' => 'rejected',
-            'verified_badge' => false,
-        ]);
 
-        // 🔔 ডোনারকে নোটিফিকেশন পাঠানো হচ্ছে
-        $donor->notify(new DonorVerificationStatusNotification('rejected'));
+        // 🚨 Anti-Hacking Guard
+        if ($donor->organization_id !== auth()->user()->organization_id) {
+            abort(403, 'Security Violation: Access Denied.');
+        }
 
-        return redirect()->route('org.dashboard')->with('error', "{$donor->name}-এর ভেরিফিকেশন রিকোয়েস্ট বাতিল করা হয়েছে।");
+        // রিজেক্ট লজিক (হতে পারে তুমি তাকে আনভেরিফাইড করবে বা অ্যাপ্লিকেশন মুছে দেবে)
+        $donor->update(['is_verified' => false]);
+
+        return back()->with('error', 'ডোনার অ্যাপ্লিকেশনটি বাতিল করা হয়েছে।');
     }
 }
