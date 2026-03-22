@@ -11,6 +11,7 @@ use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DonationRecordController;
+use App\Http\Controllers\OrgAdmin\DashboardController as OrgDashboardController;
 use Illuminate\Support\Facades\Route;
 
 // --- পাবলিক রাউটস ---
@@ -82,6 +83,6 @@ Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->name('admin.dashboard');
 
 // অর্গানাইজেশন অ্যাডমিন ড্যাশবোর্ড
-Route::get('/org/dashboard', fn () => view('org.dashboard'))
+Route::get('/org/dashboard', [OrgDashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'role:org_admin'])
     ->name('org.dashboard');
