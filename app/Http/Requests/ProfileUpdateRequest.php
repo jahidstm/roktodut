@@ -17,14 +17,16 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
-                Rule::unique(User::class)->ignore($this->user()->id),
-            ],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', \Illuminate\Validation\Rule::unique(\App\Models\User::class)->ignore($this->user()->id)],
+            
+            // 🎯 নতুন যুক্ত করা ডোনার ফিল্ডস
+            'phone' => ['nullable', 'string', 'max:20'],
+            'blood_group' => ['nullable', 'string', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
+            'district' => ['nullable', 'string', 'max:100'],
+            'thana' => ['nullable', 'string', 'max:100'],
+            'date_of_birth' => ['nullable', 'date', 'before:today'],
+            'gender' => ['nullable', 'string', 'in:male,female,other'],
+            'weight' => ['nullable', 'numeric', 'min:30', 'max:200'], // ওজন ৩০ থেকে ২০০ কেজির মধ্যে
         ];
     }
 }

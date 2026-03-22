@@ -1,29 +1,186 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('Profile') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-profile-information-form')
-                </div>
-            </div>
+@section('title', 'প্রোফাইল সেটিংস — রক্তদূত')
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.update-password-form')
-                </div>
-            </div>
-
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    @include('profile.partials.delete-user-form')
-                </div>
-            </div>
-        </div>
+@section('content')
+<div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+    
+    <div class="mb-8">
+        <h1 class="text-3xl font-black text-slate-900 tracking-tight">প্রোফাইল সেটিংস</h1>
+        <p class="text-slate-500 font-medium mt-2">আপনার ব্যক্তিগত তথ্য, ডোনার ডিটেইলস এবং পাসওয়ার্ড আপডেট করুন।</p>
     </div>
-</x-app-layout>
+
+    <div class="space-y-8">
+        
+        {{-- 🎯 ১. কমপ্লিট প্রোফাইল ও ডোনার ইনফরমেশন আপডেট ফর্ম --}}
+        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-red-600"></div>
+            <header class="mb-6">
+                <h2 class="text-xl font-extrabold text-slate-900">ব্যক্তিগত ও ডোনার তথ্য</h2>
+                <p class="text-sm text-slate-500 font-medium mt-1">রক্তদাতা হতে চাইলে ফর্মের সকল ফিল্ড সঠিকভাবে পূরণ করুন।</p>
+            </header>
+
+            <form id="send-verification" method="post" action="{{ route('verification.send') }}">
+                @csrf
+            </form>
+
+            <form method="post" action="{{ route('profile.update') }}" class="space-y-6">
+                @csrf
+                @method('patch')
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="name" class="block text-sm font-bold text-slate-700 mb-2">পূর্ণ নাম <span class="text-red-500">*</span></label>
+                        <input id="name" name="name" type="text" value="{{ old('name', $user->name) }}" required autocomplete="name" 
+                               class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
+                        @error('name') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-bold text-slate-700 mb-2">ইমেইল অ্যাড্রেস <span class="text-red-500">*</span></label>
+                        <input id="email" name="email" type="email" value="{{ old('email', $user->email) }}" required autocomplete="username"
+                               class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
+                        @error('email') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label for="phone" class="block text-sm font-bold text-slate-700 mb-2">মোবাইল নাম্বার</label>
+                        <input id="phone" name="phone" type="text" value="{{ old('phone', $user->phone) }}" placeholder="01XXXXXXXXX"
+                               class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
+                        @error('phone') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label for="blood_group" class="block text-sm font-bold text-slate-700 mb-2">রক্তের গ্রুপ</label>
+                        <select id="blood_group" name="blood_group" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
+                            <option value="">নির্বাচন করুন</option>
+                            @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bg)
+                                <option value="{{ $bg }}" {{ old('blood_group', $user->blood_group) == $bg ? 'selected' : '' }}>{{ $bg }}</option>
+                            @endforeach
+                        </select>
+                        @error('blood_group') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label for="district" class="block text-sm font-bold text-slate-700 mb-2">জেলা</label>
+                        <input id="district" name="district" type="text" value="{{ old('district', $user->district) }}" placeholder="যেমন: Dhaka"
+                               class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
+                        @error('district') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label for="thana" class="block text-sm font-bold text-slate-700 mb-2">থানা/উপজেলা</label>
+                        <input id="thana" name="thana" type="text" value="{{ old('thana', $user->thana) }}" placeholder="যেমন: Savar"
+                               class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
+                        @error('thana') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div>
+                        <label for="date_of_birth" class="block text-sm font-bold text-slate-700 mb-2">জন্ম তারিখ</label>
+                        <input id="date_of_birth" name="date_of_birth" type="date" value="{{ old('date_of_birth', $user->date_of_birth?->format('Y-m-d') ?? $user->date_of_birth) }}"
+                               class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
+                        @error('date_of_birth') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="gender" class="block text-sm font-bold text-slate-700 mb-2">লিঙ্গ</label>
+                            <select id="gender" name="gender" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
+                                <option value="">নির্বাচন করুন</option>
+                                <option value="male" {{ old('gender', $user->gender) == 'male' ? 'selected' : '' }}>পুরুষ</option>
+                                <option value="female" {{ old('gender', $user->gender) == 'female' ? 'selected' : '' }}>মহিলা</option>
+                            </select>
+                            @error('gender') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+                        <div>
+                            <label for="weight" class="block text-sm font-bold text-slate-700 mb-2">ওজন (কেজি)</label>
+                            <input id="weight" name="weight" type="number" step="0.1" value="{{ old('weight', $user->weight) }}" placeholder="যেমন: 65"
+                                   class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
+                            @error('weight') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+                </div>
+
+                {{-- ইমেইল ভেরিফিকেশন মেসেজ --}}
+                @if ($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! $user->hasVerifiedEmail())
+                    <div class="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
+                        <p class="text-sm font-semibold text-amber-800">
+                            আপনার ইমেইল অ্যাড্রেসটি ভেরিফাইড নয়।
+                            <button form="send-verification" class="underline text-red-600 hover:text-red-800 font-extrabold ml-1 transition">
+                                ভেরিফিকেশন ইমেইল আবার পাঠাতে এখানে ক্লিক করুন।
+                            </button>
+                        </p>
+                        @if (session('status') === 'verification-link-sent')
+                            <p class="mt-2 text-xs font-black text-emerald-600">
+                                একটি নতুন ভেরিফিকেশন লিংক আপনার ইমেইলে পাঠানো হয়েছে।
+                            </p>
+                        @endif
+                    </div>
+                @endif
+
+                <div class="flex items-center gap-4 pt-4 border-t border-slate-100">
+                    <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-xl text-sm font-extrabold transition shadow-sm">
+                        সেভ করুন
+                    </button>
+
+                    @if (session('status') === 'profile-updated')
+                        <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)" class="text-sm font-extrabold text-emerald-600 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            প্রোফাইল আপডেট হয়েছে!
+                        </p>
+                    @endif
+                </div>
+            </form>
+        </div>
+
+        {{-- 🎯 ২. পাসওয়ার্ড পরিবর্তন ফর্ম (আগের কোডটি এখানে থাকবে) --}}
+        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-slate-800"></div>
+            <header class="mb-6">
+                <h2 class="text-xl font-extrabold text-slate-900">পাসওয়ার্ড পরিবর্তন</h2>
+                <p class="text-sm text-slate-500 font-medium mt-1">অ্যাকাউন্টের নিরাপত্তা নিশ্চিত করতে একটি শক্তিশালী পাসওয়ার্ড ব্যবহার করুন।</p>
+            </header>
+
+            <form method="post" action="{{ route('password.update') }}" class="space-y-6 max-w-xl">
+                @csrf
+                @method('put')
+
+                <div>
+                    <label for="update_password_current_password" class="block text-sm font-bold text-slate-700 mb-2">বর্তমান পাসওয়ার্ড</label>
+                    <input id="update_password_current_password" name="current_password" type="password" autocomplete="current-password"
+                           class="w-full rounded-xl border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 font-semibold text-slate-800 px-4 py-3">
+                    @error('current_password', 'updatePassword') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label for="update_password_password" class="block text-sm font-bold text-slate-700 mb-2">নতুন পাসওয়ার্ড</label>
+                    <input id="update_password_password" name="password" type="password" autocomplete="new-password"
+                           class="w-full rounded-xl border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 font-semibold text-slate-800 px-4 py-3">
+                    @error('password', 'updatePassword') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div>
+                    <label for="update_password_password_confirmation" class="block text-sm font-bold text-slate-700 mb-2">কনফার্ম নতুন পাসওয়ার্ড</label>
+                    <input id="update_password_password_confirmation" name="password_confirmation" type="password" autocomplete="new-password"
+                           class="w-full rounded-xl border-slate-300 shadow-sm focus:border-slate-500 focus:ring-slate-500 font-semibold text-slate-800 px-4 py-3">
+                    @error('password_confirmation', 'updatePassword') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="flex items-center gap-4 pt-2">
+                    <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-xl text-sm font-extrabold transition shadow-sm">
+                        পাসওয়ার্ড আপডেট করুন
+                    </button>
+
+                    @if (session('status') === 'password-updated')
+                        <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)" class="text-sm font-extrabold text-emerald-600 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            পাসওয়ার্ড পরিবর্তিত হয়েছে!
+                        </p>
+                    @endif
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+@endsection
