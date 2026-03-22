@@ -74,9 +74,9 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <button class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-black hover:bg-blue-700 transition-all shadow-sm">
+                                <a href="{{ route('org.donor.verify', $user->id) }}" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-black hover:bg-blue-700 transition-all shadow-sm">
                                     ডকুমেন্ট দেখুন
-                                </button>
+                                </a>
                             </td>
                         </tr>
                     @empty
