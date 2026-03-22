@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>রক্তদূত — জরুরি রক্ত সহায়তা</title>
+    <title>রক্তদূত — জরুরি রক্ত সহায়তা</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,6 @@
 </head>
 
 <body class="bg-slate-50 text-slate-900 antialiased overflow-x-hidden">
-    <!-- Navbar -->
     <header class="sticky top-0 z-50 bg-white/80 backdrop-blur border-b border-slate-100">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-4 flex items-center justify-between">
             <a href="{{ route('home') }}" class="flex items-center gap-3">
@@ -26,7 +25,7 @@
                 </div>
                 <div class="leading-tight">
                     <div class="text-lg font-extrabold tracking-tight">রক্তদূত</div>
-                    <div class="text-xs text-slate-500 font-semibold">ইমার্জেন্সি ব্লাড নেটওয়ার্ক</div>
+                    <div class="text-xs text-slate-500 font-semibold">ইমার্জেন্সি ব্লাড নেটওয়ার্ক</div>
                 </div>
             </a>
 
@@ -34,33 +33,51 @@
                 <a href="{{ route('home') }}" class="text-red-600">হোম</a>
                 <a href="#donate" class="hover:text-red-600 transition">রক্ত দিন</a>
                 <a href="#urgent" class="hover:text-red-600 transition">জরুরি অনুরোধ</a>
-                <a href="{{ route('login') }}" class="hover:text-red-600 transition">ডোনার ফিড</a>
+                <a href="{{ route('requests.index') }}" class="hover:text-red-600 transition">ডোনার ফিড</a>
             </nav>
 
+            {{-- 🎯 Dynamic Auth Buttons --}}
             <div class="flex items-center gap-3">
-                <a href="{{ route('login') }}"
-                   class="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-slate-700 hover:text-red-600 transition">
-                    লগইন
-                </a>
+                @guest
+                    <a href="{{ route('login') }}"
+                       class="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-slate-700 hover:text-red-600 transition">
+                        লগইন
+                    </a>
 
-                <a href="{{ route('register') }}"
-                   class="inline-flex items-center justify-center bg-red-600 text-white px-5 py-2.5 rounded-lg font-extrabold hover:bg-red-700 transition shadow-sm shadow-red-200">
-                    রেজিস্টার
-                </a>
+                    <a href="{{ route('register') }}"
+                       class="inline-flex items-center justify-center bg-red-600 text-white px-5 py-2.5 rounded-lg font-extrabold hover:bg-red-700 transition shadow-sm shadow-red-200">
+                        রেজিস্টার
+                    </a>
+                @endguest
+
+                @auth
+                    @php
+                        $dashboardRoute = auth()->user()->role === 'org_admin' ? route('org.dashboard') : route('dashboard');
+                    @endphp
+                    
+                    <a href="{{ route('profile.edit') }}"
+                       class="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-slate-700 hover:text-red-600 transition">
+                        প্রোফাইল
+                    </a>
+
+                    <a href="{{ $dashboardRoute }}"
+                       class="inline-flex items-center justify-center bg-slate-900 text-white px-5 py-2.5 rounded-lg font-extrabold hover:bg-slate-800 transition shadow-sm gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        ড্যাশবোর্ড
+                    </a>
+                @endauth
             </div>
         </div>
     </header>
 
-    <!-- Hero -->
     <section class="relative bg-white overflow-hidden">
         <div class="absolute inset-0 bg-gradient-to-b from-red-50 via-white to-white"></div>
 
         <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 pt-16 pb-28 lg:pt-24 lg:pb-36">
             <div class="flex flex-col lg:flex-row items-center gap-14">
-                <!-- Text -->
                 <div class="lg:w-1/2 text-center lg:text-left">
                     <span class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-red-100">
-                        ইমার্জেন্সি ব্লাড ডোনেশন নেটওয়ার্ক
+                        ইমার্জেন্সি ব্লাড ডোনেশন নেটওয়ার্ক
                     </span>
 
                     <h1 class="mt-6 text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.12] tracking-tight">
@@ -69,17 +86,17 @@
                     </h1>
 
                     <p class="mt-6 text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-medium">
-                        রক্তদূত প্ল্যাটফর্মের মাধ্যমে আপনার এলাকার ভেরিফায়েড ডোনারদের সাথে দ্রুত সংযোগ করুন।
+                        রক্তদূত প্ল্যাটফর্মের মাধ্যমে আপনার এলাকার ভেরিফায়েড ডোনারদের সাথে দ্রুত সংযোগ করুন।
                         রক্ত দিন, জীবন বাঁচান।
                     </p>
 
                     <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                        <a href="{{ route('register') }}"
+                        <a href="{{ route('requests.create') }}"
                            class="inline-flex items-center justify-center bg-red-600 text-white px-7 py-3.5 rounded-lg font-extrabold shadow-sm shadow-red-200 hover:bg-red-700 transition">
-                            রক্তের রিকোয়েস্ট করুন
+                            রক্তের রিকোয়েস্ট করুন
                         </a>
 
-                        <a href="{{ route('login') }}"
+                        <a href="{{ route('requests.index') }}"
                            class="inline-flex items-center justify-center border-2 border-red-600 text-red-600 px-7 py-3.5 rounded-lg font-extrabold hover:bg-red-50 transition">
                             ডোনার ফিড দেখুন
                         </a>
@@ -87,12 +104,11 @@
 
                     <div class="mt-10 flex flex-wrap justify-center lg:justify-start gap-3 text-xs font-semibold text-slate-600">
                         <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200">OTP রিভিল</span>
-                        <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200">ভেরিফায়েড ইউজার</span>
+                        <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200">ভেরিফায়েড ইউজার</span>
                         <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200">জেলা-ভিত্তিক ম্যাচ</span>
                     </div>
                 </div>
 
-                <!-- Illustration -->
                 <div class="lg:w-1/2 flex justify-center relative">
                     <div class="relative w-72 h-72 md:w-96 md:h-96 bg-red-50 rounded-full flex items-center justify-center">
                         <div class="absolute inset-0 border-[18px] border-white rounded-full shadow-2xl z-10"></div>
@@ -112,26 +128,25 @@
         </div>
     </section>
 
-    <!-- Quick search -->
     <section class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 relative -mt-16 md:-mt-20">
         <div class="bg-white rounded-2xl shadow-xl border border-slate-100 p-6 md:p-8">
             <div class="flex items-center justify-between gap-4 mb-4">
                 <h3 class="text-lg font-extrabold text-slate-800">দ্রুত অনুসন্ধান করুন</h3>
-                <span class="text-xs font-semibold text-slate-500">(লগইন + ভেরিফিকেশন প্রয়োজন)</span>
+                <span class="text-xs font-semibold text-slate-500">(লগইন + ভেরিফিকেশন প্রয়োজন)</span>
             </div>
 
-            <form action="{{ route('login') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <form action="{{ route('search') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4">
                 <select class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200">
                     <option>বিভাগ নির্বাচন</option>
                     <option>ঢাকা</option><option>চট্টগ্রাম</option><option>রাজশাহী</option><option>খুলনা</option>
-                    <option>সিলেট</option><option>বরিশাল</option><option>রংপুর</option><option>ময়মনসিংহ</option>
+                    <option>সিলেট</option><option>বরিশাল</option><option>রংপুর</option><option>ময়মনসিংহ</option>
                 </select>
                 <select class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200">
                     <option>জেলা নির্বাচন</option>
                     <option>ঢাকা</option><option>চট্টগ্রাম</option><option>রাজশাহী</option>
                 </select>
                 <select class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200">
-                    <option>উপজেলা/এরিয়া</option>
+                    <option>উপজেলা/এরিয়া</option>
                     <option>ধানমন্ডি</option><option>উত্তরা</option><option>মিরপুর</option>
                 </select>
                 <select class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200">
@@ -142,13 +157,12 @@
 
                 <button type="submit"
                         class="bg-red-600 text-white font-extrabold rounded-lg py-3.5 hover:bg-red-700 transition shadow-sm shadow-red-200">
-                    লগইন করে খুঁজুন
+                    খুঁজুন
                 </button>
             </form>
         </div>
     </section>
 
-    <!-- Stats -->
     <section id="donate" class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 mt-16">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
             <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
@@ -161,26 +175,25 @@
             </div>
             <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
                 <div class="text-4xl font-extrabold text-red-600">৬৪</div>
-                <div class="text-slate-500 mt-2 font-semibold">জেলায় সেবা চালু</div>
+                <div class="text-slate-500 mt-2 font-semibold">জেলায় সেবা চালু</div>
             </div>
         </div>
     </section>
 
-    <!-- Urgent -->
     <section id="urgent" class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 py-20">
         <div class="text-center mb-12">
             <span class="text-red-500 font-extrabold text-sm tracking-widest uppercase">জরুরি</span>
             <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">
-                জরুরি <span class="text-red-600">রক্তের প্রয়োজন</span>
+                জরুরি <span class="text-red-600">রক্তের প্রয়োজন</span>
             </h2>
-            <p class="text-slate-500 mt-3 font-medium">এই রোগীদের এখনই আপনার সাহায্য প্রয়োজন</p>
+            <p class="text-slate-500 mt-3 font-medium">এই রোগীদের এখনই আপনার সাহায্য প্রয়োজন</p>
         </div>
 
         @php
             $cards = [
-                ['name'=>'রহিম উদ্দিন','place'=>'ঢাকা মেডিকেল কলেজ হাসপাতাল','area'=>'সাভার, ঢাকা','bg'=>'O+','time'=>'২ ঘণ্টা আগে পোস্ট করা হয়েছে'],
-                ['name'=>'ফাতেমা বেগম','place'=>'ইবনে সিনা হাসপাতাল','area'=>'গুলশান, ঢাকা','bg'=>'B-','time'=>'৪ ঘণ্টা আগে পোস্ট করা হয়েছে'],
-                ['name'=>'করিম মিয়া','place'=>'চট্টগ্রাম মেডিকেল কলেজ','area'=>'হালিশহর, চট্টগ্রাম','bg'=>'AB+','time'=>'৫ ঘণ্টা আগে পোস্ট করা হয়েছে'],
+                ['name'=>'রহিম উদ্দিন','place'=>'ঢাকা মেডিকেল কলেজ হাসপাতাল','area'=>'সাভার, ঢাকা','bg'=>'O+','time'=>'২ ঘণ্টা আগে পোস্ট করা হয়েছে'],
+                ['name'=>'ফাতেমা বেগম','place'=>'ইবনে সিনা হাসপাতাল','area'=>'গুলশান, ঢাকা','bg'=>'B-','time'=>'৪ ঘণ্টা আগে পোস্ট করা হয়েছে'],
+                ['name'=>'করিম মিয়া','place'=>'চট্টগ্রাম মেডিকেল কলেজ','area'=>'হালিশহর, চট্টগ্রাম','bg'=>'AB+','time'=>'৫ ঘণ্টা আগে পোস্ট করা হয়েছে'],
             ];
         @endphp
 
@@ -210,17 +223,17 @@
                         </div>
                     </div>
 
-                    <a href="{{ route('login') }}"
-                       class="mt-6 w-full bg-red-600 text-white font-extrabold py-3.5 rounded-lg hover:bg-red-700 transition shadow-sm shadow-red-200 flex justify-center items-center gap-2">
-                        লগইন করে কল করুন
+                    <a href="{{ route('requests.index') }}"
+                        class="mt-6 w-full bg-red-600 text-white font-extrabold py-3.5 rounded-lg hover:bg-red-700 transition shadow-sm shadow-red-200 flex justify-center items-center gap-2">
+                        বিস্তারিত দেখুন
                     </a>
                 </div>
             @endforeach
         </div>
 
         <div class="mt-12 text-center">
-            <a href="{{ route('login') }}"
-               class="inline-flex items-center justify-center border border-slate-300 bg-white text-slate-700 font-extrabold px-7 py-3 rounded-lg hover:bg-slate-50 transition shadow-sm">
+            <a href="{{ route('requests.index') }}"
+                class="inline-flex items-center justify-center border border-slate-300 bg-white text-slate-700 font-extrabold px-7 py-3 rounded-lg hover:bg-slate-50 transition shadow-sm">
                 সব দেখুন
             </a>
         </div>
