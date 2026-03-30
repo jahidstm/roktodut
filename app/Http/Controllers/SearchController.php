@@ -2,63 +2,57 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\BloodGroup;
-use App\Enums\UserRole;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Carbon\Carbon; // 🎯 তারিখ ক্যালকুলেশনের জন্য
+use Illuminate\Support\Facades\Auth;
 
 class SearchController extends Controller
 {
+    /**
+     * স্মার্ট ডোনার সার্চ এবং ম্যাচিং অ্যালগরিদম
+     */
     public function index(Request $request)
     {
-        $bloodGroups = BloodGroup::cases();
-        $bloodGroupValues = array_map(fn($c) => $c->value, $bloodGroups);
+        // 🛡️ বেস কোয়েরি: শুধুমাত্র ভেরিফাইড এবং যারা ডোনার হিসেবে রেজিস্টার্ড
+        $query = User::query()
+            ->whereIn('role', ['donor', 'org_admin']) // অ্যাডমিনরাও ডোনার হতে পারে
+            ->where('is_verified', true);
 
-        // only run query when required inputs exist
-        $hasQuery = $request->filled('district') && $request->filled('blood_group');
-
-        $request->validate([
-            'division' => ['nullable', 'string', 'max:100'], // UI-only
-            'district' => [$hasQuery ? 'required' : 'nullable', 'string', 'max:100'],
-            'upazila'  => ['nullable', 'string', 'max:100'],
-            'blood_group' => [$hasQuery ? 'required' : 'nullable', 'string', Rule::in($bloodGroupValues)],
-        ]);
-
-        $donors = collect();
-
-        if ($hasQuery) {
-            $now = Carbon::now();
-
-            $q = User::query()
-                ->where('role', UserRole::DONOR->value)
-                ->where('is_available', true)
-                ->where('blood_group', $request->input('blood_group'))
-                ->where('district', $request->input('district'))
-                ->where(function ($sub) use ($now) {
-                    $sub->whereNull('cooldown_until')
-                        ->orWhere('cooldown_until', '<', $now);
-                });
-
-            if ($request->filled('upazila')) {
-                $q->where('upazila', $request->input('upazila'));
-            }
-
-            // ranking
-            $q->orderByDesc('is_ready_now')
-              ->orderByDesc('verified_badge')
-              ->orderByRaw("CASE WHEN nid_status = 'approved' THEN 1 ELSE 0 END DESC")
-              ->orderByDesc('total_donations')
-              ->orderByRaw("COALESCE(last_login_at, '1970-01-01 00:00:00') DESC");
-
-            $donors = $q->limit(50)->get();
+        // 🔍 ১. রক্তের গ্রুপ ফিল্টার (Exact Match)
+        if ($request->filled('blood_group')) {
+            $query->where('blood_group', $request->blood_group);
         }
 
-        return view('search.index', [
-            'bloodGroups' => $bloodGroups,
-            'donors' => $donors,
-            'query' => $request->only(['division', 'district', 'upazila', 'blood_group']),
-        ]);
+        // 🔍 ২. জেলা ফিল্টার
+        if ($request->filled('district')) {
+            $query->where('district', $request->district);
+        }
+
+        // 🔍 ৩. উপজেলা বা এরিয়া ফিল্টার
+        if ($request->filled('area')) {
+            $query->where('thana', 'LIKE', '%' . $request->area . '%');
+        }
+
+        // ⚙️ ৪. Availability Logic (The Smart Algorithm)
+        // রুল: একজন ডোনার রক্ত দেওয়ার ৯০ দিন (৩ মাস) পর পুনরায় রক্ত দিতে পারবেন।
+        $ninetyDaysAgo = Carbon::now()->subDays(90);
+
+        $query->where(function ($q) use ($ninetyDaysAgo) {
+            $q->whereNull('last_donation_date') // ক. যিনি আগে কখনো প্ল্যাটফর্মে রক্ত দেননি
+              ->orWhere('last_donation_date', '<=', $ninetyDaysAgo); // খ. যার রক্তদানের ৯০ দিন পার হয়েছে
+        });
+
+        // 🛡️ ৫. সেলফ-ফিল্টার: লগইন থাকলে নিজের নাম যেন সার্চ লিস্টে না আসে
+        if (Auth::check()) {
+            $query->where('id', '!=', Auth::id());
+        }
+
+        // 🚀 এক্সিকিউশন ও প্যাগিনেশন (প্রতি পেজে ১২ জন)
+        // withQueryString() দেওয়া হয়েছে যাতে ২য় পেজে গেলেও ইউজারের ফিল্টারগুলো ঠিক থাকে
+        $donors = $query->latest()->paginate(12)->withQueryString();
+
+        // 🎨 ফ্রন্টএন্ড টিমের জন্য ডেটা পাস করা হলো (ভিউ ফাইল আলিফ বানাবে)
+        return view('search.index', compact('donors'));
     }
 }
