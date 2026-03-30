@@ -57,9 +57,44 @@ class BloodRequestController extends Controller
         $data['requested_by'] = $request->user()->id;
         $data['status'] = 'pending';
 
-        BloodRequest::create($data);
+        // ১. রিকোয়েস্ট সেভ করা
+        $bloodRequest = BloodRequest::create($data);
 
-        return redirect()->route('requests.index')->with('success', 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে।');
+        // ⚙️ ২. স্মার্ট ডোনার ম্যাচিং অ্যালগরিদম (The Active Engine)
+        $ninetyDaysAgo = \Carbon\Carbon::now()->subDays(90);
+
+        // ওই জেলার ভেরিফাইড এবং এভেইলেবল ডোনারদের খুঁজে বের করা
+        $matchingDonors = \App\Models\User::where('blood_group', $bloodRequest->blood_group)
+            ->where('district', $bloodRequest->district)
+            ->where('id', '!=', $bloodRequest->requested_by) // যে রিকোয়েস্ট করেছে তাকে নোটিফিকেশন দেব না
+            ->where('is_verified', true)
+            ->whereIn('role', ['donor', 'org_admin'])
+            ->where(function ($q) use ($ninetyDaysAgo) {
+                $q->whereNull('last_donation_date')
+                  ->orWhere('last_donation_date', '<=', $ninetyDaysAgo);
+            })
+            ->get();
+
+        // 🚀 ৩. টার্গেটেড নোটিফিকেশন পাঠানো (Mass Assignment)
+        if ($matchingDonors->count() > 0) {
+            $notifications = [];
+            foreach ($matchingDonors as $donor) {
+                $notifications[] = [
+                    'user_id' => $donor->id,
+                    'title'   => 'জরুরি রক্তের প্রয়োজন!',
+                    'message' => "আপনার জেলায় ({$bloodRequest->district}) {$bloodRequest->blood_group} রক্তের জন্য একটি ইমার্জেন্সি রিকোয়েস্ট এসেছে।",
+                    'link'    => route('requests.show', $bloodRequest->id),
+                    'is_read' => false,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            }
+            // একবারে সব নোটিফিকেশন ডাটাবেসে ইনসার্ট করা (Performance Optimized)
+            \App\Models\CustomNotification::insert($notifications);
+        }
+
+        return redirect()->route('requests.index')
+            ->with('success', 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে এবং ' . $matchingDonors->count() . ' জন ডোনারকে অ্যালার্ট পাঠানো হয়েছে।');
     }
 
     public function fulfill(Request $request, BloodRequest $bloodRequest)
