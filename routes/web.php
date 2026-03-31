@@ -13,6 +13,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DonationRecordController;
 use App\Http\Controllers\OrgAdmin\DashboardController as OrgDashboardController;
 use App\Http\Controllers\OrgAdmin\VerificationController;
+use App\Http\Controllers\LocationController; // 🎯 নতুন ইমপোর্ট
 use Illuminate\Support\Facades\Route;
 
 // --- ১. পাবলিক রাউটস ---
@@ -87,4 +88,10 @@ Route::middleware(['auth', 'verified', 'role:org_admin'])->group(function () {
     Route::get('/org/donor/{id}/verify', [VerificationController::class, 'show'])->name('org.donor.verify');
     Route::post('/org/donor/{id}/approve', [VerificationController::class, 'approve'])->name('org.donor.approve');
     Route::post('/org/donor/{id}/reject', [VerificationController::class, 'reject'])->name('org.donor.reject');
+    
 });
+
+// --- ৭. AJAX লোকেশন রাউটস (Dynamic Dropdowns) ---
+Route::get('/ajax/divisions', [LocationController::class, 'getDivisions']);
+Route::get('/ajax/districts/{division_id}', [LocationController::class, 'getDistricts']);
+Route::get('/ajax/upazilas/{district_id}', [LocationController::class, 'getUpazilas']);
