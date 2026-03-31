@@ -5,55 +5,60 @@ namespace App\Http\Controllers\OrgAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // 🎯 ইনটেলফেন্স এরর ফিক্স করতে এটি যুক্ত করা হয়েছে
+use Illuminate\Support\Facades\Auth;
 
 class VerificationController extends Controller
 {
-    // ... show method ...
-
     /**
-     * ডোনার প্রোফাইল অ্যাপ্রুভ করা
+     * ডোনারের বিস্তারিত তথ্য দেখা
      */
-    public function approve(Request $request, $id)
+    public function show($id)
     {
         $donor = User::findOrFail($id);
-        $admin = Auth::user(); // ফ্যাসাড ব্যবহার করা হয়েছে
+        $this->authorizeOrganizationAccess($donor);
 
-        // 🚨 Anti-Hacking Guard: Cross-Organization Breach Prevention
-        if ($donor->organization_id !== $admin->organization_id) {
-            abort(403, 'Security Violation: আপনি অন্য অর্গানাইজেশনের ডোনারকে ভেরিফাই করতে পারবেন না।');
-        }
-
-        // ভেরিফাই করা হলো
-        $donor->update([
-            'is_verified' => true,
-            'verified_by' => Auth::id(), // বর্তমান লগইন করা অ্যাডমিনের আইডি
-            'verified_at' => now(),
-        ]);
-
-        return back()->with('success', 'ডোনার প্রোফাইল সফলভাবে ভেরিফাই করা হয়েছে।');
+        return view('org.donor.verify', compact('donor'));
     }
 
     /**
-     * ডোনার রিকোয়েস্ট রিজেক্ট করা
+     * ডোনারকে অ্যাপ্রুভ করা
      */
-    public function reject(Request $request, $id)
+    public function approve($id)
     {
         $donor = User::findOrFail($id);
-        $admin = Auth::user();
+        $this->authorizeOrganizationAccess($donor);
 
-        // 🚨 Anti-Hacking Guard
-        if ($donor->organization_id !== $admin->organization_id) {
-            abort(403, 'Security Violation: Access Denied.');
-        }
-
-        // রিজেক্ট লজিক: মেম্বারকে আনভেরিফাইড করা
         $donor->update([
-            'is_verified' => false,
-            'verified_by' => null,
-            'verified_at' => null,
+            'nid_status' => 'approved',
+            'verified_badge' => true // 🎯 এই ব্যাজটিই আমরা পরে সার্চ রেজাল্টে দেখাব
         ]);
 
-        return back()->with('error', 'ডোনার অ্যাপ্লিকেশনটি বাতিল করা হয়েছে।');
+        return redirect()->route('org.dashboard')->with('success', "{$donor->name}-কে সফলভাবে ভেরিফাই করা হয়েছে।");
+    }
+
+    /**
+     * ডোনারকে রিজেক্ট করা
+     */
+    public function reject($id)
+    {
+        $donor = User::findOrFail($id);
+        $this->authorizeOrganizationAccess($donor);
+
+        $donor->update([
+            'nid_status' => 'rejected',
+            'verified_badge' => false
+        ]);
+
+        return redirect()->route('org.dashboard')->with('error', "{$donor->name}-এর ভেরিফিকেশন বাতিল করা হয়েছে।");
+    }
+
+    /**
+     * 🛡️ সিকিউরিটি লেয়ার: অন্য ক্লাবের অ্যাডমিন যেন এই মেম্বারকে এক্সেস করতে না পারে
+     */
+    private function authorizeOrganizationAccess(User $donor)
+    {
+        if (Auth::user()->organization_id !== $donor->organization_id) {
+            abort(403, 'Unauthorized access. This member belongs to another organization.');
+        }
     }
 }

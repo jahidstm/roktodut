@@ -5,35 +5,40 @@ namespace App\Http\Controllers\OrgAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth; // 🎯 এটি যুক্ত করা হয়েছে
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    public function index()
+    /**
+     * অর্গানাইজেশন ড্যাশবোর্ড এবং মেম্বার লিস্ট প্রদর্শন
+     */
+    public function index(Request $request)
     {
-        // Auth Facade ব্যবহার করলে ইনটেলফেন্স আর এরর দেখাবে না
-        $admin = Auth::user(); 
+        $admin = Auth::user();
 
-        // 🚨 Data Leak Prevention: অ্যাডমিনের নিজ অর্গানাইজেশনের আইডি
-        $orgId = $admin->organization_id;
+        // 🛡️ সিকিউরিটি চেক: অ্যাডমিনের নিজের কোনো অর্গানাইজেশন আইডি না থাকলে এক্সেস পাবে না
+        if (!$admin->organization_id) {
+            abort(403, 'আপনার কোনো অর্গানাইজেশন অ্যাসাইন করা নেই।');
+        }
 
-        // স্ট্যাটিস্টিক্স
-        $totalMembers = User::where('organization_id', $orgId)->count();
-        $verifiedMembers = User::where('organization_id', $orgId)
-                                ->where('is_verified', true)
-                                ->count();
-        
-        // পেন্ডিং ভেরিফিকেশন লিস্ট
-        $pendingVerifications = User::where('organization_id', $orgId)
-                                    ->where('is_verified', false)
-                                    ->latest()
-                                    ->take(10)
-                                    ->get();
+        // 🔍 শুধু এই অ্যাডমিনের অর্গানাইজেশনের মেম্বারদের খুঁজে বের করো
+        $query = User::where('organization_id', $admin->organization_id)
+                     ->where('role', 'donor');
 
-        return view('org.dashboard', compact(
-            'totalMembers', 
-            'verifiedMembers', 
-            'pendingVerifications'
-        ));
+        // ফিল্টারিং (Pending, Approved, Rejected)
+        if ($request->filled('status')) {
+            $query->where('nid_status', $request->status);
+        }
+
+        $members = $query->latest()->paginate(15)->withQueryString();
+
+        // সামারি স্ট্যাটাস (অ্যানালিটিক্স এর জন্য)
+        $stats = [
+            'total' => User::where('organization_id', $admin->organization_id)->count(),
+            'pending' => User::where('organization_id', $admin->organization_id)->where('nid_status', 'pending')->count(),
+            'approved' => User::where('organization_id', $admin->organization_id)->where('nid_status', 'approved')->count(),
+        ];
+
+        return view('org.dashboard', compact('members', 'stats', 'request'));
     }
 }
