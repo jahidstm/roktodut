@@ -26,17 +26,17 @@ class LocationSeeder extends Seeder
 
         $this->command->info('Parsing Nested Locations... Please wait.');
 
-        // 🛡 ২. ট্রানজেকশন শুরু (ডেটাবেস ক্র্যাশ রোধ করতে)
+        // 🛡️ ২. ক্লিনআপ (MySQL Implicit Commit বাইপাস করার জন্য ট্রানজেকশনের বাইরে রাখা হলো)
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+        Upazila::truncate();
+        District::truncate();
+        Division::truncate();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+
+        // 🚀 ৩. ট্রানজেকশন শুরু (শুধুমাত্র ডেটা ইনসার্ট করার জন্য)
         DB::transaction(function () use ($locations) {
             
-            // ক্লিনআপ
-            DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-            Upazila::truncate();
-            District::truncate();
-            Division::truncate();
-            DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
-            // 🚀 ৩. নেস্টেড পার্সিং (বিভাগ -> জেলা -> উপজেলা)
+            // নেস্টেড পার্সিং (বিভাগ -> জেলা -> উপজেলা)
             foreach ($locations['divisions'] as $divisionName => $districts) {
                 // বিভাগ তৈরি
                 $division = Division::create([
