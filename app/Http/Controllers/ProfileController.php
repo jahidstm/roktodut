@@ -12,7 +12,7 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * ডিসপ্লে ইউজার প্রোফাইল এডিট ফর্ম
      */
     public function edit(Request $request): View
     {
@@ -22,23 +22,30 @@ class ProfileController extends Controller
     }
 
     /**
-     * Update the user's profile information.
+     * আপডেট ইউজার প্রোফাইল ইনফরমেশন (Location ID ভিত্তিক)
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        // ১. ভ্যালিডেশন ডেটা নেওয়া (অনুরোধে পাঠানো আইডিগুলো সহ)
+        $validatedData = $request->validated();
+
+        // ২. সরাসরি আইডিগুলো অ্যাসাইন করা
+        $user->fill($validatedData);
+
+        // ৩. ইমেইল পরিবর্তন হলে ভেরিফিকেশন রিসেট করা
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
-     * Delete the user's account.
+     * ইউজার অ্যাকাউন্ট ডিলিট করা
      */
     public function destroy(Request $request): RedirectResponse
     {
