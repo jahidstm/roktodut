@@ -11,22 +11,24 @@ class ProfileUpdateRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
      */
     public function rules(): array
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', \Illuminate\Validation\Rule::unique(\App\Models\User::class)->ignore($this->user()->id)],
-            
-            // 🎯 নতুন যুক্ত করা ডোনার ফিল্ডস
-            'phone' => ['nullable', 'string', 'max:20'],
-            'blood_group' => ['nullable', 'string', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
-            'district' => ['nullable', 'string', 'max:100'],
-            'thana' => ['nullable', 'string', 'max:100'],
-            'date_of_birth' => ['nullable', 'date', 'before:today'],
-            'gender' => ['nullable', 'string', 'in:male,female,other'],
-            'weight' => ['nullable', 'numeric', 'min:30', 'max:200'], // ওজন ৩০ থেকে ২০০ কেজির মধ্যে
+            'email' => [
+                'required',
+                'string',
+                'lowercase',
+                'email',
+                'max:255',
+                Rule::unique(User::class)->ignore($this->user()->id),
+            ],
+            // 📍 সিকিউরড লোকেশন ভ্যালিডেশন রুলস
+            'division_id' => ['nullable', 'integer', 'exists:divisions,id'],
+            'district_id' => ['nullable', 'integer', 'exists:districts,id'],
+            'upazila_id'  => ['nullable', 'integer', 'exists:upazilas,id'],
         ];
     }
 }
