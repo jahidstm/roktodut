@@ -4,55 +4,57 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Carbon\Carbon; // 🎯 তারিখ ক্যালকুলেশনের জন্য
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class SearchController extends Controller
 {
     /**
-     * স্মার্ট ডোনার সার্চ এবং ম্যাচিং অ্যালগরিদম
+     * আইডি-ভিত্তিক রিয়েলটাইম ডোনার সার্চ ইঞ্জিন
      */
     public function index(Request $request)
     {
-        // 🛡️ বেস কোয়েরি: শুধুমাত্র ভেরিফাইড এবং যারা ডোনার হিসেবে রেজিস্টার্ড
+        // 🛡️ বেস কোয়েরি: শুধুমাত্র ভেরিফাইড এবং ডোনাররা আসবে
         $query = User::query()
-            ->whereIn('role', ['donor', 'org_admin']) // অ্যাডমিনরাও ডোনার হতে পারে
+            ->whereIn('role', ['donor', 'org_admin'])
             ->where('is_verified', true);
 
-        // 🔍 ১. রক্তের গ্রুপ ফিল্টার (Exact Match)
+        // 🔍 ১. রক্তের গ্রুপ ফিল্টার (String Match)
         if ($request->filled('blood_group')) {
             $query->where('blood_group', $request->blood_group);
         }
 
-        // 🔍 ২. জেলা ফিল্টার
+        // 🔍 ২. বিভাগ ফিল্টার (ID Match)
+        if ($request->filled('division')) {
+            $query->where('division_id', $request->division);
+        }
+
+        // 🔍 ৩. জেলা ফিল্টার (ID Match)
         if ($request->filled('district')) {
-            $query->where('district', $request->district);
+            $query->where('district_id', $request->district);
         }
 
-        // 🔍 ৩. উপজেলা বা এরিয়া ফিল্টার
-        if ($request->filled('area')) {
-            $query->where('thana', 'LIKE', '%' . $request->area . '%');
+        // 🔍 ৪. উপজেলা ফিল্টার (ID Match)
+        if ($request->filled('upazila')) {
+            $query->where('upazila_id', $request->upazila);
         }
 
-        // ⚙️ ৪. Availability Logic (The Smart Algorithm)
-        // রুল: একজন ডোনার রক্ত দেওয়ার ৯০ দিন (৩ মাস) পর পুনরায় রক্ত দিতে পারবেন।
+        // ⚙️ ৫. ৯০ দিনের ডোনেশন গ্যাপ অ্যালগরিদম
         $ninetyDaysAgo = Carbon::now()->subDays(90);
 
         $query->where(function ($q) use ($ninetyDaysAgo) {
-            $q->whereNull('last_donation_date') // ক. যিনি আগে কখনো প্ল্যাটফর্মে রক্ত দেননি
-              ->orWhere('last_donation_date', '<=', $ninetyDaysAgo); // খ. যার রক্তদানের ৯০ দিন পার হয়েছে
+            $q->whereNull('last_donation_date')
+              ->orWhere('last_donation_date', '<=', $ninetyDaysAgo);
         });
 
-        // 🛡️ ৫. সেলফ-ফিল্টার: লগইন থাকলে নিজের নাম যেন সার্চ লিস্টে না আসে
+        // 🛡️ ৬. সেলফ ফিল্টার
         if (Auth::check()) {
             $query->where('id', '!=', Auth::id());
         }
 
-        // 🚀 এক্সিকিউশন ও প্যাগিনেশন (প্রতি পেজে ১২ জন)
-        // withQueryString() দেওয়া হয়েছে যাতে ২য় পেজে গেলেও ইউজারের ফিল্টারগুলো ঠিক থাকে
+        // রেজাল্ট এবং প্যাগিনেশন
         $donors = $query->latest()->paginate(12)->withQueryString();
 
-        // 🎨 ফ্রন্টএন্ড টিমের জন্য ডেটা পাস করা হলো (ভিউ ফাইল আলিফ বানাবে)
-        return view('search.index', compact('donors'));
+        return view('search.index', compact('donors', 'request'));
     }
 }
