@@ -15,14 +15,17 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            
+            // 🛡️ সোশ্যাল লগইনের জন্য পাসওয়ার্ড Nullable করা হলো
+            $table->string('password')->nullable(); 
 
-            // LifeDrop কাস্টম ফিল্ড
-            $table->string('phone', 15)->unique();
+            // 🛡️ গুগল লগইনের সময় ফোন নম্বর ও ব্লাড গ্রুপ থাকে না, তাই এগুলো Nullable করা হলো
+            $table->string('phone', 15)->unique()->nullable();
             $table->string('role')->default(UserRole::DONOR->value);
-            $table->string('blood_group');
-            $table->string('district');
-            $table->string('upazila')->nullable();
+            $table->string('blood_group')->nullable(); 
+            
+            // ❌ পুরনো district এবং upazila স্ট্রিং কলামগুলো মুছে ফেলা হয়েছে (যেহেতু আমরা এখন রিলেশনাল আইডি ব্যবহার করছি)
+
             $table->text('address')->nullable();
             $table->string('gender')->nullable();
             $table->date('date_of_birth')->nullable();
@@ -55,7 +58,7 @@ return new class extends Migration
 
             // ইনডেক্স
             $table->index('blood_group');
-            $table->index('district');
+            // ❌ district ইনডেক্স মুছে ফেলা হয়েছে কারণ কলামটি আর নেই
             $table->index('is_available');
             $table->index('role');
         });

@@ -61,18 +61,31 @@
                         @error('blood_group') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
                     </div>
 
-                    <div>
-                        <label for="district" class="block text-sm font-bold text-slate-700 mb-2">জেলা</label>
-                        <input id="district" name="district" type="text" value="{{ old('district', $user->district) }}" placeholder="যেমন: Dhaka"
-                               class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
-                        @error('district') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
-                    </div>
+                    {{-- 📍 Dynamic Location Fields --}}
+                    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="division_id" class="block text-sm font-bold text-slate-700 mb-2">বিভাগ</label>
+                            <select id="division_id" name="division_id" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
+                                <option value="">নির্বাচন করুন</option>
+                            </select>
+                            @error('division_id') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                        </div>
 
-                    <div>
-                        <label for="thana" class="block text-sm font-bold text-slate-700 mb-2">থানা/উপজেলা</label>
-                        <input id="thana" name="thana" type="text" value="{{ old('thana', $user->thana) }}" placeholder="যেমন: Savar"
-                               class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
-                        @error('thana') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                        <div>
+                            <label for="district_id" class="block text-sm font-bold text-slate-700 mb-2">জেলা</label>
+                            <select id="district_id" name="district_id" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3" disabled>
+                                <option value="">প্রথমে বিভাগ নির্বাচন করুন</option>
+                            </select>
+                            @error('district_id') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                        </div>
+
+                        <div>
+                            <label for="upazila_id" class="block text-sm font-bold text-slate-700 mb-2">থানা/উপজেলা</label>
+                            <select id="upazila_id" name="upazila_id" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3" disabled>
+                                <option value="">প্রথমে জেলা নির্বাচন করুন</option>
+                            </select>
+                            @error('upazila_id') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                        </div>
                     </div>
 
                     <div>
@@ -133,7 +146,7 @@
             </form>
         </div>
 
-        {{-- 🎯 ২. পাসওয়ার্ড পরিবর্তন ফর্ম (আগের কোডটি এখানে থাকবে) --}}
+        {{-- 🎯 ২. পাসওয়ার্ড পরিবর্তন ফর্ম --}}
         <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
             <div class="absolute top-0 left-0 w-2 h-full bg-slate-800"></div>
             <header class="mb-6">
@@ -183,4 +196,71 @@
 
     </div>
 </div>
+
+{{-- ⚙️ AJAX Script for Dynamic Location Pre-selection --}}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const divSelect = document.getElementById('division_id');
+        const distSelect = document.getElementById('district_id');
+        const upzSelect = document.getElementById('upazila_id');
+
+        const savedDiv = "{{ auth()->user()->division_id }}";
+        const savedDist = "{{ auth()->user()->district_id }}";
+        const savedUpz = "{{ auth()->user()->upazila_id }}";
+
+        // ১. বিভাগ লোড করা
+        fetch('/ajax/divisions')
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(div => {
+                    const selected = (div.id == savedDiv) ? 'selected' : '';
+                    divSelect.innerHTML += `<option value="${div.id}" ${selected}>${div.name}</option>`;
+                });
+                if(savedDiv) divSelect.dispatchEvent(new Event('change'));
+            });
+
+        // ২. জেলা লোড করা
+        divSelect.addEventListener('change', function() {
+            const divId = this.value;
+            distSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
+            distSelect.disabled = true;
+            upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
+            upzSelect.disabled = true;
+
+            if (divId) {
+                fetch(`/ajax/districts/${divId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        distSelect.innerHTML = '<option value="">জেলা নির্বাচন করুন</option>';
+                        distSelect.disabled = false;
+                        data.forEach(dist => {
+                            const selected = (dist.id == savedDist) ? 'selected' : '';
+                            distSelect.innerHTML += `<option value="${dist.id}" ${selected}>${dist.name}</option>`;
+                        });
+                        if(savedDist) distSelect.dispatchEvent(new Event('change'));
+                    });
+            }
+        });
+
+        // ৩. উপজেলা লোড করা
+        distSelect.addEventListener('change', function() {
+            const distId = this.value;
+            upzSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
+            upzSelect.disabled = true;
+
+            if (distId) {
+                fetch(`/ajax/upazilas/${distId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        upzSelect.innerHTML = '<option value="">থানা/উপজেলা নির্বাচন করুন</option>';
+                        upzSelect.disabled = false;
+                        data.forEach(upz => {
+                            const selected = (upz.id == savedUpz) ? 'selected' : '';
+                            upzSelect.innerHTML += `<option value="${upz.id}" ${selected}>${upz.name}</option>`;
+                        });
+                    });
+            }
+        });
+    });
+</script>
 @endsection

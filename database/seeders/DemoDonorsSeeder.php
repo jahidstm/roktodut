@@ -5,8 +5,10 @@ namespace Database\Seeders;
 use App\Enums\BloodGroup;
 use App\Enums\UserRole;
 use App\Models\User;
+use App\Models\Division;
+use App\Models\District;
+use App\Models\Upazila;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -14,45 +16,19 @@ class DemoDonorsSeeder extends Seeder
 {
     public function run(): void
     {
-        $path = public_path('data/bd_locations.json');
+        // 🔍 ১. ডাটাবেস থেকে সরাসরি লোকেশন ডেটা নিয়ে আসা (JSON পার্স করার ঝামেলা শেষ)
+        $upazilas = Upazila::with('district')->get();
 
-        if (!File::exists($path)) {
-            throw new \RuntimeException('Location file not found at: ' . $path);
-        }
-
-        $json = json_decode(File::get($path), true);
-
-        if (!is_array($json)) {
-            throw new \RuntimeException('Invalid JSON in: ' . $path);
-        }
-
-        $divisionsObj = $json['divisions'] ?? [];
-        $pairs = [];
-
-        foreach ($divisionsObj as $divisionName => $districtsObj) {
-            if (!is_array($districtsObj)) continue;
-
-            foreach ($districtsObj as $districtName => $upazilas) {
-                if (!is_array($upazilas) || count($upazilas) === 0) {
-                    $pairs[] = ['district' => $districtName, 'upazila' => null];
-                    continue;
-                }
-
-                foreach ($upazilas as $u) {
-                    $pairs[] = ['district' => $districtName, 'upazila' => $u];
-                }
-            }
-        }
-
-        if (count($pairs) === 0) {
-            throw new \RuntimeException('No district/upazila pairs found in public/data/bd_locations.json');
+        if ($upazilas->isEmpty()) {
+            throw new \RuntimeException('No location data found in database. Run LocationSeeder first.');
         }
 
         $bloodGroupValues = array_map(fn($c) => $c->value, BloodGroup::cases());
 
         // --- 30 demo donors (unique phone range: 01710000001..01710000030) ---
         for ($i = 1; $i <= 30; $i++) {
-            $pair = $pairs[($i * 7) % count($pairs)];
+            // ডাইনামিক লোকেশন অবজেক্ট সিলেক্ট করা
+            $upz = $upazilas[($i * 7) % count($upazilas)];
             $bg = $bloodGroupValues[($i - 1) % count($bloodGroupValues)];
 
             User::updateOrCreate(
@@ -62,13 +38,14 @@ class DemoDonorsSeeder extends Seeder
                     'password' => Hash::make('password'),
                     'phone' => '0171' . str_pad((string) $i, 7, '0', STR_PAD_LEFT), // ✅ unique
                     'role' => UserRole::DONOR->value,
-
                     'blood_group' => $bg,
-                    'district' => $pair['district'],
-                    'upazila' => $pair['upazila'],
+
+                    // 📍 নতুন রিলেশনাল লোকেশন আইডি
+                    'division_id' => $upz->district->division_id,
+                    'district_id' => $upz->district_id,
+                    'upazila_id'  => $upz->id,
 
                     'is_onboarded' => true,
-
                     'is_available' => true,
                     'is_ready_now' => $i % 6 === 0,
                     'verified_badge' => $i % 4 === 0,
@@ -83,6 +60,16 @@ class DemoDonorsSeeder extends Seeder
             );
         }
 
+        // --- নির্দিষ্ট ডেমো ইউজারদের জন্য 'ঢাকা -> ঢাকা -> ধানমন্ডি' আইডি খুঁজে বের করা ---
+        $dhakaDiv = Division::where('name', 'ঢাকা')->first();
+        $dhakaDist = District::where('name', 'ঢাকা')->where('division_id', optional($dhakaDiv)->id)->first();
+        $dhanmondiUpz = Upazila::where('name', 'ধানমন্ডি')->where('district_id', optional($dhakaDist)->id)->first();
+
+        // যদি কোনো কারণে ধানমন্ডি না থাকে, তবে সেফ ফলব্যাক হিসেবে ডিফল্ট আইডি (১) ব্যবহার হবে
+        $divId = $dhakaDiv->id ?? 1;
+        $distId = $dhakaDist->id ?? 1;
+        $upzId = $dhanmondiUpz->id ?? 1;
+
         // --- Base recipient (unique phone) ---
         User::updateOrCreate(
             ['email' => 'recipient@demo.test'],
@@ -91,13 +78,14 @@ class DemoDonorsSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'phone' => '01720000000',
                 'role' => UserRole::RECIPIENT->value,
-
                 'blood_group' => BloodGroup::O_POS->value,
-                'district' => 'ঢাকা',
-                'upazila' => 'ধানমন্ডি',
+
+                // 📍 নতুন আইডি
+                'division_id' => $divId,
+                'district_id' => $distId,
+                'upazila_id'  => $upzId,
 
                 'is_onboarded' => true,
-
                 'is_available' => false,
                 'last_login_at' => now(),
                 'email_verified_at' => null,
@@ -114,13 +102,13 @@ class DemoDonorsSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'phone' => '01730000001',
                 'role' => UserRole::ADMIN->value,
-
                 'blood_group' => BloodGroup::O_POS->value,
-                'district' => 'ঢাকা',
-                'upazila' => 'ধানমন্ডি',
+
+                'division_id' => $divId,
+                'district_id' => $distId,
+                'upazila_id'  => $upzId,
 
                 'is_onboarded' => true,
-
                 'email_verified_at' => $verifiedAt,
                 'last_login_at' => now(),
                 'is_available' => false,
@@ -135,13 +123,13 @@ class DemoDonorsSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'phone' => '01730000002',
                 'role' => UserRole::ORG_ADMIN->value,
-
                 'blood_group' => BloodGroup::A_POS->value,
-                'district' => 'ঢাকা',
-                'upazila' => 'ধানমন্ডি',
+
+                'division_id' => $divId,
+                'district_id' => $distId,
+                'upazila_id'  => $upzId,
 
                 'is_onboarded' => true,
-
                 'email_verified_at' => $verifiedAt,
                 'last_login_at' => now(),
                 'is_available' => false,
@@ -156,13 +144,13 @@ class DemoDonorsSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'phone' => '01730000003',
                 'role' => UserRole::DONOR->value,
-
                 'blood_group' => BloodGroup::O_POS->value,
-                'district' => 'ঢাকা',
-                'upazila' => 'ধানমন্ডি',
+
+                'division_id' => $divId,
+                'district_id' => $distId,
+                'upazila_id'  => $upzId,
 
                 'is_onboarded' => true,
-
                 'is_available' => true,
                 'is_ready_now' => true,
                 'verified_badge' => true,
@@ -182,13 +170,13 @@ class DemoDonorsSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'phone' => '01730000004',
                 'role' => UserRole::RECIPIENT->value,
-
                 'blood_group' => BloodGroup::A_POS->value,
-                'district' => 'ঢাকা',
-                'upazila' => 'ধানমন্ডি',
+
+                'division_id' => $divId,
+                'district_id' => $distId,
+                'upazila_id'  => $upzId,
 
                 'is_onboarded' => true,
-
                 'is_available' => false,
                 'email_verified_at' => $verifiedAt,
                 'last_login_at' => now(),
