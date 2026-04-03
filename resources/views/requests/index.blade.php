@@ -15,11 +15,11 @@
     </a>
 </div>
 
-{{-- 🎯 Advanced Filter Section (নতুন অ্যাড করা হয়েছে) --}}
+{{-- 🎯 Advanced Filter Section (AJAX Driven) --}}
 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8">
-    <form action="{{ route('requests.index') }}" method="GET" class="flex flex-col md:flex-row gap-4 items-end">
+    <form action="{{ route('requests.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
         
-        <div class="w-full md:w-1/4">
+        <div>
             <label for="blood_group" class="block text-sm font-bold text-slate-700 mb-1">রক্তের গ্রুপ</label>
             <select name="blood_group" id="blood_group" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
                 <option value="">সব গ্রুপ</option>
@@ -29,29 +29,37 @@
             </select>
         </div>
 
-        <div class="w-full md:w-1/4">
-            <label for="district" class="block text-sm font-bold text-slate-700 mb-1">জেলা</label>
-            <input type="text" name="district" id="district" value="{{ request('district') }}" placeholder="যেমন: Dhaka" 
-                   class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+        <div>
+            <label for="division_id" class="block text-sm font-bold text-slate-700 mb-1">বিভাগ</label>
+            <select name="division_id" id="division_id" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+                <option value="">বিভাগ নির্বাচন</option>
+            </select>
         </div>
 
-        <div class="w-full md:w-1/4">
-            <label for="thana" class="block text-sm font-bold text-slate-700 mb-1">থানা/উপজেলা</label>
-            <input type="text" name="thana" id="thana" value="{{ request('thana') }}" placeholder="যেমন: Savar" 
-                   class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+        <div>
+            <label for="district_id" class="block text-sm font-bold text-slate-700 mb-1">জেলা</label>
+            <select name="district_id" id="district_id" disabled class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+                <option value="">প্রথমে বিভাগ নির্বাচন করুন</option>
+            </select>
         </div>
 
-        <div class="w-full md:w-1/4 flex gap-2">
-            <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
-                খুঁজুন
-            </button>
-            @if(request()->hasAny(['blood_group', 'district', 'thana']))
-                <a href="{{ route('requests.index') }}" class="shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-lg font-extrabold transition-colors flex items-center justify-center">
+        <div>
+            <label for="upazila_id" class="block text-sm font-bold text-slate-700 mb-1">উপজেলা/থানা</label>
+            <select name="upazila_id" id="upazila_id" disabled class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+                <option value="">প্রথমে জেলা নির্বাচন করুন</option>
+            </select>
+        </div>
+
+        <div class="md:col-span-4 flex justify-end gap-2 mt-2">
+            @if(request()->hasAny(['blood_group', 'division_id', 'district_id', 'upazila_id']))
+                <a href="{{ route('requests.index') }}" class="shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg font-extrabold transition-colors flex items-center justify-center">
                     ক্লিয়ার
                 </a>
             @endif
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-8 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
+                খুঁজুন
+            </button>
         </div>
-
     </form>
 </div>
 
@@ -80,7 +88,8 @@
                 <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
                     <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
                         <div class="text-xs text-slate-500 font-semibold">লোকেশন</div>
-                        <div class="font-extrabold text-slate-800 mt-1">{{ $r->thana ?? '-' }}, {{ $r->district ?? '-' }}</div>
+                        {{-- 🚀 JSON Fix Applied Here --}}
+                        <div class="font-extrabold text-slate-800 mt-1">{{ $r->upazila?->name ?? '-' }}, {{ $r->district?->name ?? '-' }}</div>
                     </div>
                     <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
                         <div class="text-xs text-slate-500 font-semibold">দরকার</div>
@@ -96,12 +105,10 @@
                 {{-- ডাইনামিক অ্যাকশন বাটন সেকশন --}}
                 <div class="mt-5 flex flex-wrap gap-2">
                     @php
-                        // Controller-এ eager loading করা আছে, তাই responses->first() অতিরিক্ত কোয়েরি করবে না
                         $myResponse = $r->responses->first();
                         $isOwner = auth()->check() && ((int) $r->requested_by === (int) auth()->id());
                     @endphp
 
-                    {{-- Fulfill Button: শুধুমাত্র রিকোয়েস্টের মালিক দেখবে --}}
                     @if (Route::has('requests.fulfill') && $isOwner && strtolower($r->status) !== 'fulfilled')
                         <form method="POST" action="{{ route('requests.fulfill', $r) }}">
                             @csrf
@@ -111,12 +118,8 @@
                         </form>
                     @endif
 
-                    {{-- Respond Section: মালিক ছাড়া অন্যরা দেখবে --}}
                     @if (Route::has('requests.respond') && !$isOwner && strtolower($r->status) !== 'fulfilled')
                         @if (!$myResponse)
-                            {{-- এখনো রেসপন্স করেনি --}}
-                            
-                            {{-- 🚨 Eligibility Check --}}
                             @if(auth()->user()->is_eligible_to_donate)
                                 <form method="POST" action="{{ route('requests.respond', $r) }}">
                                     @csrf
@@ -139,7 +142,6 @@
                                 </button>
                             </form>
                         @elseif ($myResponse->status === 'accepted')
-                            {{-- অলরেডি এক্সেপ্টেড --}}
                             <div class="flex items-center gap-2">
                                 <span class="px-4 py-2 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-100 font-extrabold text-sm">
                                     ✓ Accepted
@@ -154,13 +156,11 @@
                                 </form>
                             </div>
                         @elseif ($myResponse->status === 'declined')
-                            {{-- অলরেডি ডিক্লাইনড --}}
                             <div class="flex items-center gap-2">
                                 <span class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 border border-slate-200 font-extrabold text-sm">
                                     Declined
                                 </span>
 
-                                {{-- 🚨 Eligibility Check for changing mind --}}
                                 @if(auth()->user()->is_eligible_to_donate)
                                     <form method="POST" action="{{ route('requests.respond', $r) }}">
                                         @csrf
@@ -186,4 +186,65 @@
         {{ $requests->links() }}
     </div>
 @endif
+
+{{-- ⚙️ AJAX Script for Filter Location --}}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const divSelect = document.getElementById('division_id');
+        const distSelect = document.getElementById('district_id');
+        const upzSelect = document.getElementById('upazila_id');
+
+        const oldDiv = "{{ request('division_id') }}";
+        const oldDist = "{{ request('district_id') }}";
+        const oldUpz = "{{ request('upazila_id') }}";
+
+        fetch('/ajax/divisions')
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(div => {
+                    const selected = (div.id == oldDiv) ? 'selected' : '';
+                    divSelect.innerHTML += `<option value="${div.id}" ${selected}>${div.name}</option>`;
+                });
+                if(oldDiv) divSelect.dispatchEvent(new Event('change'));
+            });
+
+        divSelect.addEventListener('change', function() {
+            if (!this.value) {
+                distSelect.disabled = true; distSelect.innerHTML = '<option value="">প্রথমে বিভাগ নির্বাচন করুন</option>';
+                upzSelect.disabled = true; upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
+                return;
+            }
+            distSelect.disabled = true; distSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
+            fetch(`/ajax/districts/${this.value}`)
+                .then(res => res.json())
+                .then(data => {
+                    distSelect.innerHTML = '<option value="">জেলা নির্বাচন করুন</option>';
+                    distSelect.disabled = false;
+                    data.forEach(dist => {
+                        const selected = (dist.id == oldDist) ? 'selected' : '';
+                        distSelect.innerHTML += `<option value="${dist.id}" ${selected}>${dist.name}</option>`;
+                    });
+                    if(oldDist) distSelect.dispatchEvent(new Event('change'));
+                });
+        });
+
+        distSelect.addEventListener('change', function() {
+            if (!this.value) {
+                upzSelect.disabled = true; upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
+                return;
+            }
+            upzSelect.disabled = true; upzSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
+            fetch(`/ajax/upazilas/${this.value}`)
+                .then(res => res.json())
+                .then(data => {
+                    upzSelect.innerHTML = '<option value="">উপজেলা/থানা নির্বাচন করুন</option>';
+                    upzSelect.disabled = false;
+                    data.forEach(upz => {
+                        const selected = (upz.id == oldUpz) ? 'selected' : '';
+                        upzSelect.innerHTML += `<option value="${upz.id}" ${selected}>${upz.name}</option>`;
+                    });
+                });
+        });
+    });
+</script>
 @endsection

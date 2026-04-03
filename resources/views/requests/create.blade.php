@@ -3,128 +3,192 @@
 @section('title', 'নতুন রক্তের রিকোয়েস্ট — রক্তদূত')
 
 @section('content')
-<div class="max-w-3xl">
-    <h1 class="text-2xl font-extrabold tracking-tight">নতুন রক্তের রিকোয়েস্ট</h1>
+<div class="max-w-3xl mx-auto">
+    <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">নতুন রক্তের রিকোয়েস্ট</h1>
     <p class="text-slate-500 font-medium mt-1">সঠিক তথ্য দিলে দ্রুত ডোনার রেসপন্স পাবে।</p>
 
-    <div class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <form method="POST" action="{{ route('requests.store') }}" class="space-y-5">
+    <div class="mt-8 rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-2 h-full bg-red-600"></div>
+        <form method="POST" action="{{ route('requests.store') }}" class="space-y-6">
             @csrf
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="text-sm font-extrabold text-slate-800">রোগীর নাম</label>
                     <input name="patient_name" value="{{ old('patient_name') }}"
-                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-200" />
-                    @error('patient_name') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
+                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" />
+                    @error('patient_name') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
                 </div>
 
                 <div>
-                    <label class="text-sm font-extrabold text-slate-800">রক্তের গ্রুপ *</label>
-                    <select name="blood_group" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-200">
+                    <label class="text-sm font-extrabold text-slate-800">রক্তের গ্রুপ <span class="text-red-500">*</span></label>
+                    <select name="blood_group" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-bold px-4 py-3">
                         <option value="">সিলেক্ট করুন</option>
                         @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $group)
                             <option value="{{ $group }}" @selected(old('blood_group') === $group)>{{ $group }}</option>
                         @endforeach
                     </select>
-                    @error('blood_group') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
+                    @error('blood_group') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="text-sm font-extrabold text-slate-800">হাসপাতাল</label>
                     <input name="hospital" value="{{ old('hospital') }}"
-                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-200" />
-                    @error('hospital') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
+                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" />
+                    @error('hospital') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
                 </div>
 
                 <div>
-                    <label class="text-sm font-extrabold text-slate-800">ব্যাগ প্রয়োজন *</label>
+                    <label class="text-sm font-extrabold text-slate-800">ব্যাগ প্রয়োজন <span class="text-red-500">*</span></label>
                     <input type="number" min="1" name="bags_needed" value="{{ old('bags_needed', 1) }}"
-                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-200" />
-                    @error('bags_needed') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
+                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-500 font-bold px-4 py-3" />
+                    @error('bags_needed') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {{-- 📍 Dynamic Location Dropdowns --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-5 bg-slate-50 rounded-2xl border border-slate-100">
                 <div>
-                    <label class="text-sm font-extrabold text-slate-800">জেলা *</label>
-                    <input name="district" value="{{ old('district') }}"
-                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-200" />
-                    @error('district') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
+                    <label class="text-sm font-extrabold text-slate-800">বিভাগ <span class="text-red-500">*</span></label>
+                    <select id="division_id" name="division_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3">
+                        <option value="">বিভাগ নির্বাচন</option>
+                    </select>
+                    @error('division_id') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
                 </div>
 
                 <div>
-                    <label class="text-sm font-extrabold text-slate-800">থানা *</label>
-                    <input name="thana" value="{{ old('thana') }}"
-                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-200" />
-                    @error('thana') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
+                    <label class="text-sm font-extrabold text-slate-800">জেলা <span class="text-red-500">*</span></label>
+                    <select id="district_id" name="district_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" disabled>
+                        <option value="">প্রথমে বিভাগ নির্বাচন করুন</option>
+                    </select>
+                    @error('district_id') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
+                </div>
+
+                <div>
+                    <label class="text-sm font-extrabold text-slate-800">উপজেলা/থানা <span class="text-red-500">*</span></label>
+                    <select id="upazila_id" name="upazila_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" disabled>
+                        <option value="">প্রথমে জেলা নির্বাচন করুন</option>
+                    </select>
+                    @error('upazila_id') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
                 </div>
             </div>
 
             <div>
                 <label class="text-sm font-extrabold text-slate-800">ঠিকানা</label>
-                <input name="address" value="{{ old('address') }}"
-                       class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-200" />
-                @error('address') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
+                <input name="address" value="{{ old('address') }}" placeholder="যেমন: ওয়ার্ড নং ৩, সদর হাসপাতাল রোড"
+                       class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" />
+                @error('address') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="text-sm font-extrabold text-slate-800">কন্টাক্ট নাম</label>
                     <input name="contact_name" value="{{ old('contact_name') }}"
-                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-200" />
-                    @error('contact_name') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
+                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" />
+                    @error('contact_name') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
                 </div>
 
                 <div>
-                    <label class="text-sm font-extrabold text-slate-800">কন্টাক্ট নাম্বার *</label>
-                    <input name="contact_number" value="{{ old('contact_number') }}"
-                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-200" />
-                    @error('contact_number') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
+                    <label class="text-sm font-extrabold text-slate-800">কন্টাক্ট নাম্বার <span class="text-red-500">*</span></label>
+                    <input name="contact_number" value="{{ old('contact_number') }}" placeholder="01XXXXXXXXX"
+                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-500 font-bold px-4 py-3" />
+                    @error('contact_number') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label class="text-sm font-extrabold text-slate-800">জরুরিতা *</label>
-                    <select name="urgency"
-                            class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-200">
+                    <label class="text-sm font-extrabold text-slate-800">জরুরিতা <span class="text-red-500">*</span></label>
+                    <select name="urgency" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-bold px-4 py-3">
                         <option value="">সিলেক্ট করুন</option>
                         @foreach (\App\Enums\UrgencyLevel::cases() as $case)
-                            <option value="{{ $case->value }}" @selected(old('urgency') === $case->value)>
-                                {{ $case->label() }}
-                            </option>
+                            <option value="{{ $case->value }}" @selected(old('urgency') === $case->value)>{{ $case->label() }}</option>
                         @endforeach
                     </select>
-                    @error('urgency') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
+                    @error('urgency') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
                 </div>
 
                 <div>
-                    <label class="text-sm font-extrabold text-slate-800">দরকার (needed_at) *</label>
+                    <label class="text-sm font-extrabold text-slate-800">কবে রক্ত লাগবে <span class="text-red-500">*</span></label>
                     <input type="datetime-local" name="needed_at" value="{{ old('needed_at') }}"
-                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-200" />
-                    @error('needed_at') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
+                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-500 font-bold px-4 py-3" />
+                    @error('needed_at') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
                 </div>
             </div>
 
             <div>
-                <label class="text-sm font-extrabold text-slate-800">নোট</label>
-                <textarea name="notes" rows="4"
-                          class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-200">{{ old('notes') }}</textarea>
-                @error('notes') <div class="text-sm text-red-600 font-semibold mt-1">{{ $message }}</div> @enderror
+                <label class="text-sm font-extrabold text-slate-800">অতিরিক্ত নোট</label>
+                <textarea name="notes" rows="3" placeholder="রোগীর বর্তমান অবস্থা বা অন্য কোনো তথ্য..."
+                          class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3">{{ old('notes') }}</textarea>
+                @error('notes') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
             </div>
 
-            <div class="flex items-center gap-3">
-                <button type="submit" class="inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-extrabold shadow-sm shadow-red-200">
-                    সাবমিট
+            <div class="flex items-center gap-4 pt-4 border-t border-slate-100">
+                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-8 py-3.5 rounded-xl text-sm font-black transition-all shadow-sm shadow-red-200 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    রিকোয়েস্ট সাবমিট করুন
                 </button>
-                <a href="{{ route('requests.index') }}" class="font-extrabold text-slate-700 hover:text-red-600">
+                <a href="{{ route('requests.index') }}" class="px-6 py-3.5 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition">
                     বাতিল
                 </a>
             </div>
         </form>
     </div>
 </div>
+
+{{-- ⚙️ AJAX Script for Location --}}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const divSelect = document.getElementById('division_id');
+        const distSelect = document.getElementById('district_id');
+        const upzSelect = document.getElementById('upazila_id');
+
+        const oldDiv = "{{ old('division_id') }}";
+        const oldDist = "{{ old('district_id') }}";
+        const oldUpz = "{{ old('upazila_id') }}";
+
+        fetch('/ajax/divisions')
+            .then(res => res.json())
+            .then(data => {
+                data.forEach(div => {
+                    const selected = (div.id == oldDiv) ? 'selected' : '';
+                    divSelect.innerHTML += `<option value="${div.id}" ${selected}>${div.name}</option>`;
+                });
+                if(oldDiv) divSelect.dispatchEvent(new Event('change'));
+            });
+
+        divSelect.addEventListener('change', function() {
+            if (!this.value) return;
+            distSelect.disabled = true; distSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
+            fetch(`/ajax/districts/${this.value}`)
+                .then(res => res.json())
+                .then(data => {
+                    distSelect.innerHTML = '<option value="">জেলা নির্বাচন করুন</option>';
+                    distSelect.disabled = false;
+                    data.forEach(dist => {
+                        const selected = (dist.id == oldDist) ? 'selected' : '';
+                        distSelect.innerHTML += `<option value="${dist.id}" ${selected}>${dist.name}</option>`;
+                    });
+                    if(oldDist) distSelect.dispatchEvent(new Event('change'));
+                });
+        });
+
+        distSelect.addEventListener('change', function() {
+            if (!this.value) return;
+            upzSelect.disabled = true; upzSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
+            fetch(`/ajax/upazilas/${this.value}`)
+                .then(res => res.json())
+                .then(data => {
+                    upzSelect.innerHTML = '<option value="">উপজেলা/থানা নির্বাচন করুন</option>';
+                    upzSelect.disabled = false;
+                    data.forEach(upz => {
+                        const selected = (upz.id == oldUpz) ? 'selected' : '';
+                        upzSelect.innerHTML += `<option value="${upz.id}" ${selected}>${upz.name}</option>`;
+                    });
+                });
+        });
+    });
+</script>
 @endsection

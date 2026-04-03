@@ -13,7 +13,7 @@
         </div>
 
         <div class="flex items-center gap-3 shrink-0">
-            {{-- ৩. রিকোয়েস্ট ফুলফিলমেন্ট বাটন (শুধুমাত্র রিকোয়েস্টের মালিক দেখবে) --}}
+            {{-- ৩. রিকোয়েস্ট ফুলফিলমেন্ট বাটন --}}
             @if(auth()->id() === $bloodRequest->requested_by && strtolower($bloodRequest->status) !== 'fulfilled')
                 <form action="{{ route('requests.fulfill', $bloodRequest) }}" method="POST" onsubmit="return confirm('আপনি কি রক্ত পেয়েছেন? এটি কনফার্ম করলে রিকোয়েস্টটি ক্লোজ হয়ে যাবে।')">
                     @csrf
@@ -40,7 +40,8 @@
                 <div class="text-lg font-extrabold truncate">{{ $bloodRequest->patient_name ?? 'রোগী' }}</div>
                 <div class="text-sm text-slate-500 font-medium truncate mt-1">{{ $bloodRequest->hospital ?? 'হাসপাতাল উল্লেখ নেই' }}</div>
                 <div class="text-sm text-slate-500 font-semibold mt-2">
-                    লোকেশন: <span class="text-slate-800 font-extrabold">{{ $bloodRequest->thana ?? '-' }}, {{ $bloodRequest->district ?? '-' }}</span>
+                    {{-- 🚀 JSON Fix Applied Here --}}
+                    লোকেশন: <span class="text-slate-800 font-extrabold">{{ $bloodRequest->upazila?->name ?? '-' }}, {{ $bloodRequest->district?->name ?? '-' }}</span>
                 </div>
             </div>
 
