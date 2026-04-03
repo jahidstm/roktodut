@@ -52,6 +52,6 @@ class RegisteredUserController extends Controller
 
         \Illuminate\Support\Facades\Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect()->route('onboarding.show');
     }
 }

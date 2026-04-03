@@ -5,11 +5,16 @@ namespace App\Http\Controllers;
 use App\Models\BloodRequest;
 use App\Models\BloodRequestResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        if ($request->user() && !$request->user()->is_onboarded) {
+            return redirect()->route('onboarding.show');
+        }
+
         $user = $request->user();
 
         // ১. স্ট্যাটিস্টিকস ক্যালকুলেশন
@@ -23,14 +28,14 @@ class DashboardController extends Controller
             ->where('status', 'accepted')
             ->count();
 
-        $successRate = $totalRequestsMade > 0 
-            ? round(($fulfilledRequests / $totalRequestsMade) * 100, 1) 
+        $successRate = $totalRequestsMade > 0
+            ? round(($fulfilledRequests / $totalRequestsMade) * 100, 1)
             : 0;
 
         // 🎯 ২. সাম্প্রতিক ৫টি রিকোয়েস্টের হিস্ট্রি (Eager Loading এবং Aggregate Functions সহ)
         $recentRequests = BloodRequest::where('requested_by', $user->id)
             ->withCount([
-                'responses as total_responses', 
+                'responses as total_responses',
                 'responses as accepted_responses' => fn($q) => $q->where('status', 'accepted')
             ])
             ->orderByDesc('created_at')
@@ -38,9 +43,9 @@ class DashboardController extends Controller
             ->get();
 
         return view('dashboard', compact(
-            'totalRequestsMade', 
-            'fulfilledRequests', 
-            'totalContributions', 
+            'totalRequestsMade',
+            'fulfilledRequests',
+            'totalContributions',
             'successRate',
             'recentRequests' // 👈 নতুন ডেটা ভিউতে পাঠানো হলো
         ));
