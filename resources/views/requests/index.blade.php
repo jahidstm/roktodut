@@ -78,6 +78,15 @@
                             {{ $r->patient_name ?? 'রোগী' }}
                         </a>
                         <div class="text-sm text-slate-500 font-medium truncate mt-1">{{ $r->hospital ?? 'হাসপাতাল উল্লেখ নেই' }}</div>
+                        
+                        {{-- 🚀 Tabassum: Requester name with Verified Badge --}}
+                        <div class="flex items-center gap-2 mt-2">
+                            <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">প্রার্থনাকারী:</span>
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-xs font-bold text-slate-700">{{ $r->requester->name }}</span>
+                                <x-verified-badge :user="$r->requester" />
+                            </div>
+                        </div>
                     </div>
 
                     <div class="shrink-0 px-3 py-1 rounded-lg bg-red-50 text-red-700 border border-red-100 font-extrabold">
@@ -88,7 +97,6 @@
                 <div class="mt-4 grid grid-cols-2 gap-3 text-sm">
                     <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
                         <div class="text-xs text-slate-500 font-semibold">লোকেশন</div>
-                        {{-- 🚀 JSON Fix Applied Here --}}
                         <div class="font-extrabold text-slate-800 mt-1">{{ $r->upazila?->name ?? '-' }}, {{ $r->district?->name ?? '-' }}</div>
                     </div>
                     <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
@@ -102,7 +110,7 @@
                     <span>ব্যাগ: {{ $r->bags_needed ?? '-' }}</span>
                 </div>
 
-                {{-- ডাইনামিক অ্যাকশন বাটন সেকশন --}}
+                {{-- ডাইনামিক অ্যাকশন বাটন সেকশন (আলিফের কাজ এখানে চলছে) --}}
                 <div class="mt-5 flex flex-wrap gap-2">
                     @php
                         $myResponse = $r->responses->first();
