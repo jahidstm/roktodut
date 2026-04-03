@@ -13,11 +13,11 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DonationRecordController;
 use App\Http\Controllers\OrgAdmin\DashboardController as OrgDashboardController;
 use App\Http\Controllers\OrgAdmin\VerificationController;
-use App\Http\Controllers\LocationController; // 🎯 নতুন ইমপোর্ট
+use App\Http\Controllers\LocationController;
 use Illuminate\Support\Facades\Route;
 
 // --- ১. পাবলিক রাউটস ---
-Route::get('/', fn () => view('home'))->name('home');
+Route::get('/', fn() => view('home'))->name('home');
 
 require __DIR__ . '/auth.php';
 
@@ -33,7 +33,7 @@ Route::middleware(['auth'])->group(function () {
 
 // --- ৪. ভেরিফাইড ইউজার কোর ফিচারস ---
 Route::middleware(['auth', 'verified'])->group(function () {
-    
+
     // ব্লাড রিকোয়েস্ট ম্যানেজমেন্ট
     Route::resource('requests', BloodRequestController::class)
         ->parameters(['requests' => 'bloodRequest'])
@@ -48,9 +48,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // ডোনার রিভিল ফ্লো (Anti-Scraping Shield 🛡️)
     Route::post('/donors/{donor}/reveal/start', [DonorRevealController::class, 'start'])->name('donors.reveal.start');
     Route::post('/donors/{donor}/reveal/verify', [DonorRevealController::class, 'verify'])->name('donors.reveal.verify');
-    
+
     Route::post('/requests/{bloodRequest}/donors/{donor}/reveal-phone', [DonorRevealController::class, 'revealPhone'])
-        ->middleware('throttle:phone-reveal') 
+        ->middleware('throttle:phone-reveal')
         ->name('requests.donors.reveal_phone');
 
     // নোটিফিকেশন ম্যানেজমেন্ট
@@ -74,21 +74,23 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
 // সিস্টেম অ্যাডমিন ড্যাশবোর্ড
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:admin']) 
+    ->middleware(['auth', 'verified', 'role:admin'])
     ->name('admin.dashboard');
 
 // --- ৬. অর্গানাইজেশন অ্যাডমিন রাউটস (ইন্টিগ্রেটেড গ্রুপ) ---
 Route::middleware(['auth', 'verified', 'role:org_admin'])->group(function () {
-    
+
     // ড্যাশবোর্ড
     Route::get('/org/dashboard', [OrgDashboardController::class, 'index'])
         ->name('org.dashboard');
-        
+
+    // মেম্বার ভেরিফিকেশন স্ট্যাটাস আপডেট (Patch Route)
+    Route::patch('/org/members/{donor}/verify', [OrgDashboardController::class, 'updateVerificationStatus'])->name('org.members.verify');
+
     // ভেরিফিকেশন ফ্লো (Review, Approve, Reject)
     Route::get('/org/donor/{id}/verify', [VerificationController::class, 'show'])->name('org.donor.verify');
     Route::post('/org/donor/{id}/approve', [VerificationController::class, 'approve'])->name('org.donor.approve');
     Route::post('/org/donor/{id}/reject', [VerificationController::class, 'reject'])->name('org.donor.reject');
-    
 });
 
 // --- ৭. AJAX লোকেশন রাউটস (Dynamic Dropdowns) ---
