@@ -4,57 +4,58 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use App\Enums\BloodGroup;
 
 class SearchController extends Controller
 {
     /**
-     * আইডি-ভিত্তিক রিয়েলটাইম ডোনার সার্চ ইঞ্জিন
+     * স্মার্ট প্রায়োরিটি-ভিত্তিক রিয়েলটাইম ডোনার সার্চ ইঞ্জিন
      */
     public function index(Request $request)
     {
-        // 🛡️ বেস কোয়েরি: শুধুমাত্র ভেরিফাইড এবং ডোনাররা আসবে
+        // 🛡️ বেস কোয়েরি: শুধুমাত্র ডোনার এবং অর্গ-অ্যাডমিনরা আসবে যারা এই মুহূর্তে অ্যাভেইলেবল
         $query = User::query()
             ->whereIn('role', ['donor', 'org_admin'])
-            ->where('is_verified', true);
+            ->where('is_available', true) // ম্যানুয়াল অফলাইন স্ট্যাটাস চেক
+            ->where(function ($q) {
+                // ⚙️ অটো-কুলডাউন ইঞ্জিন (৪ মাসের গ্যাপ চেক)
+                $q->whereNull('cooldown_until')
+                    ->orWhere('cooldown_until', '<=', now());
+            });
 
-        // 🔍 ১. রক্তের গ্রুপ ফিল্টার (String Match)
+        // 🔍 ১. রক্তের গ্রুপ ফিল্টার
         if ($request->filled('blood_group')) {
             $query->where('blood_group', $request->blood_group);
         }
 
-        // 🔍 ২. বিভাগ ফিল্টার (ID Match)
-        if ($request->filled('division')) {
-            $query->where('division_id', $request->division);
+        // 🔍 ২. লোকেশন ফিল্টারস (বিভাগ, জেলা, উপজেলা)
+        if ($request->filled('division_id')) {
+            $query->where('division_id', $request->division_id);
+        }
+        if ($request->filled('district_id')) {
+            $query->where('district_id', $request->district_id);
+        }
+        if ($request->filled('upazila_id')) {
+            $query->where('upazila_id', $request->upazila_id);
         }
 
-        // 🔍 ৩. জেলা ফিল্টার (ID Match)
-        if ($request->filled('district')) {
-            $query->where('district_id', $request->district);
-        }
-
-        // 🔍 ৪. উপজেলা ফিল্টার (ID Match)
-        if ($request->filled('upazila')) {
-            $query->where('upazila_id', $request->upazila);
-        }
-
-        // ⚙️ ৫. ৯০ দিনের ডোনেশন গ্যাপ অ্যালগরিদম
-        $ninetyDaysAgo = Carbon::now()->subDays(90);
-
-        $query->where(function ($q) use ($ninetyDaysAgo) {
-            $q->whereNull('last_donation_date')
-              ->orWhere('last_donation_date', '<=', $ninetyDaysAgo);
-        });
-
-        // 🛡️ ৬. সেলফ ফিল্টার
+        // 🛡️ ৩. সেলফ ফিল্টার (নিজে খুঁজলে নিজেকে দেখানো হবে না)
         if (Auth::check()) {
             $query->where('id', '!=', Auth::id());
         }
 
-        // রেজাল্ট এবং প্যাগিনেশন
-        $donors = $query->latest()->paginate(12)->withQueryString();
+        // 🎯 ৪. দ্য স্মার্ট প্রায়োরিটি অ্যালগরিদম (Smart Sorting)
+        $query->orderByDesc('is_ready_now') // যারা ইমার্জেন্সির জন্য রেডি, তারা সবার আগে
+            ->orderByDesc('verified_badge') // এরপর ব্লু ব্যাজধারী ভেরিফাইড মেম্বার
+            ->orderByRaw("FIELD(nid_status, 'approved', 'pending', 'none')") // এনআইডি স্ট্যাটাস অনুযায়ী
+            ->latest(); // সবশেষে নতুন ডোনার
 
-        return view('search.index', compact('donors', 'request'));
+        $donors = $query->paginate(12)->withQueryString();
+
+        // 🎯 ফ্রন্টএন্ড ড্রপডাউনের জন্য ব্লাড গ্রুপের লিস্ট নেওয়া হলো
+        $bloodGroups = BloodGroup::cases();
+
+        return view('search.index', compact('donors', 'request', 'bloodGroups'));
     }
 }
