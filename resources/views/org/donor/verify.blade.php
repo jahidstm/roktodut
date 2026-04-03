@@ -105,24 +105,60 @@
                 </div>
             </div>
 
-            {{-- ⚡ Action Buttons --}}
-            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-4 justify-end">
-                {{-- Reject Form --}}
-                <form action="{{ route('org.donor.reject', $donor->id) }}" method="POST" class="w-full sm:w-auto">
-                    @csrf
-                    <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-white border-2 border-red-100 text-red-600 hover:bg-red-50 hover:border-red-200 rounded-xl text-sm font-black transition-all">
-                        রিজেক্ট করুন
-                    </button>
-                </form>
+            {{-- ⚡ Action Buttons with Alpine.js Modals --}}
+            <div x-data="{ showApproveModal: false, showRejectModal: false }" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-4 justify-end">
+                
+                {{-- Reject Trigger Button --}}
+                <button @click="showRejectModal = true" type="button" class="w-full sm:w-auto px-8 py-3.5 bg-white border-2 border-red-100 text-red-600 hover:bg-red-50 hover:border-red-200 rounded-xl text-sm font-black transition-all">
+                    রিজেক্ট করুন
+                </button>
 
-                {{-- Approve Form --}}
-                <form action="{{ route('org.donor.approve', $donor->id) }}" method="POST" class="w-full sm:w-auto">
-                    @csrf
-                    <button type="submit" class="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-black shadow-sm shadow-emerald-200 transition-all flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                        ভেরিফাই ও অ্যাপ্রুভ
-                    </button>
-                </form>
+                {{-- Approve Trigger Button --}}
+                <button @click="showApproveModal = true" type="button" class="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-black shadow-sm shadow-emerald-200 transition-all flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    ভেরিফাই ও অ্যাপ্রুভ
+                </button>
+
+                {{-- 🔴 Reject Confirmation Modal --}}
+                <div x-show="showRejectModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" x-transition.opacity>
+                    <div @click.away="showRejectModal = false" class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-red-100 text-red-600 p-2 rounded-full">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            </div>
+                            <h3 class="text-xl font-black text-slate-900">রিজেক্ট নিশ্চিতকরণ</h3>
+                        </div>
+                        <p class="text-slate-500 font-medium mb-8">আপনি কি নিশ্চিত যে আপনি এই ডোনারের ভেরিফিকেশন আবেদনটি বাতিল করতে চান? এই অ্যাকশনটি ডেটাবেসে লগ করা হবে।</p>
+                        <div class="flex justify-end gap-3">
+                            <button @click="showRejectModal = false" type="button" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition">বাতিল</button>
+                            <form action="{{ route('org.donor.reject', $donor->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-black transition shadow-sm">হ্যাঁ, রিজেক্ট করুন</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- 🟢 Approve Confirmation Modal --}}
+                <div x-show="showApproveModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" x-transition.opacity>
+                    <div @click.away="showApproveModal = false" class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="bg-emerald-100 text-emerald-600 p-2 rounded-full">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            </div>
+                            <h3 class="text-xl font-black text-slate-900">অ্যাপ্রুভ নিশ্চিতকরণ</h3>
+                        </div>
+                        <p class="text-slate-500 font-medium mb-8">আপনি কি নিশ্চিত যে আপনি প্রদত্ত ডকুমেন্টের সাথে ডোনারের তথ্য পুঙ্খানুপুঙ্খভাবে যাচাই করেছেন এবং তাকে ভেরিফাইড ডোনার হিসেবে অ্যাপ্রুভ করতে চান?</p>
+                        <div class="flex justify-end gap-3">
+                            <button @click="showApproveModal = false" type="button" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition">বাতিল</button>
+                            <form action="{{ route('org.donor.approve', $donor->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black transition shadow-sm">হ্যাঁ, অ্যাপ্রুভ করুন</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
         </div>
