@@ -16,8 +16,13 @@ use App\Http\Controllers\OrgAdmin\VerificationController;
 use App\Http\Controllers\LocationController;
 use Illuminate\Support\Facades\Route;
 
-// --- ১. পাবলিক রাউটস ---
+// --- ১. পাবলিক রাউটস (No Login Required) ---
 Route::get('/', fn() => view('home'))->name('home');
+
+// 🎯 ইমার্জেন্সি সার্চ এবং প্রাইভেসি শিল্ড রাউটস (Move to Public)
+Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::post('/donors/{donor}/reveal/start', [DonorRevealController::class, 'start'])->name('donors.reveal.start');
+Route::post('/donors/{donor}/reveal/verify', [DonorRevealController::class, 'verify'])->name('donors.reveal.verify');
 
 require __DIR__ . '/auth.php';
 
@@ -42,13 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/requests/{bloodRequest}/respond', [BloodRequestResponseController::class, 'store'])->name('requests.respond');
     Route::post('/requests/{bloodRequest}/fulfill', [BloodRequestController::class, 'fulfill'])->name('requests.fulfill');
 
-    // সার্চ ফিচার
-    Route::get('/search', [SearchController::class, 'index'])->name('search');
-
-    // ডোনার রিভিল ফ্লো (Anti-Scraping Shield 🛡️)
-    Route::post('/donors/{donor}/reveal/start', [DonorRevealController::class, 'start'])->name('donors.reveal.start');
-    Route::post('/donors/{donor}/reveal/verify', [DonorRevealController::class, 'verify'])->name('donors.reveal.verify');
-
+    // ডোনার রিভিল ফ্লো (For specific blood requests only)
     Route::post('/requests/{bloodRequest}/donors/{donor}/reveal-phone', [DonorRevealController::class, 'revealPhone'])
         ->middleware('throttle:phone-reveal')
         ->name('requests.donors.reveal_phone');
@@ -93,7 +92,7 @@ Route::middleware(['auth', 'verified', 'role:org_admin'])->group(function () {
     Route::post('/org/donor/{id}/reject', [VerificationController::class, 'reject'])->name('org.donor.reject');
 });
 
-// --- ৭. AJAX লোকেশন রাউটস (Dynamic Dropdowns) ---
+// --- ৭. AJAX লোকেশন রাউটস (Dynamic Dropdowns - Already Public) ---
 Route::get('/ajax/divisions', [LocationController::class, 'getDivisions']);
 Route::get('/ajax/districts/{division_id}', [LocationController::class, 'getDistricts']);
 Route::get('/ajax/upazilas/{district_id}', [LocationController::class, 'getUpazilas']);
