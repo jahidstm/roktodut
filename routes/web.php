@@ -96,3 +96,4 @@ Route::middleware(['auth', 'verified', 'role:org_admin'])->group(function () {
 Route::get('/ajax/divisions', [LocationController::class, 'getDivisions']);
 Route::get('/ajax/districts/{division_id}', [LocationController::class, 'getDistricts']);
 Route::get('/ajax/upazilas/{district_id}', [LocationController::class, 'getUpazilas']);
+

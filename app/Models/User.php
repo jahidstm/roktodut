@@ -23,8 +23,12 @@ class User extends Authenticatable
         'phone',
         'role',
         'blood_group',
-        'district',
-        'upazila',
+        // 🎯 FIX: নতুন লোকেশন রিলেশন আইডিগুলো যুক্ত করা হলো
+        'division_id',
+        'district_id',
+        'upazila_id',
+        'organization_id',
+
         'address',
         'gender',
         'date_of_birth',
@@ -43,13 +47,11 @@ class User extends Authenticatable
         'nid_status',
         'last_login_at',
         'welcome_back_checked',
-        'last_donated_at', // পুরনো কলাম
-        'last_donation_date', // ✅ নতুন কলাম (ইনস্ট্রাকশন অনুযায়ী যোগ করা হয়েছে)
-
+        'last_donated_at',
+        'last_donation_date',
         'is_onboarded',
         'email_verified_at',
         'remember_token',
-
         'provider',
         'provider_id',
     ];
@@ -76,7 +78,7 @@ class User extends Authenticatable
             'last_login_at'     => 'datetime',
             'date_of_birth'     => 'date',
             'last_donated_at'   => 'date',
-            'last_donation_date'=> 'date', // ✅ কাস্ট ফিক্সড
+            'last_donation_date' => 'date',
             'is_onboarded'      => 'boolean',
         ];
     }
@@ -149,32 +151,23 @@ class User extends Authenticatable
         return $this->cooldown_until && $this->cooldown_until->isFuture();
     }
 
-    /**
-     * ✅ ইনস্ট্রাকশন অনুযায়ী যোগ করা ৯০-দিনের মেডিকেল চেক
-     */
     public function canDonate(): bool
     {
         if (!$this->last_donation_date) {
             return true;
         }
-        
         return $this->last_donation_date->copy()->addDays(90)->isPast();
     }
 
-    /**
-     * ✅ পরবর্তী রক্তদানের কাউন্টডাউন
-     */
     public function daysUntilNextDonation(): int
     {
         if (!$this->last_donation_date) {
             return 0;
         }
-        
         $nextDonationDate = $this->last_donation_date->copy()->addDays(90);
         return max(0, (int) now()->diffInDays($nextDonationDate, false));
     }
 
-    // পূর্বের অ্যাট্রিবিউট গেটারগুলো রাখা হয়েছে সামঞ্জস্যের জন্য
     public function getNextEligibleDateAttribute()
     {
         return $this->last_donation_date ? $this->last_donation_date->copy()->addDays(90) : null;
@@ -185,16 +178,13 @@ class User extends Authenticatable
         return $this->canDonate();
     }
 
-    // ১. Organization Relationship
     public function organization()
     {
         return $this->belongsTo(Organization::class, 'organization_id');
     }
 
-    // ২. 🚨 Security Scope: শুধু নিজ অর্গানাইজেশনের ইউজারদের ফিল্টার করার জন্য
     public function scopeInSameOrganization($query)
     {
-        // Auth Facade ব্যবহার করলে এডিটর আর এরর দেখাবে না
         if (Auth::check() && Auth::user()->role === 'org_admin') {
             return $query->where('organization_id', Auth::user()->organization_id);
         }

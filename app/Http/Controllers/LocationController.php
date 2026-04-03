@@ -2,35 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Division;
 use App\Models\District;
 use App\Models\Upazila;
 use Illuminate\Http\Request;
 
 class LocationController extends Controller
 {
-    // সব বিভাগ পাঠাবে
-    public function getDivisions()
-    {
-        $divisions = Division::orderBy('name', 'asc')->get(['id', 'name']);
-        return response()->json($divisions);
-    }
-
-    // নির্দিষ্ট বিভাগের জেলাগুলো পাঠাবে
+    /**
+     * নির্দিষ্ট বিভাগের সব জেলা রিটার্ন করবে
+     */
     public function getDistricts($division_id)
     {
+        // ⚡ শুধু id এবং name আনা হচ্ছে পারফরম্যান্সের জন্য
         $districts = District::where('division_id', $division_id)
-                            ->orderBy('name', 'asc')
-                            ->get(['id', 'name']);
+            ->select('id', 'name')
+            ->orderBy('name', 'asc')
+            ->get();
+
         return response()->json($districts);
     }
 
-    // নির্দিষ্ট জেলার উপজেলাগুলো পাঠাবে
+    /**
+     * নির্দিষ্ট জেলার সব উপজেলা রিটার্ন করবে
+     */
     public function getUpazilas($district_id)
     {
         $upazilas = Upazila::where('district_id', $district_id)
-                           ->orderBy('name', 'asc')
-                           ->get(['id', 'name']);
+            ->select('id', 'name')
+            ->orderBy('name', 'asc')
+            ->get();
+
         return response()->json($upazilas);
     }
 }

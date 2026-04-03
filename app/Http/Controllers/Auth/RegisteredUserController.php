@@ -27,31 +27,34 @@ class RegisteredUserController extends Controller
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function store(Request $request): \Illuminate\Http\RedirectResponse
+    public function store(Request $request): RedirectResponse
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.\App\Models\User::class],
-            'password' => ['required', 'confirmed', \Illuminate\Validation\Rules\Password::defaults()],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'role' => ['required', 'string', 'in:donor,recipient'],
-            'phone' => ['required_if:role,donor', 'nullable', 'string', 'max:20'],
+            'phone' => ['required_if:role,donor', 'nullable', 'string', 'max:20', 'unique:users,phone'],
             'blood_group' => ['required_if:role,donor', 'nullable', 'string', 'in:A+,A-,B+,B-,O+,O-,AB+,AB-'],
         ]);
 
-        $user = \App\Models\User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'password' => Hash::make($request->password),
             'role' => $request->role,
             'phone' => $request->role === 'donor' ? $request->phone : null,
             'blood_group' => $request->role === 'donor' ? $request->blood_group : null,
-            'is_onboarded' => true, // ম্যানুয়াল রেজিস্ট্রেশনে অনবোর্ডিং ট্রু
+
+            // 🎯 THE FIX: ইউজারকে অনবোর্ডিং পেজে বাধ্য করার জন্য এটি false সেট করা হলো
+            'is_onboarded' => false,
         ]);
 
-        event(new \Illuminate\Auth\Events\Registered($user));
+        event(new Registered($user));
 
-        \Illuminate\Support\Facades\Auth::login($user);
+        Auth::login($user);
 
+        // 🚀 রিডাইরেক্ট টু অনবোর্ডিং
         return redirect()->route('onboarding.show');
     }
 }

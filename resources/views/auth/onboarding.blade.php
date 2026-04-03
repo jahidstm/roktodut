@@ -8,7 +8,7 @@
         @csrf
 
         <div class="space-y-5">
-            {{-- বিভাগ --}}
+            {{-- 🎯 বিভাগ (ভ্যালু হিসেবে ID ফিক্স করা হয়েছে) --}}
             <div>
                 <x-input-label for="division" :value="('বিভাগ *')" />
                 <select id="division" name="division_id" class="border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm block mt-1 w-full" required>
@@ -20,7 +20,7 @@
                 <x-input-error :messages="$errors->get('division_id')" class="mt-2" />
             </div>
 
-            {{-- জেলা --}}
+            {{-- 🎯 জেলা --}}
             <div>
                 <x-input-label for="district" :value="('জেলা *')" />
                 <select id="district" name="district_id" class="border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm block mt-1 w-full bg-gray-50" required disabled>
@@ -29,7 +29,7 @@
                 <x-input-error :messages="$errors->get('district_id')" class="mt-2" />
             </div>
 
-            {{-- উপজেলা --}}
+            {{-- 🎯 উপজেলা --}}
             <div>
                 <x-input-label for="upazila" :value="('উপজেলা / এরিয়া *')" />
                 <select id="upazila" name="upazila_id" class="border-gray-300 focus:border-red-500 focus:ring-red-500 rounded-md shadow-sm block mt-1 w-full bg-gray-50" required disabled>
@@ -38,7 +38,7 @@
                 <x-input-error :messages="$errors->get('upazila_id')" class="mt-2" />
             </div>
 
-            {{-- শেষ রক্তদানের তারিখ (শুধুমাত্র ডোনারদের জন্য) --}}
+            {{-- 🎯 শেষ রক্তদানের তারিখ (শুধুমাত্র ডোনারদের জন্য) --}}
             @if(auth()->user()->role === 'donor')
                 <div class="p-4 border border-red-100 rounded-md bg-red-50">
                     <x-input-label for="last_donation_date" :value="('শেষ রক্তদানের তারিখ (ঐচ্ছিক)')" />
@@ -56,7 +56,7 @@
         </div>
     </form>
 
-    {{-- 🎯 AJAX Location Loaders --}}
+    {{-- 🚀 Clean API Integration (Production Ready) --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const divisionSelect = document.getElementById('division');
@@ -82,7 +82,8 @@
                             });
                             districtSelect.disabled = false;
                             districtSelect.classList.remove('bg-gray-50');
-                        });
+                        })
+                        .catch(error => console.error("Error loading districts:", error));
                 } else {
                     districtSelect.innerHTML = '<option value="">প্রথমে বিভাগ সিলেক্ট করুন</option>';
                     districtSelect.classList.add('bg-gray-50');
@@ -106,7 +107,8 @@
                             });
                             upazilaSelect.disabled = false;
                             upazilaSelect.classList.remove('bg-gray-50');
-                        });
+                        })
+                        .catch(error => console.error("Error loading upazilas:", error));
                 } else {
                     upazilaSelect.innerHTML = '<option value="">প্রথমে জেলা সিলেক্ট করুন</option>';
                     upazilaSelect.classList.add('bg-gray-50');
