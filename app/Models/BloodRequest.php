@@ -19,8 +19,12 @@ class BloodRequest extends Model
         'blood_group',
         'bags_needed',
         'hospital',
-        'district',
-        'thana',
+
+        // 📍 নতুন রিলেশনাল লোকেশন আইডি (Mass Assignment Security Unlocked)
+        'division_id',
+        'district_id',
+        'upazila_id',
+
         'address',
         'contact_name',
         'contact_number',
@@ -35,7 +39,7 @@ class BloodRequest extends Model
         return [
             'blood_group' => BloodGroup::class,
             'urgency'     => UrgencyLevel::class,
-            'needed_at'   => 'datetime', 
+            'needed_at'   => 'datetime',
         ];
     }
 
@@ -44,7 +48,6 @@ class BloodRequest extends Model
      */
     public function requester(): BelongsTo
     {
-        // ফরেন কি 'requested_by' স্পষ্টভাবে ডিফাইন করা আছে, যা একদম সঠিক।
         return $this->belongsTo(User::class, 'requested_by');
     }
 
@@ -53,13 +56,29 @@ class BloodRequest extends Model
      */
     public function responses(): HasMany
     {
-        // 🚨 আপডেট: 'blood_request_id' স্পষ্টভাবে বলে দেওয়া হলো যাতে কোনো ম্যাজিকের ওপর নির্ভর করতে না হয়।
         return $this->hasMany(BloodRequestResponse::class, 'blood_request_id');
     }
 
     public function donations(): HasMany
     {
         return $this->hasMany(Donation::class);
+    }
+
+    // 📍 নতুন যুক্ত করা লোকেশন রিলেশনশিপস (Eager Loading এর জন্য)
+
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(Division::class);
+    }
+
+    public function district(): BelongsTo
+    {
+        return $this->belongsTo(District::class);
+    }
+
+    public function upazila(): BelongsTo
+    {
+        return $this->belongsTo(Upazila::class);
     }
 
     // --- Status Helpers ---

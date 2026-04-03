@@ -4,8 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBloodRequestRequest;
 use App\Models\BloodRequest;
+use App\Models\District;
+use App\Models\User;
+use App\Models\CustomNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Carbon\Carbon;
 
 class BloodRequestController extends Controller
 {
@@ -18,85 +22,101 @@ class BloodRequestController extends Controller
 
         $query = BloodRequest::query()
             ->with([
-                'requester:id,name', 
-                'responses' => fn ($q) => $q->where('user_id', $userId),
+                'requester:id,name',
+                'responses' => fn($q) => $q->where('user_id', $userId),
+                'district:id,name', // 🚀 ইগার লোডিং (পারফরম্যান্স অপ্টিমাইজেশন)
+                'upazila:id,name'
             ])
             ->where('status', 'pending');
 
-        // 🎯 স্মার্ট ফিল্টারিং লজিক (First-principles approach)
-        $query->when($request->filled('blood_group'), function ($q) use ($request) {
-            $q->where('blood_group', $request->blood_group);
-        });
+        // 🎯 স্মার্ট ফিল্টারিং লজিক (Relational IDs)
+        if ($request->filled('blood_group')) {
+            $query->where('blood_group', $request->blood_group);
+        }
 
-        $query->when($request->filled('district'), function ($q) use ($request) {
-            $q->where('district', 'like', '%' . $request->district . '%');
-        });
+        if ($request->filled('division_id')) {
+            $query->where('division_id', $request->division_id);
+        }
 
-        $query->when($request->filled('thana'), function ($q) use ($request) {
-            $q->where('thana', 'like', '%' . $request->thana . '%');
-        });
+        if ($request->filled('district_id')) {
+            $query->where('district_id', $request->district_id);
+        }
+
+        if ($request->filled('upazila_id')) {
+            $query->where('upazila_id', $request->upazila_id);
+        }
 
         $requests = $query->orderByRaw('needed_at is null asc')
             ->orderBy('needed_at')
             ->orderByDesc('created_at')
             ->paginate(12)
-            ->withQueryString(); // 🚨 পেজিনেশনের সাথে ফিল্টার ডেটা ধরে রাখার জন্য ম্যান্ডেটরি
+            ->withQueryString();
 
         return view('requests.index', compact('requests'));
     }
 
+    /**
+     * রিকোয়েস্ট তৈরির ফর্ম দেখায়
+     */
     public function create()
     {
         return view('requests.create');
     }
 
+    /**
+     * নতুন রিকোয়েস্ট সেভ করা এবং ডোনারদের নোটিফাই করা
+     */
     public function store(StoreBloodRequestRequest $request)
     {
         $data = $request->validated();
-        
+
         $data['requested_by'] = $request->user()->id;
         $data['status'] = 'pending';
 
         // ১. রিকোয়েস্ট সেভ করা
         $bloodRequest = BloodRequest::create($data);
 
-        // ⚙️ ২. স্মার্ট ডোনার ম্যাচিং অ্যালগরিদম (The Active Engine)
-        $ninetyDaysAgo = \Carbon\Carbon::now()->subDays(90);
+        // ২. জেলার নাম বের করা (নোটিফিকেশনে দেখানোর জন্য)
+        $districtName = District::find($bloodRequest->district_id)->name ?? 'আপনার';
 
-        // ওই জেলার ভেরিফাইড এবং এভেইলেবল ডোনারদের খুঁজে বের করা
-        $matchingDonors = \App\Models\User::where('blood_group', $bloodRequest->blood_group)
-            ->where('district', $bloodRequest->district)
-            ->where('id', '!=', $bloodRequest->requested_by) // যে রিকোয়েস্ট করেছে তাকে নোটিফিকেশন দেব না
-            ->where('is_verified', true)
+        // ⚙️ ৩. স্মার্ট ডোনার ম্যাচিং অ্যালগরিদম (The Active Engine)
+        $ninetyDaysAgo = Carbon::now()->subDays(90);
+
+        // ওই জেলার ডোনারদের খুঁজে বের করা (is_verified কলামটি রিমুভ করা হয়েছে)
+        $matchingDonors = User::where('blood_group', $bloodRequest->blood_group)
+            ->where('district_id', $bloodRequest->district_id)
+            ->where('id', '!=', $bloodRequest->requested_by)
             ->whereIn('role', ['donor', 'org_admin'])
             ->where(function ($q) use ($ninetyDaysAgo) {
                 $q->whereNull('last_donation_date')
-                  ->orWhere('last_donation_date', '<=', $ninetyDaysAgo);
+                    ->orWhere('last_donation_date', '<=', $ninetyDaysAgo);
             })
             ->get();
 
-        // 🚀 ৩. টার্গেটেড নোটিফিকেশন পাঠানো (Mass Assignment)
+        // 🚀 ৪. টার্গেটেড নোটিফিকেশন পাঠানো
         if ($matchingDonors->count() > 0) {
             $notifications = [];
             foreach ($matchingDonors as $donor) {
                 $notifications[] = [
                     'user_id' => $donor->id,
                     'title'   => 'জরুরি রক্তের প্রয়োজন!',
-                    'message' => "আপনার জেলায় ({$bloodRequest->district}) {$bloodRequest->blood_group} রক্তের জন্য একটি ইমার্জেন্সি রিকোয়েস্ট এসেছে।",
+                    'message' => "{$districtName} জেলায় {$bloodRequest->blood_group} রক্তের জন্য একটি ইমার্জেন্সি রিকোয়েস্ট এসেছে।",
                     'link'    => route('requests.show', $bloodRequest->id),
                     'is_read' => false,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
             }
-            // একবারে সব নোটিফিকেশন ডাটাবেসে ইনসার্ট করা (Performance Optimized)
-            \App\Models\CustomNotification::insert($notifications);
+            CustomNotification::insert($notifications);
         }
 
         return redirect()->route('requests.index')
             ->with('success', 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে এবং ' . $matchingDonors->count() . ' জন ডোনারকে অ্যালার্ট পাঠানো হয়েছে।');
     }
 
+    /**
+     * রিকোয়েস্ট সম্পন্ন (Fulfilled) মার্ক করা
+     */
     public function fulfill(Request $request, BloodRequest $bloodRequest)
     {
         Gate::authorize('markFulfilled', $bloodRequest);
@@ -108,13 +128,19 @@ class BloodRequestController extends Controller
         return back()->with('success', 'অভিনন্দন! রিকোয়েস্টটি সম্পন্ন (Fulfilled) মার্ক করা হয়েছে।');
     }
 
+    /**
+     * রিকোয়েস্টের বিস্তারিত এবং এক্সেপ্টেড ডোনার লিস্ট দেখানো
+     */
     public function show(Request $request, BloodRequest $bloodRequest)
     {
         Gate::authorize('view', $bloodRequest);
 
+        // 🚀 রিলেশনাল ডেটা লোড করা (JSON এরর ফিক্স করার জন্য)
         $bloodRequest->load([
             'requester:id,name',
             'responses.user:id,name,phone',
+            'district:id,name',
+            'upazila:id,name'
         ]);
 
         $accepted = $bloodRequest->responses->where('status', 'accepted')->values();
@@ -123,7 +149,7 @@ class BloodRequestController extends Controller
         $canViewAcceptedDonors = $request->user()->can('viewAcceptedDonors', $bloodRequest);
 
         return view('requests.show', [
-            'bloodRequest' => $bloodRequest, 
+            'bloodRequest' => $bloodRequest,
             'acceptedCount' => $accepted->count(),
             'declinedCount' => $declined->count(),
             'acceptedResponses' => $canViewAcceptedDonors ? $accepted : collect(),
