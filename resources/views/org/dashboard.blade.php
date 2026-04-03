@@ -101,10 +101,43 @@
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black bg-slate-100 text-slate-600 uppercase">Not Submitted</span>
                                 @endif
                             </td>
-                            <td class="px-6 py-4 text-right">
-                                <a href="{{ route('org.donor.verify', $user->id) }}" class="inline-flex items-center px-4 py-2 bg-slate-900 text-white rounded-xl text-xs font-black hover:bg-slate-800 transition-all shadow-sm">
-                                    বিস্তারিত
-                                </a>
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                @if($user->nid_status === 'pending')
+                                    <div class="flex items-center justify-end gap-2">
+                                        
+                                        {{-- Approve Button --}}
+                                        <form action="{{ route('org.members.verify', $user->id) }}" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত যে এই ডোনার আপনাদের ক্লাবের ভেরিফাইড মেম্বার?');">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="status" value="approved">
+                                            <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white rounded-md font-bold transition-colors text-xs">
+                                                ✓ Approve
+                                            </button>
+                                        </form>
+
+                                        {{-- Reject Button --}}
+                                        <form action="{{ route('org.members.verify', $user->id) }}" method="POST" onsubmit="return confirm('আপনি কি এই রিকোয়েস্টটি বাতিল করতে চান?');">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="status" value="rejected">
+                                            <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-md font-bold transition-colors text-xs">
+                                                ✕ Reject
+                                            </button>
+                                        </form>
+
+                                    </div>
+
+                                @elseif($user->nid_status === 'approved')
+                                    <span class="inline-flex items-center text-emerald-600 font-extrabold text-sm">
+                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                        </svg>
+                                        Verified
+                                    </span>
+
+                                @else
+                                    <span class="text-slate-400 font-bold text-sm">Rejected</span>
+                                @endif
                             </td>
                         </tr>
                     @empty
