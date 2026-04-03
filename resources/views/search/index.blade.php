@@ -188,5 +188,29 @@
             </div>
         @endif
     </div>
+
+    {{-- 🎯 Smart Scroll Retention Logic --}}
+    <script>
+        // ১. যখনই কোনো ফর্ম (Math Challenge বা Reveal Button) সাবমিট হবে, স্ক্রল পজিশন সেভ করে রাখব
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                sessionStorage.setItem('donorScrollPosition', window.scrollY);
+            });
+        });
+
+        // ২. পেজ রিলোড হওয়ার পর চেক করব কোনো সেভ করা স্ক্রল পজিশন আছে কি না
+        document.addEventListener("DOMContentLoaded", function() {
+            let scrollPos = sessionStorage.getItem('donorScrollPosition');
+            if (scrollPos) {
+                // পজিশন থাকলে ঠিক সেখানে স্ক্রল করে নিয়ে যাব (Smoothly)
+                window.scrollTo({
+                    top: parseInt(scrollPos),
+                    behavior: 'instant' 
+                });
+                // কাজ শেষ, তাই মেমোরি থেকে মুছে ফেললাম যাতে অন্য পেজে গেলে সমস্যা না হয়
+                sessionStorage.removeItem('donorScrollPosition');
+            }
+        });
+    </script>
 </div>
 @endsection
