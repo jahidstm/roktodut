@@ -46,15 +46,21 @@ class RegisteredUserController extends Controller
             'phone' => $request->role === 'donor' ? $request->phone : null,
             'blood_group' => $request->role === 'donor' ? $request->blood_group : null,
 
-            // 🎯 THE FIX: ইউজারকে অনবোর্ডিং পেজে বাধ্য করার জন্য এটি false সেট করা হলো
-            'is_onboarded' => false,
+            // 🎯 THE FIX: Recipient হলে সরাসরি onboarded হিসেবে মার্ক করা হচ্ছে
+            'is_onboarded' => $request->role === 'recipient' ? true : false,
         ]);
 
         event(new Registered($user));
 
         Auth::login($user);
 
-        // 🚀 রিডাইরেক্ট টু অনবোর্ডিং
+        // 🚀 ডাইনামিক রিডাইরেকশন লজিক
+        if ($user->role === 'recipient') {
+            // Recipient হলে সরাসরি ড্যাশবোর্ডে
+            return redirect()->route('dashboard');
+        }
+
+        // Donor হলে অনবোর্ডিং পেজে
         return redirect()->route('onboarding.show');
     }
 }

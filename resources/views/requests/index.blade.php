@@ -15,7 +15,7 @@
     </a>
 </div>
 
-{{-- 🎯 Advanced Filter Section (AJAX Driven) --}}
+{{-- 🎯 Advanced Filter Section (Server-side Divisions + AJAX Cascade) --}}
 <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8">
     <form action="{{ route('requests.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
         
@@ -30,22 +30,26 @@
         </div>
 
         <div>
-            <label for="division_id" class="block text-sm font-bold text-slate-700 mb-1">বিভাগ</label>
-            <select name="division_id" id="division_id" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+            <label for="filter_division" class="block text-sm font-bold text-slate-700 mb-1">বিভাগ</label>
+            <select name="division_id" id="filter_division" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
                 <option value="">বিভাগ নির্বাচন</option>
+                {{-- 🚀 Server-side fetching (Fast & Reliable) --}}
+                @foreach(\App\Models\Division::orderBy('name', 'asc')->get() as $div)
+                    <option value="{{ $div->id }}" {{ request('division_id') == $div->id ? 'selected' : '' }}>{{ $div->name }}</option>
+                @endforeach
             </select>
         </div>
 
         <div>
-            <label for="district_id" class="block text-sm font-bold text-slate-700 mb-1">জেলা</label>
-            <select name="district_id" id="district_id" disabled class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+            <label for="filter_district" class="block text-sm font-bold text-slate-700 mb-1">জেলা</label>
+            <select name="district_id" id="filter_district" disabled class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
                 <option value="">প্রথমে বিভাগ নির্বাচন করুন</option>
             </select>
         </div>
 
         <div>
-            <label for="upazila_id" class="block text-sm font-bold text-slate-700 mb-1">উপজেলা/থানা</label>
-            <select name="upazila_id" id="upazila_id" disabled class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+            <label for="filter_upazila" class="block text-sm font-bold text-slate-700 mb-1">উপজেলা/থানা</label>
+            <select name="upazila_id" id="filter_upazila" disabled class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
                 <option value="">প্রথমে জেলা নির্বাচন করুন</option>
             </select>
         </div>
@@ -79,7 +83,7 @@
                         </a>
                         <div class="text-sm text-slate-500 font-medium truncate mt-1">{{ $r->hospital ?? 'হাসপাতাল উল্লেখ নেই' }}</div>
                         
-                        {{-- 🚀 Tabassum: Requester name with Verified Badge --}}
+                        {{-- 🚀 Requester name with Verified Badge --}}
                         <div class="flex items-center gap-2 mt-2">
                             <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">প্রার্থনাকারী:</span>
                             <div class="flex items-center gap-1.5">
@@ -110,7 +114,7 @@
                     <span>ব্যাগ: {{ $r->bags_needed ?? '-' }}</span>
                 </div>
 
-                {{-- ডাইনামিক অ্যাকশন বাটন সেকশন (আলিফের কাজ এখানে চলছে) --}}
+                {{-- ডাইনামিক অ্যাকশন বাটন সেকশন --}}
                 <div class="mt-5 flex flex-wrap gap-2">
                     @php
                         $myResponse = $r->responses->first();
@@ -128,7 +132,7 @@
 
                     @if (Route::has('requests.respond') && !$isOwner && strtolower($r->status) !== 'fulfilled')
                         @if (!$myResponse)
-                            @if(auth()->user()->is_eligible_to_donate)
+                            @if(auth()->check() && auth()->user()->is_eligible_to_donate)
                                 <form method="POST" action="{{ route('requests.respond', $r) }}">
                                     @csrf
                                     <input type="hidden" name="status" value="accepted" />
@@ -137,7 +141,7 @@
                                     </button>
                                 </form>
                             @else
-                                <button disabled title="আপনি রক্তদানের যোগ্য নন (ড্যাশবোর্ড চেক করুন)" class="px-4 py-2 rounded-lg bg-slate-200 text-slate-400 font-extrabold text-sm cursor-not-allowed border border-slate-300">
+                                <button disabled title="আপনি রক্তদানের যোগ্য নন" class="px-4 py-2 rounded-lg bg-slate-200 text-slate-400 font-extrabold text-sm cursor-not-allowed border border-slate-300">
                                     Accept
                                 </button>
                             @endif
@@ -169,7 +173,7 @@
                                     Declined
                                 </span>
 
-                                @if(auth()->user()->is_eligible_to_donate)
+                                @if(auth()->check() && auth()->user()->is_eligible_to_donate)
                                     <form method="POST" action="{{ route('requests.respond', $r) }}">
                                         @csrf
                                         <input type="hidden" name="status" value="accepted" />
@@ -195,64 +199,82 @@
     </div>
 @endif
 
-{{-- ⚙️ AJAX Script for Filter Location --}}
+{{-- ⚙️ Isolated AJAX Script for Cascading Filter Location --}}
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const divSelect = document.getElementById('division_id');
-        const distSelect = document.getElementById('district_id');
-        const upzSelect = document.getElementById('upazila_id');
+        const divSelect = document.getElementById('filter_division');
+        const distSelect = document.getElementById('filter_district');
+        const upzSelect = document.getElementById('filter_upazila');
 
         const oldDiv = "{{ request('division_id') }}";
         const oldDist = "{{ request('district_id') }}";
         const oldUpz = "{{ request('upazila_id') }}";
 
-        fetch('/ajax/divisions')
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(div => {
-                    const selected = (div.id == oldDiv) ? 'selected' : '';
-                    divSelect.innerHTML += `<option value="${div.id}" ${selected}>${div.name}</option>`;
-                });
-                if(oldDiv) divSelect.dispatchEvent(new Event('change'));
-            });
+        function loadDistricts(divId, preSelectedDist = null) {
+            distSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
+            distSelect.disabled = true;
+            upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
+            upzSelect.disabled = true;
 
-        divSelect.addEventListener('change', function() {
-            if (!this.value) {
-                distSelect.disabled = true; distSelect.innerHTML = '<option value="">প্রথমে বিভাগ নির্বাচন করুন</option>';
-                upzSelect.disabled = true; upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
-                return;
-            }
-            distSelect.disabled = true; distSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
-            fetch(`/ajax/districts/${this.value}`)
+            fetch(`/ajax/districts/${divId}`)
                 .then(res => res.json())
                 .then(data => {
-                    distSelect.innerHTML = '<option value="">জেলা নির্বাচন করুন</option>';
+                    distSelect.innerHTML = '<option value="">জেলা নির্বাচন</option>';
                     distSelect.disabled = false;
                     data.forEach(dist => {
-                        const selected = (dist.id == oldDist) ? 'selected' : '';
+                        const selected = (dist.id == preSelectedDist) ? 'selected' : '';
                         distSelect.innerHTML += `<option value="${dist.id}" ${selected}>${dist.name}</option>`;
                     });
-                    if(oldDist) distSelect.dispatchEvent(new Event('change'));
-                });
+
+                    if(preSelectedDist) {
+                        loadUpazilas(preSelectedDist, oldUpz);
+                    }
+                })
+                .catch(err => console.error("Error loading districts:", err));
+        }
+
+        function loadUpazilas(distId, preSelectedUpz = null) {
+            upzSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
+            upzSelect.disabled = true;
+
+            fetch(`/ajax/upazilas/${distId}`)
+                .then(res => res.json())
+                .then(data => {
+                    upzSelect.innerHTML = '<option value="">উপজেলা/থানা নির্বাচন</option>';
+                    upzSelect.disabled = false;
+                    data.forEach(upz => {
+                        const selected = (upz.id == preSelectedUpz) ? 'selected' : '';
+                        upzSelect.innerHTML += `<option value="${upz.id}" ${selected}>${upz.name}</option>`;
+                    });
+                })
+                .catch(err => console.error("Error loading upazilas:", err));
+        }
+
+        // Event Listeners
+        divSelect.addEventListener('change', function() {
+            if (!this.value) {
+                distSelect.innerHTML = '<option value="">প্রথমে বিভাগ নির্বাচন করুন</option>';
+                distSelect.disabled = true;
+                upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
+                upzSelect.disabled = true;
+                return;
+            }
+            loadDistricts(this.value);
         });
 
         distSelect.addEventListener('change', function() {
             if (!this.value) {
-                upzSelect.disabled = true; upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
+                upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
+                upzSelect.disabled = true;
                 return;
             }
-            upzSelect.disabled = true; upzSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
-            fetch(`/ajax/upazilas/${this.value}`)
-                .then(res => res.json())
-                .then(data => {
-                    upzSelect.innerHTML = '<option value="">উপজেলা/থানা নির্বাচন করুন</option>';
-                    upzSelect.disabled = false;
-                    data.forEach(upz => {
-                        const selected = (upz.id == oldUpz) ? 'selected' : '';
-                        upzSelect.innerHTML += `<option value="${upz.id}" ${selected}>${upz.name}</option>`;
-                    });
-                });
+            loadUpazilas(this.value);
         });
+
+        // Auto-hydrate on load if old data exists
+        if(oldDiv) {
+            loadDistricts(oldDiv, oldDist);
+        }
     });
 </script>
 @endsection

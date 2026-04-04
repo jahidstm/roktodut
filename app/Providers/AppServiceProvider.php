@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Division;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
@@ -22,16 +25,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // 🛡️ Anti-Scraping Privacy Shield for Donor Phone Numbers
+        
+        // 🛡️ ২. Anti-Scraping Privacy Shield for Donor Phone Numbers
         RateLimiter::for('phone-reveal', function (Request $request) {
-    
+
             if ($request->user() && $request->user()->isAdmin()) {
                 return Limit::none();
             }
 
             return Limit::perMinutes(15, 5)->by($request->user()?->id ?: $request->ip())
                 ->response(function (Request $request) {
-                    // যদি রিকোয়েস্টটি AJAX/JSON হয়
+                    // যদি রিকোয়েস্টটি AJAX/JSON হয়
                     if ($request->expectsJson()) {
                         return response()->json([
                             'message' => 'অত্যধিক রিকোয়েস্ট! স্প্যাম প্রতিরোধের জন্য আপনাকে সাময়িকভাবে ব্লক করা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পর আবার চেষ্টা করুন।'

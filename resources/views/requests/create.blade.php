@@ -48,30 +48,19 @@
                 </div>
             </div>
 
-            {{-- 📍 Dynamic Location Dropdowns --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 p-5 bg-slate-50 rounded-2xl border border-slate-100">
-                <div>
-                    <label class="text-sm font-extrabold text-slate-800">বিভাগ <span class="text-red-500">*</span></label>
-                    <select id="division_id" name="division_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3">
-                        <option value="">বিভাগ নির্বাচন</option>
-                    </select>
-                    @error('division_id') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
-                </div>
-
-                <div>
-                    <label class="text-sm font-extrabold text-slate-800">জেলা <span class="text-red-500">*</span></label>
-                    <select id="district_id" name="district_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" disabled>
-                        <option value="">প্রথমে বিভাগ নির্বাচন করুন</option>
-                    </select>
-                    @error('district_id') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
-                </div>
-
-                <div>
-                    <label class="text-sm font-extrabold text-slate-800">উপজেলা/থানা <span class="text-red-500">*</span></label>
-                    <select id="upazila_id" name="upazila_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" disabled>
-                        <option value="">প্রথমে জেলা নির্বাচন করুন</option>
-                    </select>
-                    @error('upazila_id') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
+            {{-- 📍 Dynamic Location Dropdowns (Using Global Component with correct Kebab-case properties) --}}
+            <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                <x-location-selector 
+                    :selected-division="old('division_id')"
+                    :selected-district="old('district_id')"
+                    :selected-upazila="old('upazila_id')"
+                />
+                
+                {{-- Error states for location --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-3">
+                    @error('division_id') <div class="text-sm text-red-600 font-bold">{{ $message }}</div> @enderror
+                    @error('district_id') <div class="text-sm text-red-600 font-bold">{{ $message }}</div> @enderror
+                    @error('upazila_id') <div class="text-sm text-red-600 font-bold">{{ $message }}</div> @enderror
                 </div>
             </div>
 
@@ -137,58 +126,4 @@
         </form>
     </div>
 </div>
-
-{{-- ⚙️ AJAX Script for Location --}}
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const divSelect = document.getElementById('division_id');
-        const distSelect = document.getElementById('district_id');
-        const upzSelect = document.getElementById('upazila_id');
-
-        const oldDiv = "{{ old('division_id') }}";
-        const oldDist = "{{ old('district_id') }}";
-        const oldUpz = "{{ old('upazila_id') }}";
-
-        fetch('/ajax/divisions')
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(div => {
-                    const selected = (div.id == oldDiv) ? 'selected' : '';
-                    divSelect.innerHTML += `<option value="${div.id}" ${selected}>${div.name}</option>`;
-                });
-                if(oldDiv) divSelect.dispatchEvent(new Event('change'));
-            });
-
-        divSelect.addEventListener('change', function() {
-            if (!this.value) return;
-            distSelect.disabled = true; distSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
-            fetch(`/ajax/districts/${this.value}`)
-                .then(res => res.json())
-                .then(data => {
-                    distSelect.innerHTML = '<option value="">জেলা নির্বাচন করুন</option>';
-                    distSelect.disabled = false;
-                    data.forEach(dist => {
-                        const selected = (dist.id == oldDist) ? 'selected' : '';
-                        distSelect.innerHTML += `<option value="${dist.id}" ${selected}>${dist.name}</option>`;
-                    });
-                    if(oldDist) distSelect.dispatchEvent(new Event('change'));
-                });
-        });
-
-        distSelect.addEventListener('change', function() {
-            if (!this.value) return;
-            upzSelect.disabled = true; upzSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
-            fetch(`/ajax/upazilas/${this.value}`)
-                .then(res => res.json())
-                .then(data => {
-                    upzSelect.innerHTML = '<option value="">উপজেলা/থানা নির্বাচন করুন</option>';
-                    upzSelect.disabled = false;
-                    data.forEach(upz => {
-                        const selected = (upz.id == oldUpz) ? 'selected' : '';
-                        upzSelect.innerHTML += `<option value="${upz.id}" ${selected}>${upz.name}</option>`;
-                    });
-                });
-        });
-    });
-</script>
 @endsection

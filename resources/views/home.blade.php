@@ -96,8 +96,15 @@
             </div>
 
             <form action="{{ route('search') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                
+                {{-- 🎯 অপটিমাইজড বিভাগ ড্রপডাউন (ডাটাবেস থেকে ডেটা লোড হচ্ছে) --}}
                 <select id="division_select" name="division" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200">
                     <option value="">বিভাগ নির্বাচন</option>
+                    @if(isset($divisions))
+                        @foreach($divisions as $division)
+                            <option value="{{ $division->id }}">{{ $division->name }}</option>
+                        @endforeach
+                    @endif
                 </select>
 
                 <select id="district_select" name="district" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200" disabled>
@@ -240,22 +247,12 @@
         <p>© {{ date('Y') }} রক্তদূত. সর্বস্বত্ব সংরক্ষিত.</p>
     </footer>
 
-    {{-- ⚙️ THE AJAX LOGIC SCRIPT --}}
+    {{-- ⚙️ THE AJAX LOGIC SCRIPT (Optimized) --}}
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const divisionSelect = document.getElementById('division_select');
             const districtSelect = document.getElementById('district_select');
             const upazilaSelect = document.getElementById('upazila_select');
-
-            // Fetch Divisions on Page Load
-            fetch('/ajax/divisions')
-                .then(res => res.json())
-                .then(data => {
-                    divisionSelect.innerHTML = '<option value="">বিভাগ নির্বাচন</option>';
-                    data.forEach(div => {
-                        divisionSelect.innerHTML += `<option value="${div.id}">${div.name}</option>`;
-                    });
-                });
 
             // On Division Change -> Fetch Districts
             divisionSelect.addEventListener('change', function() {
@@ -274,7 +271,8 @@
                             data.forEach(dist => {
                                 districtSelect.innerHTML += `<option value="${dist.id}">${dist.name}</option>`;
                             });
-                        });
+                        })
+                        .catch(err => console.error("Error fetching districts:", err));
                 } else {
                     districtSelect.innerHTML = '<option value="">জেলা নির্বাচন</option>';
                 }
@@ -295,7 +293,8 @@
                             data.forEach(upz => {
                                 upazilaSelect.innerHTML += `<option value="${upz.id}">${upz.name}</option>`;
                             });
-                        });
+                        })
+                        .catch(err => console.error("Error fetching upazilas:", err));
                 } else {
                     upazilaSelect.innerHTML = '<option value="">উপজেলা/এরিয়া</option>';
                 }

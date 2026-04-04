@@ -14,17 +14,21 @@ use App\Http\Controllers\DonationRecordController;
 use App\Http\Controllers\OrgAdmin\DashboardController as OrgDashboardController;
 use App\Http\Controllers\OrgAdmin\VerificationController;
 use App\Http\Controllers\LocationController;
+use App\Models\Division;
 use Illuminate\Support\Facades\Route;
 
 // --- ১. পাবলিক রাউটস (No Login Required) ---
-Route::get('/', fn() => view('home'))->name('home');
 
-// 🎯 ইমার্জেন্সি সার্চ এবং প্রাইভেসি শিল্ড রাউটস (Move to Public)
+// 🎯 ফিক্স: হোমপেজের ড্রপডাউনের জন্য বিভাগগুলো ডেটাবেস থেকে পাঠানো হচ্ছে
+Route::get('/', function () {
+    $divisions = Division::all();
+    return view('home', compact('divisions'));
+})->name('home');
+
+// 🛡️ ইমার্জেন্সি সার্চ এবং প্রাইভেসি শিল্ড রাউটস
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::post('/donors/{donor}/reveal/start', [DonorRevealController::class, 'start'])->name('donors.reveal.start');
 Route::post('/donors/{donor}/reveal/verify', [DonorRevealController::class, 'verify'])->name('donors.reveal.verify');
-
-require __DIR__ . '/auth.php';
 
 // --- ২. সোশ্যাল লগইন ---
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');
@@ -97,3 +101,5 @@ Route::get('/ajax/divisions', [LocationController::class, 'getDivisions']);
 Route::get('/ajax/districts/{division_id}', [LocationController::class, 'getDistricts']);
 Route::get('/ajax/upazilas/{district_id}', [LocationController::class, 'getUpazilas']);
 
+// 🎯 ফিক্স: লারাভেলের ডিফল্ট অথেনটিকেশন রাউটগুলো সবসময় ফাইলের নিচে রাখা নিরাপদ
+require __DIR__ . '/auth.php';

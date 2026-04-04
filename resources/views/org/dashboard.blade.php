@@ -27,7 +27,7 @@
             </div>
             <div>
                 <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">মোট মেম্বার</p>
-                <h3 class="text-3xl font-black text-slate-900">{{ $stats['total'] }} <span class="text-base text-slate-400 font-medium">জন</span></h3>
+                <h3 class="text-3xl font-black text-slate-900">{{ $stats['total'] ?? 0 }} <span class="text-base text-slate-400 font-medium">জন</span></h3>
             </div>
         </div>
 
@@ -37,7 +37,7 @@
             </div>
             <div>
                 <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">অপেক্ষমাণ ভেরিফিকেশন</p>
-                <h3 class="text-3xl font-black text-slate-900">{{ $stats['pending'] }} <span class="text-base text-slate-400 font-medium">জন</span></h3>
+                <h3 class="text-3xl font-black text-slate-900">{{ $stats['pending'] ?? 0 }} <span class="text-base text-slate-400 font-medium">জন</span></h3>
             </div>
         </div>
 
@@ -47,7 +47,7 @@
             </div>
             <div>
                 <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">মোট ভেরিফাইড</p>
-                <h3 class="text-3xl font-black text-slate-900">{{ $stats['approved'] }} <span class="text-base text-slate-400 font-medium">জন</span></h3>
+                <h3 class="text-3xl font-black text-slate-900">{{ $stats['approved'] ?? 0 }} <span class="text-base text-slate-400 font-medium">জন</span></h3>
             </div>
         </div>
     </div>
@@ -63,9 +63,9 @@
             
             {{-- Tabs / Filter --}}
             <div class="flex bg-white border border-slate-200 rounded-lg p-1 shadow-sm">
-                <a href="{{ route('org.dashboard') }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ !$request->status ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-900' }}">সবাই</a>
-                <a href="{{ route('org.dashboard', ['status' => 'pending']) }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ $request->status === 'pending' ? 'bg-amber-100 text-amber-800' : 'text-slate-500 hover:text-slate-900' }}">পেন্ডিং</a>
-                <a href="{{ route('org.dashboard', ['status' => 'approved']) }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ $request->status === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'text-slate-500 hover:text-slate-900' }}">অ্যাপ্রুভড</a>
+                <a href="{{ route('org.dashboard') }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ !request('status') ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-900' }}">সবাই</a>
+                <a href="{{ route('org.dashboard', ['status' => 'pending']) }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ request('status') === 'pending' ? 'bg-amber-100 text-amber-800' : 'text-slate-500 hover:text-slate-900' }}">পেন্ডিং</a>
+                <a href="{{ route('org.dashboard', ['status' => 'approved']) }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ request('status') === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'text-slate-500 hover:text-slate-900' }}">অ্যাপ্রুভড</a>
             </div>
         </div>
 
@@ -101,40 +101,42 @@
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black bg-slate-100 text-slate-600 uppercase">Not Submitted</span>
                                 @endif
                             </td>
+                            
+                            {{-- 🎯 Fixed Action Column --}}
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 @if($user->nid_status === 'pending')
                                     <div class="flex items-center justify-end gap-2">
                                         
-                                        {{-- Approve Button --}}
+                                        {{-- 👁️ Review Details Button --}}
+                                        <a href="{{ route('org.donor.verify', $user->id) }}" class="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white rounded-md font-bold transition-colors text-xs">
+                                            রিভিউ করুন
+                                        </a>
+
+                                        {{-- Quick Approve Button --}}
                                         <form action="{{ route('org.members.verify', $user->id) }}" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত যে এই ডোনার আপনাদের ক্লাবের ভেরিফাইড মেম্বার?');">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="status" value="approved">
                                             <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white rounded-md font-bold transition-colors text-xs">
-                                                ✓ Approve
+                                                ✓
                                             </button>
                                         </form>
 
-                                        {{-- Reject Button --}}
+                                        {{-- Quick Reject Button --}}
                                         <form action="{{ route('org.members.verify', $user->id) }}" method="POST" onsubmit="return confirm('আপনি কি এই রিকোয়েস্টটি বাতিল করতে চান?');">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="status" value="rejected">
                                             <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-md font-bold transition-colors text-xs">
-                                                ✕ Reject
+                                                ✕
                                             </button>
                                         </form>
-
                                     </div>
-
                                 @elseif($user->nid_status === 'approved')
                                     <span class="inline-flex items-center text-emerald-600 font-extrabold text-sm">
-                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                        </svg>
+                                        <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
                                         Verified
                                     </span>
-
                                 @else
                                     <span class="text-slate-400 font-bold text-sm">Rejected</span>
                                 @endif
@@ -152,7 +154,7 @@
         </div>
         
         {{-- Pagination --}}
-        @if($members->hasPages())
+        @if(method_exists($members, 'hasPages') && $members->hasPages())
             <div class="px-6 py-4 border-t border-slate-100 bg-slate-50">
                 {{ $members->links() }}
             </div>

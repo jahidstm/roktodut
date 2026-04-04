@@ -40,7 +40,7 @@
                 <div class="text-lg font-extrabold truncate">{{ $bloodRequest->patient_name ?? 'রোগী' }}</div>
                 <div class="text-sm text-slate-500 font-medium truncate mt-1">{{ $bloodRequest->hospital ?? 'হাসপাতাল উল্লেখ নেই' }}</div>
                 <div class="text-sm text-slate-500 font-semibold mt-2">
-                    {{-- 🚀 JSON Fix Applied Here --}}
+                    {{-- 🚀 Location JSON Fix --}}
                     লোকেশন: <span class="text-slate-800 font-extrabold">{{ $bloodRequest->upazila?->name ?? '-' }}, {{ $bloodRequest->district?->name ?? '-' }}</span>
                 </div>
             </div>
@@ -78,8 +78,8 @@
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="text-lg font-extrabold">রেসপন্স সারাংশ</div>
             <div class="mt-3 text-sm font-semibold text-slate-700">
-                Accepted: <span class="font-extrabold text-emerald-700">{{ $acceptedCount }}</span><br>
-                Declined: <span class="font-extrabold text-slate-700">{{ $declinedCount }}</span>
+                Accepted: <span class="font-extrabold text-emerald-700">{{ $acceptedCount ?? 0 }}</span><br>
+                Declined: <span class="font-extrabold text-slate-700">{{ $declinedCount ?? 0 }}</span>
             </div>
         </div>
 
@@ -87,12 +87,12 @@
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div class="text-lg font-extrabold">Accepted ডোনার</div>
 
-            @if(!$canViewAcceptedDonors)
+            @if(empty($canViewAcceptedDonors) || !$canViewAcceptedDonors)
                 <div class="mt-3 text-sm text-slate-500 font-medium p-4 bg-slate-50 rounded-xl border border-slate-100">
                     প্রাইভেসির কারণে আপনি accepted ডোনারদের তালিকা দেখতে পারবেন না। শুধুমাত্র রিকোয়েস্টের মালিক এটি দেখতে পারবেন।
                 </div>
             @else
-                @if($acceptedResponses->isEmpty())
+                @if(empty($acceptedResponses) || $acceptedResponses->isEmpty())
                     <div class="mt-3 text-sm text-slate-500 font-medium p-4 bg-slate-50 rounded-xl border border-slate-100">
                         এখনো কেউ accept করেনি।
                     </div>
@@ -130,46 +130,54 @@
 
 {{-- Reveal Phone Number Script --}}
 <script>
-document.addEventListener('click', async (e) => {
-    const btn = e.target.closest('.reveal-btn');
-    if (!btn) return;
+document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('click', async (e) => {
+        const btn = e.target.closest('.reveal-btn');
+        if (!btn) return;
 
-    const url = btn.getAttribute('data-url');
-    const targetId = btn.getAttribute('data-target');
-    const targetEl = document.getElementById(targetId);
+        const url = btn.getAttribute('data-url');
+        const targetId = btn.getAttribute('data-target');
+        const targetEl = document.getElementById(targetId);
 
-    btn.disabled = true;
-    const originalText = btn.textContent;
-    btn.textContent = 'Revealing...';
-    btn.classList.add('opacity-75', 'cursor-not-allowed');
+        if (!url || !targetEl) return;
 
-    try {
-        const res = await fetch(url, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Accept': 'application/json',
+        btn.disabled = true;
+        const originalText = btn.textContent;
+        btn.textContent = 'Revealing...';
+        btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data.message || 'নাম্বার দেখতে সমস্যা হচ্ছে। আবার চেষ্টা করুন।');
             }
-        });
+            
+            targetEl.textContent = data.phone ?? 'N/A';
+            btn.textContent = 'Revealed';
+            btn.classList.replace('bg-red-600', 'bg-slate-400');
+            btn.classList.replace('hover:bg-red-700', 'hover:bg-slate-500');
+            btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            
+            // Remove the button class so it can't be clicked again
+            btn.classList.remove('reveal-btn');
 
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
-            throw new Error(data.message || 'নাম্বার দেখতে সমস্যা হচ্ছে। আবার চেষ্টা করুন।');
+        } catch (err) {
+            btn.disabled = false;
+            btn.textContent = originalText;
+            btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            alert(err.message);
         }
-        
-        targetEl.textContent = data.phone ?? 'N/A';
-        btn.textContent = 'Revealed';
-        btn.classList.replace('bg-red-600', 'bg-slate-400');
-        btn.classList.replace('hover:bg-red-700', 'hover:bg-slate-500');
-        btn.classList.remove('opacity-75', 'cursor-not-allowed');
-
-    } catch (err) {
-        btn.disabled = false;
-        btn.textContent = originalText;
-        btn.classList.remove('opacity-75', 'cursor-not-allowed');
-        alert(err.message);
-    }
+    });
 });
 </script>
 @endsection
