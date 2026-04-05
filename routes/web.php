@@ -14,6 +14,7 @@ use App\Http\Controllers\DonationRecordController;
 use App\Http\Controllers\OrgAdmin\DashboardController as OrgDashboardController;
 use App\Http\Controllers\OrgAdmin\VerificationController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\OrgRegistrationController;
 use App\Models\Division;
 use Illuminate\Support\Facades\Route;
 
@@ -64,6 +65,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // 🚀 NID ডকুমেন্ট আপলোড রাউট
+    Route::post('/donor/upload-nid', [ProfileController::class, 'uploadNid'])->name('donor.upload_nid');
+
     // রক্তদানের রেকর্ড আপডেট
     Route::post('/donation-record', [DonationRecordController::class, 'update'])->name('donation.record.update');
 });
@@ -101,5 +105,12 @@ Route::get('/ajax/divisions', [LocationController::class, 'getDivisions']);
 Route::get('/ajax/districts/{division_id}', [LocationController::class, 'getDistricts']);
 Route::get('/ajax/upazilas/{district_id}', [LocationController::class, 'getUpazilas']);
 
-// 🎯 ফিক্স: লারাভেলের ডিফল্ট অথেনটিকেশন রাউটগুলো সবসময় ফাইলের নিচে রাখা নিরাপদ
+// 🎯 ফিক্স: লারাভেলের ডিফল্ট অথেনটিকেশন রাউটগুলো সবসময় ফাইলের নিচে রাখা নিরাপদ
 require __DIR__ . '/auth.php';
+
+
+// Organization Registration Routes
+Route::middleware('guest')->group(function () {
+    Route::get('/org/register', [OrgRegistrationController::class, 'create'])->name('org.register');
+    Route::post('/org/register', [OrgRegistrationController::class, 'store'])->name('org.store');
+});

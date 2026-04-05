@@ -8,11 +8,6 @@ use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends FormRequest
 {
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
-     */
     public function rules(): array
     {
         return [
@@ -25,10 +20,17 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
-            // 📍 সিকিউরড লোকেশন ভ্যালিডেশন রুলস
-            'division_id' => ['nullable', 'integer', 'exists:divisions,id'],
-            'district_id' => ['nullable', 'integer', 'exists:districts,id'],
-            'upazila_id'  => ['nullable', 'integer', 'exists:upazilas,id'],
+            // 🚀 নতুন ফিল্ডগুলোর ভ্যালিডেশন
+            'phone' => ['nullable', 'string', 'max:20'],
+            'blood_group' => ['nullable', 'string'],
+            'division_id' => ['nullable', 'exists:divisions,id'],
+            'district_id' => ['nullable', 'exists:districts,id'],
+            'upazila_id' => ['nullable', 'exists:upazilas,id'],
+            'date_of_birth' => ['nullable', 'date'],
+            'gender' => ['nullable', 'string', 'in:male,female'],
+            'weight' => ['nullable', 'numeric', 'min:30'],
+            'organization_id' => ['nullable', 'exists:organizations,id'],
+            'profile_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'], // Max 2MB
         ];
     }
 }

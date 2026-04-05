@@ -33,7 +33,7 @@
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
                 <div class="bg-slate-900 px-6 py-8 text-center relative">
                     <div class="absolute top-4 right-4 bg-red-600 text-white text-xs font-black px-3 py-1 rounded-full shadow-sm">
-                        {{ $donor->blood_group ?? 'N/A' }}
+                        {{ $donor->blood_group?->value ?? (string) $donor->blood_group ?? 'N/A' }}
                     </div>
                     <div class="w-24 h-24 bg-slate-200 rounded-full border-4 border-slate-800 mx-auto flex items-center justify-center overflow-hidden">
                         {{-- Profile Image Placeholder --}}
@@ -81,14 +81,30 @@
                     <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-md">Front Side</span>
                 </div>
 
-                <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex-grow flex flex-col items-center justify-center p-8 min-h-[300px] relative group cursor-pointer">
-                    <div class="absolute inset-0 bg-slate-900/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center">
-                        <span class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg">ক্লিক করে বড় করুন</span>
-                    </div>
-                    
-                    @if($donor->nid_image)
-                        <p class="text-slate-500 font-bold">ইমেজ প্রদর্শনের কোড এখানে বসবে</p>
+                {{-- 🚀 Image Rendering Logic (Updated with iFrame for PDF) --}}
+                <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-2xl flex-grow flex flex-col items-center justify-center p-4 min-h-[400px] relative group overflow-hidden">
+                    @if($donor->nid_path)
+                        @if(Str::endsWith($donor->nid_path, ['.pdf']))
+                            {{-- Embedded PDF Viewer --}}
+                            <div class="w-full h-full flex flex-col items-center w-full gap-4">
+                                <iframe src="{{ asset('storage/' . $donor->nid_path) }}" class="w-full h-[350px] rounded-xl border border-slate-200 shadow-inner" style="border: none;"></iframe>
+                                
+                                <a href="{{ asset('storage/' . $donor->nid_path) }}" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white text-sm font-bold rounded-xl hover:bg-slate-900 transition-colors shadow-sm">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                                    নতুন ট্যাবে বড় করে দেখুন
+                                </a>
+                            </div>
+                        @else
+                            {{-- Image Preview --}}
+                            <a href="{{ asset('storage/' . $donor->nid_path) }}" target="_blank" class="w-full h-full flex items-center justify-center cursor-pointer">
+                                <img src="{{ asset('storage/' . $donor->nid_path) }}" alt="NID Document" class="max-h-[400px] w-auto object-contain rounded-xl">
+                            </a>
+                            <div class="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center pointer-events-none">
+                                <span class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg">ক্লিক করে বড় করুন</span>
+                            </div>
+                        @endif
                     @else
+                        {{-- No Document Fallback --}}
                         <svg class="w-16 h-16 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         <p class="text-slate-500 font-bold text-sm">ডোনার এখনো কোনো ডকুমেন্ট আপলোড করেননি</p>
                     @endif
@@ -102,7 +118,7 @@
                 </div>
             </div>
 
-            {{-- ⚡ Action Buttons with Alpine.js Modals (Double-Submit Prevented) --}}
+            {{-- ⚡ Action Buttons --}}
             <div x-data="{ showApproveModal: false, showRejectModal: false }" class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center gap-4 justify-end">
                 
                 <button @click="showRejectModal = true" type="button" class="w-full sm:w-auto px-8 py-3.5 bg-white border-2 border-red-100 text-red-600 hover:bg-red-50 hover:border-red-200 rounded-xl text-sm font-black transition-all">
@@ -116,7 +132,7 @@
 
                 {{-- 🔴 Reject Confirmation Modal --}}
                 <div x-show="showRejectModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" x-transition.opacity>
-                    <div @click.away="showRejectModal = false" class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100">
+                    <div @click.away="showRejectModal = false" class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="bg-red-100 text-red-600 p-2 rounded-full">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -126,11 +142,10 @@
                         <p class="text-slate-500 font-medium mb-8">আপনি কি নিশ্চিত যে আপনি এই ডোনারের ভেরিফিকেশন আবেদনটি বাতিল করতে চান? এই অ্যাকশনটি ডেটাবেসে লগ করা হবে।</p>
                         <div class="flex justify-end gap-3">
                             <button @click="showRejectModal = false" type="button" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition">বাতিল</button>
-                            
-                            {{-- Secure Form --}}
-                            <form action="{{ route('org.donor.reject', $donor->id) }}" method="POST" x-data="{ submitting: false }" @submit="submitting = true">
+                            <form action="{{ route('org.donor.reject', $donor->id) }}" method="POST">
                                 @csrf
-                                <button type="submit" x-bind:disabled="submitting" x-text="submitting ? 'প্রসেসিং...' : 'হ্যাঁ, রিজেক্ট করুন'" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-black transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                <button type="submit" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-black transition shadow-sm">
+                                    হ্যাঁ, রিজেক্ট করুন
                                 </button>
                             </form>
                         </div>
@@ -139,7 +154,7 @@
 
                 {{-- 🟢 Approve Confirmation Modal --}}
                 <div x-show="showApproveModal" style="display: none;" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm" x-transition.opacity>
-                    <div @click.away="showApproveModal = false" class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95" x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100">
+                    <div @click.away="showApproveModal = false" class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="bg-emerald-100 text-emerald-600 p-2 rounded-full">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -149,11 +164,10 @@
                         <p class="text-slate-500 font-medium mb-8">আপনি কি নিশ্চিত যে আপনি প্রদত্ত ডকুমেন্টের সাথে ডোনারের তথ্য পুঙ্খানুপুঙ্খভাবে যাচাই করেছেন এবং তাকে ভেরিফাইড ডোনার হিসেবে অ্যাপ্রুভ করতে চান?</p>
                         <div class="flex justify-end gap-3">
                             <button @click="showApproveModal = false" type="button" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition">বাতিল</button>
-                            
-                            {{-- Secure Form --}}
-                            <form action="{{ route('org.donor.approve', $donor->id) }}" method="POST" x-data="{ submitting: false }" @submit="submitting = true">
+                            <form action="{{ route('org.donor.approve', $donor->id) }}" method="POST">
                                 @csrf
-                                <button type="submit" x-bind:disabled="submitting" x-text="submitting ? 'প্রসেসিং...' : 'হ্যাঁ, অ্যাপ্রুভ করুন'" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                <button type="submit" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black transition shadow-sm">
+                                    হ্যাঁ, অ্যাপ্রুভ করুন
                                 </button>
                             </form>
                         </div>

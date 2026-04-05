@@ -25,8 +25,51 @@
         <p class="text-slate-500 font-medium mt-1">আপনার রক্তদান এবং রিকোয়েস্টের বিস্তারিত ড্যাশবোর্ড।</p>
     </div>
 
+    @if(session('success'))
+        <div class="mb-8 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl font-bold flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            {{ session('success') }}
+        </div>
+    @endif
+
+    {{-- 🚀 NID Upload Prompt for Organization Members --}}
+    @php $user = auth()->user(); @endphp
+    @if($user->organization_id && $user->nid_status === 'pending' && empty($user->nid_path))
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8 shadow-sm">
+            <div class="flex flex-col md:flex-row md:items-start gap-4">
+                <div class="shrink-0 text-amber-600 bg-amber-100 p-3 rounded-full hidden md:block">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-black text-amber-900">ভেরিফিকেশন প্রয়োজন!</h3>
+                    <p class="text-sm text-amber-800 font-medium mt-1">
+                        আপনি একটি ব্লাড ক্লাবের সদস্য হিসেবে যুক্ত হতে চেয়েছেন। ভেরিফাইড ডোনার (ব্লু-ব্যাজ) হতে আপনার NID, জন্মনিবন্ধন বা স্টুডেন্ট আইডি কার্ডের ছবি আপলোড করুন।
+                    </p>
+                    
+                    <form action="{{ route('donor.upload_nid') }}" method="POST" enctype="multipart/form-data" class="mt-4 flex flex-col sm:flex-row items-center gap-3">
+                        @csrf
+                        <input type="file" name="nid_document" accept=".jpg,.jpeg,.png,.pdf" class="w-full sm:w-auto text-sm text-amber-900 bg-white border border-amber-200 rounded-xl file:mr-4 file:py-2.5 file:px-4 file:border-0 file:text-sm file:font-bold file:bg-amber-600 file:text-white hover:file:bg-amber-700 cursor-pointer" required>
+                        <button type="submit" class="w-full sm:w-auto bg-amber-700 hover:bg-amber-800 text-white px-8 py-2.5 rounded-xl font-bold transition-all shadow-sm">
+                            আপলোড করুন
+                        </button>
+                    </form>
+                    @error('nid_document') <p class="text-red-600 text-xs mt-2 font-bold">{{ $message }}</p> @enderror
+                </div>
+            </div>
+        </div>
+    @elseif($user->organization_id && $user->nid_status === 'pending' && !empty($user->nid_path))
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8 shadow-sm flex items-center gap-4">
+            <div class="shrink-0 text-blue-600 bg-blue-100 p-3 rounded-full">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div>
+                <h3 class="text-base font-black text-blue-900">ডকুমেন্ট রিভিউ হচ্ছে...</h3>
+                <p class="text-sm text-blue-700 font-medium mt-0.5">আপনার পরিচয়পত্র অর্গানাইজেশনের কাছে পাঠানো হয়েছে। তারা যাচাই করলে আপনার প্রোফাইলে ব্লু-ব্যাজ যুক্ত হবে।</p>
+            </div>
+        </div>
+    @endif
+
     @php
-        $user = auth()->user();
         $isEligible = $user->is_eligible_to_donate;
         $nextDate = $user->next_eligible_date;
     @endphp
@@ -49,7 +92,8 @@
                         আপনার সর্বশেষ রক্তদানের পর ৯০ দিন পার হয়ে গেছে।
                     @else
                         পরবর্তী রক্তদানের তারিখ: <span class="text-slate-800 font-extrabold">{{ $nextDate->format('d M, Y') }}</span> 
-                        (আর মাত্র <span class="text-red-600 font-extrabold">{{ now()->diffInDays($nextDate) }} দিন</span> বাকি)
+                        {{-- 🎯 THE FIX: startOfDay() ব্যবহার করে ইন্টিজার ক্যালকুলেশন --}}
+                        (আর মাত্র <span class="text-red-600 font-extrabold">{{ (int) now()->startOfDay()->diffInDays($nextDate->startOfDay()) }} দিন</span> বাকি)
                     @endif
                 </p>
             </div>

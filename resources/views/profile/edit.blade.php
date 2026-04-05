@@ -10,6 +10,13 @@
         <p class="text-slate-500 font-medium mt-2">আপনার ব্যক্তিগত তথ্য, ডোনার ডিটেইলস এবং পাসওয়ার্ড আপডেট করুন।</p>
     </div>
 
+    @if (session('status') === 'profile-updated')
+        <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold rounded-xl flex items-center gap-2 shadow-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            প্রোফাইল সফলভাবে আপডেট হয়েছে!
+        </div>
+    @endif
+
     <div class="space-y-8">
         
         {{-- 🎯 ১. কমপ্লিট প্রোফাইল ও ডোনার ইনফরমেশন আপডেট ফর্ম --}}
@@ -24,9 +31,26 @@
                 @csrf
             </form>
 
-            <form method="post" action="{{ route('profile.update') }}" class="space-y-6">
+            <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('patch')
+
+                {{-- 📸 Profile Image Section --}}
+                <div class="flex items-center gap-6 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                    <div class="w-20 h-20 shrink-0 bg-slate-200 rounded-full border-4 border-white shadow-sm overflow-hidden flex items-center justify-center">
+                        @if($user->profile_image)
+                            <img src="{{ asset('storage/' . $user->profile_image) }}" alt="Profile" class="w-full h-full object-cover">
+                        @else
+                            <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        @endif
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-sm font-bold text-slate-900 mb-1">প্রোফাইল ছবি আপলোড করুন</label>
+                        <input type="file" name="profile_image" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-extrabold file:bg-slate-800 file:text-white hover:file:bg-slate-900 transition cursor-pointer">
+                        <p class="text-xs text-slate-400 mt-1 font-medium">সর্বোচ্চ ২ মেগাবাইট (JPG বা PNG)</p>
+                        @error('profile_image') <p class="text-red-500 text-xs mt-1 font-bold">{{ $message }}</p> @enderror
+                    </div>
+                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -55,63 +79,59 @@
                         <select id="blood_group" name="blood_group" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
                             <option value="">নির্বাচন করুন</option>
                             @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bg)
-                                <option value="{{ $bg }}" {{ old('blood_group', $user->blood_group) == $bg ? 'selected' : '' }}>{{ $bg }}</option>
+                                <option value="{{ $bg }}" {{ old('blood_group', $user->blood_group?->value ?? $user->blood_group) == $bg ? 'selected' : '' }}>{{ $bg }}</option>
                             @endforeach
                         </select>
                         @error('blood_group') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
                     </div>
+                </div>
 
-                    {{-- 📍 Dynamic Location Fields --}}
-                    <div class="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
-                            <label for="division_id" class="block text-sm font-bold text-slate-700 mb-2">বিভাগ</label>
-                            <select id="division_id" name="division_id" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
-                                <option value="">নির্বাচন করুন</option>
-                            </select>
-                            @error('division_id') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
-                        </div>
+                {{-- 📍 Dynamic Location Fields (Using Global Component) --}}
+                <div class="p-5 bg-slate-50 border border-slate-200 rounded-2xl">
+                    <label class="block text-sm font-bold text-slate-700 mb-3">লোকেশন তথ্য</label>
+                    <x-location-selector 
+                        :selected-division="old('division_id', $user->division_id)"
+                        :selected-district="old('district_id', $user->district_id)"
+                        :selected-upazila="old('upazila_id', $user->upazila_id)"
+                    />
+                </div>
 
-                        <div>
-                            <label for="district_id" class="block text-sm font-bold text-slate-700 mb-2">জেলা</label>
-                            <select id="district_id" name="district_id" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3" disabled>
-                                <option value="">প্রথমে বিভাগ নির্বাচন করুন</option>
-                            </select>
-                            @error('district_id') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div>
-                            <label for="upazila_id" class="block text-sm font-bold text-slate-700 mb-2">থানা/উপজেলা</label>
-                            <select id="upazila_id" name="upazila_id" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3" disabled>
-                                <option value="">প্রথমে জেলা নির্বাচন করুন</option>
-                            </select>
-                            @error('upazila_id') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
-                        </div>
-                    </div>
-
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label for="date_of_birth" class="block text-sm font-bold text-slate-700 mb-2">জন্ম তারিখ</label>
-                        <input id="date_of_birth" name="date_of_birth" type="date" value="{{ old('date_of_birth', $user->date_of_birth?->format('Y-m-d') ?? $user->date_of_birth) }}"
+                        <input id="date_of_birth" name="date_of_birth" type="date" value="{{ old('date_of_birth', $user->date_of_birth?->format('Y-m-d') ?? $user->date_of_birth) }}" max="{{ date('Y-m-d') }}"
                                class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
                         @error('date_of_birth') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
                     </div>
-
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label for="gender" class="block text-sm font-bold text-slate-700 mb-2">লিঙ্গ</label>
-                            <select id="gender" name="gender" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
-                                <option value="">নির্বাচন করুন</option>
-                                <option value="male" {{ old('gender', $user->gender) == 'male' ? 'selected' : '' }}>পুরুষ</option>
-                                <option value="female" {{ old('gender', $user->gender) == 'female' ? 'selected' : '' }}>মহিলা</option>
-                            </select>
-                            @error('gender') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
-                        </div>
-                        <div>
-                            <label for="weight" class="block text-sm font-bold text-slate-700 mb-2">ওজন (কেজি)</label>
-                            <input id="weight" name="weight" type="number" step="0.1" value="{{ old('weight', $user->weight) }}" placeholder="যেমন: 65"
-                                   class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
-                            @error('weight') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
-                        </div>
+                    <div>
+                        <label for="gender" class="block text-sm font-bold text-slate-700 mb-2">লিঙ্গ</label>
+                        <select id="gender" name="gender" class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
+                            <option value="">নির্বাচন করুন</option>
+                            <option value="male" {{ old('gender', $user->gender) == 'male' ? 'selected' : '' }}>পুরুষ</option>
+                            <option value="female" {{ old('gender', $user->gender) == 'female' ? 'selected' : '' }}>মহিলা</option>
+                        </select>
+                        @error('gender') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
                     </div>
+                    <div>
+                        <label for="weight" class="block text-sm font-bold text-slate-700 mb-2">ওজন (কেজি)</label>
+                        <input id="weight" name="weight" type="number" step="0.1" value="{{ old('weight', $user->weight) }}" placeholder="যেমন: 65"
+                               class="w-full rounded-xl border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
+                        @error('weight') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                    </div>
+                </div>
+
+                {{-- 🏢 Organization Section --}}
+                <div class="pt-4">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">অর্গানাইজেশন/ব্লাড ক্লাব</label>
+                    <select name="organization_id" class="w-full rounded-xl border-slate-300 focus:border-red-500 focus:ring-red-500 font-semibold text-slate-800 px-4 py-3">
+                        <option value="">কোনো ব্লাড ক্লাবের সাথে যুক্ত নই</option>
+                        @if(isset($organizations))
+                            @foreach($organizations as $org)
+                                <option value="{{ $org->id }}" @selected(old('organization_id', $user->organization_id) == $org->id)>{{ $org->name }}</option>
+                            @endforeach
+                        @endif
+                    </select>
+                    <p class="text-xs text-slate-500 mt-1 font-medium">অর্গানাইজেশন পরিবর্তন করলে আপনার ভেরিফাইড ব্যাজ পুনরায় যাচাই করা হবে।</p>
                 </div>
 
                 {{-- ইমেইল ভেরিফিকেশন মেসেজ --}}
@@ -131,17 +151,10 @@
                     </div>
                 @endif
 
-                <div class="flex items-center gap-4 pt-4 border-t border-slate-100">
-                    <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3 rounded-xl text-sm font-extrabold transition shadow-sm">
+                <div class="flex items-center gap-4 pt-6 border-t border-slate-100">
+                    <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3.5 rounded-xl text-sm font-extrabold transition shadow-sm">
                         সেভ করুন
                     </button>
-
-                    @if (session('status') === 'profile-updated')
-                        <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 3000)" class="text-sm font-extrabold text-emerald-600 flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                            প্রোফাইল আপডেট হয়েছে!
-                        </p>
-                    @endif
                 </div>
             </form>
         </div>
@@ -179,8 +192,8 @@
                     @error('password_confirmation', 'updatePassword') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
 
-                <div class="flex items-center gap-4 pt-2">
-                    <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3 rounded-xl text-sm font-extrabold transition shadow-sm">
+                <div class="flex items-center gap-4 pt-4 border-t border-slate-100">
+                    <button type="submit" class="bg-slate-900 hover:bg-slate-800 text-white px-6 py-3.5 rounded-xl text-sm font-extrabold transition shadow-sm">
                         পাসওয়ার্ড আপডেট করুন
                     </button>
 
@@ -194,73 +207,21 @@
             </form>
         </div>
 
+        {{-- 🚪 ৩. লগআউট সেকশন --}}
+        <div class="bg-red-50 p-6 sm:p-8 rounded-3xl border border-red-100 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+                <h3 class="text-lg font-black text-red-900">অ্যাকাউন্ট থেকে বের হতে চান?</h3>
+                <p class="text-sm text-red-700 font-medium mt-1">আপনি যেকোনো সময় আপনার ইমেইল ও পাসওয়ার্ড দিয়ে পুনরায় লগইন করতে পারবেন।</p>
+            </div>
+            <form method="POST" action="{{ route('logout') }}" class="w-full md:w-auto">
+                @csrf
+                <button type="submit" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white px-8 py-3.5 rounded-xl font-extrabold shadow-sm transition-colors flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    লগআউট করুন
+                </button>
+            </form>
+        </div>
+
     </div>
 </div>
-
-{{-- ⚙️ AJAX Script for Dynamic Location Pre-selection --}}
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const divSelect = document.getElementById('division_id');
-        const distSelect = document.getElementById('district_id');
-        const upzSelect = document.getElementById('upazila_id');
-
-        const savedDiv = "{{ auth()->user()->division_id }}";
-        const savedDist = "{{ auth()->user()->district_id }}";
-        const savedUpz = "{{ auth()->user()->upazila_id }}";
-
-        // ১. বিভাগ লোড করা
-        fetch('/ajax/divisions')
-            .then(res => res.json())
-            .then(data => {
-                data.forEach(div => {
-                    const selected = (div.id == savedDiv) ? 'selected' : '';
-                    divSelect.innerHTML += `<option value="${div.id}" ${selected}>${div.name}</option>`;
-                });
-                if(savedDiv) divSelect.dispatchEvent(new Event('change'));
-            });
-
-        // ২. জেলা লোড করা
-        divSelect.addEventListener('change', function() {
-            const divId = this.value;
-            distSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
-            distSelect.disabled = true;
-            upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
-            upzSelect.disabled = true;
-
-            if (divId) {
-                fetch(`/ajax/districts/${divId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        distSelect.innerHTML = '<option value="">জেলা নির্বাচন করুন</option>';
-                        distSelect.disabled = false;
-                        data.forEach(dist => {
-                            const selected = (dist.id == savedDist) ? 'selected' : '';
-                            distSelect.innerHTML += `<option value="${dist.id}" ${selected}>${dist.name}</option>`;
-                        });
-                        if(savedDist) distSelect.dispatchEvent(new Event('change'));
-                    });
-            }
-        });
-
-        // ৩. উপজেলা লোড করা
-        distSelect.addEventListener('change', function() {
-            const distId = this.value;
-            upzSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
-            upzSelect.disabled = true;
-
-            if (distId) {
-                fetch(`/ajax/upazilas/${distId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        upzSelect.innerHTML = '<option value="">থানা/উপজেলা নির্বাচন করুন</option>';
-                        upzSelect.disabled = false;
-                        data.forEach(upz => {
-                            const selected = (upz.id == savedUpz) ? 'selected' : '';
-                            upzSelect.innerHTML += `<option value="${upz.id}" ${selected}>${upz.name}</option>`;
-                        });
-                    });
-            }
-        });
-    });
-</script>
 @endsection

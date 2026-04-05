@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\BloodGroup;
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -23,14 +24,13 @@ class User extends Authenticatable
         'phone',
         'role',
         'blood_group',
-        // 🎯 FIX: নতুন লোকেশন রিলেশন আইডিগুলো যুক্ত করা হলো
         'division_id',
         'district_id',
         'upazila_id',
         'organization_id',
-
         'address',
         'gender',
+        'weight',
         'date_of_birth',
         'profile_image',
         'edu_email',
@@ -44,11 +44,11 @@ class User extends Authenticatable
         'points',
         'verified_badge',
         'nid_image',
+        'nid_path',
         'nid_status',
         'last_login_at',
         'welcome_back_checked',
-        'last_donated_at',
-        'last_donation_date',
+        'last_donated_at',      // 🎯 ডাটাবেসের আসল কলাম
         'is_onboarded',
         'email_verified_at',
         'remember_token',
@@ -77,13 +77,29 @@ class User extends Authenticatable
             'cooldown_until'    => 'datetime',
             'last_login_at'     => 'datetime',
             'date_of_birth'     => 'date',
-            'last_donated_at'   => 'date',
-            'last_donation_date' => 'date',
+            'last_donated_at'   => 'date', // 🎯 Date কাস্টিং
             'is_onboarded'      => 'boolean',
         ];
     }
 
-    // ==================== Relationships ====================
+    // ==================== 📍 Location Relationships ====================
+
+    public function division(): BelongsTo
+    {
+        return $this->belongsTo(Division::class, 'division_id');
+    }
+
+    public function district(): BelongsTo
+    {
+        return $this->belongsTo(District::class, 'district_id');
+    }
+
+    public function upazila(): BelongsTo
+    {
+        return $this->belongsTo(Upazila::class, 'upazila_id');
+    }
+
+    // ==================== Other Relationships ====================
 
     public function donations(): HasMany
     {
@@ -129,7 +145,12 @@ class User extends Authenticatable
         return $this->hasMany(Blog::class, 'author_id');
     }
 
-    // ==================== Helper Methods ====================
+    public function organization(): BelongsTo
+    {
+        return $this->belongsTo(Organization::class, 'organization_id');
+    }
+
+    // ==================== Helper Methods (THE FIX) ====================
 
     public function isDonor(): bool
     {
@@ -151,36 +172,34 @@ class User extends Authenticatable
         return $this->cooldown_until && $this->cooldown_until->isFuture();
     }
 
+    // 🎯 FIX: 'last_donated_at' কলাম ব্যবহার করা হলো
     public function canDonate(): bool
     {
-        if (!$this->last_donation_date) {
+        if (!$this->last_donated_at) {
             return true;
         }
-        return $this->last_donation_date->copy()->addDays(90)->isPast();
+        return $this->last_donated_at->copy()->addDays(90)->isPast();
     }
 
+    // 🎯 FIX: 'last_donated_at' কলাম ব্যবহার করা হলো
     public function daysUntilNextDonation(): int
     {
-        if (!$this->last_donation_date) {
+        if (!$this->last_donated_at) {
             return 0;
         }
-        $nextDonationDate = $this->last_donation_date->copy()->addDays(90);
+        $nextDonationDate = $this->last_donated_at->copy()->addDays(90);
         return max(0, (int) now()->diffInDays($nextDonationDate, false));
     }
 
+    // 🎯 FIX: 'last_donated_at' কলাম ব্যবহার করা হলো
     public function getNextEligibleDateAttribute()
     {
-        return $this->last_donation_date ? $this->last_donation_date->copy()->addDays(90) : null;
+        return $this->last_donated_at ? $this->last_donated_at->copy()->addDays(90) : null;
     }
 
     public function getIsEligibleToDonateAttribute()
     {
         return $this->canDonate();
-    }
-
-    public function organization()
-    {
-        return $this->belongsTo(Organization::class, 'organization_id');
     }
 
     public function scopeInSameOrganization($query)

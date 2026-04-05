@@ -36,7 +36,7 @@
                 <a href="{{ route('requests.index') }}" class="hover:text-red-600 transition">ডোনার ফিড</a>
             </nav>
 
-            {{-- 🎯 Dynamic Auth Buttons --}}
+            {{-- 🎯 Dynamic Auth Buttons & Profile Chip --}}
             <div class="flex items-center gap-3">
                 @guest
                     <a href="{{ route('login') }}" class="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-slate-700 hover:text-red-600 transition">লগইন</a>
@@ -44,14 +44,84 @@
                 @endguest
 
                 @auth
-                    @php
-                        $dashboardRoute = auth()->user()->role === 'org_admin' ? route('org.dashboard') : route('dashboard');
-                    @endphp
-                    <a href="{{ route('profile.edit') }}" class="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-slate-700 hover:text-red-600 transition">প্রোফাইল</a>
-                    <a href="{{ $dashboardRoute }}" class="inline-flex items-center justify-center bg-slate-900 text-white px-5 py-2.5 rounded-lg font-extrabold hover:bg-slate-800 transition shadow-sm gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        ড্যাশবোর্ড
-                    </a>
+                    {{-- 🎯 User Profile Chip & Dropdown --}}
+                    <div x-data="{ openProfile: false }" class="relative inline-block text-left ml-1 sm:ml-2">
+                        
+                        {{-- 🔘 Trigger Button (Profile Chip) --}}
+                        <button @click="openProfile = !openProfile" @click.away="openProfile = false" type="button" class="flex items-center gap-2 p-1.5 sm:pr-4 bg-white border border-slate-200 rounded-full hover:bg-slate-50 hover:border-red-200 transition-all shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                            
+                            {{-- Avatar Thumbnail --}}
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
+                                @if(auth()->user()->profile_image)
+                                    <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="Profile" class="w-full h-full object-cover">
+                                @else
+                                    <span class="text-slate-600 font-black text-xs sm:text-sm">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
+                                @endif
+                            </div>
+                            
+                            {{-- Name & Chevron --}}
+                            <span class="text-sm font-bold text-slate-800 hidden sm:block">{{ explode(' ', auth()->user()->name)[0] }}</span>
+                            <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 hidden sm:block" :class="openProfile ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
+
+                        {{-- 🔽 Dropdown Menu --}}
+                        <div x-show="openProfile" 
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+                             style="display: none;"
+                             class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50">
+                            
+                            {{-- Section 1: User Identity --}}
+                            <div class="px-5 py-4 bg-slate-50/50 border-b border-slate-100">
+                                <p class="text-base font-black text-slate-900 truncate">{{ auth()->user()->name }}</p>
+                                <p class="text-xs font-semibold text-slate-500 mt-0.5 flex items-center gap-1.5">
+                                    @if(auth()->user()->role?->value === 'org_admin' || auth()->user()->role === 'org_admin')
+                                        <span class="w-2 h-2 rounded-full bg-blue-500"></span> অর্গানাইজেশন অ্যাডমিন
+                                    @else
+                                        <span class="w-2 h-2 rounded-full bg-red-500"></span> ডোনার • <span class="text-red-600 font-bold">{{ auth()->user()->blood_group?->value ?? auth()->user()->blood_group ?? 'N/A' }}</span>
+                                    @endif
+                                </p>
+                            </div>
+
+                            {{-- Section 2: Core Actions --}}
+                            <div class="py-2 border-b border-slate-100">
+                                @php
+                                    $dashboardRoute = 'dashboard';
+                                    if(auth()->user()->role === 'org_admin' || auth()->user()->role?->value === 'org_admin') {
+                                        $dashboardRoute = 'org.dashboard';
+                                    } elseif(auth()->user()->role === 'admin' || auth()->user()->role?->value === 'admin') {
+                                        $dashboardRoute = 'admin.dashboard';
+                                    }
+                                @endphp
+                                
+                                <a href="{{ route($dashboardRoute) }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-red-600 transition-colors">
+                                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                                    ড্যাশবোর্ড
+                                </a>
+                                
+                                <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-red-600 transition-colors">
+                                    <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    অ্যাকাউন্ট সেটিংস
+                                </a>
+                            </div>
+
+                            {{-- Section 3: System Actions (Logout) --}}
+                            <div class="py-2 bg-red-50/30">
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="w-full text-left flex items-center gap-3 px-5 py-2.5 text-sm font-black text-red-600 hover:bg-red-50 transition-colors">
+                                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                        লগআউট করুন
+                                    </button>
+                                </form>
+                            </div>
+                            
+                        </div>
+                    </div>
                 @endauth
             </div>
         </div>
@@ -97,7 +167,7 @@
 
             <form action="{{ route('search') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
                 
-                {{-- 🎯 অপটিমাইজড বিভাগ ড্রপডাউন (ডাটাবেস থেকে ডেটা লোড হচ্ছে) --}}
+                {{-- 🎯 অপটিমাইজড বিভাগ ড্রপডাউন --}}
                 <select id="division_select" name="division" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200">
                     <option value="">বিভাগ নির্বাচন</option>
                     @if(isset($divisions))

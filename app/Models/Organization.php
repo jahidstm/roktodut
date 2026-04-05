@@ -11,16 +11,23 @@ class Organization extends Model
 {
     use HasFactory;
 
+    // 🚀 THE FIX: ডাটাবেসের সব কলামের নাম এখানে যুক্ত করা হলো
     protected $fillable = [
         'name',
+        'short_name',
         'type',
+        'established_year',
+        'division',
         'district',
+        'upazila',
         'address',
         'phone',
         'email',
         'logo',
+        'document_path',
         'description',
         'admin_id',
+        'status',
         'is_verified',
     ];
 

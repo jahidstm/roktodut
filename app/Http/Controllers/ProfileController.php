@@ -18,30 +18,59 @@ class ProfileController extends Controller
     {
         return view('profile.edit', [
             'user' => $request->user(),
+            // 🚀 ড্রপডাউনের জন্য অর্গানাইজেশন পাঠানো হচ্ছে
+            'organizations' => \App\Models\Organization::orderBy('name', 'asc')->get(),
         ]);
     }
 
     /**
-     * আপডেট ইউজার প্রোফাইল ইনফরমেশন (Location ID ভিত্তিক)
+     * আপডেট ইউজার প্রোফাইল ইনফরমেশন
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
         $user = $request->user();
 
-        // ১. ভ্যালিডেশন ডেটা নেওয়া (অনুরোধে পাঠানো আইডিগুলো সহ)
         $validatedData = $request->validated();
-
-        // ২. সরাসরি আইডিগুলো অ্যাসাইন করা
         $user->fill($validatedData);
 
-        // ৩. ইমেইল পরিবর্তন হলে ভেরিফিকেশন রিসেট করা
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
+        }
+
+        // 🚀 প্রোফাইল পিকচার আপলোড লজিক
+        if ($request->hasFile('profile_image')) {
+            $path = $request->file('profile_image')->store('profile_images', 'public');
+            $user->profile_image = $path;
+        }
+
+        // যদি ইউজার নতুন অর্গানাইজেশন সিলেক্ট করে, তবে তার NID স্ট্যাটাস আবার pending হবে
+        if ($user->isDirty('organization_id') && $user->organization_id != null) {
+            $user->nid_status = 'pending';
         }
 
         $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
+    }
+
+    /**
+     * NID বা ডকুমেন্ট আপলোড লজিক
+     */
+    public function uploadNid(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'nid_document' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048']
+        ]);
+
+        $user = $request->user();
+
+        if ($request->hasFile('nid_document')) {
+            $path = $request->file('nid_document')->store('donor_nids', 'public');
+            $user->nid_path = $path;
+            $user->save();
+        }
+
+        return Redirect::route('dashboard')->with('success', 'ডকুমেন্ট সফলভাবে আপলোড হয়েছে! অর্গানাইজেশন যাচাই করার পর আপনার ব্যাজ যুক্ত হবে।');
     }
 
     /**
@@ -56,7 +85,6 @@ class ProfileController extends Controller
         $user = $request->user();
 
         Auth::logout();
-
         $user->delete();
 
         $request->session()->invalidate();
