@@ -32,7 +32,7 @@ class DashboardController extends Controller
             ? round(($fulfilledRequests / $totalRequestsMade) * 100, 1)
             : 0;
 
-        // 🎯 ২. সাম্প্রতিক ৫টি রিকোয়েস্টের হিস্ট্রি (Eager Loading এবং Aggregate Functions সহ)
+        // ২. সাম্প্রতিক ৫টি রিকোয়েস্টের হিস্ট্রি
         $recentRequests = BloodRequest::where('requested_by', $user->id)
             ->withCount([
                 'responses as total_responses',
@@ -42,12 +42,22 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // 🎯 ৩. গ্রহীতার রিকোয়েস্টে কোনো ডোনার 'claimed' (unverified) অবস্থায় আছে কি না চেক করা
+        // এখানে 'requested_by' ব্যবহার করা হয়েছে যাতে আপনার টেবিল স্কিমার সাথে ম্যাচ করে
+        $pendingClaim = BloodRequestResponse::whereHas('bloodRequest', function ($query) use ($user) {
+            $query->where('requested_by', $user->id);
+        })
+            ->where('verification_status', 'claimed')
+            ->with(['user', 'bloodRequest']) // ডোনারের নাম ও রিকোয়েস্ট ডেটা লোড করা
+            ->first();
+
         return view('dashboard', compact(
             'totalRequestsMade',
             'fulfilledRequests',
             'totalContributions',
             'successRate',
-            'recentRequests' // 👈 নতুন ডেটা ভিউতে পাঠানো হলো
+            'recentRequests',
+            'pendingClaim' // 👈 নতুন ডেটা ভিউতে পাঠানো হলো
         ));
     }
 }

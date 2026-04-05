@@ -15,6 +15,7 @@ use App\Http\Controllers\OrgAdmin\DashboardController as OrgDashboardController;
 use App\Http\Controllers\OrgAdmin\VerificationController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\OrgRegistrationController;
+use App\Http\Controllers\DonationClaimController; // 🚀 কন্ট্রোলার ইম্পোর্ট
 use App\Models\Division;
 use Illuminate\Support\Facades\Route;
 
@@ -50,6 +51,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->only(['index', 'create', 'store', 'show']);
 
     Route::post('/requests/{bloodRequest}/respond', [BloodRequestResponseController::class, 'store'])->name('requests.respond');
+
+    // 🎯 ডোনেশন ক্লেইম রাউট (PIN or Image)
+    Route::post('/responses/{response}/claim', [DonationClaimController::class, 'store'])->name('donations.claim');
+
+    // 🎯 গ্রহীতার ভেরিফিকেশন রাউট (Approve/Dispute)
+    Route::post('/responses/{response}/recipient-verify', [DonationClaimController::class, 'verifyByRecipient'])->name('donations.recipient_verify');
+
     Route::post('/requests/{bloodRequest}/fulfill', [BloodRequestController::class, 'fulfill'])->name('requests.fulfill');
 
     // ডোনার রিভিল ফ্লো (For specific blood requests only)
@@ -82,10 +90,13 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified', 'role:donor,recipient'])
     ->name('dashboard');
 
-// সিস্টেম অ্যাডমিন ড্যাশবোর্ড
-Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:admin'])
-    ->name('admin.dashboard');
+// 🛡️ সিস্টেম অ্যাডমিন রাউটস (ইন্টিগ্রেটেড গ্রুপ)
+Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+    Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+
+    // 🎯 অ্যাডমিন ডোনেশন ভেরিফিকেশন রাউট
+    Route::post('/admin/donations/{response}/verify', [DonationClaimController::class, 'adminVerify'])->name('admin.donations.verify');
+});
 
 // --- ৬. অর্গানাইজেশন অ্যাডমিন রাউটস (ইন্টিগ্রেটেড গ্রুপ) ---
 Route::middleware(['auth', 'verified', 'role:org_admin'])->group(function () {
@@ -103,14 +114,13 @@ Route::middleware(['auth', 'verified', 'role:org_admin'])->group(function () {
     Route::post('/org/donor/{id}/reject', [VerificationController::class, 'reject'])->name('org.donor.reject');
 });
 
-// --- ৭. AJAX লোকেশন রাউটস (Dynamic Dropdowns - Already Public) ---
+// --- ৭. AJAX লোকেশন রাউটস ---
 Route::get('/ajax/divisions', [LocationController::class, 'getDivisions']);
 Route::get('/ajax/districts/{division_id}', [LocationController::class, 'getDistricts']);
 Route::get('/ajax/upazilas/{district_id}', [LocationController::class, 'getUpazilas']);
 
-// 🎯 ফিক্স: লারাভেলের ডিফল্ট অথেনটিকেশন রাউটগুলো সবসময় ফাইলের নিচে রাখা নিরাপদ
+// 🎯 লারাভেলের ডিফল্ট অথেনটিকেশন রাউটগুলো সবসময় ফাইলের নিচে রাখা নিরাপদ
 require __DIR__ . '/auth.php';
-
 
 // Organization Registration Routes
 Route::middleware('guest')->group(function () {

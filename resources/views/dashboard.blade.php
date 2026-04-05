@@ -32,6 +32,71 @@
     </div>
 @endif
 
+{{-- 🩸 Recipient Confirmation Pop-up (The Truth Loop) --}}
+@if(isset($pendingClaim))
+    <div class="fixed inset-0 z-[110] flex items-center justify-center bg-slate-900/80 backdrop-blur-md">
+        <div class="bg-white rounded-[2rem] p-8 max-w-lg w-full mx-4 shadow-2xl border border-red-100 animate-pop-in">
+            <div class="relative">
+                {{-- Donor Avatar Thumbnail --}}
+                <div class="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white shadow-md overflow-hidden">
+                    @if($pendingClaim->donor && $pendingClaim->donor->profile_image)
+                        <img src="{{ asset('storage/' . $pendingClaim->donor->profile_image) }}" class="w-full h-full object-cover">
+                    @elseif($pendingClaim->donor)
+                        <span class="text-red-600 font-black text-2xl">{{ mb_substr($pendingClaim->donor->name, 0, 1) }}</span>
+                    @else
+                        <span class="text-red-600 font-black text-2xl">?</span>
+                    @endif
+                </div>
+                <div class="absolute -bottom-2 right-1/2 translate-x-12 bg-emerald-500 text-white p-1.5 rounded-full border-4 border-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <h2 class="text-2xl font-black text-slate-900 leading-tight">ডোনেশন কনফার্ম করুন</h2>
+                <p class="text-slate-500 font-medium mt-3 px-2">
+                    <span class="text-red-600 font-bold">{{ $pendingClaim->donor->name ?? 'একজন ডোনার' }}</span> ক্লেইম করেছেন যে তিনি আপনার রিকোয়েস্টে রক্ত দিয়েছেন। এটি কি সঠিক?
+                </p>
+                
+                <div class="mt-4 inline-block bg-slate-50 px-4 py-2 rounded-full border border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-widest">
+                    Request ID: {{ $pendingClaim->bloodRequest->unique_id ?? 'REQ-'.$pendingClaim->bloodRequest->id }}
+                </div>
+                
+                @if($pendingClaim->proof_image_path)
+                    <div class="mt-4">
+                        <a href="{{ asset('storage/' . $pendingClaim->proof_image_path) }}" target="_blank" class="text-sm font-bold text-blue-600 hover:underline">
+                            🔍 ডোনারের দেওয়া প্রমাণ দেখুন
+                        </a>
+                    </div>
+                @endif
+            </div>
+
+            <div class="grid grid-cols-1 gap-3 mt-8">
+                <form action="{{ route('donations.recipient_verify', $pendingClaim->id) }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="decision" value="approve">
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-emerald-100 transition-all flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                        হ্যাঁ, তিনি রক্ত দিয়েছেন
+                    </button>
+                </form>
+
+                <form action="{{ route('donations.recipient_verify', $pendingClaim->id) }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="decision" value="dispute">
+                    <button type="submit" onclick="return confirm('আপনি কি নিশ্চিত যে এই ডোনার রক্ত দেননি? এটি তার প্রোফাইলে নেতিবাচক প্রভাব ফেলবে।')" class="w-full bg-white hover:bg-red-50 text-red-600 font-bold py-3.5 rounded-2xl border-2 border-red-100 transition-all">
+                        না, তিনি আসেননি (Report)
+                    </button>
+                </form>
+            </div>
+            
+            <p class="text-[10px] text-slate-400 text-center mt-6 font-bold uppercase tracking-tight">
+                আপনার একটি কনফার্মেশন ডোনারকে উৎসাহিত করবে
+            </p>
+        </div>
+    </div>
+@endif
+
 <div class="max-w-7xl mx-auto">
     
     <div class="mb-8">
@@ -58,6 +123,13 @@
         <div class="mb-8 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl font-bold flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             {{ session('success') }}
+        </div>
+    @endif
+    
+    @if(session('error'))
+        <div class="mb-8 p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl font-bold flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            {{ session('error') }}
         </div>
     @endif
 
