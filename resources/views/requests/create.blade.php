@@ -9,7 +9,9 @@
 
     <div class="mt-8 rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm relative overflow-hidden">
         <div class="absolute top-0 left-0 w-2 h-full bg-red-600"></div>
-        <form method="POST" action="{{ route('requests.store') }}" class="space-y-6">
+        
+        {{-- 🎯 THE FIX: ফর্মের সাথে Alpine.js x-data যোগ করা হলো --}}
+        <form method="POST" action="{{ route('requests.store') }}" class="space-y-6" x-data="{ isSubmitting: false }" @submit="if(isSubmitting) { $event.preventDefault(); return false; } isSubmitting = true;">
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -115,10 +117,27 @@
             </div>
 
             <div class="flex items-center gap-4 pt-4 border-t border-slate-100">
-                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-8 py-3.5 rounded-xl text-sm font-black transition-all shadow-sm shadow-red-200 flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                    রিকোয়েস্ট সাবমিট করুন
+                {{-- 🎯 THE FIX: ডাইনামিক সাবমিট বাটন --}}
+                <button type="submit" 
+                        :disabled="isSubmitting"
+                        class="bg-red-600 hover:bg-red-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white px-8 py-3.5 rounded-xl text-sm font-black transition-all shadow-sm shadow-red-200 flex items-center justify-center min-w-[200px]">
+                    
+                    {{-- নরমাল অবস্থা --}}
+                    <span x-show="!isSubmitting" class="flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        রিকোয়েস্ট সাবমিট করুন
+                    </span>
+
+                    {{-- লোডিং অবস্থা --}}
+                    <span x-show="isSubmitting" style="display: none;" class="flex items-center gap-2">
+                        <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        প্রসেসিং হচ্ছে...
+                    </span>
                 </button>
+                
                 <a href="{{ route('requests.index') }}" class="px-6 py-3.5 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition">
                     বাতিল
                 </a>

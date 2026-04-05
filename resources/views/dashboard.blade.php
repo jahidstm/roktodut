@@ -97,8 +97,9 @@
     </div>
 @endif
 
-<div class="max-w-7xl mx-auto">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     
+    {{-- 🎯 THE FIX: হেডারের স্পেসিং ঠিক করা হয়েছে --}}
     <div class="mb-8">
         <div class="flex items-center gap-3">
             <h1 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
@@ -118,20 +119,6 @@
         </div>
         <p class="text-slate-500 font-medium mt-1">আপনার রক্তদান এবং রিকোয়েস্টের বিস্তারিত ড্যাশবোর্ড।</p>
     </div>
-
-    @if(session('success'))
-        <div class="mb-8 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl font-bold flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-            {{ session('success') }}
-        </div>
-    @endif
-    
-    @if(session('error'))
-        <div class="mb-8 p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl font-bold flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-            {{ session('error') }}
-        </div>
-    @endif
 
     {{-- 🚀 NID Upload Prompt for Organization Members --}}
     @php $user = auth()->user(); @endphp
@@ -317,6 +304,59 @@
                             <td colspan="5" class="px-6 py-10 text-center text-slate-500 font-medium">আপনি এখনো কোনো রক্তের রিকোয়েস্ট করেননি।</td>
                         </tr>
                     @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
+    {{-- 🎯 ডোনারের ড্যাশবোর্ডে অ্যাকসেপ্ট করা রিকোয়েস্টের লিস্ট --}}
+    @if(isset($acceptedDonations) && $acceptedDonations->count() > 0)
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mt-10">
+        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-red-50/50">
+            <div>
+                <h2 class="text-lg font-extrabold text-red-900 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    আপনি যেসব রিকোয়েস্ট অ্যাকসেপ্ট করেছেন
+                </h2>
+                <p class="text-sm text-red-700/70 font-medium mt-1">রক্তদানের পর এখান থেকে প্রমাণ জমা দিন বা পিন দিন</p>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <tbody class="divide-y divide-slate-100 text-sm">
+                    @foreach($acceptedDonations as $donation)
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4">
+                                <div class="font-extrabold text-slate-900">রোগী: {{ $donation->bloodRequest->patient_name ?? 'N/A' }}</div>
+                                <div class="text-xs font-bold text-slate-500 mt-0.5">গ্রুপ: <span class="text-red-600">{{ $donation->bloodRequest->blood_group?->value ?? $donation->bloodRequest->blood_group }}</span></div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-semibold text-slate-700">{{ $donation->bloodRequest->needed_at?->format('d M, Y') ?? 'ASAP' }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($donation->verification_status === 'pending')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800">অপেক্ষমাণ (Pending)</span>
+                                @elseif($donation->verification_status === 'claimed')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-blue-100 text-blue-800">রিভিউ হচ্ছে (Claimed)</span>
+                                @elseif($donation->verification_status === 'verified')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">ভেরিফাইড (Verified)</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                @if($donation->verification_status === 'pending')
+                                    <a href="{{ route('requests.show', $donation->blood_request_id) }}" class="inline-flex items-center justify-center px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-extrabold shadow-sm hover:bg-slate-800 transition">
+                                        প্রমাণ জমা দিন (Claim)
+                                    </a>
+                                @else
+                                    <a href="{{ route('requests.show', $donation->blood_request_id) }}" class="inline-flex items-center justify-center px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-extrabold text-slate-700 hover:bg-slate-100 transition">
+                                        ভিউ রিকোয়েস্ট
+                                    </a>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
                 </tbody>
             </table>
         </div>

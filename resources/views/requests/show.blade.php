@@ -3,34 +3,18 @@
 @section('title', 'রিকোয়েস্ট ডিটেইলস — রক্তদূত')
 
 @section('content')
-<div class="max-w-5xl mx-auto">
-    
-    {{-- হেডার সেকশন --}}
-    <div class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-6">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    {{-- Header Section --}}
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
         <div>
-            <h1 class="text-2xl font-extrabold tracking-tight">রিকোয়েস্ট ডিটেইলস</h1>
+            <h1 class="text-3xl font-black text-slate-900 tracking-tight">রিকোয়েস্ট ডিটেইলস</h1>
             <p class="text-slate-500 font-medium mt-1">Accepted ডোনার লিস্ট এবং স্ট্যাটাস</p>
         </div>
-
-        <div class="flex items-center gap-3 shrink-0">
-            {{-- ৩. রিকোয়েস্ট ফুলফিলমেন্ট বাটন --}}
-            @if(auth()->id() === $bloodRequest->requested_by && strtolower($bloodRequest->status) !== 'fulfilled')
-                <form action="{{ route('requests.fulfill', $bloodRequest) }}" method="POST" onsubmit="return confirm('আপনি কি রক্ত পেয়েছেন? এটি কনফার্ম করলে রিকোয়েস্টটি ক্লোজ হয়ে যাবে।')">
-                    @csrf
-                    <button type="submit" class="inline-flex items-center px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-extrabold rounded-lg shadow-sm shadow-emerald-200 transition">
-                        <svg class="w-4 h-4 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        ✓ Mark as Fulfilled
-                    </button>
-                </form>
-            @endif
-
-            <a href="{{ route('requests.index') }}"
-               class="inline-flex items-center justify-center border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 px-4 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
-                ফিডে ফিরে যান
-            </a>
-        </div>
+        
+        <a href="{{ route('requests.index') }}" class="shrink-0 bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-extrabold py-2.5 px-5 rounded-xl shadow-sm transition-colors flex items-center gap-2">
+            ফিডে ফিরে যান
+        </a>
     </div>
 
     {{-- রিকোয়েস্ট কার্ড --}}
@@ -72,19 +56,103 @@
         @endif
     </div>
 
-    {{-- 🎯 ডোনারের জন্য Donation Claim Action Box --}}
+    {{-- 🎯 Action Box: Accept, Decline, or Fulfill Buttons --}}
     @php
-        // বর্তমান ইউজারের রেসপন্সটি খুঁজে বের করা হচ্ছে
-        $myResponse = \App\Models\BloodRequestResponse::where('blood_request_id', $bloodRequest->id)
-                        ->where('user_id', auth()->id())
-                        ->first();
+        $myResponse = auth()->check() ? $bloodRequest->responses->where('user_id', auth()->id())->first() : null;
+        $isOwner = auth()->check() && ((int) $bloodRequest->requested_by === (int) auth()->id());
     @endphp
 
+    <div class="mt-6 mb-6 p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+        <div>
+            <h3 class="text-base font-black text-slate-800">আপনার সিদ্ধান্ত (Action)</h3>
+            <p class="text-sm text-slate-500 font-medium">এই রিকোয়েস্টের জন্য আপনার সাড়া দিন</p>
+        </div>
+        
+        <div class="flex flex-wrap gap-3">
+            @if (Route::has('requests.fulfill') && $isOwner && strtolower($bloodRequest->status) !== 'fulfilled')
+                <form method="POST" action="{{ route('requests.fulfill', $bloodRequest) }}">
+                    @csrf
+                    <button class="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black shadow-sm transition">
+                        Mark as Fulfilled
+                    </button>
+                </form>
+            @endif
+
+            @if (Route::has('requests.respond') && !$isOwner && strtolower($bloodRequest->status) !== 'fulfilled')
+                @if (!$myResponse)
+                    @if(auth()->check() && auth()->user()->is_eligible_to_donate)
+                        <form method="POST" action="{{ route('requests.respond', $bloodRequest) }}">
+                            @csrf
+                            <input type="hidden" name="status" value="accepted" />
+                            <button class="px-8 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black shadow-sm transition">
+                                Accept
+                            </button>
+                        </form>
+                    @else
+                        <button disabled title="আপনি রক্তদানের যোগ্য নন" class="px-8 py-3 rounded-xl bg-slate-200 text-slate-400 font-black cursor-not-allowed border border-slate-300">
+                            Accept
+                        </button>
+                    @endif
+
+                    <form method="POST" action="{{ route('requests.respond', $bloodRequest) }}">
+                        @csrf
+                        <input type="hidden" name="status" value="declined" />
+                        <button class="px-8 py-3 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-black transition">
+                            Decline
+                        </button>
+                    </form>
+                @elseif ($myResponse->status === 'accepted')
+                    <div class="flex items-center gap-4">
+                        <span class="px-6 py-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-black flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                            আপনি অ্যাকসেপ্ট করেছেন
+                        </span>
+                        
+                        <form method="POST" action="{{ route('requests.respond', $bloodRequest) }}">
+                            @csrf
+                            <input type="hidden" name="status" value="declined" />
+                            <button class="text-sm text-slate-500 hover:text-red-600 font-bold underline transition">
+                                Change to Decline
+                            </button>
+                        </form>
+                    </div>
+                @elseif ($myResponse->status === 'declined')
+                    <div class="flex items-center gap-4">
+                        <span class="px-6 py-3 rounded-xl bg-slate-100 text-slate-700 border border-slate-200 font-black">
+                            আপনি ডিক্লাইন করেছেন
+                        </span>
+
+                        @if(auth()->check() && auth()->user()->is_eligible_to_donate)
+                            <form method="POST" action="{{ route('requests.respond', $bloodRequest) }}">
+                                @csrf
+                                <input type="hidden" name="status" value="accepted" />
+                                <button class="text-sm text-emerald-600 hover:text-emerald-700 font-bold underline transition">
+                                    Change to Accept
+                                </button>
+                            </form>
+                        @else
+                            <span class="text-xs text-slate-400 font-bold cursor-not-allowed" title="আপনি রক্তদানের যোগ্য নন">
+                                Cannot Accept
+                            </span>
+                        @endif
+                    </div>
+                @endif
+            @endif
+            
+            @if(strtolower($bloodRequest->status) === 'fulfilled')
+                <div class="px-8 py-3 rounded-xl bg-emerald-100 text-emerald-800 font-black border border-emerald-200">
+                    এই রিকোয়েস্টটি সম্পন্ন হয়েছে (Fulfilled)
+                </div>
+            @endif
+        </div>
+    </div>
+
+    {{-- 🎯 ডোনারের জন্য Donation Claim Action Box --}}
     @if($myResponse && strtolower($myResponse->status) === 'accepted' && $myResponse->verification_status === 'pending')
-        <div x-data="{ claimMethod: 'pin' }" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-6">
+        <div x-data="{ claimMethod: 'pin', fileName: null }" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-6 mb-6">
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-100">
                 <h3 class="text-lg font-extrabold text-slate-800">রক্তদান কনফার্ম করুন</h3>
-                <p class="text-sm font-medium text-slate-500">পয়েন্ট এবং ব্যাজ পেতে আপনার রক্তদান ভেরিফাই করুন।</p>
+                <p class="text-sm font-medium text-slate-500">পয়েন্ট এবং ব্যাজ পেতে আপনার রক্তদান ভেরিফাই করুন。</p>
             </div>
 
             <form action="{{ route('donations.claim', $myResponse->id) }}" method="POST" enctype="multipart/form-data" class="p-6">
@@ -113,11 +181,13 @@
                 {{-- Image Upload Block --}}
                 <div x-show="claimMethod === 'image'" x-transition.opacity style="display: none;" class="space-y-4">
                     <label class="block text-sm font-bold text-slate-700">প্রমাণ আপলোড করুন:</label>
-                    <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:bg-slate-50 transition cursor-pointer relative">
-                        <input type="file" name="proof_image" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                        <svg class="mx-auto h-10 w-10 text-slate-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                        <p class="text-sm font-bold text-slate-600">হাসপাতালের বেড স্লিপ বা ব্লাড ব্যাগের ছবি সিলেক্ট করুন</p>
-                        <p class="text-xs text-slate-400 mt-1">JPG, PNG (সর্বোচ্চ ২ MB)</p>
+                    <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:bg-slate-50 transition cursor-pointer relative" :class="fileName ? 'bg-red-50 border-red-300' : ''">
+                        <input type="file" name="proof_image" accept="image/*,application/pdf" @change="fileName = $event.target.files[0].name" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                        
+                        <svg class="mx-auto h-10 w-10 text-slate-400 mb-3" :class="fileName ? 'text-red-500' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        
+                        <p class="text-sm font-bold text-slate-600" x-text="fileName ? fileName : 'হাসপাতালের বেড স্লিপ বা ব্লাড ব্যাগের ছবি সিলেক্ট করুন'"></p>
+                        <p class="text-xs mt-1" :class="fileName ? 'text-red-600 font-bold' : 'text-slate-400'" x-text="fileName ? 'ফাইল সিলেক্ট করা হয়েছে। এখন কনফার্ম করুন।' : 'JPG, PNG, PDF (সর্বোচ্চ ২ MB)'"></p>
                     </div>
                     @error('proof_image') <p class="text-red-600 text-xs font-bold text-center mt-1">{{ $message }}</p> @enderror
                 </div>
@@ -128,13 +198,17 @@
             </form>
         </div>
     @elseif($myResponse && strtolower($myResponse->status) === 'accepted' && $myResponse->verification_status !== 'pending')
-        <div class="mt-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-center gap-3">
+        <div class="mt-6 mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-center gap-3">
             <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <span class="text-emerald-800 font-bold">
                 @if($myResponse->verification_status === 'verified')
                     আপনার রক্তদান সফলভাবে ভেরিফাইড হয়েছে!
-                @else
+                @elseif($myResponse->verification_status === 'claimed')
                     আপনার ক্লেইম রিভিউতে আছে। অনুগ্রহ করে অপেক্ষা করুন।
+                @elseif($myResponse->verification_status === 'disputed')
+                    আপনার ক্লেইমটি ডিসপুট করা হয়েছে। অ্যাডমিন রিভিউ করবে।
+                @else
+                    আপনার ক্লেইমটি বাতিল করা হয়েছে।
                 @endif
             </span>
         </div>
@@ -187,19 +261,23 @@
                                 </div>
 
                                 {{-- 🎯 রোগীর লোকের জন্য PIN Display Box --}}
+                                @if(auth()->id() === $bloodRequest->requested_by)
                                 <div class="p-3 bg-white rounded-lg border border-red-100 flex items-center justify-between shadow-sm">
                                     <div>
                                         <p class="text-[10px] font-bold text-red-500 uppercase tracking-wider">ভেরিফিকেশন পিন (ডোনারকে দিন)</p>
                                         <p class="text-2xl font-black text-red-600 tracking-widest mt-0.5">{{ $resp->verification_pin ?? '----' }}</p>
                                     </div>
-                                    @if($resp->verification_status === 'verified')
-                                        <span class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wide">Verified</span>
-                                    @elseif($resp->verification_status === 'claimed')
-                                        <span class="bg-amber-100 text-amber-700 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wide">Reviewing</span>
-                                    @else
-                                        <span class="bg-slate-100 text-slate-500 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wide">Pending</span>
-                                    @endif
+                                    <div class="text-right">
+                                        @if($resp->verification_status === 'verified')
+                                            <span class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wide">Verified</span>
+                                        @elseif($resp->verification_status === 'claimed')
+                                            <span class="bg-amber-100 text-amber-700 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wide">Reviewing</span>
+                                        @else
+                                            <span class="bg-slate-100 text-slate-500 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wide">Pending</span>
+                                        @endif
+                                    </div>
                                 </div>
+                                @endif
                             </div>
                         @endforeach
                     </div>

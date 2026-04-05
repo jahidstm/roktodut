@@ -11,13 +11,14 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        // ১. অনবোর্ডিং চেক
         if ($request->user() && !$request->user()->is_onboarded) {
             return redirect()->route('onboarding.show');
         }
 
-        $user = $request->user();
+        $user = Auth::user();
 
-        // ১. স্ট্যাটিস্টিকস ক্যালকুলেশন
+        // ২. স্ট্যাটিস্টিকস ক্যালকুলেশন
         $totalRequestsMade = BloodRequest::where('requested_by', $user->id)->count();
 
         $fulfilledRequests = BloodRequest::where('requested_by', $user->id)
@@ -32,7 +33,7 @@ class DashboardController extends Controller
             ? round(($fulfilledRequests / $totalRequestsMade) * 100, 1)
             : 0;
 
-        // ২. সাম্প্রতিক ৫টি রিকোয়েস্টের হিস্ট্রি
+        // ৩. সাম্প্রতিক ৫টি রিকোয়েস্টের হিস্ট্রি (Eager Loading সহ)
         $recentRequests = BloodRequest::where('requested_by', $user->id)
             ->withCount([
                 'responses as total_responses',
@@ -42,13 +43,20 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // 🎯 ৩. গ্রহীতার রিকোয়েস্টে কোনো ডোনার 'claimed' (unverified) অবস্থায় আছে কি না চেক করা
-        // এখানে 'requested_by' ব্যবহার করা হয়েছে যাতে আপনার টেবিল স্কিমার সাথে ম্যাচ করে
+        // 🎯 ৪. ডোনার হিসেবে আপনার একসেপ্ট করা সাম্প্রতিক ৫টি ডোনেশন
+        // ফিক্স: 'donor_id' এর বদলে 'user_id' ব্যবহার করা হয়েছে
+        $acceptedDonations = BloodRequestResponse::where('user_id', $user->id)
+            ->with(['bloodRequest'])
+            ->orderByDesc('created_at')
+            ->limit(5)
+            ->get();
+
+        // ৫. গ্রহীতার রিকোয়েস্টে কোনো ডোনার 'claimed' অবস্থায় আছে কি না (পপ-আপ লজিক)
         $pendingClaim = BloodRequestResponse::whereHas('bloodRequest', function ($query) use ($user) {
             $query->where('requested_by', $user->id);
         })
             ->where('verification_status', 'claimed')
-            ->with(['user', 'bloodRequest']) // ডোনারের নাম ও রিকোয়েস্ট ডেটা লোড করা
+            ->with(['user', 'bloodRequest'])
             ->first();
 
         return view('dashboard', compact(
@@ -57,7 +65,8 @@ class DashboardController extends Controller
             'totalContributions',
             'successRate',
             'recentRequests',
-            'pendingClaim' // 👈 নতুন ডেটা ভিউতে পাঠানো হলো
+            'pendingClaim',
+            'acceptedDonations' // 👈 কম্প্যাক্টে যোগ করা হয়েছে
         ));
     }
 }
