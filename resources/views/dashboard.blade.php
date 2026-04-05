@@ -3,6 +3,35 @@
 @section('title', 'ইউজার ড্যাশবোর্ড — রক্তদূত')
 
 @section('content')
+
+{{-- 🚀 Welcome Back Smart Prompt (The Re-engagement Loop) --}}
+@if(auth()->user()->is_onboarded && !auth()->user()->welcome_back_checked)
+    <div class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-8 max-w-lg w-full mx-4 shadow-2xl animate-fade-in-up">
+            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-5">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h2 class="text-2xl font-black text-slate-900 text-center">অনেক দিন পর দেখা!</h2>
+            <p class="text-slate-500 text-center font-medium mt-2 mb-6">দীর্ঘদিন পর রক্তদূতে আপনাকে আবার স্বাগতম। আপনি কি বর্তমানে জরুরি প্রয়োজনে রক্তদানে প্রস্তুত আছেন?</p>
+            
+            <form action="{{ route('welcome_back.update') }}" method="POST">
+                @csrf
+                <label class="flex items-center gap-3 p-4 border-2 border-slate-100 rounded-xl cursor-pointer hover:border-blue-500 transition-colors bg-slate-50">
+                    <input type="checkbox" name="is_available" value="1" class="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500" {{ auth()->user()->is_available ? 'checked' : '' }}>
+                    <div>
+                        <p class="font-bold text-slate-800">হ্যাঁ, আমি রক্তদানে প্রস্তুত</p>
+                        <p class="text-xs text-slate-500 font-medium">আপনার প্রোফাইল ডোনার সার্চে দৃশ্যমান হবে</p>
+                    </div>
+                </label>
+                
+                <button type="submit" class="w-full mt-6 bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-3.5 rounded-xl shadow-sm transition">
+                    স্ট্যাটাস আপডেট করুন
+                </button>
+            </form>
+        </div>
+    </div>
+@endif
+
 <div class="max-w-7xl mx-auto">
     
     <div class="mb-8">
@@ -92,7 +121,6 @@
                         আপনার সর্বশেষ রক্তদানের পর ৯০ দিন পার হয়ে গেছে।
                     @else
                         পরবর্তী রক্তদানের তারিখ: <span class="text-slate-800 font-extrabold">{{ $nextDate->format('d M, Y') }}</span> 
-                        {{-- 🎯 THE FIX: startOfDay() ব্যবহার করে ইন্টিজার ক্যালকুলেশন --}}
                         (আর মাত্র <span class="text-red-600 font-extrabold">{{ (int) now()->startOfDay()->diffInDays($nextDate->startOfDay()) }} দিন</span> বাকি)
                     @endif
                 </p>

@@ -54,6 +54,21 @@ class ProfileController extends Controller
     }
 
     /**
+     * 🚀 Welcome Back স্ট্যাটাস আপডেট
+     */
+    public function welcomeBackUpdate(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        // ইউজার যদি 'is_available' চেকবক্স মার্ক করে থাকে
+        $user->is_available = $request->has('is_available');
+        $user->welcome_back_checked = true; // চেক করা হয়ে গেছে
+        $user->save();
+
+        return back()->with('success', 'আপনার স্ট্যাটাস সফলভাবে আপডেট করা হয়েছে। রক্তদূতে আবার স্বাগতম!');
+    }
+
+    /**
      * NID বা ডকুমেন্ট আপলোড লজিক
      */
     public function uploadNid(Request $request): RedirectResponse

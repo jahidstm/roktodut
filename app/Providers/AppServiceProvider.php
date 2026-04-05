@@ -10,6 +10,11 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Http\Request;
 
+// 🚀 Welcome Back ফিচারের জন্য ইমপোর্টগুলো
+use Illuminate\Support\Facades\Event;
+use Illuminate\Auth\Events\Login;
+use App\Listeners\LogSuccessfulLogin;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -25,7 +30,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        
+        // 🎯 ১. Welcome Back Check (লগইন ইভেন্ট লিসেনার)
+        Event::listen(
+            Login::class,
+            LogSuccessfulLogin::class,
+        );
+
         // 🛡️ ২. Anti-Scraping Privacy Shield for Donor Phone Numbers
         RateLimiter::for('phone-reveal', function (Request $request) {
 
