@@ -42,6 +42,13 @@ class User extends Authenticatable
         'cooldown_until',
         'total_donations',
         'points',
+        'reward_points',
+        'total_verified_donations',
+        'referral_code',
+        'referred_by',
+        'monthly_points',
+        'monthly_points_month',
+        'is_campus_hero',
         'verified_badge',
         'nid_image',
         'nid_path',
@@ -77,8 +84,9 @@ class User extends Authenticatable
             'cooldown_until'    => 'datetime',
             'last_login_at'     => 'datetime',
             'date_of_birth'     => 'date',
-            'last_donated_at'   => 'date', // 🎯 Date কাস্টিং
+            'last_donated_at'   => 'date',
             'is_onboarded'      => 'boolean',
+            'is_campus_hero'    => 'boolean',
         ];
     }
 
@@ -148,6 +156,16 @@ class User extends Authenticatable
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class, 'organization_id');
+    }
+
+    public function referredBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'referred_by');
+    }
+
+    public function referrals(): HasMany
+    {
+        return $this->hasMany(User::class, 'referred_by');
     }
 
     // ==================== Helper Methods (THE FIX) ====================

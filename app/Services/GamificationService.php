@@ -1,0 +1,307 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\Badge;
+use App\Models\User;
+use Illuminate\Support\Str;
+
+class GamificationService
+{
+    // ==========================================
+    // পয়েন্ট কনফিগারেশন
+    // ==========================================
+    const POINTS_SUCCESSFUL_DONATION    = 50;  // সফল রক্তদান
+    const POINTS_FIRST_RESPONDER_BONUS  = 10;  // ৩ ঘণ্টার মধ্যে ইমার্জেন্সিতে রেসপন্ড
+    const POINTS_REFERRAL_SIGNUP        = 10;  // রেফারেল সাইন-আপ+প্রোফাইল
+    const POINTS_REFERRAL_FIRST_DONATE  = 30;  // রেফারড ব্যক্তির প্রথম রক্তদান
+    const POINTS_RECIPIENT_REVIEW       = 10;  // গ্রহীতার পজিটিভ রিভিউ
+    const POINTS_PROFILE_COMPLETE       = 20;  // প্রোফাইল ১০০% ও NID ভেরিফাই
+    const POINTS_REQUEST_SHARE_DAILY    = 5;   // ব্লাড রিকোয়েস্ট শেয়ার (দিনে ৩ বার পর্যন্ত)
+
+    // ==========================================
+    // পয়েন্ট দেওয়া
+    // ==========================================
+
+    public function awardDonationPoints(User $donor, bool $isFirstResponder = false): void
+    {
+        $points = self::POINTS_SUCCESSFUL_DONATION;
+        if ($isFirstResponder) {
+            $points += self::POINTS_FIRST_RESPONDER_BONUS;
+        }
+
+        $this->addPoints($donor, $points);
+        $this->updateMonthlyPoints($donor, $points);
+        $this->checkAndAwardBadges($donor);
+
+        // রেফারার কে বোনাস পয়েন্ট দেওয়া (প্রথম ডোনেশনে)
+        if ($donor->total_verified_donations === 1 && $donor->referred_by) {
+            $referrer = User::find($donor->referred_by);
+            if ($referrer) {
+                $this->addPoints($referrer, self::POINTS_REFERRAL_FIRST_DONATE);
+                $this->checkAndAwardBadges($referrer);
+            }
+        }
+    }
+
+    public function awardReferralSignupPoints(User $referrer): void
+    {
+        $this->addPoints($referrer, self::POINTS_REFERRAL_SIGNUP);
+        $this->checkAndAwardBadges($referrer);
+    }
+
+    public function awardReviewPoints(User $donor): void
+    {
+        $this->addPoints($donor, self::POINTS_RECIPIENT_REVIEW);
+        $this->checkAndAwardBadges($donor);
+    }
+
+    public function awardProfileCompletionPoints(User $user): void
+    {
+        // শুধুমাত্র একবার দেওয়া হবে
+        if ($user->points === 0 || !$user->badges()->where('name', 'profile_complete_bonus')->exists()) {
+            $this->addPoints($user, self::POINTS_PROFILE_COMPLETE);
+            $this->checkAndAwardBadges($user);
+        }
+    }
+
+    // ==========================================
+    // ব্যাজ চেকিং ও প্রদান
+    // ==========================================
+
+    public function checkAndAwardBadges(User $user): void
+    {
+        $user->refresh(); // সর্বশেষ ডেটা নিন
+
+        $this->checkMilestoneBadges($user);
+        $this->checkSpecialBadges($user);
+    }
+
+    private function checkMilestoneBadges(User $user): void
+    {
+        $donations = $user->total_verified_donations ?? 0;
+        $points    = $user->points ?? 0;
+
+        // Bronze Bloodline: ১ম ডোনেশন বা ৫০ পয়েন্ট
+        if ($donations >= 1 || $points >= 50) {
+            $this->awardBadgeIfNotOwned($user, 'bronze_bloodline');
+        }
+
+        // Silver Savior: ৫ ডোনেশন বা ৩০০ পয়েন্ট
+        if ($donations >= 5 || $points >= 300) {
+            $this->awardBadgeIfNotOwned($user, 'silver_savior');
+        }
+
+        // Golden Guardian: ১০ ডোনেশন বা ৬০০ পয়েন্ট
+        if ($donations >= 10 || $points >= 600) {
+            $this->awardBadgeIfNotOwned($user, 'golden_guardian');
+        }
+
+        // Platinum Hero: ২০+ ডোনেশন বা ১৫০০+ পয়েন্ট
+        if ($donations >= 20 || $points >= 1500) {
+            $this->awardBadgeIfNotOwned($user, 'platinum_hero');
+        }
+    }
+
+    private function checkSpecialBadges(User $user): void
+    {
+        // Campus Hero: .edu বা .ac.bd ইমেইল
+        $email = $user->edu_email ?? $user->email ?? '';
+        if (str_ends_with($email, '.edu') || str_contains($email, '.ac.bd') || str_ends_with($email, '.edu.bd')) {
+            $this->awardBadgeIfNotOwned($user, 'campus_hero');
+            if (!$user->is_campus_hero) {
+                $user->update(['is_campus_hero' => true]);
+            }
+        }
+
+        // Verified Donor: NID ভেরিফাইড
+        if ($user->nid_status === 'verified' || $user->verified_badge) {
+            $this->awardBadgeIfNotOwned($user, 'verified_donor');
+        }
+
+        // Ready Now: ইমার্জেন্সি মোড চালু
+        if ($user->is_ready_now) {
+            $this->awardBadgeIfNotOwned($user, 'ready_now');
+        }
+
+        // Rare Blood Hero: নেগেটিভ ব্লাড গ্রুপ + ডোনেশন করেছেন
+        $bloodGroup = $user->blood_group?->value ?? $user->blood_group ?? '';
+        if (str_contains((string)$bloodGroup, '-') && ($user->total_verified_donations ?? 0) >= 1) {
+            $this->awardBadgeIfNotOwned($user, 'rare_blood_hero');
+        }
+    }
+
+    private function awardBadgeIfNotOwned(User $user, string $badgeSlug): void
+    {
+        $badge = Badge::where('name', $badgeSlug)->first();
+        if (!$badge) return;
+
+        $alreadyHas = $user->badges()->where('badge_id', $badge->id)->exists();
+        if (!$alreadyHas) {
+            $user->badges()->attach($badge->id, [
+                'earned_at'  => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+    }
+
+    // ==========================================
+    // লিডারবোর্ড
+    // ==========================================
+
+    public function getLeaderboard(string $scope = 'national', ?int $districtId = null, string $period = 'all_time', int $limit = 50)
+    {
+        $query = User::where('role', 'donor')
+            ->where(function ($q) {
+                $q->where('total_verified_donations', '>', 0)
+                  ->orWhere('points', '>', 0);
+            })
+            ->with(['badges', 'district']);
+
+        if ($scope === 'district' && $districtId) {
+            $query->where('district_id', $districtId);
+        }
+
+        if ($period === 'monthly') {
+            $currentMonth = now()->format('Y-m');
+            $query->where('monthly_points_month', $currentMonth)
+                  ->orderByDesc('monthly_points')
+                  ->orderByDesc('total_verified_donations');
+        } else {
+            // All-time: প্রথমে ডোনেশন কাউন্ট, তারপর পয়েন্ট
+            $query->orderByDesc('total_verified_donations')
+                  ->orderByDesc('points');
+        }
+
+        return $query->limit($limit)->get();
+    }
+
+    // ==========================================
+    // রেফারেল কোড
+    // ==========================================
+
+    public function generateReferralCode(User $user): string
+    {
+        if ($user->referral_code) {
+            return $user->referral_code;
+        }
+
+        do {
+            $code = strtoupper(Str::random(4)) . $user->id;
+        } while (User::where('referral_code', $code)->exists());
+
+        $user->update(['referral_code' => $code]);
+        return $code;
+    }
+
+    public function processReferral(User $newUser, string $referralCode): void
+    {
+        $referrer = User::where('referral_code', $referralCode)->first();
+        if (!$referrer || $referrer->id === $newUser->id) return;
+
+        $newUser->update(['referred_by' => $referrer->id]);
+        // নতুন ইউজার প্রোফাইল কমপ্লিট করলে রেফারার পয়েন্ট পাবে
+    }
+
+    // ==========================================
+    // Helper
+    // ==========================================
+
+    private function addPoints(User $user, int $amount): void
+    {
+        $user->increment('points', $amount);
+    }
+
+    private function updateMonthlyPoints(User $user, int $amount): void
+    {
+        $currentMonth = now()->format('Y-m');
+
+        // মাস বদলে গেলে রিসেট করো
+        if ($user->monthly_points_month !== $currentMonth) {
+            $user->update([
+                'monthly_points'       => $amount,
+                'monthly_points_month' => $currentMonth,
+            ]);
+        } else {
+            $user->increment('monthly_points', $amount);
+        }
+    }
+
+    // ব্যাজের ডিসপ্লে ডেটা হেল্পার
+    public static function getBadgeDisplayData(string $slug): array
+    {
+        return match ($slug) {
+            'bronze_bloodline' => [
+                'label' => 'Bronze Bloodline',
+                'bn'    => 'ব্রোঞ্জ ব্লাডলাইন',
+                'emoji' => '🥉',
+                'color' => 'text-amber-700 bg-amber-50 border-amber-200',
+                'glow'  => 'shadow-amber-200',
+            ],
+            'silver_savior' => [
+                'label' => 'Silver Savior',
+                'bn'    => 'সিলভার সেভিয়ার',
+                'emoji' => '🥈',
+                'color' => 'text-slate-600 bg-slate-50 border-slate-200',
+                'glow'  => 'shadow-slate-200',
+            ],
+            'golden_guardian' => [
+                'label' => 'Golden Guardian',
+                'bn'    => 'গোল্ডেন গার্ডিয়ান',
+                'emoji' => '🏅',
+                'color' => 'text-yellow-700 bg-yellow-50 border-yellow-200',
+                'glow'  => 'shadow-yellow-200',
+            ],
+            'platinum_hero' => [
+                'label' => 'Platinum Hero',
+                'bn'    => 'প্লাটিনাম হিরো',
+                'emoji' => '🏆',
+                'color' => 'text-purple-700 bg-purple-50 border-purple-200',
+                'glow'  => 'shadow-purple-300',
+            ],
+            'campus_hero' => [
+                'label' => 'Campus Hero',
+                'bn'    => 'ক্যাম্পাস হিরো',
+                'emoji' => '🎓',
+                'color' => 'text-blue-700 bg-blue-50 border-blue-200',
+                'glow'  => 'shadow-blue-200',
+            ],
+            'verified_donor' => [
+                'label' => 'Verified Donor',
+                'bn'    => 'ভেরিফাইড ডোনার',
+                'emoji' => '🛡️',
+                'color' => 'text-emerald-700 bg-emerald-50 border-emerald-200',
+                'glow'  => 'shadow-emerald-200',
+            ],
+            'ready_now' => [
+                'label' => 'Ready Now',
+                'bn'    => 'রেডি নাউ',
+                'emoji' => '⚡',
+                'color' => 'text-orange-700 bg-orange-50 border-orange-200',
+                'glow'  => 'shadow-orange-200',
+            ],
+            'rare_blood_hero' => [
+                'label' => 'Rare Blood Hero',
+                'bn'    => 'রেয়ার ব্লাড হিরো',
+                'emoji' => '💎',
+                'color' => 'text-pink-700 bg-pink-50 border-pink-200',
+                'glow'  => 'shadow-pink-200',
+            ],
+            'midnight_savior' => [
+                'label' => 'Midnight Savior',
+                'bn'    => 'মিডনাইট সেভিয়ার',
+                'emoji' => '🌙',
+                'color' => 'text-indigo-700 bg-indigo-50 border-indigo-200',
+                'glow'  => 'shadow-indigo-200',
+            ],
+            default => [
+                'label' => $slug,
+                'bn'    => $slug,
+                'emoji' => '🏅',
+                'color' => 'text-slate-600 bg-slate-50 border-slate-200',
+                'glow'  => 'shadow-slate-200',
+            ],
+        };
+    }
+}

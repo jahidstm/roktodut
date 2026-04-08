@@ -16,6 +16,7 @@ use App\Http\Controllers\OrgAdmin\VerificationController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\OrgRegistrationController;
 use App\Http\Controllers\DonationClaimController; // 🚀 কন্ট্রোলার ইম্পোর্ট
+use App\Http\Controllers\LeaderboardController;
 use App\Models\Division;
 use Illuminate\Support\Facades\Route;
 
@@ -31,6 +32,9 @@ Route::get('/', function () {
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::post('/donors/{donor}/reveal/start', [DonorRevealController::class, 'start'])->name('donors.reveal.start');
 Route::post('/donors/{donor}/reveal/verify', [DonorRevealController::class, 'verify'])->name('donors.reveal.verify');
+
+// 🏆 লিডারবোর্ড (পাবলিক)
+Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
 
 // --- ২. সোশ্যাল লগইন ---
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');

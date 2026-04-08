@@ -11,7 +11,8 @@ class DatabaseSeeder extends Seeder
         // 🚀 সিকোয়েন্স ফিক্সড: আগে লোকেশন, এরপর ডোনার ও অর্গানাইজেশন
         $this->call([
             LocationSeeder::class,
-            DemoDonorsSeeder::class, 
+            BadgeSeeder::class,   // 🏅 আগে ব্যাজ সিড
+            DemoDonorsSeeder::class,
         ]);
     }
 }

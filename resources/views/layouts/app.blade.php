@@ -35,6 +35,11 @@
         <nav class="flex items-center gap-3 sm:gap-5">
             {{-- ১. রিকোয়েস্ট ফিড --}}
             <a href="{{ route('requests.index') }}" class="text-sm font-bold text-slate-600 hover:text-red-600 transition-colors hidden sm:block">রিকোয়েস্ট ফিড</a>
+
+            {{-- ২. লিডারবোর্ড --}}
+            <a href="{{ route('leaderboard') }}" class="text-sm font-bold text-slate-600 hover:text-red-600 transition-colors hidden sm:flex items-center gap-1.5">
+                🏆 <span>লিডারবোর্ড</span>
+            </a>
             
             {{-- ২. রিকোয়েস্ট করুন বাটন (সঠিক অর্ডারে আনা হলো) --}}
             <a href="{{ route('requests.create') }}" class="text-sm font-extrabold bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg shadow-sm transition-colors hidden sm:block">
