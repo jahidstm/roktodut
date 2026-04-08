@@ -254,64 +254,13 @@
         @endforelse
     </div>
 
-    {{-- ══════════════════════════════════════════
-         Points Guide (Collapsible)
-    ══════════════════════════════════════════ --}}
-    <div class="mt-6 bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden" x-data="{ open: false }">
-        <button @click="open = !open" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-slate-50 transition-colors">
-            <div class="flex items-center gap-2">
-                <span class="text-lg">🪙</span>
-                <span class="font-black text-slate-800">পয়েন্ট আর্নিং গাইড</span>
-            </div>
-            <svg class="w-5 h-5 text-slate-400 transition-transform duration-300" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
-            </svg>
-        </button>
-
-        <div x-show="open" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 -translate-y-2" x-transition:enter-end="opacity-100 translate-y-0" style="display:none">
-            <div class="px-5 pb-5 border-t border-slate-100">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                    @php
-                        $pointsGuide = [
-                            ['emoji' => '🩸', 'label' => 'সফল রক্তদান', 'points' => '+৫০', 'color' => 'border-red-100 bg-red-50'],
-                            ['emoji' => '⚡', 'label' => 'First Responder বোনাস (৩ ঘণ্টার মধ্যে)', 'points' => '+১০', 'color' => 'border-orange-100 bg-orange-50'],
-                            ['emoji' => '👥', 'label' => 'রেফারেল সাইন-আপ', 'points' => '+১০', 'color' => 'border-blue-100 bg-blue-50'],
-                            ['emoji' => '🎁', 'label' => 'রেফারড ব্যক্তির প্রথম ডোনেশন', 'points' => '+৩০', 'color' => 'border-green-100 bg-green-50'],
-                            ['emoji' => '💬', 'label' => 'গ্রহীতার পজিটিভ রিভিউ', 'points' => '+১০', 'color' => 'border-purple-100 bg-purple-50'],
-                            ['emoji' => '✅', 'label' => 'প্রোফাইল ১০০% সম্পন্ন', 'points' => '+২০', 'color' => 'border-slate-100 bg-slate-50'],
-                        ];
-                    @endphp
-                    @foreach($pointsGuide as $item)
-                        <div class="flex items-center gap-3 p-3 rounded-xl border {{ $item['color'] }}">
-                            <span class="text-xl flex-shrink-0">{{ $item['emoji'] }}</span>
-                            <div class="flex-1 min-w-0">
-                                <div class="text-sm font-bold text-slate-700 truncate">{{ $item['label'] }}</div>
-                            </div>
-                            <div class="flex-shrink-0 font-black text-emerald-700 text-sm">{{ $item['points'] }}</div>
-                        </div>
-                    @endforeach
-                </div>
-
-                {{-- Badge Legend --}}
-                <div class="mt-4 pt-4 border-t border-slate-100">
-                    <h3 class="text-sm font-black text-slate-700 mb-3">🏅 ব্যাজ প্রাপ্তির শর্ত</h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        @foreach([
-                            ['emoji' => '🥉', 'name' => 'Bronze', 'cond' => '১ ডোনেশন বা ৫০ pts'],
-                            ['emoji' => '🥈', 'name' => 'Silver', 'cond' => '৫ ডোনেশন বা ৩০০ pts'],
-                            ['emoji' => '🏅', 'name' => 'Golden', 'cond' => '১০ ডোনেশন বা ৬০০ pts'],
-                            ['emoji' => '🏆', 'name' => 'Platinum', 'cond' => '২০ ডোনেশন বা ১৫০০ pts'],
-                        ] as $b)
-                            <div class="text-center p-2 rounded-xl bg-slate-50 border border-slate-100">
-                                <div class="text-2xl">{{ $b['emoji'] }}</div>
-                                <div class="text-xs font-black text-slate-700 mt-1">{{ $b['name'] }}</div>
-                                <div class="text-[10px] text-slate-500 font-semibold mt-0.5">{{ $b['cond'] }}</div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
+    {{-- Points Guide moved to /gamification-guide page --}}
+    <div class="mt-6 flex justify-center">
+        <a href="{{ route('gamification.guide') }}"
+            class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-red-600 transition-colors border border-slate-200 hover:border-red-200 bg-white rounded-xl px-4 py-2.5 shadow-sm">
+            🪙 পয়েন্ট ও ব্যাজ সিস্টেম সম্পর্কে জানুন
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
     </div>
 
     {{-- ══════════════════════════════════════════

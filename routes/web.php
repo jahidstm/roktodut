@@ -24,8 +24,18 @@ use Illuminate\Support\Facades\Route;
 
 // 🎯 ফিক্স: হোমপেজের ড্রপডাউনের জন্য বিভাগগুলো ডেটাবেস থেকে পাঠানো হচ্ছে
 Route::get('/', function () {
-    $divisions = Division::all();
-    return view('home', compact('divisions'));
+    $divisions  = \App\Models\Division::all();
+    $topDonors  = \App\Models\User::where('role', 'donor')
+        ->where(function ($q) {
+            $q->where('total_verified_donations', '>', 0)
+              ->orWhere('points', '>', 0);
+        })
+        ->with(['badges', 'district'])
+        ->orderByDesc('total_verified_donations')
+        ->orderByDesc('points')
+        ->limit(3)
+        ->get();
+    return view('home', compact('divisions', 'topDonors'));
 })->name('home');
 
 // 🛡️ ইমার্জেন্সি সার্চ এবং প্রাইভেসি শিল্ড রাউটস
@@ -35,6 +45,11 @@ Route::post('/donors/{donor}/reveal/verify', [DonorRevealController::class, 'ver
 
 // 🏆 লিডারবোর্ড (পাবলিক)
 Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
+
+// 🪙 গ্যামিফিকেশন গাইড (পাবলিক)
+Route::get('/gamification-guide', function () {
+    return view('pages.gamification-guide');
+})->name('gamification.guide');
 
 // --- ২. সোশ্যাল লগইন ---
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');

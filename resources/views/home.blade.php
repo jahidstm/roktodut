@@ -34,6 +34,9 @@
                 <a href="#donate" class="hover:text-red-600 transition">রক্ত দিন</a>
                 <a href="#urgent" class="hover:text-red-600 transition">জরুরি অনুরোধ</a>
                 <a href="{{ route('requests.index') }}" class="hover:text-red-600 transition">ডোনার ফিড</a>
+                <a href="{{ route('leaderboard') }}" class="hover:text-red-600 transition flex items-center gap-1.5">
+                    🏆 লিডারবোর্ড
+                </a>
             </nav>
 
             {{-- 🎯 Dynamic Auth Buttons & Profile Chip --}}
@@ -327,7 +330,139 @@
         </div>
     </section>
 
+    {{-- ══════════ Top 3 Donors Preview Section ══════════ --}}
+    <section id="leaderboard-preview" class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 mt-20">
+
+        {{-- Section Header --}}
+        <div class="text-center mb-12">
+            <span class="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-amber-100">
+                🏆 লিডারবোর্ড
+            </span>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-4">
+                আমাদের <span class="text-red-600">সেরা রক্তবীর</span>
+            </h2>
+            <p class="text-slate-500 mt-3 font-medium max-w-lg mx-auto">
+                যারা বারবার জীবন বাঁচিয়েছেন — তাদের অবদানের বিশেষ স্বীকৃতি
+            </p>
+        </div>
+
+        @if(isset($topDonors) && $topDonors->count() > 0)
+
+        {{-- Podium Grid --}}
+        <div class="grid grid-cols-3 gap-4 sm:gap-6 items-end mb-8">
+
+            {{-- ২য় স্থান (বাম) --}}
+            @if($topDonors->count() >= 2)
+            @php $d2 = $topDonors[1]; @endphp
+            <div class="flex flex-col items-center group">
+                <div class="relative mb-3">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center text-white font-black text-2xl shadow-lg group-hover:scale-105 transition-transform duration-300 overflow-hidden border-2 border-white">
+                        @if($d2->profile_image)
+                            <img src="{{ asset('storage/' . $d2->profile_image) }}" class="w-full h-full object-cover" alt="{{ $d2->name }}">
+                        @else
+                            {{ mb_substr($d2->name, 0, 1) }}
+                        @endif
+                    </div>
+                    <span class="absolute -top-3 -right-2 text-xl drop-shadow">🥈</span>
+                </div>
+                <div class="text-center mb-2 w-full px-1">
+                    <p class="font-black text-slate-800 text-xs sm:text-sm truncate">{{ explode(' ', $d2->name)[0] }}</p>
+                    <p class="text-xs text-red-600 font-bold">{{ $d2->blood_group?->value ?? $d2->blood_group ?? '?' }}</p>
+                    @if($d2->badges->count() > 0)
+                        <div class="flex justify-center gap-0.5 mt-1">@foreach($d2->badges->take(2) as $b)<span class="text-sm" title="{{ $b->bn_name ?? $b->name }}">{{ $b->emoji ?? $b->icon }}</span>@endforeach</div>
+                    @endif
+                </div>
+                <div class="h-28 sm:h-36 w-full rounded-t-2xl bg-gradient-to-b from-slate-300 to-slate-500 flex flex-col items-center justify-start pt-3 shadow-lg">
+                    <p class="text-white font-black text-xl">{{ $d2->total_verified_donations ?? 0 }}</p>
+                    <p class="text-white/80 text-[10px] sm:text-xs font-semibold">রক্তদান</p>
+                </div>
+            </div>
+            @endif
+
+            {{-- ১ম স্থান (মাঝে) --}}
+            @php $d1 = $topDonors[0]; @endphp
+            <div class="flex flex-col items-center group">
+                <div class="relative mb-3">
+                    {{-- Special glow ring for #1 --}}
+                    <div class="absolute inset-0 rounded-2xl bg-yellow-400 opacity-30 blur-md scale-110"></div>
+                    <div class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-yellow-300 to-amber-500 flex items-center justify-center text-white font-black text-3xl shadow-xl group-hover:scale-105 transition-transform duration-300 overflow-hidden border-2 border-yellow-200">
+                        @if($d1->profile_image)
+                            <img src="{{ asset('storage/' . $d1->profile_image) }}" class="w-full h-full object-cover" alt="{{ $d1->name }}">
+                        @else
+                            {{ mb_substr($d1->name, 0, 1) }}
+                        @endif
+                    </div>
+                    <span class="absolute -top-4 -right-2 text-2xl drop-shadow-lg">👑</span>
+                </div>
+                <div class="text-center mb-2 w-full px-1">
+                    <p class="font-black text-slate-900 text-sm sm:text-base truncate">{{ explode(' ', $d1->name)[0] }}</p>
+                    <p class="text-xs text-red-600 font-black">{{ $d1->blood_group?->value ?? $d1->blood_group ?? '?' }}</p>
+                    @if($d1->badges->count() > 0)
+                        <div class="flex justify-center gap-0.5 mt-1">@foreach($d1->badges->take(3) as $b)<span class="text-base" title="{{ $b->bn_name ?? $b->name }}">{{ $b->emoji ?? $b->icon }}</span>@endforeach</div>
+                    @endif
+                    @if(($d1->total_verified_donations ?? 0) >= 20 || ($d1->points ?? 0) >= 1500)
+                        <span class="inline-block mt-1 text-[10px] font-black text-purple-700 bg-purple-100 border border-purple-200 rounded-full px-2 py-0.5 animate-pulse">✨ Platinum</span>
+                    @endif
+                </div>
+                <div class="h-40 sm:h-48 w-full rounded-t-2xl bg-gradient-to-b from-yellow-300 to-amber-500 flex flex-col items-center justify-start pt-3 shadow-xl">
+                    <p class="text-white font-black text-2xl sm:text-3xl">{{ $d1->total_verified_donations ?? 0 }}</p>
+                    <p class="text-white/80 text-xs font-semibold">রক্তদান</p>
+                    <p class="text-white/70 text-[10px] font-bold mt-1">{{ number_format($d1->points ?? 0) }} pts</p>
+                </div>
+            </div>
+
+            {{-- ৩য় স্থান (ডান) --}}
+            @if($topDonors->count() >= 3)
+            @php $d3 = $topDonors[2]; @endphp
+            <div class="flex flex-col items-center group">
+                <div class="relative mb-3">
+                    <div class="w-14 h-14 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-br from-amber-600 to-amber-700 flex items-center justify-center text-white font-black text-xl shadow-lg group-hover:scale-105 transition-transform duration-300 overflow-hidden border-2 border-white">
+                        @if($d3->profile_image)
+                            <img src="{{ asset('storage/' . $d3->profile_image) }}" class="w-full h-full object-cover" alt="{{ $d3->name }}">
+                        @else
+                            {{ mb_substr($d3->name, 0, 1) }}
+                        @endif
+                    </div>
+                    <span class="absolute -top-3 -right-2 text-xl drop-shadow">🥉</span>
+                </div>
+                <div class="text-center mb-2 w-full px-1">
+                    <p class="font-black text-slate-800 text-xs sm:text-sm truncate">{{ explode(' ', $d3->name)[0] }}</p>
+                    <p class="text-xs text-red-600 font-bold">{{ $d3->blood_group?->value ?? $d3->blood_group ?? '?' }}</p>
+                    @if($d3->badges->count() > 0)
+                        <div class="flex justify-center gap-0.5 mt-1">@foreach($d3->badges->take(2) as $b)<span class="text-sm" title="{{ $b->bn_name ?? $b->name }}">{{ $b->emoji ?? $b->icon }}</span>@endforeach</div>
+                    @endif
+                </div>
+                <div class="h-24 sm:h-32 w-full rounded-t-2xl bg-gradient-to-b from-amber-600 to-amber-800 flex flex-col items-center justify-start pt-3 shadow-lg">
+                    <p class="text-white font-black text-xl">{{ $d3->total_verified_donations ?? 0 }}</p>
+                    <p class="text-white/80 text-[10px] sm:text-xs font-semibold">রক্তদান</p>
+                </div>
+            </div>
+            @endif
+
+        </div>
+
+        @else
+        {{-- Empty State --}}
+        <div class="text-center py-12 bg-white rounded-2xl border border-slate-100 mb-8">
+            <div class="text-5xl mb-3">🩸</div>
+            <p class="text-slate-500 font-semibold">এখনও কোনো শীর্ষ ডোনার নেই।</p>
+            <p class="text-slate-400 text-sm mt-1">রক্তদান করুন এবং তালিকায় প্রথম হন!</p>
+        </div>
+        @endif
+
+        {{-- CTA Button --}}
+        <div class="text-center mt-4">
+            <a href="{{ route('leaderboard') }}"
+                class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-8 py-3.5 rounded-xl shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
+                সম্পূর্ণ লিডারবোর্ড দেখুন
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+
+    </section>
+
     {{-- Donor Feed Section --}}
+
     <section class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 py-20">
         <div class="text-center mb-12">
             <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-2">
