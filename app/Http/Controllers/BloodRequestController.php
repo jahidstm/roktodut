@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\DonationCompleted;
 use App\Http\Requests\StoreBloodRequestRequest;
 use App\Models\BloodRequest;
+use App\Models\BloodRequestResponse;
 use App\Models\District;
 use App\Models\User;
 use App\Models\CustomNotification;
@@ -116,16 +118,40 @@ class BloodRequestController extends Controller
 
     /**
      * রিকোয়েস্ট সম্পন্ন (Fulfilled) মার্ক করা
+     * → DonationCompleted ইভেন্ট ফায়ার করা হয় প্রতিটি accepted ডোনারের জন্য
      */
     public function fulfill(Request $request, BloodRequest $bloodRequest)
     {
         Gate::authorize('markFulfilled', $bloodRequest);
 
-        $bloodRequest->update([
-            'status' => 'fulfilled',
-        ]);
+        $bloodRequest->update(['status' => 'fulfilled']);
 
-        return back()->with('success', 'অভিনন্দন! রিকোয়েস্টটি সম্পন্ন (Fulfilled) মার্ক করা হয়েছে।');
+        // ─── সকল accepted ডোনারদের জন্য Event Fire করা ────────────────────
+        $acceptedResponses = BloodRequestResponse::where('blood_request_id', $bloodRequest->id)
+            ->where('status', 'accepted')
+            ->with('user')
+            ->get();
+
+        foreach ($acceptedResponses as $response) {
+            $donor = $response->user;
+            if (!$donor) continue;
+
+            // 🎯 First Responder Detection:
+            // ইমার্জেন্সি রিকোয়েস্টে ৩ ঘণ্টার মধ্যে রেসপন্ড করলে বোনাস
+            $isEmergency = ($bloodRequest->urgency === 'emergency');
+            $responseTimeHours = $bloodRequest->created_at->diffInHours($response->created_at);
+            $isFirstResponder  = $isEmergency && $responseTimeHours <= 3;
+
+            // 🚀 ইভেন্ট ফায়ার — RewardDonorPoints Listener ব্যাকগ্রাউন্ডে চলবে
+            event(new DonationCompleted(
+                donor:            $donor,
+                bloodRequest:     $bloodRequest,
+                isEmergency:      $isEmergency,
+                isFirstResponder: $isFirstResponder,
+            ));
+        }
+
+        return back()->with('success', '🎉 অভিনন্দন! রিকোয়েস্টটি সম্পন্ন মার্ক করা হয়েছে এবং ডোনাররা পয়েন্ট পাবেন।');
     }
 
     /**

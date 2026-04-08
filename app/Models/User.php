@@ -168,6 +168,13 @@ class User extends Authenticatable
         return $this->hasMany(User::class, 'referred_by');
     }
 
+    public function pointLogs(): HasMany
+    {
+        return $this->hasMany(PointLog::class);
+    }
+
+
+
     // ==================== Helper Methods (THE FIX) ====================
 
     public function isDonor(): bool

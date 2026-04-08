@@ -15,6 +15,10 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Login;
 use App\Listeners\LogSuccessfulLogin;
 
+// 🏆 Gamification Engine
+use App\Events\DonationCompleted;
+use App\Listeners\RewardDonorPoints;
+
 class AppServiceProvider extends ServiceProvider
 {
     /**
@@ -34,6 +38,13 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(
             Login::class,
             LogSuccessfulLogin::class,
+        );
+
+        // 🏆 ২. Gamification Engine — ডোনেশন সম্পন্ন হলে পয়েন্ট ও ব্যাজ প্রদান
+        //       ShouldQueue implement করায় এটি ব্যাকগ্রাউন্ড Queue-তে চলবে।
+        Event::listen(
+            DonationCompleted::class,
+            RewardDonorPoints::class,
         );
 
         // 🛡️ ২. Anti-Scraping Privacy Shield for Donor Phone Numbers

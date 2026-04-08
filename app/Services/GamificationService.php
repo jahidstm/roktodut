@@ -3,7 +3,10 @@
 namespace App\Services;
 
 use App\Models\Badge;
+use App\Models\BloodRequest;
+use App\Models\PointLog;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class GamificationService
@@ -23,25 +26,102 @@ class GamificationService
     // পয়েন্ট দেওয়া
     // ==========================================
 
-    public function awardDonationPoints(User $donor, bool $isFirstResponder = false): void
+    /**
+     * যেকোনো কাজে পয়েন্ট দেওয়া + point_logs-এ অডিট রেকর্ড রাখা।
+     *
+     * @param  User   $user       — যাকে পয়েন্ট দেওয়া হবে
+     * @param  int    $points     — কত পয়েন্ট (+/- উভয়ই হতে পারে)
+     * @param  string $actionType — PointLog::ACTION_* কনস্ট্যান্ট
+     * @param  array  $metadata   — অতিরিক্ত তথ্য (যেমন blood_request_id)
+     */
+    public function awardPoints(User $user, int $points, string $actionType, array $metadata = []): void
     {
-        $points = self::POINTS_SUCCESSFUL_DONATION;
+        DB::transaction(function () use ($user, $points, $actionType, $metadata) {
+            // ১. users টেবিলে পয়েন্ট যোগ করা
+            $user->increment('points', $points);
+
+            // ২. point_logs-এ অডিট ট্রেইল রাখা
+            PointLog::create([
+                'user_id'     => $user->id,
+                'points'      => $points,
+                'action_type' => $actionType,
+                'metadata'    => $metadata ?: null,
+            ]);
+        });
+    }
+
+    /**
+     * সম্পূর্ণ ডোনেশন রিওয়ার্ড প্রসেস:
+     *  → total_verified_donations +১
+     *  → last_donated_at আপডেট
+     *  → +৫০ পয়েন্ট (+ First Responder বোনাস)
+     *  → মাসিক পয়েন্ট আপডেট
+     *  → ব্যাজ চেক ও আনলক
+     *  → রেফারার বোনাস (প্রথম ডোনেশনে)
+     */
+    public function processDonationReward(
+        User         $donor,
+        BloodRequest $bloodRequest,
+        bool         $isFirstResponder = false,
+    ): void {
+        // ─── ১. ডোনেশন কাউন্ট ও তারিখ আপডেট ──────────────────────────
+        $donor->increment('total_verified_donations');
+        $donor->update(['last_donated_at' => now()->toDateString()]);
+        $donor->refresh();
+
+        // ─── ২. মূল ডোনেশন পয়েন্ট (+৫০) ──────────────────────────────
+        $this->awardPoints(
+            user:       $donor,
+            points:     self::POINTS_SUCCESSFUL_DONATION,
+            actionType: PointLog::ACTION_DONATION_COMPLETED,
+            metadata:   [
+                'blood_request_id' => $bloodRequest->id,
+                'blood_group'      => $bloodRequest->blood_group,
+                'district_id'      => $bloodRequest->district_id,
+            ],
+        );
+        $this->updateMonthlyPoints($donor, self::POINTS_SUCCESSFUL_DONATION);
+
+        // ─── ৩. First Responder বোনাস (+১০) — ৩ ঘণ্টার মধ্যে রেসপন্ড ──
         if ($isFirstResponder) {
-            $points += self::POINTS_FIRST_RESPONDER_BONUS;
+            $this->awardPoints(
+                user:       $donor,
+                points:     self::POINTS_FIRST_RESPONDER_BONUS,
+                actionType: PointLog::ACTION_FIRST_RESPONDER_BONUS,
+                metadata:   ['blood_request_id' => $bloodRequest->id],
+            );
+            $this->updateMonthlyPoints($donor, self::POINTS_FIRST_RESPONDER_BONUS);
         }
 
-        $this->addPoints($donor, $points);
-        $this->updateMonthlyPoints($donor, $points);
+        // ─── ৪. ব্যাজ চেক ও আনলক ─────────────────────────────────────
         $this->checkAndAwardBadges($donor);
 
-        // রেফারার কে বোনাস পয়েন্ট দেওয়া (প্রথম ডোনেশনে)
+        // ─── ৫. রেফারার বোনাস (প্রথম ডোনেশনেই কেবল) ──────────────────
         if ($donor->total_verified_donations === 1 && $donor->referred_by) {
             $referrer = User::find($donor->referred_by);
             if ($referrer) {
-                $this->addPoints($referrer, self::POINTS_REFERRAL_FIRST_DONATE);
+                $this->awardPoints(
+                    user:       $referrer,
+                    points:     self::POINTS_REFERRAL_FIRST_DONATION,
+                    actionType: PointLog::ACTION_REFERRAL_FIRST_DONATION,
+                    metadata:   ['referred_donor_id' => $donor->id],
+                );
                 $this->checkAndAwardBadges($referrer);
             }
         }
+    }
+
+    /**
+     * পুরনো মেথড — এখনো ব্যবহারযোগ্য (DonationClaimController compatibility)
+     * @deprecated processDonationReward() ব্যবহার করুন
+     */
+    public function awardDonationPoints(User $donor, bool $isFirstResponder = false): void
+    {
+        $this->processDonationReward(
+            donor:            $donor,
+            bloodRequest:     new BloodRequest(), // fallback, নতুন কোডে event দিয়ে call করুন
+            isFirstResponder: $isFirstResponder,
+        );
     }
 
     public function awardReferralSignupPoints(User $referrer): void
@@ -205,9 +285,12 @@ class GamificationService
     }
 
     // ==========================================
-    // Helper
+    // Private Helpers
     // ==========================================
 
+    /**
+     * @deprecated awardPoints() ব্যবহার করুন (DB logging নেই এতে)
+     */
     private function addPoints(User $user, int $amount): void
     {
         $user->increment('points', $amount);
