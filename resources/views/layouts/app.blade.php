@@ -33,10 +33,16 @@
 
         {{-- 🧭 Navigation & Actions --}}
         <nav class="flex items-center gap-3 sm:gap-5">
+            {{-- ১. রিকোয়েস্ট ফিড --}}
             <a href="{{ route('requests.index') }}" class="text-sm font-bold text-slate-600 hover:text-red-600 transition-colors hidden sm:block">রিকোয়েস্ট ফিড</a>
             
+            {{-- ২. রিকোয়েস্ট করুন বাটন (সঠিক অর্ডারে আনা হলো) --}}
+            <a href="{{ route('requests.create') }}" class="text-sm font-extrabold bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg shadow-sm transition-colors hidden sm:block">
+                রিকোয়েস্ট করুন
+            </a>
+            
             @auth
-                {{-- 🔔 Notification Bell --}}
+                {{-- ৩. Notification Bell --}}
                 <div class="relative" x-data="{ openNotification: false }" @click.outside="openNotification = false" @close.stop="openNotification = false">
                     <button @click="openNotification = ! openNotification" class="relative p-2 text-slate-500 hover:text-red-600 transition rounded-full hover:bg-red-50 focus:outline-none">
                         <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +108,7 @@
                     </div>
                 </div>
 
-                {{-- 🎯 User Profile Chip & Dropdown --}}
+                {{-- ৪. User Profile Chip & Dropdown --}}
                 <div x-data="{ openProfile: false }" class="relative inline-block text-left ml-1 sm:ml-2">
                     
                     {{-- 🔘 Trigger Button (Profile Chip) --}}
@@ -185,10 +191,6 @@
                 <a href="{{ route('login') }}" class="text-sm font-bold text-slate-700 hover:text-red-600 transition-colors">লগইন</a>
                 <a href="{{ route('register') }}" class="bg-red-600 text-white text-sm font-bold px-4 py-2 sm:px-5 sm:py-2.5 rounded-full hover:bg-red-700 shadow-sm transition-colors">অ্যাকাউন্ট খুলুন</a>
             @endauth
-
-            <a href="{{ route('requests.create') }}" class="text-sm font-extrabold bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg shadow-sm transition-colors hidden sm:block">
-                রিকোয়েস্ট করুন
-            </a>
         </nav>
     </div>
 </header>

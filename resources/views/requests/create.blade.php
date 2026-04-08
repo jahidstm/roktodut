@@ -3,14 +3,15 @@
 @section('title', 'নতুন রক্তের রিকোয়েস্ট — রক্তদূত')
 
 @section('content')
-<div class="max-w-3xl mx-auto">
+{{-- 🎯 THE FIX: ফর্মটি মাঝখানে রাখতে এবং উপরে-নিচে পর্যাপ্ত শ্বাস নেওয়ার জায়গা (Breathing Space) দিতে px-4 sm:px-6 lg:px-8 py-10 যোগ করা হলো --}}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
     <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">নতুন রক্তের রিকোয়েস্ট</h1>
     <p class="text-slate-500 font-medium mt-1">সঠিক তথ্য দিলে দ্রুত ডোনার রেসপন্স পাবে।</p>
 
     <div class="mt-8 rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm relative overflow-hidden">
         <div class="absolute top-0 left-0 w-2 h-full bg-red-600"></div>
         
-        {{-- 🎯 THE FIX: ফর্মের সাথে Alpine.js x-data যোগ করা হলো --}}
+        {{-- 🎯 ফর্মের সাথে Alpine.js x-data যোগ করা হলো --}}
         <form method="POST" action="{{ route('requests.store') }}" class="space-y-6" x-data="{ isSubmitting: false }" @submit="if(isSubmitting) { $event.preventDefault(); return false; } isSubmitting = true;">
             @csrf
 
@@ -50,7 +51,7 @@
                 </div>
             </div>
 
-            {{-- 📍 Dynamic Location Dropdowns (Using Global Component with correct Kebab-case properties) --}}
+            {{-- 📍 Dynamic Location Dropdowns --}}
             <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100">
                 <x-location-selector 
                     :selected-division="old('division_id')"
@@ -117,7 +118,7 @@
             </div>
 
             <div class="flex items-center gap-4 pt-4 border-t border-slate-100">
-                {{-- 🎯 THE FIX: ডাইনামিক সাবমিট বাটন --}}
+                {{-- 🎯 ডাইনামিক সাবমিট বাটন --}}
                 <button type="submit" 
                         :disabled="isSubmitting"
                         class="bg-red-600 hover:bg-red-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white px-8 py-3.5 rounded-xl text-sm font-black transition-all shadow-sm shadow-red-200 flex items-center justify-center min-w-[200px]">

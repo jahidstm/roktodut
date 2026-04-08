@@ -44,6 +44,72 @@
                 @endguest
 
                 @auth
+                    {{-- 🔔 Notification Bell (Added specifically for Home Page) --}}
+                    <div class="relative flex items-center" x-data="{ openNotification: false }" @click.outside="openNotification = false" @close.stop="openNotification = false">
+                        <button @click="openNotification = ! openNotification" class="relative p-2 text-slate-500 hover:text-red-600 transition rounded-full hover:bg-red-50 focus:outline-none">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                            @if(auth()->user()->unreadNotifications->count() > 0)
+                                <span class="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-extrabold text-white shadow-sm ring-2 ring-white">
+                                    {{ auth()->user()->unreadNotifications->count() }}
+                                </span>
+                            @endif
+                        </button>
+
+                        {{-- Notification Dropdown --}}
+                        <div x-show="openNotification"
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 scale-95 translate-y-2"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave="transition ease-in duration-150"
+                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                             x-transition:leave-end="opacity-0 scale-95 translate-y-2"
+                             class="absolute right-0 mt-3 top-12 w-80 sm:w-96 rounded-2xl bg-white shadow-xl ring-1 ring-slate-200 overflow-hidden z-50"
+                             style="display: none;">
+                            <div class="px-4 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                                <h3 class="text-sm font-extrabold text-slate-800">নোটিফিকেশন</h3>
+                                @if(auth()->user()->unreadNotifications->count() > 0)
+                                    <span class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-black uppercase">{{ auth()->user()->unreadNotifications->count() }} নতুন</span>
+                                @endif
+                            </div>
+                            <div class="max-h-80 overflow-y-auto divide-y divide-slate-50">
+                                @forelse(auth()->user()->unreadNotifications as $notification)
+                                    <form action="{{ route('notifications.read', $notification->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="w-full text-left p-4 hover:bg-slate-50 transition flex gap-3 items-start group">
+                                            <div class="mt-0.5 rounded-full p-2 shrink-0 {{ isset($notification->data['status']) && $notification->data['status'] === 'approved' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600' }}">
+                                                @if(isset($notification->data['status']) && $notification->data['status'] === 'approved')
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                                                @else
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                @endif
+                                            </div>
+                                            <div>
+                                                <div class="text-sm font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
+                                                    {{ $notification->data['message'] ?? 'নতুন নোটিফিকেশন' }}
+                                                </div>
+                                                <div class="text-[10px] text-slate-400 mt-1 font-bold uppercase tracking-wide">
+                                                    @if(isset($notification->data['patient_name']))
+                                                        {{ $notification->data['patient_name'] }} • 
+                                                    @endif
+                                                    {{ $notification->created_at->diffForHumans() }}
+                                                </div>
+                                            </div>
+                                        </button>
+                                    </form>
+                                @empty
+                                    <div class="p-8 text-center flex flex-col items-center justify-center">
+                                        <div class="bg-slate-50 p-3 rounded-full mb-3 text-slate-300">
+                                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                                        </div>
+                                        <span class="text-sm font-bold text-slate-400">নতুন কোনো নোটিফিকেশন নেই।</span>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- 🎯 User Profile Chip & Dropdown --}}
                     <div x-data="{ openProfile: false }" class="relative inline-block text-left ml-1 sm:ml-2">
                         
