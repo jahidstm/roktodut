@@ -517,4 +517,41 @@ class GamificationService
             ],
         };
     }
+
+    // =========================================================
+    // NID ভেরিফিকেশন ব্যাজ — Org Admin ও System Admin উভয়ই ব্যবহার করে
+    // =========================================================
+
+    /**
+     * NID verified হলে 'verified_donor' ব্যাজ দাও।
+     * idempotent — ইউজারের কাছে ইতিমধ্যে ব্যাজ থাকলে duplicate হবে না।
+     */
+    public function awardVerifiedBadge(User $user): void
+    {
+        $badge = \App\Models\Badge::where('name', 'verified_donor')->first();
+        if (! $badge) return;
+
+        $alreadyHas = $user->badges()->where('badge_id', $badge->id)->exists();
+        if (! $alreadyHas) {
+            $user->badges()->attach($badge->id, [
+                'earned_at'  => now(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        $user->update(['verified_badge' => true, 'nid_status' => 'verified']);
+    }
+
+    /**
+     * NID rejected হলে 'verified_donor' ব্যাজ সরিয়ে নাও।
+     */
+    public function revokeVerifiedBadge(User $user): void
+    {
+        $badge = \App\Models\Badge::where('name', 'verified_donor')->first();
+        if ($badge) {
+            $user->badges()->detach($badge->id);
+        }
+        $user->update(['verified_badge' => false, 'nid_status' => 'unverified']);
+    }
 }

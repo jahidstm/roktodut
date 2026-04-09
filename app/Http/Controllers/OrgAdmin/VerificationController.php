@@ -4,11 +4,13 @@ namespace App\Http\Controllers\OrgAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\GamificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class VerificationController extends Controller
 {
+    public function __construct(private readonly GamificationService $gamification) {}
     /**
      * ডোনারের বিস্তারিত তথ্য দেখা
      */
@@ -29,9 +31,12 @@ class VerificationController extends Controller
         $this->authorizeOrganizationAccess($donor);
 
         $donor->update([
-            'nid_status' => 'approved',
-            'verified_badge' => true // 🎯 এই ব্যাজটিই আমরা পরে সার্চ রেজাল্টে দেখাব
+            'nid_status'     => 'verified',
+            'verified_badge' => true,
         ]);
+
+        // 🏅 Verified Donor ব্যাজ অ্যার্জন করান
+        $this->gamification->awardVerifiedBadge($donor);
 
         return redirect()->route('org.dashboard')->with('success', "{$donor->name}-কে সফলভাবে ভেরিফাই করা হয়েছে।");
     }
@@ -45,9 +50,12 @@ class VerificationController extends Controller
         $this->authorizeOrganizationAccess($donor);
 
         $donor->update([
-            'nid_status' => 'rejected',
-            'verified_badge' => false
+            'nid_status'     => 'unverified',
+            'verified_badge' => false,
         ]);
+
+        // ব্যাজ রিমুভ করি
+        $this->gamification->revokeVerifiedBadge($donor);
 
         return redirect()->route('org.dashboard')->with('error', "{$donor->name}-এর ভেরিফিকেশন বাতিল করা হয়েছে।");
     }

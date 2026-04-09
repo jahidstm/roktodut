@@ -147,7 +147,108 @@
         </div>
     </div>
 
+    {{-- 🪪 ২b. NID ভেরিফিকেশন রিভিউ (System Admin) --}}
+    <div class="mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">🪪</span>
+                NID ভেরিফিকেশন রিভিউ
+            </h2>
+            <span class="text-xs font-extrabold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
+                {{ $pendingNids->count() }} টি পেন্ডিং
+            </span>
+        </div>
+
+        @if($pendingNids->isEmpty())
+            <div class="bg-white rounded-2xl border border-slate-200 p-10 text-center">
+                <div class="text-4xl mb-3">✅</div>
+                <p class="font-bold text-slate-600">কোনো পেন্ডিং NID নেই।</p>
+            </div>
+        @else
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="bg-slate-50 border-b border-slate-200 text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+                            <th class="text-left px-5 py-3.5">ডোনার</th>
+                            <th class="text-left px-4 py-3.5">অর্গানাইজেশন</th>
+                            <th class="text-left px-4 py-3.5">জেলা</th>
+                            <th class="text-center px-4 py-3.5">ডকুমেন্ট</th>
+                            <th class="text-center px-4 py-3.5">অ্যাকশন</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @foreach($pendingNids as $donor)
+                            <tr class="hover:bg-slate-50/60 transition">
+                                {{-- ডোনার নাম + ইমেইল --}}
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-9 h-9 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-black text-sm shrink-0">
+                                            {{ mb_substr($donor->name, 0, 1) }}
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-slate-900">{{ $donor->name }}</p>
+                                            <p class="text-xs text-slate-400">{{ $donor->email }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                {{-- অর্গানাইজেশন --}}
+                                <td class="px-4 py-4">
+                                    @if($donor->organization)
+                                        <span class="text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">
+                                            {{ $donor->organization->name }}
+                                        </span>
+                                    @else
+                                        <span class="text-xs text-slate-400 font-medium">কোনো ক্লাব নেই</span>
+                                    @endif
+                                </td>
+
+                                {{-- জেলা --}}
+                                <td class="px-4 py-4 text-sm text-slate-600 font-medium">
+                                    {{ $donor->district?->name ?? '—' }}
+                                </td>
+
+                                {{-- ডকুমেন্ট লিঙ্ক --}}
+                                <td class="px-4 py-4 text-center">
+                                    <a href="{{ asset('storage/' . $donor->nid_path) }}"
+                                       target="_blank"
+                                       class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:underline">
+                                        🔍 দেখুন
+                                    </a>
+                                </td>
+
+                                {{-- অ্যাকশন বাটন --}}
+                                <td class="px-4 py-4">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <form action="{{ route('admin.nid.verify', $donor) }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="decision" value="approve">
+                                            <button type="submit"
+                                                    class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-4 py-2 rounded-lg transition shadow-sm">
+                                                ✅ অ্যাপ্রুভ
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('admin.nid.verify', $donor) }}" method="POST">
+                                            @csrf
+                                            <input type="hidden" name="decision" value="reject">
+                                            <button type="submit"
+                                                    onclick="return confirm('{{ $donor->name }}-এর NID বাতিল করবেন?')"
+                                                    class="bg-white border-2 border-red-100 hover:bg-red-50 text-red-600 text-xs font-extrabold px-4 py-2 rounded-lg transition">
+                                                ❌ বাতিল
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @endif
+    </div>
+
     {{-- 📈 ৩. চার্ট সেকশন --}}
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
 
         {{-- Pie Chart: ব্লাড গ্রুপ ডিমান্ড --}}

@@ -4,13 +4,16 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\BloodRequest;
-use App\Models\BloodRequestResponse; // 🚀 নতুন মডেল ইম্পোর্ট
+use App\Models\BloodRequestResponse;
 use App\Models\User;
+use App\Services\GamificationService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
 {
+    public function __construct(private readonly GamificationService $gamification) {}
     public function index()
     {
         // ১. গ্লোবাল কাউন্টস (Platform Health)
@@ -45,6 +48,13 @@ class AdminDashboardController extends Controller
             ->orderBy('donor_claimed_at', 'desc')
             ->get();
 
+        // 🏅 ৫. পেন্ডিং NID ভেরিফিকেশন (System Admin Review)
+        $pendingNids = User::where('nid_status', 'pending')
+            ->whereNotNull('nid_path')
+            ->with(['district', 'organization'])
+            ->orderBy('updated_at', 'asc')
+            ->get();
+
         return view('admin.dashboard', compact(
             'totalUsers',
             'totalDonors',
@@ -53,7 +63,24 @@ class AdminDashboardController extends Controller
             'successRate',
             'bloodGroupDemand',
             'districtDemand',
-            'pendingClaims' // 👈 নতুন ডেটা ভিউতে পাঠানো হলো
+            'pendingClaims',
+            'pendingNids',
         ));
+    }
+
+    /**
+     * সিস্টেম অ্যাডমিন NID অ্যাপ্রুভ / রিজেক্ট
+     */
+    public function verifyNid(Request $request, User $user): RedirectResponse
+    {
+        $decision = $request->input('decision'); // 'approve' | 'reject'
+
+        if ($decision === 'approve') {
+            $this->gamification->awardVerifiedBadge($user);
+            return back()->with('success', "✅ {$user->name}-এর NID ভেরিফাই সম্পন্ন হয়েছে। 'Verified Donor' ব্যাজ যুক্ত হয়েছে।");
+        }
+
+        $this->gamification->revokeVerifiedBadge($user);
+        return back()->with('error', "❌ {$user->name}-এর NID ভেরিফিকেশন বাতিল হয়েছে।");
     }
 }

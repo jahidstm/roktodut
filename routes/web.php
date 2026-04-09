@@ -119,6 +119,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // 🎯 অ্যাডমিন ডোনেশন ভেরিফিকেশন রাউট
     Route::post('/admin/donations/{response}/verify', [DonationClaimController::class, 'adminVerify'])->name('admin.donations.verify');
 
+    // 🪪 সিস্টেম অ্যাডমিন NID ভেরিফিকেশন রাউট
+    Route::post('/admin/users/{user}/verify-nid', [AdminDashboardController::class, 'verifyNid'])->name('admin.nid.verify');
+
     // 🎮 Gamification Governance মডিউল
     Route::prefix('admin/gamification')->name('admin.gamification.')->group(function () {
         Route::get('/',                          [GamificationGovernanceController::class, 'index'])->name('index');

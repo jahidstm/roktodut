@@ -393,7 +393,13 @@
                     <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-xl shrink-0">🔍</div>
                     <div>
                         <p class="font-extrabold text-amber-900 text-sm">আপনার ডকুমেন্ট রিভিউ হচ্ছে!</p>
-                        <p class="text-amber-700 text-xs font-medium mt-0.5">অর্গানাইজেশন অ্যাডমিন যাচাই করার পর আপনার 'Verified Donor' ব্যাজ যুক্ত হবে।</p>
+                        <p class="text-amber-700 text-xs font-medium mt-0.5">
+                            @if($user->organization_id)
+                                অর্গানাইজেশন অ্যাডমিন বা সিস্টেম অ্যাডমিন যাচাই করার পর আপনার <strong>'Verified Donor'</strong> ব্যাজ যুক্ত হবে।
+                            @else
+                                সিস্টেম অ্যাডমিন যাচাই করার পর আপনার <strong>'Verified Donor'</strong> ব্যাজ যুক্ত হবে।
+                            @endif
+                        </p>
                     </div>
                 </div>
             @endif
