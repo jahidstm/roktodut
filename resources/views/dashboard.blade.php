@@ -233,6 +233,163 @@
     </div>
 
     {{-- ══════════════════════════════════════════
+         🪪 Digital Smart Card — QR Verified Identity
+    ══════════════════════════════════════════ --}}
+    @if($user->qr_token && $user->nid_status === 'verified')
+    <div class="mb-10 relative overflow-hidden rounded-3xl border border-slate-700/50 shadow-2xl"
+         style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #1c0808 100%);">
+
+        {{-- Decorative blobs --}}
+        <div class="absolute -top-16 -right-16 w-60 h-60 rounded-full pointer-events-none"
+             style="background: radial-gradient(circle, rgba(220,38,38,0.13) 0%, transparent 70%);"></div>
+        <div class="absolute -bottom-12 -left-12 w-48 h-48 rounded-full pointer-events-none"
+             style="background: radial-gradient(circle, rgba(153,27,27,0.10) 0%, transparent 70%);"></div>
+        <div class="absolute top-0 left-0 right-0 h-px pointer-events-none"
+             style="background: linear-gradient(to right, transparent, rgba(220,38,38,0.35), transparent);"></div>
+
+        <div class="relative z-10 p-6 sm:p-8">
+
+            {{-- ── Header Row ── --}}
+            <div class="flex items-start justify-between gap-4 mb-7">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
+                         style="background:rgba(220,38,38,.12); border:1px solid rgba(220,38,38,.22);">
+                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-white font-black text-base leading-tight">Digital Smart Card</h2>
+                        <p class="text-slate-500 text-xs font-semibold mt-0.5">QR কোড স্ক্যান করে পরিচয় যাচাই করুন</p>
+                    </div>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-emerald-400 text-[11px] font-bold rounded-full shrink-0"
+                      style="background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.25);">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    NID Verified
+                </span>
+            </div>
+
+            {{-- ── Card Body ── --}}
+            <div class="flex flex-col sm:flex-row items-center gap-7">
+
+                {{-- QR Code (JavaScript rendered) --}}
+                <div class="shrink-0 flex flex-col items-center gap-2">
+                    <div class="bg-white p-3.5 rounded-2xl"
+                         style="box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 0 4px rgba(255,255,255,.06);">
+                        <div id="smart-card-qr" style="width:148px;height:148px;"></div>
+                    </div>
+                    <p class="text-slate-600 text-[10px] font-bold uppercase tracking-widest">হাসপাতালে স্ক্যান করুন</p>
+                </div>
+
+                {{-- Donor Details --}}
+                <div class="flex-1 w-full text-center sm:text-left">
+
+                    {{-- Name --}}
+                    <h3 class="text-2xl sm:text-3xl font-black text-white leading-tight mb-3">{{ $user->name }}</h3>
+
+                    {{-- Chips Row --}}
+                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-4">
+
+                        {{-- Blood Group --}}
+                        <span class="inline-flex items-center gap-1.5 text-lg font-black px-4 py-2 rounded-xl text-red-300"
+                              style="background:rgba(220,38,38,.15); border:1.5px solid rgba(220,38,38,.3);">
+                            🩸 {{ $user->blood_group?->value ?? 'N/A' }}
+                        </span>
+
+                        {{-- Availability Status --}}
+                        @if($isEligible && $user->is_available)
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl text-emerald-300"
+                                  style="background:rgba(22,163,74,.12); border:1.5px solid rgba(22,163,74,.25);">
+                                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                Available
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl text-amber-300"
+                                  style="background:rgba(217,119,6,.1); border:1.5px solid rgba(217,119,6,.25);">
+                                <span class="inline-block w-2 h-2 rounded-full bg-amber-400"></span>
+                                In Cooldown
+                            </span>
+                        @endif
+
+                        {{-- Verified Donor Badge --}}
+                        @if($user->verified_badge)
+                            <span class="inline-flex items-center gap-1 text-xs font-bold px-3 py-2 rounded-xl text-blue-300"
+                                  style="background:rgba(59,130,246,.12); border:1.5px solid rgba(59,130,246,.25);">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                ভেরিফাইড ডোনার
+                            </span>
+                        @endif
+                    </div>
+
+                    {{-- Quick Stats --}}
+                    <div class="grid grid-cols-2 gap-2.5 mb-5">
+                        <div class="rounded-xl p-3 text-center sm:text-left"
+                             style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);">
+                            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">মোট ডোনেশন</p>
+                            <p class="text-white font-black text-xl leading-none">
+                                {{ $totalContributions ?? 0 }}
+                                <span class="text-slate-500 font-semibold text-xs ml-0.5">বার</span>
+                            </p>
+                        </div>
+                        <div class="rounded-xl p-3 text-center sm:text-left"
+                             style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);">
+                            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">গ্যামিফিকেশন পয়েন্ট</p>
+                            <p class="text-amber-400 font-black text-xl leading-none">
+                                {{ number_format($user->points ?? 0) }}
+                                <span class="text-slate-500 font-semibold text-xs ml-0.5">pts</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Shareable Link --}}
+                    <div class="flex items-center gap-2">
+                        <input id="smart-card-link"
+                               type="text"
+                               value="{{ route('public.verify', $user->qr_token) }}"
+                               class="flex-1 text-xs py-2.5 px-3 rounded-xl text-slate-400 font-mono focus:outline-none focus:ring-1 focus:ring-red-600/40 min-w-0 truncate"
+                               style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);"
+                               readonly>
+                        <button onclick="copySmartCardLink()" id="smart-card-copy-btn"
+                                class="shrink-0 bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-colors whitespace-nowrap">
+                            কপি লিঙ্ক
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Security Note --}}
+            <p class="text-slate-600 text-[10px] font-semibold mt-5 pt-4 text-center"
+               style="border-top: 1px solid rgba(255,255,255,.06);">
+                🔒 এই QR কোডে ফোন নম্বর, ইমেইল বা ব্যক্তিগত তথ্য নেই — শুধুমাত্র পরিচয় যাচাই করা যাবে।
+            </p>
+        </div>
+    </div>
+
+    {{-- QR Code Generator via CDN (no PHP extension required) --}}
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script>
+        (function () {
+            var verifyUrl = @json(route('public.verify', $user->qr_token));
+            var canvas = document.createElement('canvas');
+            QRCode.toCanvas(canvas, verifyUrl, {
+                width: 148,
+                margin: 1,
+                color: { dark: '#1e293b', light: '#ffffff' }
+            }, function () {
+                var container = document.getElementById('smart-card-qr');
+                if (container) container.appendChild(canvas);
+            });
+        })();
+    </script>
+    @endif
+
+    {{-- ══════════════════════════════════════════
          🏆 গ্যামিফিকেশন উইজেট
     ══════════════════════════════════════════ --}}
     @if(isset($gamificationStats))
@@ -640,6 +797,22 @@ function copyDashboardReferral() {
         setTimeout(() => {
             btn.textContent = 'কপি করুন';
             btn.classList.remove('bg-emerald-100', 'text-emerald-800');
+        }, 2500);
+    });
+}
+
+function copySmartCardLink() {
+    const input = document.getElementById('smart-card-link');
+    const btn   = document.getElementById('smart-card-copy-btn');
+    if (!input || !btn) return;
+    navigator.clipboard.writeText(input.value).then(() => {
+        btn.textContent = '✓ কপি হয়েছে!';
+        btn.classList.replace('bg-red-600', 'bg-emerald-600');
+        btn.classList.replace('hover:bg-red-700', 'hover:bg-emerald-700');
+        setTimeout(() => {
+            btn.textContent = 'কপি লিঙ্ক';
+            btn.classList.replace('bg-emerald-600', 'bg-red-600');
+            btn.classList.replace('hover:bg-emerald-700', 'hover:bg-red-700');
         }, 2500);
     });
 }
