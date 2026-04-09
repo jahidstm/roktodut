@@ -95,6 +95,17 @@ class DemoDonorsSeeder extends Seeder
             $isOrgMember = ($i % 3 === 0);
             $nidStatus   = $isOrgMember ? ($i % 6 === 0 ? 'verified' : 'pending') : 'unverified';
 
+            // qr_token শুধুমাত্র 'verified' ডোনারদের জন্য
+            $qrToken = ($nidStatus === 'verified') ? Str::random(32) : null;
+
+            // কুলডাউন লজিক:
+            // verified ডোনারদের মধ্যে i%12===0 → in cooldown (ভবিষ্যৎ তারিখ)
+            // বাকি verified → available (cooldown_until = null)
+            $cooldownUntil = null;
+            if ($nidStatus === 'verified' && $i % 12 === 0) {
+                $cooldownUntil = now()->addDays(30 + ($i % 60))->toDateTimeString();
+            }
+
             $lastDonatedAt = ($donations > 0)
                 ? now()->subDays(130 + ($i * 2))->toDateString() // কুলডাউন পেরিয়ে গেছে
                 : null;
@@ -113,6 +124,7 @@ class DemoDonorsSeeder extends Seeder
                     'organization_id'         => $isOrgMember ? $org->id : null,
                     'nid_status'              => $nidStatus,
                     'nid_path'                => $nidStatus !== 'unverified' ? 'seed/dummy_nid.jpg' : null,
+                    'qr_token'                => $qrToken,
                     'is_onboarded'            => true,
                     'is_available'            => ($i % 5 !== 0), // ৮০% ইমার্জেন্সি মোড চালু
                     'is_ready_now'            => ($i % 6 === 0),
@@ -123,6 +135,7 @@ class DemoDonorsSeeder extends Seeder
                     'monthly_points'          => $monthlyPoints,
                     'monthly_points_month'    => $monthlyPoints > 0 ? $currentMonth : null,
                     'last_donated_at'         => $lastDonatedAt,
+                    'cooldown_until'          => $cooldownUntil,
                     'last_login_at'           => now()->subDays($i % 20),
                     'is_shadowbanned'         => false,
                     'remember_token'          => Str::random(10),
@@ -166,6 +179,7 @@ class DemoDonorsSeeder extends Seeder
                 'organization_id'         => $org->id,
                 'nid_status'              => 'verified',
                 'nid_path'                => 'seed/dummy_nid.jpg',
+                'qr_token'                => Str::random(32), // Platinum Hero — সবসময় available
                 'is_onboarded'            => true,
                 'is_available'            => true,
                 'verified_badge'          => true,
@@ -175,6 +189,7 @@ class DemoDonorsSeeder extends Seeder
                 'monthly_points'          => 110,
                 'monthly_points_month'    => $currentMonth,
                 'last_donated_at'         => now()->subDays(135)->toDateString(),
+                'cooldown_until'          => null, // available অবস্থায় আছেন
                 'is_shadowbanned'         => false,
                 'email_verified_at'       => now(),
                 'gender'                  => 'male',
@@ -206,6 +221,8 @@ class DemoDonorsSeeder extends Seeder
         );
 
         $this->command->info('✅ DemoDonorsSeeder: 30+ ডোনার গ্যামিফিকেশন ডেটা সহ সিড সম্পন্ন।');
+        $this->command->info('   ↳ Verified ডোনারদের qr_token সেট করা হয়েছে।');
+        $this->command->info('   ↳ কিছু verified ডোনার available, কিছু in cooldown অবস্থায়।');
     }
 
     private function attachBadge(User $user, Badge $badge): void
