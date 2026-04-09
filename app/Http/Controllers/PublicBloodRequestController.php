@@ -23,12 +23,26 @@ class PublicBloodRequestController extends Controller
             $query->where('district_id', $request->district);
         }
 
-        $requests = $query->orderByRaw("FIELD(urgency, 'emergency', 'urgent', 'normal')")
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('patient_name', 'like', "%{$search}%")
+                  ->orWhere('hospital', 'like', "%{$search}%");
+            });
+        }
+
+        $requests = $query
+            ->orderByRaw("FIELD(urgency, 'emergency', 'urgent', 'normal')")
             ->orderBy('needed_at', 'asc')
             ->paginate(12)
             ->withQueryString();
 
         $districts = \App\Models\District::orderBy('name', 'asc')->get();
+
+        // Ajax/live-filter: return only the partial HTML
+        if ($request->ajax()) {
+            return view('public.requests.partials.list', compact('requests'));
+        }
 
         return view('public.requests.index', compact('requests', 'districts'));
     }
