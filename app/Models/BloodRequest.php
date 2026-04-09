@@ -81,6 +81,31 @@ class BloodRequest extends Model
         return $this->belongsTo(Upazila::class);
     }
 
+    // ── ৭. Query Scopes ────────────────────────────────────────
+
+    /**
+     * শুধুমাত্র সক্রিয় (pending + ভবিষ্যতের) রিকোয়েস্ট।
+     * needed_at NULL বা ভবিষ্যতের হলে সক্রিয় ধরা হবে।
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'pending')
+            ->where(function ($q) {
+                $q->whereNull('needed_at')
+                  ->orWhere('needed_at', '>=', now()->subHours(2));
+            });
+    }
+
+    /**
+     * Local Emergency Radar: জেলা ও ব্লাড গ্রুপ অনুযায়ী ফিল্টার।
+     * compatible_groups: নিজের গ্রুপকেও অন্তর্ভুক্ত করে।
+     */
+    public function scopeLocalRadar($query, int $districtId, array $bloodGroups)
+    {
+        return $query->where('district_id', $districtId)
+            ->whereIn('blood_group', $bloodGroups);
+    }
+
     // --- Status Helpers ---
 
     public function isPending(): bool

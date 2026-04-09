@@ -61,7 +61,43 @@ class DashboardController extends Controller
             ->with(['user', 'bloodRequest'])
             ->first();
 
-        // 🏆 ৬. গ্যামিফিকেশন স্ট্যাটস
+        // 🔴 ৬. LOCAL EMERGENCY RADAR ─────────────────────────────────────────
+        // শুধুমাত্র ইউজারের জেলায় সক্রিয় রিকোয়েস্ট দেখাও।
+        // Priority: ১. নিজের blood group match, ২. urgency (emergency first), ৩. nearest needed_at
+        $radarRequests = collect();
+
+        if ($user->district_id) {
+            $userBloodGroup = $user->blood_group?->value ?? $user->blood_group;
+
+            // urgency অনুযায়ী sort order
+            $urgencyOrder = ['emergency' => 0, 'urgent' => 1, 'normal' => 2];
+
+            $radarRequests = BloodRequest::active()
+                ->where('district_id', $user->district_id)
+                ->where('requested_by', '!=', $user->id) // নিজের রিকোয়েস্ট বাদ
+                ->with(['district:id,name', 'upazila:id,name'])
+                ->get()
+                ->sortBy(function ($req) use ($userBloodGroup, $urgencyOrder) {
+                    $reqGroup = $req->blood_group?->value ?? $req->blood_group;
+                    $isMatch  = ($reqGroup === $userBloodGroup) ? 0 : 1; // নিজের গ্রুপ আগে
+                    $urgency  = $urgencyOrder[$req->urgency?->value ?? $req->urgency ?? 'normal'] ?? 2;
+                    $timeVal  = $req->needed_at ? $req->needed_at->timestamp : PHP_INT_MAX;
+                    return [$isMatch, $urgency, $timeVal];
+                })
+                ->take(6)
+                ->values();
+
+            // 🔐 Privacy Shield: contact_number মাস্ক করা (পুরো ফোন নম্বর হাইড)
+            $radarRequests = $radarRequests->map(function ($req) {
+                $phone = $req->contact_number ?? '';
+                $req->masked_phone = strlen($phone) >= 6
+                    ? substr($phone, 0, 3) . '****' . substr($phone, -2)
+                    : '***';
+                return $req;
+            });
+        }
+
+        // 🏆 ৭. গ্যামিফিকেশন স্ট্যাটস
         $currentPoints     = $user->points ?? 0;
         $totalDonations    = $user->total_verified_donations ?? 0;
 
@@ -112,7 +148,8 @@ class DashboardController extends Controller
             'recentRequests',
             'pendingClaim',
             'acceptedDonations',
-            'gamificationStats'
+            'gamificationStats',
+            'radarRequests'
         ));
     }
 }

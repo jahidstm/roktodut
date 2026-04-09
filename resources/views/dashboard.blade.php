@@ -198,6 +198,184 @@
         </form>
     </div>
 
+    {{-- ══════════════════════════════════════════════════════════════
+         🔴 LOCAL EMERGENCY RADAR
+         ইউজারের জেলার সক্রিয় রক্তের রিকোয়েস্ট — Priority sorted
+    ══════════════════════════════════════════════════════════════ --}}
+    @if($radarRequests->isNotEmpty())
+    <div class="mb-10">
+
+        {{-- ── Header ── --}}
+        <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-3">
+                <div class="relative flex items-center">
+                    {{-- Pulsing outer ring --}}
+                    <span class="absolute inline-flex h-10 w-10 rounded-full bg-red-500 opacity-20 animate-ping"></span>
+                    <div class="relative w-10 h-10 rounded-xl bg-red-600 flex items-center justify-center shadow-lg shadow-red-200">
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                  d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                        </svg>
+                    </div>
+                </div>
+                <div>
+                    <h2 class="text-lg font-black text-slate-900 leading-tight">লোকাল ইমার্জেন্সি রাডার</h2>
+                    <p class="text-xs font-semibold text-slate-500">
+                        {{ auth()->user()->district?->name ?? 'আপনার জেলা' }}-তে সক্রিয় জরুরি রিকোয়েস্টসমূহ
+                    </p>
+                </div>
+            </div>
+            <a href="{{ route('requests.index') }}"
+               class="text-xs font-bold text-red-600 hover:text-red-700 flex items-center gap-1 hover:underline underline-offset-2">
+                সব দেখুন
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+
+        {{-- ── Request Cards Grid ── --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            @php $user = auth()->user(); @endphp
+            @foreach($radarRequests as $req)
+                @php
+                    $urgencyVal  = $req->urgency?->value ?? $req->urgency ?? 'normal';
+                    $reqGroup    = $req->blood_group?->value ?? $req->blood_group ?? '?';
+                    $userGroup   = $user->blood_group?->value ?? $user->blood_group ?? '';
+                    $isMyGroup   = ($reqGroup === $userGroup);
+                    $isEmergency = ($urgencyVal === 'emergency');
+                    $isUrgent    = ($urgencyVal === 'urgent');
+                    $neededAt    = $req->needed_at;
+                    $diffHours   = $neededAt ? (int) now()->diffInHours($neededAt, false) : null;
+                @endphp
+
+                <div class="relative overflow-hidden rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl
+                    {{ $isEmergency ? 'border-red-800/60 shadow-lg shadow-red-900/20' : ($isUrgent ? 'border-amber-700/40 shadow-sm' : 'border-slate-700/30') }}"
+                     style="background: {{ $isEmergency ? 'linear-gradient(135deg,#1c0808 0%,#2d1010 60%,#1e1a1a 100%)' : ($isUrgent ? 'linear-gradient(135deg,#1c1400 0%,#2d2010 60%,#1a1a1e 100%)' : 'linear-gradient(135deg,#0f172a 0%,#1e293b 100%)') }};">
+
+                    {{-- Pulse bar at top for emergency --}}
+                    @if($isEmergency)
+                        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-red-500 to-transparent animate-pulse"></div>
+                    @endif
+
+                    {{-- My blood group match indicator --}}
+                    @if($isMyGroup)
+                        <div class="absolute top-3 right-3 z-10">
+                            <span class="inline-flex items-center gap-1 text-[10px] font-black text-emerald-300 px-2 py-0.5 rounded-full"
+                                  style="background:rgba(16,185,129,.15); border:1px solid rgba(16,185,129,.3);">
+                                ✓ আপনার গ্রুপ
+                            </span>
+                        </div>
+                    @endif
+
+                    <div class="p-5">
+                        {{-- Top row: Blood group + urgency --}}
+                        <div class="flex items-start gap-3 mb-4">
+                            {{-- Blood Group Badge --}}
+                            <div class="shrink-0 w-14 h-14 rounded-xl flex items-center justify-center font-black text-xl shadow-lg
+                                {{ $isEmergency ? 'bg-red-600/30 text-red-200 ring-1 ring-red-500/40' : ($isUrgent ? 'bg-amber-600/25 text-amber-200 ring-1 ring-amber-500/30' : 'bg-slate-600/30 text-slate-200 ring-1 ring-slate-500/20') }}">
+                                {{ $reqGroup }}
+                            </div>
+
+                            <div class="flex-1 min-w-0 pt-0.5">
+                                {{-- Urgency badge --}}
+                                <div class="mb-1.5">
+                                    @if($isEmergency)
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-black text-red-300 px-2 py-0.5 rounded-full uppercase tracking-wider"
+                                              style="background:rgba(220,38,38,.25); border:1px solid rgba(220,38,38,.4);">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse inline-block"></span>
+                                            অতি জরুরি
+                                        </span>
+                                    @elseif($isUrgent)
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-black text-amber-300 px-2 py-0.5 rounded-full uppercase tracking-wider"
+                                              style="background:rgba(217,119,6,.2); border:1px solid rgba(217,119,6,.35);">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block"></span>
+                                            জরুরি
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-400 px-2 py-0.5 rounded-full"
+                                              style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);">
+                                            সাধারণ
+                                        </span>
+                                    @endif
+                                </div>
+
+                                {{-- Patient name --}}
+                                <p class="text-sm font-black text-white leading-tight truncate">
+                                    {{ $req->patient_name ?? 'অজ্ঞাত রোগী' }}
+                                </p>
+                                <p class="text-xs text-slate-400 font-medium truncate mt-0.5">
+                                    🏥 {{ $req->hospital ?? 'হাসপাতাল উল্লেখ নেই' }}
+                                </p>
+                            </div>
+                        </div>
+
+                        {{-- Time countdown --}}
+                        <div class="mb-4 flex items-center gap-2 px-3 py-2 rounded-xl"
+                             style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07);">
+                            <svg class="w-3.5 h-3.5 shrink-0 {{ $isEmergency ? 'text-red-400' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            @if($neededAt && $diffHours !== null)
+                                @if($diffHours < 0)
+                                    <span class="text-xs font-bold text-red-400">{{ abs($diffHours) }} ঘণ্টা আগে ছিল</span>
+                                @elseif($diffHours < 1)
+                                    <span class="text-xs font-black text-red-300 animate-pulse">এখনই প্রয়োজন!</span>
+                                @elseif($diffHours < 24)
+                                    <span class="text-xs font-bold {{ $isEmergency ? 'text-red-300' : 'text-amber-300' }}">
+                                        {{ $diffHours }} ঘণ্টার মধ্যে প্রয়োজন
+                                    </span>
+                                @else
+                                    <span class="text-xs font-semibold text-slate-400">
+                                        {{ $neededAt->format('d M, Y') }}-এর মধ্যে
+                                    </span>
+                                @endif
+                            @else
+                                <span class="text-xs font-semibold text-slate-500">যত দ্রুত সম্ভব</span>
+                            @endif
+
+                            {{-- Bags needed chip --}}
+                            @if($req->bags_needed > 1)
+                                <span class="ml-auto text-[10px] font-bold text-slate-400 shrink-0">
+                                    {{ $req->bags_needed }} ব্যাগ
+                                </span>
+                            @endif
+                        </div>
+
+                        {{-- Action Button --}}
+                        <a href="{{ route('requests.show', $req->id) }}"
+                           class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-extrabold transition-all duration-200
+                           {{ $isEmergency
+                                ? 'bg-red-600 hover:bg-red-500 text-white shadow-md shadow-red-900/50'
+                                : ($isUrgent
+                                    ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-900/30'
+                                    : 'text-slate-200 hover:text-white hover:bg-white/10') }}"
+                           style="{{ (!$isEmergency && !$isUrgent) ? 'border:1px solid rgba(255,255,255,.12);' : '' }}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                            </svg>
+                            রক্ত দিতে চাই
+                        </a>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+    @elseif(auth()->user()->district_id)
+    {{-- Radar active but no requests --}}
+    <div class="mb-10 rounded-2xl border border-slate-200 bg-white p-6 flex items-center gap-4 shadow-sm">
+        <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 text-xl">✅</div>
+        <div>
+            <p class="font-black text-slate-800">আপনার এলাকায় এখন কোনো জরুরি রিকোয়েস্ট নেই</p>
+            <p class="text-xs text-slate-500 font-medium mt-0.5">রাডার সক্রিয় আছে — নতুন রিকোয়েস্ট আসলে এখানে দেখা যাবে।</p>
+        </div>
+    </div>
+    @endif
+
+    {{-- ══════════════════════════════════════════
+         📊 Stats Grid
+    ══════════════════════════════════════════ --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
             <div class="text-slate-500 text-sm font-bold uppercase tracking-wider">মোট রিকোয়েস্ট</div>
