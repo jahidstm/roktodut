@@ -177,7 +177,7 @@
                     @if(!$user->last_donated_at)
                         আমাদের সিস্টেমে আপনার পূর্বের রক্তদানের কোনো রেকর্ড নেই।
                     @elseif($isEligible)
-                        আপনার সর্বশেষ রক্তদানের পর ৯০ দিন পার হয়ে গেছে।
+                        আপনার সর্বশেষ রক্তদানের পর ১২০ দিন পার হয়ে গেছে।
                     @else
                         পরবর্তী রক্তদানের তারিখ: <span class="text-slate-800 font-extrabold">{{ $nextDate->format('d M, Y') }}</span> 
                         (আর মাত্র <span class="text-red-600 font-extrabold">{{ (int) now()->startOfDay()->diffInDays($nextDate->startOfDay()) }} দিন</span> বাকি)

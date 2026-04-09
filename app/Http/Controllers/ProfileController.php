@@ -12,14 +12,41 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
+     * প্রোফাইল কমপ্লিশন পার্সেন্টেজ হিসাব করা
+     */
+    private function calcCompletion($user): array
+    {
+        $steps = [
+            ['key' => 'name',          'label' => 'পূর্ণ নাম',              'weight' => 10, 'done' => !empty($user->name)],
+            ['key' => 'email',         'label' => 'ইমেইল ভেরিফাই',         'weight' => 10, 'done' => (bool) $user->email_verified_at],
+            ['key' => 'phone',         'label' => 'মোবাইল নাম্বার',         'weight' => 10, 'done' => !empty($user->phone)],
+            ['key' => 'blood_group',   'label' => 'রক্তের গ্রুপ',           'weight' => 15, 'done' => !empty($user->blood_group)],
+            ['key' => 'profile_image', 'label' => 'প্রোফাইল ছবি',           'weight' => 10, 'done' => !empty($user->profile_image)],
+            ['key' => 'date_of_birth', 'label' => 'জন্ম তারিখ',             'weight' => 5,  'done' => !empty($user->date_of_birth)],
+            ['key' => 'gender',        'label' => 'লিঙ্গ',                  'weight' => 5,  'done' => !empty($user->gender)],
+            ['key' => 'weight',        'label' => 'শরীরের ওজন',              'weight' => 5,  'done' => !empty($user->weight)],
+            ['key' => 'district_id',   'label' => 'জেলা / লোকেশন',         'weight' => 15, 'done' => !empty($user->district_id)],
+            ['key' => 'is_available',  'label' => 'ইমার্জেন্সি মোড চালু',   'weight' => 5,  'done' => (bool) $user->is_available],
+            ['key' => 'nid_path',      'label' => 'পরিচয়পত্র (NID) আপলোড', 'weight' => 10, 'done' => !empty($user->nid_path)],
+        ];
+
+        $earned = collect($steps)->where('done', true)->sum('weight');
+        return ['percent' => $earned, 'steps' => $steps];
+    }
+
+    /**
      * ডিসপ্লে ইউজার প্রোফাইল এডিট ফর্ম
      */
     public function edit(Request $request): View
     {
+        $user       = $request->user();
+        $completion = $this->calcCompletion($user);
+
         return view('profile.edit', [
-            'user' => $request->user(),
-            // 🚀 ড্রপডাউনের জন্য অর্গানাইজেশন পাঠানো হচ্ছে
+            'user'          => $user,
             'organizations' => \App\Models\Organization::orderBy('name', 'asc')->get(),
+            'completionPercent' => $completion['percent'],
+            'completionSteps'   => $completion['steps'],
         ]);
     }
 
@@ -54,15 +81,29 @@ class ProfileController extends Controller
     }
 
     /**
+     * 🚨 ইমার্জেন্সি মোড টগল (Profile page থেকে)
+     */
+    public function toggleEmergencyMode(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+        $user->is_available = !$user->is_available;
+        $user->save();
+
+        $msg = $user->is_available
+            ? '✅ ইমার্জেন্সি মোড চালু হয়েছে! এখন আপনি ডোনার সার্চে দৃশ্যমান।'
+            : '⏸ ইমার্জেন্সি মোড বন্ধ করা হয়েছে।';
+
+        return Redirect::route('profile.edit')->with('status', 'emergency-updated')->with('emergency_msg', $msg);
+    }
+
+    /**
      * 🚀 Welcome Back স্ট্যাটাস আপডেট
      */
     public function welcomeBackUpdate(Request $request): RedirectResponse
     {
         $user = $request->user();
-
-        // ইউজার যদি 'is_available' চেকবক্স মার্ক করে থাকে
-        $user->is_available = $request->has('is_available');
-        $user->welcome_back_checked = true; // চেক করা হয়ে গেছে
+        $user->is_available      = $request->has('is_available');
+        $user->welcome_back_checked = true;
         $user->save();
 
         return back()->with('success', 'আপনার স্ট্যাটাস সফলভাবে আপডেট করা হয়েছে। রক্তদূতে আবার স্বাগতম!');

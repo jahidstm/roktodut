@@ -82,16 +82,16 @@ class BloodRequestController extends Controller
         $districtName = District::find($bloodRequest->district_id)->name ?? 'আপনার';
 
         // ⚙️ ৩. স্মার্ট ডোনার ম্যাচিং অ্যালগরিদম (The Active Engine)
-        $ninetyDaysAgo = Carbon::now()->subDays(90);
+        $eligibleCutoff = Carbon::now()->subDays(120); // ১২০ দিনের জৈবিক কুলডাউন
 
         // ওই জেলার ডোনারদের খুঁজে বের করা (is_verified কলামটি রিমুভ করা হয়েছে)
         $matchingDonors = User::where('blood_group', $bloodRequest->blood_group)
             ->where('district_id', $bloodRequest->district_id)
             ->where('id', '!=', $bloodRequest->requested_by)
             ->whereIn('role', ['donor', 'org_admin'])
-            ->where(function ($q) use ($ninetyDaysAgo) {
+            ->where(function ($q) use ($eligibleCutoff) {
                 $q->whereNull('last_donation_date')
-                    ->orWhere('last_donation_date', '<=', $ninetyDaysAgo);
+                    ->orWhere('last_donation_date', '<=', $eligibleCutoff);
             })
             ->get();
 

@@ -205,7 +205,7 @@ class User extends Authenticatable
         if (!$this->last_donated_at) {
             return true;
         }
-        return $this->last_donated_at->copy()->addDays(90)->isPast();
+        return $this->last_donated_at->copy()->addDays(120)->isPast();
     }
 
     // 🎯 FIX: 'last_donated_at' কলাম ব্যবহার করা হলো
@@ -214,14 +214,14 @@ class User extends Authenticatable
         if (!$this->last_donated_at) {
             return 0;
         }
-        $nextDonationDate = $this->last_donated_at->copy()->addDays(90);
+        $nextDonationDate = $this->last_donated_at->copy()->addDays(120);
         return max(0, (int) now()->diffInDays($nextDonationDate, false));
     }
 
     // 🎯 FIX: 'last_donated_at' কলাম ব্যবহার করা হলো
     public function getNextEligibleDateAttribute()
     {
-        return $this->last_donated_at ? $this->last_donated_at->copy()->addDays(90) : null;
+        return $this->last_donated_at ? $this->last_donated_at->copy()->addDays(120) : null;
     }
 
     public function getIsEligibleToDonateAttribute()
