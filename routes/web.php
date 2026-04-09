@@ -19,6 +19,8 @@ use App\Http\Controllers\OrgRegistrationController;
 use App\Http\Controllers\DonationClaimController; // 🚀 কন্ট্রোলার ইম্পোর্ট
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\PublicVerificationController; // 🔐 QR Smart Card
+use App\Http\Controllers\PageController;
+use App\Http\Controllers\PublicBloodRequestController;
 use App\Models\Division;
 use Illuminate\Support\Facades\Route;
 
@@ -27,7 +29,7 @@ use Illuminate\Support\Facades\Route;
 // ─────────────────────────────────────────────────────────────────────────
 // throttle:60,1 → প্রতি IP থেকে প্রতি ১ মিনিটে সর্বোচ্চ ৬০ রিকোয়েস্ট।
 // এর বেশি হলে Laravel স্বয়ংক্রিয়ভাবে HTTP 429 Too Many Requests ফেরত দেবে।
-// Security: auth middleware ইচ্ছাকৃতভাবে নেই — QR scanner-কে login করতে হবে না।
+// Security: auth middleware ইচ্ছাকৃতভাবে নেই — QR scanner-কে login করতে হবেঠি না।
 // ─────────────────────────────────────────────────────────────────────────
 Route::get('/verify/{token}', [PublicVerificationController::class, 'show'])
     ->middleware('throttle:60,1')
@@ -66,6 +68,12 @@ Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leade
 Route::get('/gamification-guide', function () {
     return view('pages.gamification-guide');
 })->name('gamification.guide');
+
+// 🩸 রক্ত দিন - ল্যান্ডিং পেজ
+Route::get('/donate-blood', [PageController::class, 'donateBloodInfo'])->name('pages.donate');
+
+// 🚨 জরুরি রক্তের অনুরোধ - পাবলিক ফিড
+Route::get('/urgent-requests', [PublicBloodRequestController::class, 'index'])->name('public.requests.index');
 
 // --- ২. সোশ্যাল লগইন ---
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');

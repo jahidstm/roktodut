@@ -31,9 +31,10 @@
 
             <nav class="hidden md:flex items-center gap-7 font-semibold text-slate-600">
                 <a href="{{ route('home') }}" class="text-red-600">হোম</a>
-                <a href="#donate" class="hover:text-red-600 transition">রক্ত দিন</a>
-                <a href="#urgent" class="hover:text-red-600 transition">জরুরি অনুরোধ</a>
+                <a href="{{ route('pages.donate') }}" class="hover:text-red-600 transition">রক্ত দিন</a>
+                <a href="{{ route('public.requests.index') }}" class="hover:text-red-600 transition">জরুরি অনুরোধ</a>
                 <a href="{{ route('requests.index') }}" class="hover:text-red-600 transition">ডোনার ফিড</a>
+                <a href="{{ route('search') }}" class="hover:text-red-600 transition">স্মার্ট ডোনার সার্চ</a>
                 <a href="{{ route('leaderboard') }}" class="hover:text-red-600 transition flex items-center gap-1.5">
                     🏆 লিডারবোর্ড
                 </a>
