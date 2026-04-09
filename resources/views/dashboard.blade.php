@@ -233,6 +233,67 @@
     </div>
 
     {{-- ══════════════════════════════════════════
+         🎁 Referral Banner — "বন্ধুকে আমন্ত্রণ জানান"
+    ══════════════════════════════════════════ --}}
+    @auth
+    @php
+        $gamification  = app(\App\Services\GamificationService::class);
+        $myCode        = $gamification->generateReferralCode(auth()->user());
+        $referralLink  = url('/register?ref=' . $myCode);
+    @endphp
+    <div class="mb-10 relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 p-6 sm:p-8 shadow-xl">
+        {{-- Decorative circles --}}
+        <div class="absolute -top-8 -right-8 w-40 h-40 bg-white/10 rounded-full pointer-events-none"></div>
+        <div class="absolute -bottom-10 right-24 w-28 h-28 bg-white/10 rounded-full pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            {{-- Left: Text --}}
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="text-3xl">👥</span>
+                    <h2 class="text-white font-black text-lg sm:text-xl leading-tight">
+                        বন্ধুকে আমন্ত্রণ জানান &amp; আয় করুন!
+                    </h2>
+                </div>
+                <p class="text-emerald-100 text-sm font-medium max-w-sm">
+                    বন্ধু সাইন-আপ করলে <span class="text-white font-black">+১০ পয়েন্ট</span>,
+                    প্রথমবার রক্তদিলে আরও <span class="text-white font-black">+৩০ পয়েন্ট</span> পাবেন!
+                </p>
+
+                {{-- Point badges --}}
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <span class="inline-flex items-center gap-1 bg-white/20 border border-white/30 text-white text-xs font-extrabold px-3 py-1 rounded-full">
+                        🎉 সাইন-আপ বোনাস: +১০ pts
+                    </span>
+                    <span class="inline-flex items-center gap-1 bg-white/20 border border-white/30 text-white text-xs font-extrabold px-3 py-1 rounded-full">
+                        🩸 প্রথম ডোনেশন বোনাস: +৩০ pts
+                    </span>
+                </div>
+            </div>
+
+            {{-- Right: Code + Copy --}}
+            <div class="flex-shrink-0 w-full sm:w-auto">
+                <div class="bg-white/15 border border-white/25 backdrop-blur rounded-2xl p-4 text-center mb-3">
+                    <div class="text-white/75 text-[10px] font-extrabold uppercase tracking-widest mb-1">আপনার রেফারেল কোড</div>
+                    <div class="text-white font-black text-2xl tracking-[0.2em]">{{ $myCode }}</div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input id="referral-link-dashboard"
+                           type="text"
+                           value="{{ $referralLink }}"
+                           class="flex-1 text-xs py-2.5 px-3 rounded-xl bg-white/15 border border-white/25 text-white font-semibold focus:outline-none focus:ring-2 focus:ring-white/50 min-w-0"
+                           readonly>
+                    <button onclick="copyDashboardReferral()" id="dash-copy-btn"
+                            class="flex-shrink-0 bg-white text-emerald-700 font-black text-xs px-4 py-2.5 rounded-xl hover:bg-emerald-50 transition-colors shadow-sm whitespace-nowrap">
+                        কপি করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endauth
+
+    {{-- ══════════════════════════════════════════
          🏆 গ্যামিফিকেশন উইজেট
     ══════════════════════════════════════════ --}}
     @if(isset($gamificationStats))
@@ -456,4 +517,19 @@
     </div>
     @endif
 </div>
+
+<script>
+function copyDashboardReferral() {
+    const input = document.getElementById('referral-link-dashboard');
+    const btn   = document.getElementById('dash-copy-btn');
+    navigator.clipboard.writeText(input.value).then(() => {
+        btn.textContent = '✓ কপি হয়েছে!';
+        btn.classList.add('bg-emerald-100', 'text-emerald-800');
+        setTimeout(() => {
+            btn.textContent = 'কপি করুন';
+            btn.classList.remove('bg-emerald-100', 'text-emerald-800');
+        }, 2500);
+    });
+}
+</script>
 @endsection
