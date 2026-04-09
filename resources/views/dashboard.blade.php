@@ -372,20 +372,22 @@
     </div>
 
     {{-- QR Code Generator via CDN (no PHP extension required) --}}
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
-        (function () {
+        document.addEventListener("DOMContentLoaded", function() {
             var verifyUrl = @json(route('public.verify', $user->qr_token));
-            var canvas = document.createElement('canvas');
-            QRCode.toCanvas(canvas, verifyUrl, {
-                width: 148,
-                margin: 1,
-                color: { dark: '#1e293b', light: '#ffffff' }
-            }, function () {
-                var container = document.getElementById('smart-card-qr');
-                if (container) container.appendChild(canvas);
-            });
-        })();
+            var container = document.getElementById('smart-card-qr');
+            if (container) {
+                new QRCode(container, {
+                    text: verifyUrl,
+                    width: 148,
+                    height: 148,
+                    colorDark : "#1e293b",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.M
+                });
+            }
+        });
     </script>
     @endif
 

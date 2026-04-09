@@ -529,15 +529,17 @@ class GamificationService
     public function awardVerifiedBadge(User $user): void
     {
         $badge = \App\Models\Badge::where('name', 'verified_donor')->first();
-        if (! $badge) return;
-
-        $alreadyHas = $user->badges()->where('badge_id', $badge->id)->exists();
-        if (! $alreadyHas) {
-            $user->badges()->attach($badge->id, [
-                'earned_at'  => now(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+        if ($badge) {
+            $alreadyHas = $user->badges()->where('badge_id', $badge->id)->exists();
+            if (! $alreadyHas) {
+                $user->badges()->attach($badge->id, [
+                    'earned_at'  => now(),
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+        } else {
+            \Illuminate\Support\Facades\Log::warning("GamificationService: 'verified_donor' badge not found in DB.");
         }
 
         // ─── QR Smart Card Token ─────────────────────────────────────────
