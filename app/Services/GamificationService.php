@@ -6,8 +6,11 @@ use App\Models\Badge;
 use App\Models\BloodRequest;
 use App\Models\PointLog;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class GamificationService
 {
@@ -21,6 +24,13 @@ class GamificationService
     const POINTS_RECIPIENT_REVIEW       = 10;  // গ্রহীতার পজিটিভ রিভিউ
     const POINTS_PROFILE_COMPLETE       = 20;  // প্রোফাইল ১০০% ও NID ভেরিফাই
     const POINTS_REQUEST_SHARE_DAILY    = 5;   // ব্লাড রিকোয়েস্ট শেয়ার (দিনে ৩ বার পর্যন্ত)
+
+    // ==========================================
+    // Anti-Cheat কনফিগারেশন
+    // ==========================================
+
+    /** জৈবিক কুলডাউন — মানবদেহে রক্ত পুনর্গঠনে প্রয়োজনীয় ন্যূনতম সময় (দিন) */
+    const DONATION_COOLDOWN_DAYS = 120;
 
     // ==========================================
     // পয়েন্ট দেওয়া
@@ -52,18 +62,29 @@ class GamificationService
 
     /**
      * সম্পূর্ণ ডোনেশন রিওয়ার্ড প্রসেস:
+     *  → Anti-Cheat: ১২০ দিনের জৈবিক কুলডাউন চেক
      *  → total_verified_donations +১
      *  → last_donated_at আপডেট
      *  → +৫০ পয়েন্ট (+ First Responder বোনাস)
      *  → মাসিক পয়েন্ট আপডেট
      *  → ব্যাজ চেক ও আনলক
      *  → রেফারার বোনাস (প্রথম ডোনেশনে)
+     *
+     * @throws RuntimeException  যদি ১২০ দিনের কুলডাউন পার না হয়
      */
     public function processDonationReward(
         User         $donor,
         BloodRequest $bloodRequest,
         bool         $isFirstResponder = false,
     ): void {
+        // ─── ০. Anti-Cheat: ১২০-দিনের জৈবিক কুলডাউন গেটকিপার ─────────
+        //
+        // বাস্তবে একজন মানুষ প্রতি ৩-৪ মাসে (≈ ১২০ দিন) একবার রক্ত দিতে পারেন।
+        // এর আগে পয়েন্ট/ব্যাজ ক্লেইম করার যেকোনো চেষ্টাকে সিস্টেম ব্লক করবে।
+        //
+        // নতুন ডোনার (last_donated_at = null) → প্রথমবার বলে বাইপাস করা হবে।
+        $this->enforceDonationCooldown($donor);
+
         // ─── ১. ডোনেশন কাউন্ট ও তারিখ আপডেট ──────────────────────────
         $donor->increment('total_verified_donations');
         $donor->update(['last_donated_at' => now()->toDateString()]);
@@ -108,6 +129,51 @@ class GamificationService
                 );
                 $this->checkAndAwardBadges($referrer);
             }
+        }
+    }
+
+    // ==========================================
+    // Anti-Cheat: কুলডাউন এনফোর্সমেন্ট
+    // ==========================================
+
+    /**
+     * ১২০-দিনের জৈবিক কুলডাউন নিশ্চিত করে।
+     *
+     * নিয়ম:
+     *  • last_donated_at = null  → প্রথম ডোনেশন, পাস করো।
+     *  • last_donated_at + 120 দিন > আজ → এখনো কুলডাউনে আছেন, ব্লক করো।
+     *  • last_donated_at + 120 দিন ≤ আজ → কুলডাউন শেষ, পাস করো।
+     *
+     * @throws RuntimeException  কুলডাউন পার না হলে
+     */
+    private function enforceDonationCooldown(User $donor): void
+    {
+        // নতুন ডোনার — কোনো পূর্ববর্তী ডোনেশন নেই, বাইপাস করো
+        if (is_null($donor->last_donated_at)) {
+            return;
+        }
+
+        $lastDonation  = Carbon::parse($donor->last_donated_at)->startOfDay();
+        $cooldownEnds  = $lastDonation->copy()->addDays(self::DONATION_COOLDOWN_DAYS);
+        $today         = Carbon::today();
+
+        if ($today->lt($cooldownEnds)) {
+            $daysRemaining = (int) $today->diffInDays($cooldownEnds);
+
+            // Security log — সন্দেহজনক রিকোয়েস্ট লগ করো
+            Log::warning('[GamificationService] Anti-Cheat: Donation cooldown violation detected.', [
+                'user_id'         => $donor->id,
+                'last_donated_at' => $donor->last_donated_at,
+                'cooldown_ends'   => $cooldownEnds->toDateString(),
+                'days_remaining'  => $daysRemaining,
+                'ip'              => request()->ip(),
+            ]);
+
+            throw new RuntimeException(
+                "অ্যান্টি-চিট: কুলডাউন এখনো শেষ হয়নি। "
+                . "পরবর্তী ডোনেশন রিওয়ার্ড পাওয়া যাবে {$daysRemaining} দিন পরে "
+                . "({$cooldownEnds->toDateString()})।"
+            );
         }
     }
 
