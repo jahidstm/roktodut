@@ -33,6 +33,59 @@ class GamificationService
     const DONATION_COOLDOWN_DAYS = 120;
 
     // ==========================================
+    // প্রোফাইল কমপ্লিশন ও Emergency Mode
+    // ==========================================
+
+    /**
+     * প্রোফাইল ১০০% সম্পূর্ণ হলে একবারের জন্য +২০ পয়েন্ট দেওয়া।
+     * Idempotent — একই ইউজারকে দ্বিতীয়বার দেবে না।
+     */
+    public function awardProfileCompletionBonus(User $user): bool
+    {
+        // ইতোমধ্যে পুরস্কার পেয়েছে কি না চেক করা
+        $alreadyAwarded = PointLog::where('user_id', $user->id)
+            ->where('action_type', PointLog::ACTION_PROFILE_COMPLETION)
+            ->exists();
+
+        if ($alreadyAwarded) {
+            return false; // দ্বিতীয়বার দেব না
+        }
+
+        $this->awardPoints(
+            user:       $user,
+            points:     self::POINTS_PROFILE_COMPLETE,
+            actionType: PointLog::ACTION_PROFILE_COMPLETION,
+            metadata:   ['reason' => 'প্রোফাইল ১০০% সম্পূর্ণ করা হয়েছে।'],
+        );
+
+        Log::info("GamificationService: Profile completion bonus awarded.", ['user_id' => $user->id]);
+
+        return true;
+    }
+
+    /**
+     * Emergency Mode (is_available) চালু/বন্ধের সাথে "Ready Now" ব্যাজ সিঙ্ক করা।
+     *  - $isAvailable = true  → ব্যাজ যুক্ত করো (যদি না থাকে)
+     *  - $isAvailable = false → ব্যাজ রিমুভ করো
+     */
+    public function handleReadyNowBadge(User $user, bool $isAvailable): void
+    {
+        $badge = Badge::where('name', 'ready_now')->first();
+
+        if (!$badge) {
+            Log::warning("GamificationService: 'ready_now' badge not found in DB.");
+            return;
+        }
+
+        if ($isAvailable) {
+            // Attach — syncWithoutDetaching() ব্যবহার করলে duplicate হবে না
+            $user->badges()->syncWithoutDetaching([$badge->id]);
+        } else {
+            $user->badges()->detach($badge->id);
+        }
+    }
+
+    // ==========================================
     // পয়েন্ট দেওয়া
     // ==========================================
 

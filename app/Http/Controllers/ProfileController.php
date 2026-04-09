@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\GamificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,10 +12,12 @@ use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
+    public function __construct(private GamificationService $gamification) {}
+
     /**
      * প্রোফাইল কমপ্লিশন পার্সেন্টেজ হিসাব করা
      */
-    private function calcCompletion($user): array
+    public function calcCompletion($user): array
     {
         $steps = [
             ['key' => 'name',          'label' => 'পূর্ণ নাম',              'weight' => 10, 'done' => !empty($user->name)],
@@ -35,7 +38,7 @@ class ProfileController extends Controller
     }
 
     /**
-     * ডিসপ্লে ইউজার প্রোফাইল এডিট ফর্ম
+     * প্রোফাইল এডিট ফর্ম দেখান
      */
     public function edit(Request $request): View
     {
@@ -43,15 +46,15 @@ class ProfileController extends Controller
         $completion = $this->calcCompletion($user);
 
         return view('profile.edit', [
-            'user'          => $user,
-            'organizations' => \App\Models\Organization::orderBy('name', 'asc')->get(),
+            'user'              => $user,
+            'organizations'     => \App\Models\Organization::orderBy('name', 'asc')->get(),
             'completionPercent' => $completion['percent'],
             'completionSteps'   => $completion['steps'],
         ]);
     }
 
     /**
-     * আপডেট ইউজার প্রোফাইল ইনফরমেশন
+     * প্রোফাইল আপডেট করা + ১০০% হলে গ্যামিফিকেশন বোনাস
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
@@ -64,24 +67,36 @@ class ProfileController extends Controller
             $user->email_verified_at = null;
         }
 
-        // 🚀 প্রোফাইল পিকচার আপলোড লজিক
+        // প্রোফাইল পিকচার আপলোড
         if ($request->hasFile('profile_image')) {
             $path = $request->file('profile_image')->store('profile_images', 'public');
             $user->profile_image = $path;
         }
 
-        // যদি ইউজার নতুন অর্গানাইজেশন সিলেক্ট করে, তবে তার NID স্ট্যাটাস আবার pending হবে
+        // অর্গানাইজেশন পরিবর্তনে NID re-verify
         if ($user->isDirty('organization_id') && $user->organization_id != null) {
             $user->nid_status = 'pending';
         }
 
         $user->save();
+        $user->refresh();
+
+        // ─── গ্যামিফিকেশন: প্রোফাইল ১০০% হলে বোনাস দাও ─────────────
+        $completion = $this->calcCompletion($user);
+        if ($completion['percent'] >= 100) {
+            $awarded = $this->gamification->awardProfileCompletionBonus($user);
+            if ($awarded) {
+                return Redirect::route('profile.edit')
+                    ->with('status', 'profile-updated')
+                    ->with('bonus_msg', '🎉 অভিনন্দন! প্রোফাইল ১০০% সম্পূর্ণ করায় আপনি +২০ পয়েন্ট পেয়েছেন!');
+            }
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
     /**
-     * 🚨 ইমার্জেন্সি মোড টগল (Profile page থেকে)
+     * 🚨 Emergency Mode টগল + Ready Now ব্যাজ সিঙ্ক
      */
     public function toggleEmergencyMode(Request $request): RedirectResponse
     {
@@ -89,28 +104,36 @@ class ProfileController extends Controller
         $user->is_available = !$user->is_available;
         $user->save();
 
-        $msg = $user->is_available
-            ? '✅ ইমার্জেন্সি মোড চালু হয়েছে! এখন আপনি ডোনার সার্চে দৃশ্যমান।'
-            : '⏸ ইমার্জেন্সি মোড বন্ধ করা হয়েছে।';
+        // ─── গ্যামিফিকেশন: ব্যাজ সিঙ্ক ─────────────────────────────
+        $this->gamification->handleReadyNowBadge($user, $user->is_available);
 
-        return Redirect::route('profile.edit')->with('status', 'emergency-updated')->with('emergency_msg', $msg);
+        $msg = $user->is_available
+            ? '✅ ইমার্জেন্সি মোড চালু! আপনি এখন ডোনার সার্চে দৃশ্যমান এবং 🏅 Ready Now ব্যাজ পেয়েছেন।'
+            : '⏸ ইমার্জেন্সি মোড বন্ধ করা হয়েছে এবং Ready Now ব্যাজ সরানো হয়েছে।';
+
+        return Redirect::route('profile.edit')
+            ->with('status', 'emergency-updated')
+            ->with('emergency_msg', $msg);
     }
 
     /**
-     * 🚀 Welcome Back স্ট্যাটাস আপডেট
+     * Welcome Back স্ট্যাটাস আপডেট
      */
     public function welcomeBackUpdate(Request $request): RedirectResponse
     {
         $user = $request->user();
-        $user->is_available      = $request->has('is_available');
+        $user->is_available         = $request->has('is_available');
         $user->welcome_back_checked = true;
         $user->save();
+
+        // ব্যাজ সিঙ্ক
+        $this->gamification->handleReadyNowBadge($user, $user->is_available);
 
         return back()->with('success', 'আপনার স্ট্যাটাস সফলভাবে আপডেট করা হয়েছে। রক্তদূতে আবার স্বাগতম!');
     }
 
     /**
-     * NID বা ডকুমেন্ট আপলোড লজিক
+     * NID ডকুমেন্ট আপলোড
      */
     public function uploadNid(Request $request): RedirectResponse
     {
@@ -124,13 +147,21 @@ class ProfileController extends Controller
             $path = $request->file('nid_document')->store('donor_nids', 'public');
             $user->nid_path = $path;
             $user->save();
+            $user->refresh();
+
+            // NID আপলোড করলে প্রোফাইল ১০০% হয় কিনা চেক করা
+            $completion = $this->calcCompletion($user);
+            if ($completion['percent'] >= 100) {
+                $this->gamification->awardProfileCompletionBonus($user);
+            }
         }
 
-        return Redirect::route('dashboard')->with('success', 'ডকুমেন্ট সফলভাবে আপলোড হয়েছে! অর্গানাইজেশন যাচাই করার পর আপনার ব্যাজ যুক্ত হবে।');
+        return Redirect::route('dashboard')
+            ->with('success', 'ডকুমেন্ট সফলভাবে আপলোড হয়েছে! অর্গানাইজেশন যাচাই করার পর আপনার ব্যাজ যুক্ত হবে।');
     }
 
     /**
-     * ইউজার অ্যাকাউন্ট ডিলিট করা
+     * অ্যাকাউন্ট ডিলিট
      */
     public function destroy(Request $request): RedirectResponse
     {

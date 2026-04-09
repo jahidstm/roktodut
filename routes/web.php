@@ -64,7 +64,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // --- ৪. ভেরিফাইড ইউজার কোর ফিচারস ---
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
 
     // ব্লাড রিকোয়েস্ট ম্যানেজমেন্ট
     Route::resource('requests', BloodRequestController::class)
@@ -109,11 +109,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // সাধারণ ইউজার/ডোনার ড্যাশবোর্ড
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified', 'role:donor,recipient'])
+    ->middleware(['auth', 'role:donor,recipient'])
     ->name('dashboard');
 
 // 🛡️ সিস্টেম অ্যাডমিন রাউটস (ইন্টিগ্রেটেড গ্রুপ)
-Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
+Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
     // 🎯 অ্যাডমিন ডোনেশন ভেরিফিকেশন রাউট
@@ -130,7 +130,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 });
 
 // --- ৬. অর্গানাইজেশন অ্যাডমিন রাউটস (ইন্টিগ্রেটেড গ্রুপ) ---
-Route::middleware(['auth', 'verified', 'role:org_admin'])->group(function () {
+Route::middleware(['auth', 'role:org_admin'])->group(function () {
 
     // ড্যাশবোর্ড
     Route::get('/org/dashboard', [OrgDashboardController::class, 'index'])

@@ -18,9 +18,27 @@
             প্রোফাইল সফলভাবে আপডেট হয়েছে!
         </div>
     @endif
+
+    @if(session('bonus_msg'))
+        <div class="mb-6 p-5 bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-300 rounded-2xl flex items-center gap-3 shadow-sm">
+            <div class="w-10 h-10 rounded-xl bg-amber-400 flex items-center justify-center text-xl shrink-0">🏆</div>
+            <div>
+                <p class="font-extrabold text-amber-900 text-sm">{{ session('bonus_msg') }}</p>
+                <p class="text-amber-700 text-xs font-medium mt-0.5">পয়েন্ট লগগ করা হয়েছে এবং লিডারবোর্ডে আপডেট হবে।</p>
+            </div>
+        </div>
+    @endif
+
     @if(session('status') === 'emergency-updated')
         <div class="mb-6 p-4 bg-blue-50 border border-blue-200 text-blue-800 font-bold rounded-xl flex items-center gap-2 shadow-sm">
             ⚡ {{ session('emergency_msg') }}
+        </div>
+    @endif
+
+    @if(session('status') === 'verification-link-sent')
+        <div class="mb-6 p-4 bg-sky-50 border border-sky-200 text-sky-800 font-bold rounded-xl flex items-center gap-2 shadow-sm">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            ভেরিফিকেশন ইমেইল পাঠানো হয়েছে! আপনার ইনবক্স চেক করুন।
         </div>
     @endif
 
@@ -163,7 +181,7 @@
                 <p class="text-sm text-slate-500 font-medium mt-1">সকল ফিল্ড পূরণ করলে প্রোফাইল ১০০% হবে এবং +২০ পয়েন্ট পাবেন।</p>
             </header>
 
-            <form id="send-verification" method="post" action="{{ route('verification.send') }}">@csrf</form>
+            {{-- email verification form removed --}}
 
             <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
@@ -308,7 +326,7 @@
                     <p class="text-xs text-slate-500 mt-1 font-medium">অর্গানাইজেশন পরিবর্তন করলে আপনার ভেরিফাইড ব্যাজ পুনরায় যাচাই করা হবে।</p>
                 </div>
 
-                {{-- ইমেইল ভেরিফিকেশন মেসেজ --}}
+                {{-- ইমেইল ভেরিফিকেশন — আপাতত বন্ধ রাখা হয়েছে
                 @if($user instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && !$user->hasVerifiedEmail())
                     <div class="mt-4 p-4 bg-amber-50 rounded-xl border border-amber-200">
                         <p class="text-sm font-semibold text-amber-800">
@@ -322,6 +340,7 @@
                         @endif
                     </div>
                 @endif
+                --}}
 
                 <div class="flex items-center gap-4 pt-6 border-t border-slate-100">
                     <button type="submit"

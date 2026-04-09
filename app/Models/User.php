@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\BloodGroup;
 use App\Enums\UserRole;
+// use Illuminate\Contracts\Auth\MustVerifyEmail; // আপাতত বন্ধ রাখা হয়েছে
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -13,7 +14,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Carbon;
 
-class User extends Authenticatable
+class User extends Authenticatable // implements MustVerifyEmail — আপাতত বন্ধ
 {
     use HasFactory, Notifiable;
 
