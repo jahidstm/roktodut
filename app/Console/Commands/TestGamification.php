@@ -80,8 +80,14 @@ class TestGamification extends Command
         // ৫. মাইলস্টোন টেস্ট (১০ বার ডোনেশন পর্যন্ত নিয়ে যাওয়া)
         $this->warn('--- সিনারিও ২: ১টি থেকে ৫টি ডোনেশনে উন্নীত করা ---');
         
-        for($i = 0; $i < 4; $i++) {
+        for ($i = 0; $i < 4; $i++) {
+            // পরীক্ষাগারে last_donated_at নিল করুন — ভায়োলোজিক্যাল কুলডাউন বাইপাস (testing only)
+            $user->last_donated_at = null;
+            $user->save();
+
             app(GamificationService::class)->processDonationReward($user, $request);
+            $user->refresh();
+            $this->line("  ডোনেশন " . ($i + 2) . ": মোট {$user->total_verified_donations} বার, জমা পয়েন্ট {$user->points}");
         }
 
         $user->refresh();

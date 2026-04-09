@@ -147,23 +147,89 @@
         </div>
     </div>
 
-    {{-- 📈 ৩. চার্ট সেকশন (For Developer Alif) --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-300">
-        <div>
-            <h3 class="font-extrabold text-slate-800 mb-2">@Alif: ব্লাড গ্রুপ ডিমান্ড (Pie Chart)</h3>
-            <p class="text-sm text-slate-500 mb-4">Chart.js ব্যবহার করে নিচের JSON ডেটা দিয়ে পাই-চার্ট রেন্ডার করো।</p>
-            <pre class="bg-slate-900 text-emerald-400 p-4 rounded-xl text-xs overflow-auto">
-const bloodGroupData = @json($bloodGroupDemand);
-            </pre>
+    {{-- 📈 ৩. চার্ট সেকশন --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+
+        {{-- Pie Chart: ব্লাড গ্রুপ ডিমান্ড --}}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <h3 class="font-extrabold text-slate-800 mb-1 flex items-center gap-2">
+                <span class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center text-sm">🩸</span>
+                ব্লাড গ্রুপ ডিমান্ড
+            </h3>
+            <p class="text-xs text-slate-400 font-medium mb-4">কোন রক্তের গ্রুপ সবচেয়ে বেশি রিকোয়েস্ট হয়েছে</p>
+            <div class="flex items-center justify-center" style="height:220px;">
+                <canvas id="bloodGroupChart"></canvas>
+            </div>
         </div>
-        <div>
-            <h3 class="font-extrabold text-slate-800 mb-2">@Alif: ইমার্জেন্সি জোন (Bar Chart)</h3>
-            <p class="text-sm text-slate-500 mb-4">টপ ৫ জেলার ডেটা দিয়ে একটি বার-চার্ট তৈরি করো।</p>
-            <pre class="bg-slate-900 text-blue-400 p-4 rounded-xl text-xs overflow-auto">
-const districtData = @json($districtDemand);
-            </pre>
+
+        {{-- Bar Chart: জেলা ভিত্তিক ইমার্জেন্সি --}}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+            <h3 class="font-extrabold text-slate-800 mb-1 flex items-center gap-2">
+                <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm">📍</span>
+                শীর্ষ ৫ ইমার্জেন্সি জেলা
+            </h3>
+            <p class="text-xs text-slate-400 font-medium mb-4">সবচেয়ে বেশি রিকোয়েস্ট আসা জেলাসমূহ</p>
+            <div style="height:220px;">
+                <canvas id="districtChart"></canvas>
+            </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+    <script>
+    (function () {
+        const bloodGroupData  = @json($bloodGroupDemand);
+        const districtData    = @json($districtDemand);
+
+        // ─── ১. ব্লাড গ্রুপ Pie Chart ────────────────────────────────
+        const bgColors = ['#ef4444','#f97316','#eab308','#22c55e','#06b6d4','#3b82f6','#8b5cf6','#ec4899'];
+        new Chart(document.getElementById('bloodGroupChart'), {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(bloodGroupData),
+                datasets: [{
+                    data: Object.values(bloodGroupData),
+                    backgroundColor: bgColors.slice(0, Object.keys(bloodGroupData).length),
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right', labels: { font: { size: 11, weight: 'bold' }, padding: 12 } },
+                    tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed} রিকোয়েস্ট` } }
+                }
+            }
+        });
+
+        // ─── ২. জেলা Bar Chart ───────────────────────────────────────
+        new Chart(document.getElementById('districtChart'), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(districtData).map(id => 'জেলা #' + id),
+                datasets: [{
+                    label: 'মোট রিকোয়েস্ট',
+                    data: Object.values(districtData),
+                    backgroundColor: 'rgba(59,130,246,0.8)',
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#f1f5f9' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    })();
+    </script>
+
 
     {{-- 🎮 ৪. Gamification Governance Quick Access --}}
     <div class="mt-8">

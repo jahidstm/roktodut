@@ -21,7 +21,7 @@ class ProfileController extends Controller
     {
         $steps = [
             ['key' => 'name',          'label' => 'পূর্ণ নাম',              'weight' => 10, 'done' => !empty($user->name)],
-            ['key' => 'email',         'label' => 'ইমেইল ভেরিফাই',         'weight' => 10, 'done' => (bool) $user->email_verified_at],
+            ['key' => 'email',         'label' => 'ইমেইল অ্যাড্রেস',        'weight' => 10, 'done' => !empty($user->email)],
             ['key' => 'phone',         'label' => 'মোবাইল নাম্বার',         'weight' => 10, 'done' => !empty($user->phone)],
             ['key' => 'blood_group',   'label' => 'রক্তের গ্রুপ',           'weight' => 15, 'done' => !empty($user->blood_group)],
             ['key' => 'profile_image', 'label' => 'প্রোফাইল ছবি',           'weight' => 10, 'done' => !empty($user->profile_image)],

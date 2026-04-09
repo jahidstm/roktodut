@@ -20,7 +20,7 @@ class GamificationService
     const POINTS_SUCCESSFUL_DONATION    = 50;  // সফল রক্তদান
     const POINTS_FIRST_RESPONDER_BONUS  = 10;  // ৩ ঘণ্টার মধ্যে ইমার্জেন্সিতে রেসপন্ড
     const POINTS_REFERRAL_SIGNUP        = 10;  // রেফারেল সাইন-আপ+প্রোফাইল
-    const POINTS_REFERRAL_FIRST_DONATE  = 30;  // রেফারড ব্যক্তির প্রথম রক্তদান
+    const POINTS_REFERRAL_FIRST_DONATION = 30;  // রেফারড ব্যক্তির প্রথম রক্তদান
     const POINTS_RECIPIENT_REVIEW       = 10;  // গ্রহীতার পজিটিভ রিভিউ
     const POINTS_PROFILE_COMPLETE       = 20;  // প্রোফাইল ১০০% ও NID ভেরিফাই
     const POINTS_REQUEST_SHARE_DAILY    = 5;   // ব্লাড রিকোয়েস্ট শেয়ার (দিনে ৩ বার পর্যন্ত)
@@ -245,13 +245,23 @@ class GamificationService
 
     public function awardReferralSignupPoints(User $referrer): void
     {
-        $this->addPoints($referrer, self::POINTS_REFERRAL_SIGNUP);
+        $this->awardPoints(
+            user:       $referrer,
+            points:     self::POINTS_REFERRAL_SIGNUP,
+            actionType: PointLog::ACTION_REFERRAL_SIGNUP,
+            metadata:   ['reason' => 'রেফারেল সাইন-আপ বোনাস'],
+        );
         $this->checkAndAwardBadges($referrer);
     }
 
     public function awardReviewPoints(User $donor): void
     {
-        $this->addPoints($donor, self::POINTS_RECIPIENT_REVIEW);
+        $this->awardPoints(
+            user:       $donor,
+            points:     self::POINTS_RECIPIENT_REVIEW,
+            actionType: PointLog::ACTION_RECIPIENT_REVIEW,
+            metadata:   ['reason' => 'গ্রহীতার পজিটিভ রিভিউ'],
+        );
         $this->checkAndAwardBadges($donor);
     }
 
