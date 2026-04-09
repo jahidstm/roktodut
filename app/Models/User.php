@@ -55,6 +55,7 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         'nid_path',
         'nid_number',
         'nid_status',
+        'qr_token',             // 🔐 Dynamic QR Smart Card token
         'last_login_at',
         'welcome_back_checked',
         'last_donated_at',      // 🎯 ডাটাবেসের আসল কলাম
@@ -70,6 +71,10 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         'password',
         'remember_token',
         'nid_image',
+        'qr_token',             // 🔐 JSON/API response-এ কখনো expose করা যাবে না
+        'phone',                // Privacy Shield — সরাসরি serialize-এ দেখা যাবে না
+        'email',                // Privacy Shield
+        'nid_number',           // Privacy Shield
     ];
 
     protected function casts(): array

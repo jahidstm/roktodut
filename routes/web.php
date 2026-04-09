@@ -18,8 +18,22 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\OrgRegistrationController;
 use App\Http\Controllers\DonationClaimController; // 🚀 কন্ট্রোলার ইম্পোর্ট
 use App\Http\Controllers\LeaderboardController;
+use App\Http\Controllers\PublicVerificationController; // 🔐 QR Smart Card
 use App\Models\Division;
 use Illuminate\Support\Facades\Route;
+
+// ─────────────────────────────────────────────────────────────────────────
+// 🔐 Dynamic QR Smart Card — Public Verification (NO auth middleware)
+// ─────────────────────────────────────────────────────────────────────────
+// throttle:60,1 → প্রতি IP থেকে প্রতি ১ মিনিটে সর্বোচ্চ ৬০ রিকোয়েস্ট।
+// এর বেশি হলে Laravel স্বয়ংক্রিয়ভাবে HTTP 429 Too Many Requests ফেরত দেবে।
+// Security: auth middleware ইচ্ছাকৃতভাবে নেই — QR scanner-কে login করতে হবে না।
+// ─────────────────────────────────────────────────────────────────────────
+Route::get('/verify/{token}', [PublicVerificationController::class, 'show'])
+    ->middleware('throttle:60,1')
+    ->name('public.verify');
+
+
 
 // --- ১. পাবলিক রাউটস (No Login Required) ---
 

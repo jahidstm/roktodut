@@ -540,11 +540,18 @@ class GamificationService
             ]);
         }
 
+        // ─── QR Smart Card Token ─────────────────────────────────────────
+        // NID verify হওয়ার সাথে সাথে একটি cryptographically secure token তৈরি
+        // করা হয়। একবার তৈরি হলে আর বদলানো হবে না (idempotent)।
+        $this->generateQrTokenIfMissing($user);
+
         $user->update(['verified_badge' => true, 'nid_status' => 'verified']);
     }
 
     /**
      * NID rejected হলে 'verified_donor' ব্যাজ সরিয়ে নাও।
+     * Note: qr_token ইচ্ছাকৃতভাবে রিভোকে NULL করা হয় না —
+     *       পুনরায় verify হলে একই token পুনরায় সক্রিয় হবে।
      */
     public function revokeVerifiedBadge(User $user): void
     {
@@ -553,5 +560,39 @@ class GamificationService
             $user->badges()->detach($badge->id);
         }
         $user->update(['verified_badge' => false, 'nid_status' => 'unverified']);
+    }
+
+    // =========================================================
+    // Dynamic QR Smart Card Token
+    // =========================================================
+
+    /**
+     * ক্রিপ্টোগ্রাফিক্যালি সিকিউর QR token তৈরি করে users.qr_token-এ সেভ করে।
+     *
+     * বৈশিষ্ট্য:
+     *  • random_bytes(32) → 256-bit entropy → bin2hex → 64-char hex string
+     *  • DB-তে unique constraint আছে, তাই collision loop দিয়ে নিশ্চিত করা হয়
+     *  • Idempotent: token আগে থেকে থাকলে নতুন token তৈরি করে না
+     *  • PII-free: নাম/ফোন/ইমেইল/NID নম্বর কিছুই token-এ নেই
+     */
+    public function generateQrTokenIfMissing(User $user): void
+    {
+        // ইতিমধ্যে token আছে — আর কিছু করতে হবে না
+        if (! empty($user->qr_token)) {
+            return;
+        }
+
+        // Collision-safe loop: DB-তে unique constraint আছে বলে
+        // যতক্ষণ না unique token পাওয়া যায় retry করো।
+        do {
+            $token = bin2hex(random_bytes(32)); // 64-char hex, 256-bit entropy
+        } while (User::where('qr_token', $token)->exists());
+
+        $user->update(['qr_token' => $token]);
+
+        Log::info('[QR SmartCard] Token generated for user.', [
+            'user_id' => $user->id,
+            'token'   => substr($token, 0, 8) . '...', // লগে শুধু prefix দেখাও
+        ]);
     }
 }
