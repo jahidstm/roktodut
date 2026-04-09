@@ -9,6 +9,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\GamificationGovernanceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DonationRecordController;
 use App\Http\Controllers\OrgAdmin\DashboardController as OrgDashboardController;
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     $divisions  = \App\Models\Division::all();
     $topDonors  = \App\Models\User::where('role', 'donor')
+        ->notShadowbanned()
         ->where(function ($q) {
             $q->where('total_verified_donations', '>', 0)
               ->orWhere('points', '>', 0);
@@ -115,6 +117,15 @@ Route::middleware(['auth', 'verified', 'role:admin'])->group(function () {
 
     // 🎯 অ্যাডমিন ডোনেশন ভেরিফিকেশন রাউট
     Route::post('/admin/donations/{response}/verify', [DonationClaimController::class, 'adminVerify'])->name('admin.donations.verify');
+
+    // 🎮 Gamification Governance মডিউল
+    Route::prefix('admin/gamification')->name('admin.gamification.')->group(function () {
+        Route::get('/',                          [GamificationGovernanceController::class, 'index'])->name('index');
+        Route::get('/users/{user}',              [GamificationGovernanceController::class, 'show'])->name('show');
+        Route::post('/users/{user}/shadowban',   [GamificationGovernanceController::class, 'toggleShadowban'])->name('shadowban');
+        Route::post('/users/{user}/points',      [GamificationGovernanceController::class, 'adjustPoints'])->name('points.adjust');
+        Route::post('/users/{user}/badges',      [GamificationGovernanceController::class, 'assignBadge'])->name('badges.assign');
+    });
 });
 
 // --- ৬. অর্গানাইজেশন অ্যাডমিন রাউটস (ইন্টিগ্রেটেড গ্রুপ) ---

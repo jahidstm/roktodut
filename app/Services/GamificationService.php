@@ -299,6 +299,7 @@ class GamificationService
     public function getLeaderboard(string $scope = 'national', ?int $districtId = null, string $period = 'all_time', int $limit = 50)
     {
         $query = User::where('role', 'donor')
+            ->notShadowbanned()                          // ← শ্যাডোব্যান্ড ইউজার বাদ
             ->where(function ($q) {
                 $q->where('total_verified_donations', '>', 0)
                   ->orWhere('points', '>', 0);

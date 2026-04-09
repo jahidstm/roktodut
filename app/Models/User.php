@@ -61,6 +61,7 @@ class User extends Authenticatable
         'remember_token',
         'provider',
         'provider_id',
+        'is_shadowbanned',
     ];
 
     protected $hidden = [
@@ -87,6 +88,7 @@ class User extends Authenticatable
             'last_donated_at'   => 'date',
             'is_onboarded'      => 'boolean',
             'is_campus_hero'    => 'boolean',
+            'is_shadowbanned'   => 'boolean',
         ];
     }
 
@@ -233,5 +235,14 @@ class User extends Authenticatable
             return $query->where('organization_id', Auth::user()->organization_id);
         }
         return $query;
+    }
+
+    /**
+     * শ্যাডোব্যান্ড ইউজারদের লিডারবোর্ড থেকে ফিল্টার করার স্কোপ।
+     * লিডারবোর্ড কোয়েরি যেখানে ব্যবহার করুন: ->notShadowbanned()->বাকি কোয়েরি
+     */
+    public function scopeNotShadowbanned($query)
+    {
+        return $query->where('is_shadowbanned', false);
     }
 }

@@ -165,5 +165,37 @@ const districtData = @json($districtDemand);
         </div>
     </div>
 
+    {{-- 🎮 ৪. Gamification Governance Quick Access --}}
+    <div class="mt-8">
+        <div class="mb-5 flex items-center gap-2">
+            <h2 class="text-xl font-extrabold text-slate-800">🎮 Gamification Governance</h2>
+        </div>
+        <a href="{{ route('admin.gamification.index') }}"
+           class="group flex items-center justify-between p-6 bg-white border-2 border-slate-200
+                  hover:border-red-300 hover:shadow-md rounded-2xl transition-all duration-200">
+            <div class="flex items-center gap-5">
+                <div class="w-14 h-14 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center text-2xl shrink-0
+                            group-hover:bg-red-600 group-hover:text-white transition-colors duration-200">
+                    🎮
+                </div>
+                <div>
+                    <h3 class="text-lg font-extrabold text-slate-900">Gamification Governance Panel</h3>
+                    <p class="text-sm text-slate-500 font-medium mt-0.5">
+                        ডোনারদের পয়েন্ট অ্যাডজাস্ট করুন, শ্যাডোব্যান করুন, ব্যাজ অ্যাসাইন করুন এবং পয়েন্ট লগ অডিট করুন।
+                    </p>
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        <span class="bg-red-50 text-red-600 text-xs font-bold px-2.5 py-1 rounded-full border border-red-100">🚫 Shadowban</span>
+                        <span class="bg-blue-50 text-blue-600 text-xs font-bold px-2.5 py-1 rounded-full border border-blue-100">🔧 Point Adjust</span>
+                        <span class="bg-amber-50 text-amber-600 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-100">🏅 Badge Assign</span>
+                        <span class="bg-slate-100 text-slate-600 text-xs font-bold px-2.5 py-1 rounded-full border border-slate-200">📋 Audit Trail</span>
+                    </div>
+                </div>
+            </div>
+            <svg class="w-6 h-6 text-slate-300 group-hover:text-red-500 transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+            </svg>
+        </a>
+    </div>
+
 </div>
 @endsection
