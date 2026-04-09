@@ -133,19 +133,33 @@ class ProfileController extends Controller
     }
 
     /**
-     * NID ডকুমেন্ট আপলোড
+     * NID ডকুমেন্ট ও নাম্বার আপলোড/সেভ করা
      */
     public function uploadNid(Request $request): RedirectResponse
     {
         $request->validate([
-            'nid_document' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048']
+            'nid_number'   => ['nullable', 'string', 'min:10', 'max:20'],
+            'nid_document' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
         ]);
 
-        $user = $request->user();
+        $user    = $request->user();
+        $changed = false;
 
+        // NID নাম্বার সেভ করা
+        if ($request->filled('nid_number')) {
+            $user->nid_number = $request->nid_number;
+            $changed = true;
+        }
+
+        // NID ডকুমেন্ট আপলোড করা
         if ($request->hasFile('nid_document')) {
-            $path = $request->file('nid_document')->store('donor_nids', 'public');
+            $path           = $request->file('nid_document')->store('donor_nids', 'public');
             $user->nid_path = $path;
+            $user->nid_status = 'pending'; // নতুন ডকুমেন্টে সর্বদা pending
+            $changed = true;
+        }
+
+        if ($changed) {
             $user->save();
             $user->refresh();
 
@@ -156,8 +170,9 @@ class ProfileController extends Controller
             }
         }
 
-        return Redirect::route('dashboard')
-            ->with('success', 'ডকুমেন্ট সফলভাবে আপলোড হয়েছে! অর্গানাইজেশন যাচাই করার পর আপনার ব্যাজ যুক্ত হবে।');
+        return Redirect::route('profile.edit')
+            ->with('status', 'profile-updated')
+            ->with('success_msg', '✅ এনআইডি তথ্য সফলভাবে জমা দেওয়া হয়েছে! অ্যাডমিন যাচাই করার পর আপনার Verified Donor ব্যাজ যুক্ত হবে।');
     }
 
     /**

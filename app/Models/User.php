@@ -53,6 +53,7 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         'verified_badge',
         'nid_image',
         'nid_path',
+        'nid_number',
         'nid_status',
         'last_login_at',
         'welcome_back_checked',

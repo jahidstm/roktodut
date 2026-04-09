@@ -15,7 +15,7 @@
     @if(session('status') === 'profile-updated')
         <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold rounded-xl flex items-center gap-2 shadow-sm">
             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            প্রোফাইল সফলভাবে আপডেট হয়েছে!
+            {{ session('success_msg') ?? 'প্রোফাইল সফলভাবে আপডেট হয়েছে!' }}
         </div>
     @endif
 
@@ -347,6 +347,109 @@
                             class="bg-slate-900 hover:bg-slate-800 text-white px-8 py-3.5 rounded-xl text-sm font-extrabold transition shadow-sm">
                         সেভ করুন
                     </button>
+                </div>
+            </form>
+        </div>
+
+        {{-- ══════════════════════════════════════════════════════════
+             ③ আইডেন্টিটি ভেরিফিকেশন (NID)
+        ══════════════════════════════════════════════════════════ --}}
+        <div class="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-sm relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-amber-500"></div>
+
+            {{-- Header --}}
+            <header class="mb-6 flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-900">আইডেন্টিটি ভেরিফিকেশন (NID)</h2>
+                    <p class="text-sm text-slate-500 font-medium mt-1">প্ল্যাটফর্মে 'Verified Donor' ব্যাজ পেতে আপনার এনআইডি তথ্য প্রদান করুন।</p>
+                </div>
+
+                {{-- NID Status Badge --}}
+                @php
+                    $nidStatus = $user->nid_status ?? 'unverified';
+                    $statusConfig = match($nidStatus) {
+                        'verified' => ['bg' => 'bg-emerald-100', 'text' => 'text-emerald-800', 'border' => 'border-emerald-200', 'dot' => 'bg-emerald-500', 'label' => '✅ Verified'],
+                        'pending'  => ['bg' => 'bg-amber-100',   'text' => 'text-amber-800',   'border' => 'border-amber-200',   'dot' => 'bg-amber-500',   'label' => '⏳ Pending Review'],
+                        default    => ['bg' => 'bg-red-50',      'text' => 'text-red-700',     'border' => 'border-red-200',     'dot' => 'bg-red-500',     'label' => '❌ Unverified'],
+                    };
+                @endphp
+                <div class="inline-flex items-center gap-2 {{ $statusConfig['bg'] }} border {{ $statusConfig['border'] }} {{ $statusConfig['text'] }} text-xs font-extrabold px-3 py-2 rounded-xl shrink-0">
+                    <span class="w-2 h-2 rounded-full {{ $statusConfig['dot'] }} {{ $nidStatus === 'pending' ? 'animate-pulse' : '' }}"></span>
+                    {{ $statusConfig['label'] }}
+                </div>
+            </header>
+
+            {{-- Verified Message --}}
+            @if($nidStatus === 'verified')
+                <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-xl shrink-0">🏅</div>
+                    <div>
+                        <p class="font-extrabold text-emerald-800 text-sm">আপনার পরিচয় সফলভাবে যাচাই করা হয়েছে!</p>
+                        <p class="text-emerald-700 text-xs font-medium mt-0.5">আপনি 'Verified Donor' ব্যাজ পেয়েছেন। তথ্য পুনরায় জমা দিতে নিচের ফর্ম ব্যবহার করুন।</p>
+                    </div>
+                </div>
+            @elseif($nidStatus === 'pending')
+                <div class="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-xl shrink-0">🔍</div>
+                    <div>
+                        <p class="font-extrabold text-amber-900 text-sm">আপনার ডকুমেন্ট রিভিউ হচ্ছে!</p>
+                        <p class="text-amber-700 text-xs font-medium mt-0.5">অর্গানাইজেশন অ্যাডমিন যাচাই করার পর আপনার 'Verified Donor' ব্যাজ যুক্ত হবে।</p>
+                    </div>
+                </div>
+            @endif
+
+            {{-- NID Upload Form --}}
+            <form method="POST" action="{{ route('donor.upload_nid') }}" enctype="multipart/form-data" class="space-y-5">
+                @csrf
+
+                {{-- NID Number --}}
+                <div>
+                    <label for="nid_number" class="block text-sm font-bold text-slate-700 mb-2">
+                        এনআইডি (NID) নাম্বার
+                        <span class="text-slate-400 font-normal text-xs ml-1">(১০ বা ১৭ ডিজিট)</span>
+                    </label>
+                    <input id="nid_number" name="nid_number" type="text"
+                           value="{{ old('nid_number', $user->nid_number ?? '') }}"
+                           placeholder="যেমন: 1234567890123"
+                           class="w-full rounded-xl border-slate-300 shadow-sm focus:border-amber-500 focus:ring-amber-500 font-semibold text-slate-800 px-4 py-3">
+                    @error('nid_number') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                {{-- NID Image Upload --}}
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">
+                        এনআইডি কার্ডের ছবি
+                        <span class="text-slate-400 font-normal text-xs ml-1">(সামনের অংশ — JPG, PNG বা PDF)</span>
+                    </label>
+
+                    {{-- Current NID preview --}}
+                    @if($user->nid_path)
+                        <div class="mb-3 flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                            <div class="w-8 h-8 rounded-lg bg-slate-200 flex items-center justify-center text-slate-500 shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-xs font-bold text-slate-700 truncate">ডকুমেন্ট আপলোড করা হয়েছে</p>
+                                <p class="text-[10px] text-slate-500">নতুন ফাইল সিলেক্ট করলে পুরনোটি replace হবে</p>
+                            </div>
+                            <span class="text-[10px] font-extrabold text-amber-700 bg-amber-50 border border-amber-200 px-2 py-1 rounded-lg shrink-0">আপলোডেড</span>
+                        </div>
+                    @endif
+
+                    <input type="file" name="nid_document" accept=".jpg,.jpeg,.png,.pdf"
+                           class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-5 file:rounded-xl file:border-0 file:text-xs file:font-extrabold file:bg-amber-600 file:text-white hover:file:bg-amber-700 transition cursor-pointer">
+                    <p class="text-xs text-slate-400 mt-1.5 font-medium">সর্বোচ্চ ২ মেগাবাইট। ছবিটি স্পষ্ট ও সম্পূর্ণ হওয়া প্রয়োজন।</p>
+                    @error('nid_document') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="flex items-center gap-4 pt-4 border-t border-slate-100">
+                    <button type="submit"
+                            class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-3.5 rounded-xl text-sm font-extrabold transition shadow-sm">
+                        ভেরিফিকেশনের জন্য জমা দিন
+                    </button>
+                    @if($nidStatus === 'pending')
+                        <span class="text-xs text-slate-500 font-medium">পূর্ববর্তী জমা রিভিউ হচ্ছে — নতুন জমা দিলে replace হবে।</span>
+                    @endif
                 </div>
             </form>
         </div>
