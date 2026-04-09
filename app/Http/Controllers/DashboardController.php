@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\BloodRequest;
 use App\Models\BloodRequestResponse;
+use App\Models\User;
+use App\Services\GamificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -16,7 +18,7 @@ class DashboardController extends Controller
             return redirect()->route('onboarding.show');
         }
 
-        $user = Auth::user();
+        $user = Auth::user()->load('badges');
 
         // ২. স্ট্যাটিস্টিকস ক্যালকুলেশন
         $totalRequestsMade = BloodRequest::where('requested_by', $user->id)->count();
@@ -59,6 +61,49 @@ class DashboardController extends Controller
             ->with(['user', 'bloodRequest'])
             ->first();
 
+        // 🏆 ৬. গ্যামিফিকেশন স্ট্যাটস
+        $currentPoints     = $user->points ?? 0;
+        $totalDonations    = $user->total_verified_donations ?? 0;
+
+        // মাইলস্টোন সংজ্ঞা
+        $milestones = [
+            ['label' => 'Bronze Bloodline', 'bn' => 'ব্রোঞ্জ ব্লাডলাইন', 'emoji' => '🥉', 'color' => 'amber',   'donations' => 1,  'points' => 50],
+            ['label' => 'Silver Savior',    'bn' => 'সিলভার সেভিয়ার',   'emoji' => '🥈', 'color' => 'slate',   'donations' => 5,  'points' => 300],
+            ['label' => 'Golden Guardian',  'bn' => 'গোল্ডেন গার্ডিয়ান', 'emoji' => '🏅', 'color' => 'yellow',  'donations' => 10, 'points' => 600],
+            ['label' => 'Platinum Hero',    'bn' => 'প্লাটিনাম হিরো',   'emoji' => '🏆', 'color' => 'purple',  'donations' => 20, 'points' => 1500],
+        ];
+
+        // পরবর্তী মাইলস্টোন খোঁজা
+        $nextMilestone = null;
+        $progressPercent = 0;
+        foreach ($milestones as $m) {
+            if ($totalDonations < $m['donations']) {
+                $nextMilestone = $m;
+                $prevDonations = 0;
+                foreach ($milestones as $prev) {
+                    if ($prev['donations'] < $m['donations']) $prevDonations = $prev['donations'];
+                }
+                $progressPercent = $prevDonations < $m['donations']
+                    ? min(99, round(($totalDonations - $prevDonations) / ($m['donations'] - $prevDonations) * 100))
+                    : 100;
+                break;
+            }
+        }
+
+        // লিডারবোর্ডে আমার র‍্যাঙ্ক
+        $myRank = User::where('role', 'donor')
+            ->where(fn($q) => $q->where('total_verified_donations', '>', 0)->orWhere('points', '>', 0))
+            ->where(function ($q) use ($totalDonations, $currentPoints) {
+                $q->where('total_verified_donations', '>', $totalDonations)
+                  ->orWhere(fn($q2) => $q2->where('total_verified_donations', $totalDonations)->where('points', '>', $currentPoints));
+            })
+            ->count() + 1;
+
+        $gamificationStats = compact(
+            'currentPoints', 'totalDonations', 'milestones',
+            'nextMilestone', 'progressPercent', 'myRank'
+        );
+
         return view('dashboard', compact(
             'totalRequestsMade',
             'fulfilledRequests',
@@ -66,7 +111,8 @@ class DashboardController extends Controller
             'successRate',
             'recentRequests',
             'pendingClaim',
-            'acceptedDonations' // 👈 কম্প্যাক্টে যোগ করা হয়েছে
+            'acceptedDonations',
+            'gamificationStats'
         ));
     }
 }

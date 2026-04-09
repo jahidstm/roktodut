@@ -232,6 +232,99 @@
         </div>
     </div>
 
+    {{-- ══════════════════════════════════════════
+         🏆 গ্যামিফিকেশন উইজেট
+    ══════════════════════════════════════════ --}}
+    @if(isset($gamificationStats))
+    @php extract($gamificationStats); @endphp
+    <div class="mb-10 rounded-3xl overflow-hidden border border-slate-100 shadow-lg bg-white">
+
+        {{-- Header --}}
+        <div class="bg-gradient-to-r from-red-600 to-red-800 px-6 py-5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-white/15 flex items-center justify-center text-xl">🏆</div>
+                <div>
+                    <h2 class="text-white font-black text-base leading-tight">আপনার গ্যামিফিকেশন স্ট্যাটাস</h2>
+                    <p class="text-red-200 text-xs font-semibold">পয়েন্ট উপার্জন করুন, ব্যাজ জিতুন!</p>
+                </div>
+            </div>
+            <a href="{{ route('leaderboard') }}"
+               class="inline-flex items-center gap-1.5 text-xs font-bold text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-3 py-2 transition-all">
+                লিডারবোর্ড
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+
+        <div class="p-6">
+            {{-- Stats Row --}}
+            <div class="grid grid-cols-3 gap-4 mb-6">
+                {{-- Points --}}
+                <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 text-center">
+                    <div class="text-2xl font-black text-amber-600">{{ number_format($currentPoints) }}</div>
+                    <div class="text-xs font-bold text-amber-500 mt-1">মোট পয়েন্ট</div>
+                </div>
+                {{-- Donations --}}
+                <div class="bg-red-50 border border-red-100 rounded-2xl p-4 text-center">
+                    <div class="text-2xl font-black text-red-600">{{ $totalDonations }}</div>
+                    <div class="text-xs font-bold text-red-500 mt-1">রক্তদান</div>
+                </div>
+                {{-- Rank --}}
+                <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 text-center">
+                    <div class="text-2xl font-black text-blue-600">#{{ $myRank }}</div>
+                    <div class="text-xs font-bold text-blue-500 mt-1">র‍্যাঙ্ক</div>
+                </div>
+            </div>
+
+            {{-- Earned Badges --}}
+            @if(auth()->user()->badges->count() > 0)
+            <div class="mb-6">
+                <div class="text-xs font-black text-slate-500 uppercase tracking-wider mb-3">অর্জিত ব্যাজসমূহ</div>
+                <div class="flex flex-wrap gap-2">
+                    @foreach(auth()->user()->badges as $badge)
+                        @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
+                        <div class="inline-flex items-center gap-1.5 text-xs font-bold {{ $bd['color'] }} border rounded-full px-3 py-1.5 shadow-sm {{ $bd['glow'] }}">
+                            <span class="text-base">{{ $bd['emoji'] }}</span>
+                            <span>{{ $bd['bn'] }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
+            {{-- Next Milestone Progress Bar --}}
+            @if($nextMilestone)
+            <div class="bg-slate-50 border border-slate-100 rounded-2xl p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="text-sm font-black text-slate-700">
+                        {{ $nextMilestone['emoji'] }} পরবর্তী লক্ষ্য: <span class="text-red-600">{{ $nextMilestone['bn'] }}</span>
+                    </div>
+                    <div class="text-xs font-bold text-slate-500">
+                        {{ $totalDonations }}/{{ $nextMilestone['donations'] }} রক্তদান
+                    </div>
+                </div>
+                {{-- Progress Bar --}}
+                <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                    <div class="h-3 rounded-full bg-gradient-to-r from-red-500 to-red-600 transition-all duration-700 relative"
+                         style="width: {{ $progressPercent }}%">
+                        <div class="absolute inset-0 bg-white/20 animate-pulse rounded-full"></div>
+                    </div>
+                </div>
+                <div class="flex justify-between text-[10px] font-bold text-slate-400 mt-1.5">
+                    <span>{{ $progressPercent }}% সম্পন্ন</span>
+                    <span>আর {{ $nextMilestone['donations'] - $totalDonations }} টি ডোনেশন বাকি</span>
+                </div>
+            </div>
+            @else
+            <div class="bg-purple-50 border border-purple-200 rounded-2xl p-4 text-center">
+                <div class="text-2xl mb-1">✨</div>
+                <div class="font-black text-purple-800">অভিনন্দন! আপনি সর্বোচ্চ Platinum Hero!</div>
+                <div class="text-xs text-purple-600 font-semibold mt-1">আপনি রক্তদূতের সর্বোচ্চ পদে আছেন।</div>
+            </div>
+            @endif
+        </div>
+    </div>
+    @endif
+
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
         <a href="{{ route('requests.create') }}" class="group p-8 rounded-3xl bg-red-600 hover:bg-red-700 transition shadow-lg shadow-red-200">
             <div class="text-white font-black text-xl mb-2">জরুরি রক্তের দরকার?</div>
