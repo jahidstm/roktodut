@@ -11,6 +11,16 @@ class PageController extends Controller
      */
     public function donateBloodInfo()
     {
-        return view('pages.donate');
+        $verifiedDonors = \App\Models\User::where('role', 'donor')
+            ->where(function($q) {
+                $q->where('nid_status', 'approved')->orWhere('verified_badge', 1);
+            })->count();
+
+        // Calculate lives saved roughly as total bags given across platforms or total fulfilled * 3.
+        // We'll use total verified donations from system + base number
+        $totalDonations = \App\Models\User::sum('total_verified_donations');
+        $livesSaved = ($totalDonations * 3) + 120; // 120 is base offset for social proof demo
+
+        return view('pages.donate', compact('verifiedDonors', 'livesSaved'));
     }
 }
