@@ -233,67 +233,6 @@
     </div>
 
     {{-- ══════════════════════════════════════════
-         🎁 Referral Banner — "বন্ধুকে আমন্ত্রণ জানান"
-    ══════════════════════════════════════════ --}}
-    @auth
-    @php
-        $gamification  = app(\App\Services\GamificationService::class);
-        $myCode        = $gamification->generateReferralCode(auth()->user());
-        $referralLink  = url('/register?ref=' . $myCode);
-    @endphp
-    <div class="mb-10 relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 p-6 sm:p-8 shadow-xl">
-        {{-- Decorative circles --}}
-        <div class="absolute -top-8 -right-8 w-40 h-40 bg-white/10 rounded-full pointer-events-none"></div>
-        <div class="absolute -bottom-10 right-24 w-28 h-28 bg-white/10 rounded-full pointer-events-none"></div>
-
-        <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            {{-- Left: Text --}}
-            <div class="flex-1">
-                <div class="flex items-center gap-3 mb-2">
-                    <span class="text-3xl">👥</span>
-                    <h2 class="text-white font-black text-lg sm:text-xl leading-tight">
-                        বন্ধুকে আমন্ত্রণ জানান &amp; আয় করুন!
-                    </h2>
-                </div>
-                <p class="text-emerald-100 text-sm font-medium max-w-sm">
-                    বন্ধু সাইন-আপ করলে <span class="text-white font-black">+১০ পয়েন্ট</span>,
-                    প্রথমবার রক্তদিলে আরও <span class="text-white font-black">+৩০ পয়েন্ট</span> পাবেন!
-                </p>
-
-                {{-- Point badges --}}
-                <div class="flex flex-wrap gap-2 mt-3">
-                    <span class="inline-flex items-center gap-1 bg-white/20 border border-white/30 text-white text-xs font-extrabold px-3 py-1 rounded-full">
-                        🎉 সাইন-আপ বোনাস: +১০ pts
-                    </span>
-                    <span class="inline-flex items-center gap-1 bg-white/20 border border-white/30 text-white text-xs font-extrabold px-3 py-1 rounded-full">
-                        🩸 প্রথম ডোনেশন বোনাস: +৩০ pts
-                    </span>
-                </div>
-            </div>
-
-            {{-- Right: Code + Copy --}}
-            <div class="flex-shrink-0 w-full sm:w-auto">
-                <div class="bg-white/15 border border-white/25 backdrop-blur rounded-2xl p-4 text-center mb-3">
-                    <div class="text-white/75 text-[10px] font-extrabold uppercase tracking-widest mb-1">আপনার রেফারেল কোড</div>
-                    <div class="text-white font-black text-2xl tracking-[0.2em]">{{ $myCode }}</div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <input id="referral-link-dashboard"
-                           type="text"
-                           value="{{ $referralLink }}"
-                           class="flex-1 text-xs py-2.5 px-3 rounded-xl bg-white/15 border border-white/25 text-white font-semibold focus:outline-none focus:ring-2 focus:ring-white/50 min-w-0"
-                           readonly>
-                    <button onclick="copyDashboardReferral()" id="dash-copy-btn"
-                            class="flex-shrink-0 bg-white text-emerald-700 font-black text-xs px-4 py-2.5 rounded-xl hover:bg-emerald-50 transition-colors shadow-sm whitespace-nowrap">
-                        কপি করুন
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endauth
-
-    {{-- ══════════════════════════════════════════
          🏆 গ্যামিফিকেশন উইজেট
     ══════════════════════════════════════════ --}}
     @if(isset($gamificationStats))
@@ -309,11 +248,18 @@
                     <p class="text-red-200 text-xs font-semibold">পয়েন্ট উপার্জন করুন, ব্যাজ জিতুন!</p>
                 </div>
             </div>
-            <a href="{{ route('leaderboard') }}"
-               class="inline-flex items-center gap-1.5 text-xs font-bold text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-3 py-2 transition-all">
-                লিডারবোর্ড
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            </a>
+            {{-- ডানপাশের বাটন গ্রুপ --}}
+            <div class="flex items-center gap-2">
+                <a href="{{ route('gamification.guide') }}"
+                   class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl transition-all backdrop-blur-sm">
+                    🪙 গাইড
+                </a>
+                <a href="{{ route('leaderboard') }}"
+                   class="inline-flex items-center gap-1.5 text-xs font-bold text-white/80 hover:text-white bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl px-3 py-2 transition-all">
+                    লিডারবোর্ড
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
         </div>
 
         <div class="p-6">
@@ -397,6 +343,64 @@
             <p class="text-slate-500 text-sm font-medium">আপনার এরিয়ার সাম্প্রতিক রিকোয়েস্টগুলো দেখুন এবং সাড়া দিন।</p>
         </a>
     </div>
+
+    {{-- ══════════════════════════════════════════
+         🎁 Referral Banner — বন্ধুকে আমন্ত্রণ জানান
+    ══════════════════════════════════════════ --}}
+    @auth
+    @php
+        $gamification = app(\App\Services\GamificationService::class);
+        $myCode       = $gamification->generateReferralCode(auth()->user());
+        $referralLink = url('/register?ref=' . $myCode);
+    @endphp
+    <div class="mb-8 relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 p-6 sm:p-8 shadow-xl">
+        <div class="absolute -top-8 -right-8 w-40 h-40 bg-white/10 rounded-full pointer-events-none"></div>
+        <div class="absolute -bottom-10 right-24 w-28 h-28 bg-white/10 rounded-full pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            {{-- Left: Text --}}
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="text-3xl">👥</span>
+                    <h2 class="text-white font-black text-lg sm:text-xl leading-tight">
+                        বন্ধুকে আমন্ত্রণ জানান &amp; আয় করুন!
+                    </h2>
+                </div>
+                <p class="text-emerald-100 text-sm font-medium max-w-sm">
+                    বন্ধু সাইন-আপ করলে <span class="text-white font-black">+১০ পয়েন্ট</span>,
+                    প্রথমবার রক্তদিলে আরও <span class="text-white font-black">+৩০ পয়েন্ট</span> পাবেন!
+                </p>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <span class="inline-flex items-center gap-1 bg-white/20 border border-white/30 text-white text-xs font-extrabold px-3 py-1 rounded-full">
+                        🎉 সাইন-আপ বোনাস: +১০ pts
+                    </span>
+                    <span class="inline-flex items-center gap-1 bg-white/20 border border-white/30 text-white text-xs font-extrabold px-3 py-1 rounded-full">
+                        🩸 প্রথম ডোনেশন বোনাস: +৩০ pts
+                    </span>
+                </div>
+            </div>
+
+            {{-- Right: Code + Copy --}}
+            <div class="flex-shrink-0 w-full sm:w-auto">
+                <div class="bg-white/15 border border-white/25 backdrop-blur rounded-2xl p-4 text-center mb-3">
+                    <div class="text-white/75 text-[10px] font-extrabold uppercase tracking-widest mb-1">আপনার রেফারেল কোড</div>
+                    <div class="text-white font-black text-2xl tracking-[0.2em]">{{ $myCode }}</div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input id="referral-link-dashboard"
+                           type="text"
+                           value="{{ $referralLink }}"
+                           class="flex-1 text-xs py-2.5 px-3 rounded-xl bg-white/15 border border-white/25 text-white font-semibold focus:outline-none focus:ring-2 focus:ring-white/50 min-w-0"
+                           readonly>
+                    <button onclick="copyDashboardReferral()" id="dash-copy-btn"
+                            class="flex-shrink-0 bg-white text-emerald-700 font-black text-xs px-4 py-2.5 rounded-xl hover:bg-emerald-50 transition-colors shadow-sm whitespace-nowrap">
+                        কপি করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endauth
 
     @if(isset($recentRequests))
     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
@@ -516,6 +520,114 @@
         </div>
     </div>
     @endif
+
+    {{-- ══════════════════════════════════════════
+         🪙 পয়েন্ট ও ব্যাজ সিস্টেম — Quick Guide Teaser
+         ব্যবহারকারী কীভাবে পয়েন্ট আয় করতে পারে সেটা
+         সংক্ষেপে দেখানো হচ্ছে, পূর্ণ গাইডে লিঙ্ক সহ।
+    ══════════════════════════════════════════ --}}
+    <div class="mt-10 rounded-3xl overflow-hidden border border-slate-200 shadow-sm bg-white">
+
+        {{-- Header --}}
+        <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-white/20 flex items-center justify-center text-xl shrink-0">🪙</div>
+                <div>
+                    <h2 class="text-white font-black text-base leading-tight">পয়েন্ট ও ব্যাজ সিস্টেম</h2>
+                    <p class="text-amber-100 text-xs font-semibold">রক্তদান করুন, পয়েন্ট আয় করুন, ব্যাজ জিতুন!</p>
+                </div>
+            </div>
+            <a href="{{ route('gamification.guide') }}"
+               class="inline-flex items-center gap-2 bg-white text-amber-700 font-extrabold text-xs px-4 py-2.5 rounded-xl hover:bg-amber-50 transition-colors shadow-sm shrink-0">
+                সম্পূর্ণ গাইড দেখুন
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+
+        {{-- Earning Actions Grid --}}
+        <div class="p-6">
+            <p class="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-4">⚡ কীভাবে পয়েন্ট আয় করবেন</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+
+                {{-- সফল রক্তদান --}}
+                <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-100 rounded-2xl">
+                    <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center text-lg shrink-0">🩸</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-extrabold text-slate-800">সফল রক্তদান</p>
+                        <p class="text-xs text-slate-500 font-medium truncate">রিকোয়েস্টে সাড়া দিয়ে রক্তদান করুন</p>
+                    </div>
+                    <span class="text-sm font-black text-red-600 shrink-0">+৫০</span>
+                </div>
+
+                {{-- First Responder Bonus --}}
+                <div class="flex items-center gap-3 p-4 bg-orange-50 border border-orange-100 rounded-2xl">
+                    <div class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-lg shrink-0">⚡</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-extrabold text-slate-800">First Responder বোনাস</p>
+                        <p class="text-xs text-slate-500 font-medium truncate">৩ ঘণ্টার মধ্যে ইমার্জেন্সিতে রেসপন্ড</p>
+                    </div>
+                    <span class="text-sm font-black text-orange-600 shrink-0">+১০</span>
+                </div>
+
+                {{-- রেফারেল --}}
+                <div class="flex items-center gap-3 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-lg shrink-0">👥</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-extrabold text-slate-800">রেফারেল বোনাস</p>
+                        <p class="text-xs text-slate-500 font-medium truncate">বন্ধু সাইন-আপ + প্রথম ডোনেশনে</p>
+                    </div>
+                    <span class="text-sm font-black text-emerald-600 shrink-0">+৪০</span>
+                </div>
+
+                {{-- প্রোফাইল কমপ্লিট --}}
+                <div class="flex items-center gap-3 p-4 bg-blue-50 border border-blue-100 rounded-2xl">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-lg shrink-0">✅</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-extrabold text-slate-800">প্রোফাইল কমপ্লিট</p>
+                        <p class="text-xs text-slate-500 font-medium truncate">১০০% প্রোফাইল + NID ভেরিফিকেশন</p>
+                    </div>
+                    <span class="text-sm font-black text-blue-600 shrink-0">+২০</span>
+                </div>
+
+                {{-- গ্রহীতার রিভিউ --}}
+                <div class="flex items-center gap-3 p-4 bg-purple-50 border border-purple-100 rounded-2xl">
+                    <div class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-lg shrink-0">💬</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-extrabold text-slate-800">গ্রহীতার পজিটিভ রিভিউ</p>
+                        <p class="text-xs text-slate-500 font-medium truncate">রক্ত পাওয়ার পর গ্রহীতা রিভিউ দিলে</p>
+                    </div>
+                    <span class="text-sm font-black text-purple-600 shrink-0">+১০</span>
+                </div>
+
+                {{-- ব্যাজ টিজার --}}
+                <div class="flex items-center gap-3 p-4 bg-gradient-to-br from-yellow-50 to-amber-50 border border-amber-100 rounded-2xl">
+                    <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-lg shrink-0">🏅</div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-extrabold text-slate-800">মাইলস্টোন ব্যাজ</p>
+                        <p class="text-xs text-slate-500 font-medium truncate">Bronze → Silver → Gold → Platinum</p>
+                    </div>
+                    <a href="{{ route('gamification.guide') }}"
+                       class="text-xs font-extrabold text-amber-600 hover:text-amber-700 shrink-0 underline underline-offset-2">
+                        দেখুন →
+                    </a>
+                </div>
+            </div>
+
+            {{-- Bottom CTA --}}
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100">
+                <p class="text-sm text-slate-500 font-medium">
+                    🎯 আরো ব্যাজ, স্পেশাল অ্যাচিভমেন্ট এবং পূর্ণ পয়েন্ট সিস্টেম দেখতে —
+                </p>
+                <a href="{{ route('gamification.guide') }}"
+                   class="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-extrabold text-sm px-6 py-3 rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all shadow-md shadow-amber-100 shrink-0">
+                    🪙 পয়েন্ট ও ব্যাজ সিস্টেম সম্পর্কে জানুন
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script>
