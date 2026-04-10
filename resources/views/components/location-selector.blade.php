@@ -8,7 +8,7 @@
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
     {{-- বিভাগ --}}
     <div>
-        <label for="comp_division" class="text-sm font-extrabold text-slate-800">বিভাগ @if($required) <span class="text-red-500">*</span> @endif</label>
+        <label for="comp_division" class="text-sm font-extrabold text-slate-800">বিভাগ @if($required) <span class="text-red-500">*</span>@endif</label>
         <select id="comp_division" name="division_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" @if($required) required @endif>
             <option value="">বিভাগ নির্বাচন করুন</option>
             @foreach($divisions as $division)
@@ -21,7 +21,7 @@
 
     {{-- জেলা --}}
     <div>
-        <label for="comp_district" class="text-sm font-extrabold text-slate-800">জেলা @if($required) <span class="text-red-500">*</span> @endif</label>
+        <label for="comp_district" class="text-sm font-extrabold text-slate-800">জেলা @if($required) <span class="text-red-500">*</span>@endif</label>
         <select id="comp_district" name="district_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" @if($required) required @endif {{ $selectedDivision ? '' : 'disabled' }}>
             <option value="">{{ $selectedDivision ? 'লোড হচ্ছে...' : 'প্রথমে বিভাগ সিলেক্ট করুন' }}</option>
         </select>
@@ -29,7 +29,7 @@
 
     {{-- উপজেলা --}}
     <div>
-        <label for="comp_upazila" class="text-sm font-extrabold text-slate-800">উপজেলা/থানা @if($required) <span class="text-red-500">*</span> @endif</label>
+        <label for="comp_upazila" class="text-sm font-extrabold text-slate-800">উপজেলা/থানা @if($required) <span class="text-red-500">*</span>@endif</label>
         <select id="comp_upazila" name="upazila_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" @if($required) required @endif disabled>
             <option value="">প্রথমে জেলা সিলেক্ট করুন</option>
         </select>
