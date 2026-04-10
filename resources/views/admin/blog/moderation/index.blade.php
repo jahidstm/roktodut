@@ -175,12 +175,15 @@
                                         <div class="flex items-center justify-between gap-2">
                                             <span class="text-slate-500">পরিচয়:</span>
                                             <span class="text-rose-700 font-extrabold">
-                                                @match($meta->anonymize_level)
-                                                    'public'    => '👤 নিজ নামে',
-                                                    'initials'  => '🔤 আদ্যক্ষর',
-                                                    'anonymous' => '🎭 সম্পূর্ণ গোপন',
-                                                    default     => $meta->anonymize_level
-                                                @endmatch
+                                                @if($meta->anonymize_level === 'public')
+                                                    👤 নিজ নামে
+                                                @elseif($meta->anonymize_level === 'initials')
+                                                    🔤 আদ্যক্ষর
+                                                @elseif($meta->anonymize_level === 'anonymous')
+                                                    🎭 সম্পূর্ণ গোপন
+                                                @else
+                                                    {{ ucfirst($meta->anonymize_level) }}
+                                                @endif
                                             </span>
                                         </div>
 
@@ -387,12 +390,11 @@
 
 @endsection
 
-
 @push('scripts')
 <script>
-// ── Named route base URLs (resolved server-side) ─────────────────────────────
-const APPROVE_BASE = '{{ rtrim(route("admin.blog.moderation.approve", ["post" => 0]), "0") }}';
-const REJECT_BASE  = '{{ rtrim(route("admin.blog.moderation.reject",  ["post" => 0]), "0") }}';
+// ── Route Templates (The Right Way) ─────────────────────────────
+const APPROVE_ROUTE_TEMPLATE = "{{ route('admin.blog.moderation.approve', ':post_id') }}";
+const REJECT_ROUTE_TEMPLATE  = "{{ route('admin.blog.moderation.reject',  ':post_id') }}";
 
 // ── Modal Helpers ────────────────────────────────────────────────────────────
 function openModal(id) {
@@ -426,7 +428,8 @@ document.addEventListener('keydown', function (e) {
 
 // ── Open Approve Modal ────────────────────────────────────────────────────────
 function openApproveModal(postId, hasRef) {
-    document.getElementById('approve-form').action = APPROVE_BASE + postId + '/approve';
+    // 🎯 FIX: Replace the placeholder with the actual post ID
+    document.getElementById('approve-form').action = APPROVE_ROUTE_TEMPLATE.replace(':post_id', postId);
 
     const toggle = document.getElementById('verify-story-toggle');
     if (hasRef) {
@@ -441,11 +444,10 @@ function openApproveModal(postId, hasRef) {
 
 // ── Open Reject Modal ─────────────────────────────────────────────────────────
 function openRejectModal(postId, title) {
-    document.getElementById('reject-form').action = REJECT_BASE + postId + '/reject';
+    // 🎯 FIX: Replace the placeholder with the actual post ID
+    document.getElementById('reject-form').action = REJECT_ROUTE_TEMPLATE.replace(':post_id', postId);
 
-    document.getElementById('reject-modal-subtitle').textContent =
-        `"${title}" — এই পোস্টটি প্রকাশিত হবে না।`;
-
+    document.getElementById('reject-modal-subtitle').textContent = `"${title}" — এই পোস্টটি প্রকাশিত হবে না।`;
     document.getElementById('rejection-reason').value = '';
 
     openModal('reject-modal');

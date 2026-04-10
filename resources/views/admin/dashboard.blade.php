@@ -364,5 +364,45 @@
         </a>
     </div>
 
+    {{-- 📝 ৫. ব্লগ ও কন্টেন্ট মডারেশন Quick Access --}}
+    <div class="mt-4">
+        <a href="{{ route('admin.blog.moderation.index') }}"
+           class="group flex items-center justify-between p-6 bg-white border-2 border-slate-200
+                  hover:border-violet-300 hover:shadow-md rounded-2xl transition-all duration-200">
+            <div class="flex items-center gap-5">
+                <div class="w-14 h-14 rounded-2xl bg-violet-100 text-violet-600 flex items-center justify-center text-2xl shrink-0
+                            group-hover:bg-violet-600 group-hover:text-white transition-colors duration-200">
+                    📝
+                </div>
+                <div>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <h3 class="text-lg font-extrabold text-slate-900">ব্লগ ও কন্টেন্ট মডারেশন</h3>
+                        {{-- Dynamic Status Badge --}}
+                        @if($pendingBlogCount > 0)
+                            <span class="inline-flex items-center gap-1 bg-red-100 text-red-700 text-xs font-black px-2.5 py-1 rounded-full border border-red-200 animate-pulse">
+                                🔴 {{ $pendingBlogCount }} টি পেন্ডিং
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-black px-2.5 py-1 rounded-full border border-emerald-200">
+                                ✅ সব ক্লিয়ার
+                            </span>
+                        @endif
+                    </div>
+                    <p class="text-sm text-slate-500 font-medium mt-0.5">
+                        সাবমিট হওয়া ব্লগ পোস্ট রিভিউ করুন, অ্যাপ্রুভ বা রিজেক্ট করুন এবং কন্টেন্ট কোয়ালিটি নিশ্চিত করুন।
+                    </p>
+                    <div class="flex flex-wrap gap-2 mt-3">
+                        <span class="bg-violet-50 text-violet-600 text-xs font-bold px-2.5 py-1 rounded-full border border-violet-100">✍️ পোস্ট রিভিউ</span>
+                        <span class="bg-amber-50 text-amber-600 text-xs font-bold px-2.5 py-1 rounded-full border border-amber-100">⚠️ স্প্যাম ফিল্টার</span>
+                        <span class="bg-emerald-50 text-emerald-600 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-100">✅ অ্যাপ্রুভ / রিজেক্ট</span>
+                    </div>
+                </div>
+            </div>
+            <svg class="w-6 h-6 text-slate-300 group-hover:text-violet-500 transition-colors duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/>
+            </svg>
+        </a>
+    </div>
+
 </div>
 @endsection

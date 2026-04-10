@@ -43,22 +43,31 @@ class BlogController extends Controller
 
     /**
      * Display the specified blog post.
+     *
+     * Admin Preview Bypass: Admins can view posts of any status (pending_review,
+     * draft, etc.) to facilitate moderation. All other users are restricted to
+     * published posts only — a mismatch results in a standard 404.
      */
     public function show(string $slug)
     {
-        $post = Post::with(['author', 'categories', 'storyMeta', 'healthMeta.reviewer'])
-            ->where('slug', $slug)
-            ->firstOrFail();
+        $isAdmin = auth()->check() && auth()->user()->isAdmin();
 
-        // Prevent viewing drafts unless authorized (you might want to add auth checks here later)
-        if (!$post->isPublished()) {
-            abort(404);
+        $query = Post::with(['author', 'categories', 'storyMeta', 'healthMeta.reviewer'])
+            ->where('slug', $slug);
+
+        // Guests and regular donors may only see published posts.
+        if (! $isAdmin) {
+            $query->where('status', 'published');
         }
 
-        // Increment view count using the Redis helper
-        $post->incrementView();
+        $post = $query->firstOrFail();
 
-        // Fetch popular posts for the sidebar
+        // Only count views for publicly-accessible, published posts.
+        if ($post->isPublished()) {
+            $post->incrementView();
+        }
+
+        // Fetch popular posts for the sidebar (always published)
         $popularPosts = Post::published()
             ->where('id', '!=', $post->id)
             ->orderByDesc('view_count')

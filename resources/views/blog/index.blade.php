@@ -116,7 +116,6 @@
                             $wordCount = str_word_count(strip_tags($post->body_sanitized ?? ''));
                             $readMins  = max(1, (int) ceil($wordCount / 200));
 
-                            {{-- Anonymization for the card listing --}}
                             $displayName = '';
                             $showRealAvatar = true;
                             if ($isStory && $post->storyMeta) {

@@ -238,7 +238,7 @@
                  CRITICAL STYLING:  Wrapped in Tailwind prose for typography styles.
                  ─────────────────────────────────────────────────────────── --}}
             <div id="post-body-content"
-                 class="prose prose-lg dark:prose-invert max-w-none bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-8 sm:px-8 sm:py-10">
+                 class="prose prose-slate prose-lg max-w-none bg-white rounded-2xl border border-slate-100 shadow-sm px-6 py-8 sm:px-8 sm:py-10">
                 {!! $post->body_sanitized !!}
             </div>
 

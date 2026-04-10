@@ -213,14 +213,14 @@
     </h3>
     <ul class="space-y-3">
         @foreach([
-            ['emoji' => '🩸', 'text' => 'প্রতি ৩ মাসে একবার রক্ত দেওয়া যায়'],
+            ['emoji' => '🩸', 'text' => 'প্রতি ৪ মাসে একবার রক্ত দেওয়া যায়'],
             ['emoji' => '💉', 'text' => 'গড় দান সময়: মাত্র ১০-১৫ মিনিট'],
             ['emoji' => '❤️', 'text' => 'একটি দান ৩টি জীবন বাঁচাতে পারে'],
             ['emoji' => '✅', 'text' => '১৬-৬৫ বছর বয়সীরা দান করতে পারেন'],
         ] as $fact)
             <li class="flex items-start gap-2.5 text-sm font-medium text-slate-600">
                 <span class="shrink-0 text-base">{{ $fact['emoji'] }}</span>
-                <span class="leading-snug">{{ $fact['text'] }}</span>
+                <span class="leading-snug pl-1">{{ $fact['text'] }}</span>
             </li>
         @endforeach
     </ul>

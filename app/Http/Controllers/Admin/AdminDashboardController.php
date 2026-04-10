@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\BloodRequest;
 use App\Models\BloodRequestResponse;
+use App\Models\Post;
 use App\Models\User;
 use App\Services\GamificationService;
 use Illuminate\Http\RedirectResponse;
@@ -55,6 +56,9 @@ class AdminDashboardController extends Controller
             ->orderBy('updated_at', 'asc')
             ->get();
 
+        // 📝 ৬. পেন্ডিং ব্লগ পোস্ট (Blog Moderation)
+        $pendingBlogCount = Post::pendingReview()->count();
+
         return view('admin.dashboard', compact(
             'totalUsers',
             'totalDonors',
@@ -65,6 +69,7 @@ class AdminDashboardController extends Controller
             'districtDemand',
             'pendingClaims',
             'pendingNids',
+            'pendingBlogCount',
         ));
     }
 
