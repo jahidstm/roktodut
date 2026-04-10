@@ -9,7 +9,7 @@
     {{-- বিভাগ --}}
     <div>
         <label for="comp_division" class="text-sm font-extrabold text-slate-800">বিভাগ @if($required) <span class="text-red-500">*</span>@endif</label>
-        <select id="comp_division" name="division_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" @if($required) required @endif>
+        <select id="comp_division" name="division_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" {{ $required ? 'required' : '' }}>
             <option value="">বিভাগ নির্বাচন করুন</option>
             @foreach($divisions as $division)
                 <option value="{{ $division->id }}" {{ $selectedDivision == $division->id ? 'selected' : '' }}>
@@ -22,7 +22,7 @@
     {{-- জেলা --}}
     <div>
         <label for="comp_district" class="text-sm font-extrabold text-slate-800">জেলা @if($required) <span class="text-red-500">*</span>@endif</label>
-        <select id="comp_district" name="district_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" @if($required) required @endif {{ $selectedDivision ? '' : 'disabled' }}>
+        <select id="comp_district" name="district_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" {{ $required ? 'required' : '' }} {{ $selectedDivision ? '' : 'disabled' }}>
             <option value="">{{ $selectedDivision ? 'লোড হচ্ছে...' : 'প্রথমে বিভাগ সিলেক্ট করুন' }}</option>
         </select>
     </div>
@@ -30,7 +30,7 @@
     {{-- উপজেলা --}}
     <div>
         <label for="comp_upazila" class="text-sm font-extrabold text-slate-800">উপজেলা/থানা @if($required) <span class="text-red-500">*</span>@endif</label>
-        <select id="comp_upazila" name="upazila_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" @if($required) required @endif disabled>
+        <select id="comp_upazila" name="upazila_id" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" {{ $required ? 'required' : '' }} disabled>
             <option value="">প্রথমে জেলা সিলেক্ট করুন</option>
         </select>
     </div>
