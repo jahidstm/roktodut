@@ -28,20 +28,27 @@ class AdminDashboardController extends Controller
             ? round(($fulfilledRequests / $totalRequests) * 100, 1)
             : 0;
 
-        // ৩. ব্লাড গ্রুপ ডিমান্ড অ্যানালাইসিস (পাই-চার্টের জন্য)
+        // ৩. ব্লাড গ্রুপ ডিমান্ড অ্যানালাইসিস (পাই-চার্টের জন্য - গত ৩০ দিন)
         $bloodGroupDemand = BloodRequest::select('blood_group', DB::raw('count(*) as total'))
+            ->where('created_at', '>=', now()->subDays(30))
             ->groupBy('blood_group')
             ->pluck('total', 'blood_group')
             ->toArray();
 
-        // ৪. লোকেশন-বেজড ইমার্জেন্সি ট্রেন্ড (বার-চার্টের জন্য টপ ৫ জেলা)
-        // নোট: যদি তোমার ডিস্ট্রিক্ট আইডি হয়, তাহলে with('district') দিয়ে লোড করতে হতে পারে।
-        $districtDemand = BloodRequest::select('district_id', DB::raw('count(*) as total'))
+        // ৪. লোকেশন-বেজড ইমার্জেন্সি ট্রেন্ড (বার-চার্টের জন্য টপ ৫ জেলা - গত ৩০ দিন)
+        $districtDemandRaw = BloodRequest::with('district')
+            ->select('district_id', DB::raw('count(*) as total'))
+            ->where('created_at', '>=', now()->subDays(30))
             ->groupBy('district_id')
             ->orderByDesc('total')
             ->limit(5)
-            ->pluck('total', 'district_id')
-            ->toArray();
+            ->get();
+
+        $districtDemand = [];
+        foreach ($districtDemandRaw as $row) {
+            $name = $row->district ? $row->district->name : 'অজানা জেলা';
+            $districtDemand[$name] = $row->total;
+        }
 
         // 🎯 ৫. যেসব ক্লেইম ভেরিফাই করার জন্য পেন্ডিং আছে বা ডিসপুট করা হয়েছে
         $pendingClaims = BloodRequestResponse::with(['user', 'bloodRequest']) // 'user' হলো ডোনার

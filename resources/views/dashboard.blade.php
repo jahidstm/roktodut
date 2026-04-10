@@ -157,6 +157,8 @@
         </div>
     @endif
 
+
+    {{-- 1. Real-Time Status / Eligibility --}}
     @php
         $isEligible = $user->is_eligible_to_donate;
         $nextDate = $user->next_eligible_date;
@@ -198,6 +200,22 @@
         </form>
     </div>
 
+
+    {{-- 2. Core Action (CTA Row) --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+        <a href="{{ route('requests.create') }}" class="group p-8 rounded-3xl bg-red-600 hover:bg-red-700 transition shadow-lg shadow-red-200">
+            <div class="text-white font-black text-xl mb-2">জরুরি রক্তের দরকার?</div>
+            <p class="text-red-100 text-sm font-medium">সহজেই নতুন রিকোয়েস্ট তৈরি করুন এবং ডোনারদের সাথে যোগাযোগ করুন।</p>
+        </a>
+
+        <a href="{{ route('requests.index') }}" class="group p-8 rounded-3xl bg-white border-2 border-slate-200 hover:border-red-500 transition shadow-sm">
+            <div class="text-slate-900 font-black text-xl mb-2">রক্ত দিতে চান?</div>
+            <p class="text-slate-500 text-sm font-medium">আপনার এরিয়ার সাম্প্রতিক রিকোয়েস্টগুলো দেখুন এবং সাড়া দিন।</p>
+        </a>
+    </div>
+
+
+    {{-- 3. Actionable Queue --}}
     {{-- ══════════════════════════════════════════════════════════════
          🔴 LOCAL EMERGENCY RADAR
          ইউজারের জেলার সক্রিয় রক্তের রিকোয়েস্ট — Priority sorted
@@ -373,6 +391,61 @@
     </div>
     @endif
 
+    {{-- 🎯 ডোনারের ড্যাশবোর্ডে অ্যাকসেপ্ট করা রিকোয়েস্টের লিস্ট --}}
+    @if(isset($acceptedDonations) && $acceptedDonations->count() > 0)
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-10">
+        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-red-50/50">
+            <div>
+                <h2 class="text-lg font-extrabold text-red-900 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    আপনার রেসপন্স করা রিকোয়েস্ট
+                </h2>
+                <p class="text-sm text-red-700/70 font-medium mt-1">রক্তদানের পর এখান থেকে প্রমাণ জমা দিন বা পিন দিন</p>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <tbody class="divide-y divide-slate-100 text-sm">
+                    @foreach($acceptedDonations as $donation)
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4">
+                                <div class="font-extrabold text-slate-900">রোগী: {{ $donation->bloodRequest->patient_name ?? 'N/A' }}</div>
+                                <div class="text-xs font-bold text-slate-500 mt-0.5">গ্রুপ: <span class="text-red-600">{{ $donation->bloodRequest->blood_group?->value ?? $donation->bloodRequest->blood_group }}</span></div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-semibold text-slate-700">{{ $donation->bloodRequest->needed_at?->format('d M, Y') ?? 'ASAP' }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                @if($donation->verification_status === 'pending')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800">অপেক্ষমাণ (Pending)</span>
+                                @elseif($donation->verification_status === 'claimed')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-blue-100 text-blue-800">রিভিউ হচ্ছে (Claimed)</span>
+                                @elseif($donation->verification_status === 'verified')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">ভেরিফাইড (Verified)</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                @if($donation->verification_status === 'pending')
+                                    <a href="{{ route('requests.show', $donation->blood_request_id) }}" class="inline-flex items-center justify-center px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-extrabold shadow-sm hover:bg-slate-800 transition">
+                                        প্রমাণ জমা দিন (Claim)
+                                    </a>
+                                @else
+                                    <a href="{{ route('requests.show', $donation->blood_request_id) }}" class="inline-flex items-center justify-center px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-extrabold text-slate-700 hover:bg-slate-100 transition">
+                                        ভিউ রিকোয়েস্ট
+                                    </a>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
+
+    {{-- 4. User Impact (Stats Grid) --}}
     {{-- ══════════════════════════════════════════
          📊 Stats Grid
     ══════════════════════════════════════════ --}}
@@ -410,6 +483,8 @@
         </div>
     </div>
 
+
+    {{-- 5. Motivation Engine (Gamification Summary) --}}
     {{-- ══════════════════════════════════════════
          🪪 Digital Smart Card — QR Verified Identity
     ══════════════════════════════════════════ --}}
@@ -669,18 +744,8 @@
     </div>
     @endif
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-        <a href="{{ route('requests.create') }}" class="group p-8 rounded-3xl bg-red-600 hover:bg-red-700 transition shadow-lg shadow-red-200">
-            <div class="text-white font-black text-xl mb-2">জরুরি রক্তের দরকার?</div>
-            <p class="text-red-100 text-sm font-medium">সহজেই নতুন রিকোয়েস্ট তৈরি করুন এবং ডোনারদের সাথে যোগাযোগ করুন।</p>
-        </a>
 
-        <a href="{{ route('requests.index') }}" class="group p-8 rounded-3xl bg-white border-2 border-slate-200 hover:border-red-500 transition shadow-sm">
-            <div class="text-slate-900 font-black text-xl mb-2">রক্ত দিতে চান?</div>
-            <p class="text-slate-500 text-sm font-medium">আপনার এরিয়ার সাম্প্রতিক রিকোয়েস্টগুলো দেখুন এবং সাড়া দিন।</p>
-        </a>
-    </div>
-
+    {{-- 6. Growth Loop (Referral / Invite) --}}
     {{-- ══════════════════════════════════════════
          🎁 Referral Banner — বন্ধুকে আমন্ত্রণ জানান
     ══════════════════════════════════════════ --}}
@@ -805,59 +870,8 @@
     </div>
     @endif
 
-    {{-- 🎯 ডোনারের ড্যাশবোর্ডে অ্যাকসেপ্ট করা রিকোয়েস্টের লিস্ট --}}
-    @if(isset($acceptedDonations) && $acceptedDonations->count() > 0)
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mt-10">
-        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-red-50/50">
-            <div>
-                <h2 class="text-lg font-extrabold text-red-900 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                    আপনি যেসব রিকোয়েস্ট অ্যাকসেপ্ট করেছেন
-                </h2>
-                <p class="text-sm text-red-700/70 font-medium mt-1">রক্তদানের পর এখান থেকে প্রমাণ জমা দিন বা পিন দিন</p>
-            </div>
-        </div>
 
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <tbody class="divide-y divide-slate-100 text-sm">
-                    @foreach($acceptedDonations as $donation)
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="px-6 py-4">
-                                <div class="font-extrabold text-slate-900">রোগী: {{ $donation->bloodRequest->patient_name ?? 'N/A' }}</div>
-                                <div class="text-xs font-bold text-slate-500 mt-0.5">গ্রুপ: <span class="text-red-600">{{ $donation->bloodRequest->blood_group?->value ?? $donation->bloodRequest->blood_group }}</span></div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="font-semibold text-slate-700">{{ $donation->bloodRequest->needed_at?->format('d M, Y') ?? 'ASAP' }}</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                @if($donation->verification_status === 'pending')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800">অপেক্ষমাণ (Pending)</span>
-                                @elseif($donation->verification_status === 'claimed')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-blue-100 text-blue-800">রিভিউ হচ্ছে (Claimed)</span>
-                                @elseif($donation->verification_status === 'verified')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">ভেরিফাইড (Verified)</span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                @if($donation->verification_status === 'pending')
-                                    <a href="{{ route('requests.show', $donation->blood_request_id) }}" class="inline-flex items-center justify-center px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-extrabold shadow-sm hover:bg-slate-800 transition">
-                                        প্রমাণ জমা দিন (Claim)
-                                    </a>
-                                @else
-                                    <a href="{{ route('requests.show', $donation->blood_request_id) }}" class="inline-flex items-center justify-center px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-extrabold text-slate-700 hover:bg-slate-100 transition">
-                                        ভিউ রিকোয়েস্ট
-                                    </a>
-                                @endif
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-    @endif
-
+    {{-- 7. Static Info (Points & Badges Rules) --}}
     {{-- ══════════════════════════════════════════
          🪙 পয়েন্ট ও ব্যাজ সিস্টেম — Quick Guide Teaser
          ব্যবহারকারী কীভাবে পয়েন্ট আয় করতে পারে সেটা

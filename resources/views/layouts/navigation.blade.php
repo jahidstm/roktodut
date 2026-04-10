@@ -1,42 +1,64 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-slate-100 shadow-sm relative z-50">
+<nav x-data="{ open: false }" class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
-            
-            {{-- 🎯 Left Side: Logo & Main Links --}}
+        <div class="flex justify-between items-center h-16">
+
+            {{-- Left Side: Logo & Desktop Nav --}}
             <div class="flex items-center gap-8">
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" class="flex items-center gap-2">
-                        <x-application-logo class="block h-10 w-auto fill-current text-red-600" />
-                        <span class="text-xl font-black text-slate-900 tracking-tight">রক্তদূত</span>
+                    <a href="{{ route('home') }}" class="flex items-center gap-2">
+                        <x-application-logo class="block h-9 w-auto fill-current text-red-600" />
+                        <span class="text-lg font-black text-slate-900 tracking-tight">রক্তদূত</span>
                     </a>
                 </div>
 
-                <div class="hidden sm:flex space-x-8">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="text-sm font-bold">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
+                {{-- Desktop Nav Links (5 exact items) --}}
+                <div class="hidden md:flex items-center gap-1 text-[15px] font-semibold text-slate-600">
+                    <a href="{{ route('home') }}"
+                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('home') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                        হোম
+                    </a>
+                    @auth
+                        <a href="{{ route('requests.index') }}"
+                           class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('requests.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                            রক্ত দিন
+                        </a>
+                    @endauth
+                    @guest
+                        <a href="{{ route('public.requests.index') }}"
+                           class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('public.requests.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                            রক্ত দিন
+                        </a>
+                    @endguest
+                    <a href="{{ route('search') }}"
+                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('search') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                        স্মার্ট ডোনার সার্চ
+                    </a>
+                    <a href="{{ route('leaderboard') }}"
+                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('leaderboard') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                        লিডারবোর্ড
+                    </a>
+                    <a href="{{ route('blog.index') }}"
+                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('blog.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                        ব্লগ
+                    </a>
                 </div>
             </div>
 
-            {{-- 🎯 Right Side: Action Buttons & Profile (Strict Order) --}}
-            <div class="hidden sm:flex sm:items-center gap-6">
-                
-                {{-- ১. রিকোয়েস্ট ফিড লিংক --}}
-                <a href="{{ route('requests.index') }}" class="text-slate-600 hover:text-red-600 font-bold text-sm transition">
-                    রিকোয়েস্ট ফিড
-                </a>
+            {{-- Right Side: Action CTA + Notification + Profile --}}
+            <div class="hidden sm:flex sm:items-center gap-4">
 
-                {{-- ২. রিকোয়েস্ট করুন বাটন (মাঝে) --}}
-                <a href="{{ route('requests.create') }}" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-xl font-black text-sm shadow-sm transition">
+                {{-- রিকোয়েস্ট করুন --}}
+                <a href="{{ route('requests.create') }}"
+                   class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-black text-sm shadow-sm transition">
                     রিকোয়েস্ট করুন
                 </a>
-                
-                <div class="h-6 w-px bg-slate-200 mx-1"></div> {{-- Divider --}}
 
-                {{-- ৩. নোটিফিকেশন আইকন --}}
+                <div class="h-5 w-px bg-slate-200"></div>
+
+                {{-- Notification Icon --}}
                 <div class="relative flex items-center" x-data="{ dropdownOpen: false }" @click.outside="dropdownOpen = false" @close.stop="dropdownOpen = false">
                     <button @click="dropdownOpen = ! dropdownOpen" class="relative p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                         </svg>
                         @if(auth()->user()->unreadNotifications->count() > 0)
@@ -64,11 +86,11 @@
                     </div>
                 </div>
 
-                {{-- ৪. প্রোফাইল ড্রপডাউন (একদম ডানে) --}}
+                {{-- Profile Dropdown --}}
                 <div class="flex items-center">
                     <x-dropdown align="right" width="48">
                         <x-slot name="trigger">
-                            <button class="flex items-center gap-2 px-3 py-2 border border-slate-200 hover:border-slate-300 rounded-full bg-white hover:bg-slate-50 transition focus:outline-none">
+                            <button class="flex items-center gap-2 px-3 py-1.5 border border-slate-200 hover:border-slate-300 rounded-full bg-white hover:bg-slate-50 transition focus:outline-none">
                                 <div class="w-7 h-7 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-black">
                                     {{ mb_substr(Auth::user()->name, 0, 1) }}
                                 </div>
@@ -78,7 +100,6 @@
                                 </svg>
                             </button>
                         </x-slot>
-
                         <x-slot name="content">
                             <x-dropdown-link :href="route('profile.edit')" class="font-bold">
                                 {{ __('Profile') }}
@@ -95,7 +116,7 @@
                 </div>
             </div>
 
-            {{-- 🎯 Mobile Hamburger Menu --}}
+            {{-- Mobile Hamburger Button --}}
             <div class="-me-2 flex items-center sm:hidden">
                 <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 focus:outline-none transition">
                     <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
@@ -107,17 +128,30 @@
         </div>
     </div>
 
-    {{-- 🎯 Mobile Menu Content --}}
+    {{-- Mobile Menu Content --}}
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden border-t border-slate-100 bg-white">
         <div class="pt-2 pb-3 space-y-1">
-            <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" class="font-bold">
-                {{ __('Dashboard') }}
+            <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')" class="font-bold">
+                হোম
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('requests.index')" :active="request()->routeIs('requests.index')" class="font-bold">
-                রক্তের রিকোয়েস্ট ফিড
+            @auth
+                <x-responsive-nav-link :href="route('requests.index')" :active="request()->routeIs('requests.*')" class="font-bold">
+                    রক্ত দিন
+                </x-responsive-nav-link>
+            @endauth
+            @guest
+                <x-responsive-nav-link :href="route('public.requests.index')" class="font-bold">
+                    রক্ত দিন
+                </x-responsive-nav-link>
+            @endguest
+            <x-responsive-nav-link :href="route('search')" :active="request()->routeIs('search')" class="font-bold">
+                স্মার্ট ডোনার সার্চ
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('requests.create')" :active="request()->routeIs('requests.create')" class="text-red-600 font-bold">
-                নতুন রিকোয়েস্ট করুন
+            <x-responsive-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')" class="font-bold">
+                লিডারবোর্ড
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('blog.index')" :active="request()->routeIs('blog.*')" class="font-bold">
+                ব্লগ
             </x-responsive-nav-link>
         </div>
         <div class="pt-4 pb-1 border-t border-slate-100">
@@ -126,6 +160,9 @@
                 <div class="font-medium text-sm text-slate-500">{{ Auth::user()->email }}</div>
             </div>
             <div class="mt-3 space-y-1">
+                <x-responsive-nav-link :href="route('profile.edit')" class="font-bold">
+                    {{ __('Profile') }}
+                </x-responsive-nav-link>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <x-responsive-nav-link :href="route('logout')" class="text-red-600 font-bold"

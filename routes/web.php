@@ -20,7 +20,7 @@ use App\Http\Controllers\OrgRegistrationController;
 use App\Http\Controllers\DonationClaimController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\PublicVerificationController;
-use App\Http\Controllers\PageController;
+
 use App\Http\Controllers\PublicBloodRequestController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BlogSubmissionController;
@@ -51,7 +51,16 @@ Route::get('/', function () {
         ->orderByDesc('points')
         ->limit(3)
         ->get();
-    return view('home', compact('divisions', 'topDonors'));
+
+    // Social proof stats (migrated from donate page)
+    $verifiedDonors = \App\Models\User::where('role', 'donor')
+        ->where(function ($q) {
+            $q->where('nid_status', 'approved')->orWhere('verified_badge', 1);
+        })->count();
+    $totalDonations = \App\Models\User::sum('total_verified_donations');
+    $livesSaved     = ($totalDonations * 3) + 120;
+
+    return view('home', compact('divisions', 'topDonors', 'verifiedDonors', 'livesSaved'));
 })->name('home');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
@@ -64,7 +73,7 @@ Route::get('/gamification-guide', function () {
     return view('pages.gamification-guide');
 })->name('gamification.guide');
 
-Route::get('/donate-blood', [PageController::class, 'donateBloodInfo'])->name('pages.donate');
+
 
 Route::get('/urgent-requests', [PublicBloodRequestController::class, 'index'])->name('public.requests.index');
 

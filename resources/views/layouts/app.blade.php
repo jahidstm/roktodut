@@ -227,19 +227,8 @@
     @yield('content')
 </main>
 
-<footer class="border-t border-slate-200 bg-white mt-auto">
-    <div class="mx-auto max-w-6xl px-4 py-8 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div class="flex items-center gap-2">
-            <span class="text-red-600 font-extrabold tracking-tight">RD</span>
-            <span class="text-sm text-slate-500 font-semibold">© {{ date('Y') }} রক্তদূত প্ল্যাটফর্ম</span>
-        </div>
-        <div class="flex items-center gap-6 text-sm font-semibold text-slate-500">
-            <a href="#" class="hover:text-red-600 transition-colors">শর্তাবলী</a>
-            <a href="#" class="hover:text-red-600 transition-colors">প্রাইভেসি পলিসি</a>
-            <a href="#" class="hover:text-red-600 transition-colors">যোগাযোগ</a>
-        </div>
-    </div>
-</footer>
+@include('layouts.footer')
+
     {{-- Per-page scripts pushed by child views (modals, WYSIWYG init, etc.) --}}
     @stack('scripts')
 </body>
