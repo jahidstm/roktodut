@@ -47,7 +47,7 @@
             @endguest
             <a href="{{ route('search') }}" class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition">স্মার্ট ডোনার সার্চ</a>
             <a href="{{ route('leaderboard') }}" class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition">লিডারবোর্ড</a>
-            <a href="{{ route('blog.index') }}" class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition">Blog</a>
+            <a href="{{ route('blog.index') }}" class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition">ব্লগ</a>
         </nav>
 
         {{-- Auth Buttons & Profile Chip --}}
