@@ -10,6 +10,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\GamificationGovernanceController;
+use App\Http\Controllers\Admin\BlogModerationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DonationRecordController;
 use App\Http\Controllers\OrgAdmin\DashboardController as OrgDashboardController;
@@ -22,6 +23,7 @@ use App\Http\Controllers\PublicVerificationController; // 🔐 QR Smart Card
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PublicBloodRequestController;
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\BlogSubmissionController;
 use App\Models\Division;
 use Illuminate\Support\Facades\Route;
 
@@ -78,6 +80,11 @@ Route::get('/urgent-requests', [PublicBloodRequestController::class, 'index'])->
 
 // 📰 ব্লগ রাউটস
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+// IMPORTANT: blog.create must be registered BEFORE blog/{slug} (wildcard).
+// Otherwise '/blog/create' would match {slug}='create' and 404.
+Route::get('/blog/create', [BlogSubmissionController::class, 'create'])
+    ->middleware('auth')
+    ->name('blog.create');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // --- ২. সোশ্যাল লগইন ---
@@ -128,6 +135,9 @@ Route::middleware(['auth'])->group(function () {
     // 🚀 NID ডকুমেন্ট আপলোড রাউট
     Route::post('/donor/upload-nid', [ProfileController::class, 'uploadNid'])->name('donor.upload_nid');
 
+    // ✍️ ব্লগ পোস্ট সাবমিট (GET /blog/create is hoisted above blog/{slug} — see public routes)
+    Route::post('/blog', [BlogSubmissionController::class, 'store'])->name('blog.store');
+
     // রক্তদানের রেকর্ড আপডেট
     Route::post('/donation-record', [DonationRecordController::class, 'update'])->name('donation.record.update');
 });
@@ -156,6 +166,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::post('/users/{user}/shadowban',   [GamificationGovernanceController::class, 'toggleShadowban'])->name('shadowban');
         Route::post('/users/{user}/points',      [GamificationGovernanceController::class, 'adjustPoints'])->name('points.adjust');
         Route::post('/users/{user}/badges',      [GamificationGovernanceController::class, 'assignBadge'])->name('badges.assign');
+    });
+
+    // 📝 ব্লগ মডারেশন
+    Route::prefix('admin/blog/moderation')->name('admin.blog.moderation.')->group(function () {
+        Route::get('/',                  [BlogModerationController::class, 'index'])->name('index');
+        Route::patch('/{post}/approve',  [BlogModerationController::class, 'approve'])->name('approve');
+        Route::patch('/{post}/reject',   [BlogModerationController::class, 'reject'])->name('reject');
     });
 });
 

@@ -32,8 +32,24 @@
             রক্তদানের অভিজ্ঞতা, চিকিৎসা পরামর্শ এবং আমাদের ডোনারদের অনুপ্রেরণামূলক গল্প পড়ুন।
         </p>
 
+        {{-- Write Post CTA (auth only) --}}
+        @auth
+        <div class="mt-6">
+            <a href="{{ route('blog.create') }}"
+               id="blog-write-cta"
+               class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full
+                      bg-white text-red-600 font-extrabold text-sm shadow-md
+                      hover:bg-red-50 hover:shadow-lg transition-all duration-200 active:scale-[0.97]">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                </svg>
+                নতুন পোস্ট লিখুন
+            </a>
+        </div>
+        @endauth
+
         {{-- Category Filter Pills --}}
-        <div class="mt-8 flex flex-wrap justify-center gap-3" id="blog-filter-pills">
+        <div class="mt-6 flex flex-wrap justify-center gap-3" id="blog-filter-pills">
             <a href="{{ route('blog.index') }}"
                class="filter-pill {{ !request('type') ? 'active-pill' : '' }} inline-flex items-center gap-1.5 px-5 py-2 rounded-full font-bold text-sm transition-all duration-200
                       {{ !request('type') ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }}">

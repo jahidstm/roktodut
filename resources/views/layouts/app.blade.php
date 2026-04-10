@@ -14,6 +14,9 @@
     <style>
         :root { font-family: 'Hind Siliguri', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; }
     </style>
+
+    {{-- Per-page head assets (CDN scripts, extra CSS pushed by child views) --}}
+    @stack('head')
 </head>
 
 <body class="bg-slate-50 text-slate-900 antialiased">
@@ -237,5 +240,7 @@
         </div>
     </div>
 </footer>
+    {{-- Per-page scripts pushed by child views (modals, WYSIWYG init, etc.) --}}
+    @stack('scripts')
 </body>
 </html>

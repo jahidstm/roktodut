@@ -19,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $donation_ref_type   Polymorphic type (e.g. App\Models\Donation)
  * @property int|null    $donation_ref_id     FK to the actual donation record
  * @property bool        $is_verified_story   Admin-confirmed as genuine
- * @property string      $anonymize_level     'none' | 'partial' | 'full'
+ * @property string      $anonymize_level     'public' | 'initials' | 'anonymous'
  */
 class SuccessStoryMeta extends Model
 {
@@ -59,26 +59,27 @@ class SuccessStoryMeta extends Model
     // =========================================================================
 
     /**
-     * Whether the donor/patient name should be redacted in public views.
+     * Whether any anonymization is applied (i.e. not fully public).
+     * Maps to the DB enum: 'public' | 'initials' | 'anonymous'
      */
     public function shouldAnonymize(): bool
     {
-        return $this->anonymize_level !== 'none';
+        return $this->anonymize_level !== 'public';
     }
 
     /**
-     * Whether to show a partial anonymization (e.g., show "MD. A***" instead of full name).
+     * Whether to show only the author's initials (e.g. "M. H.").
      */
-    public function isPartiallyAnonymized(): bool
+    public function isInitialsOnly(): bool
     {
-        return $this->anonymize_level === 'partial';
+        return $this->anonymize_level === 'initials';
     }
 
     /**
-     * Whether the patient/donor must be completely hidden from public view.
+     * Whether the author must be completely hidden (displayed as "একজন রক্তদাতা").
      */
     public function isFullyAnonymized(): bool
     {
-        return $this->anonymize_level === 'full';
+        return $this->anonymize_level === 'anonymous';
     }
 }
