@@ -157,9 +157,9 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         return $this->hasMany(Story::class, 'author_id');
     }
 
-    public function blogs(): HasMany
+    public function posts(): HasMany
     {
-        return $this->hasMany(Blog::class, 'author_id');
+        return $this->hasMany(Post::class, 'author_user_id');
     }
 
     public function organization(): BelongsTo
