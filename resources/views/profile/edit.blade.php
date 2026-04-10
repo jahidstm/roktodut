@@ -266,6 +266,7 @@
                         :selected-division="old('division_id', $user->division_id)"
                         :selected-district="old('district_id', $user->district_id)"
                         :selected-upazila="old('upazila_id', $user->upazila_id)"
+                        :required="false"
                     />
                 </div>
 
