@@ -21,6 +21,7 @@ use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\PublicVerificationController; // 🔐 QR Smart Card
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PublicBloodRequestController;
+use App\Http\Controllers\BlogController;
 use App\Models\Division;
 use Illuminate\Support\Facades\Route;
 
@@ -74,6 +75,10 @@ Route::get('/donate-blood', [PageController::class, 'donateBloodInfo'])->name('p
 
 // 🚨 জরুরি রক্তের অনুরোধ - পাবলিক ফিড
 Route::get('/urgent-requests', [PublicBloodRequestController::class, 'index'])->name('public.requests.index');
+
+// 📰 ব্লগ রাউটস
+Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
+Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
 // --- ২. সোশ্যাল লগইন ---
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');
