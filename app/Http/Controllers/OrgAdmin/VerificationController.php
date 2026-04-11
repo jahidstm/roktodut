@@ -33,6 +33,9 @@ class VerificationController extends Controller
         $donor->update([
             'nid_status'     => 'verified',
             'verified_badge' => true,
+            'rejected_reason' => null,
+            'reviewed_by'    => Auth::id(),
+            'reviewed_at'    => now(),
         ]);
 
         // 🏅 Verified Donor ব্যাজ অ্যার্জন করান
@@ -44,14 +47,21 @@ class VerificationController extends Controller
     /**
      * ডোনারকে রিজেক্ট করা
      */
-    public function reject($id)
+    public function reject(Request $request, $id)
     {
+        $request->validate([
+            'reject_reason' => 'required|string|max:255'
+        ]);
+
         $donor = User::findOrFail($id);
         $this->authorizeOrganizationAccess($donor);
 
         $donor->update([
-            'nid_status'     => 'unverified',
+            'nid_status'     => 'rejected',
             'verified_badge' => false,
+            'rejected_reason' => $request->reject_reason,
+            'reviewed_by'    => Auth::id(),
+            'reviewed_at'    => now(),
         ]);
 
         // ব্যাজ রিমুভ করি

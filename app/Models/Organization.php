@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Organization extends Model
 {
@@ -58,5 +59,25 @@ class Organization extends Model
     public function pendingMembers(): BelongsToMany
     {
         return $this->members()->wherePivot('status', 'pending');
+    }
+
+    public function locationDistrict(): BelongsTo
+    {
+        return $this->belongsTo(District::class, 'district');
+    }
+
+    public function locationUpazila(): BelongsTo
+    {
+        return $this->belongsTo(Upazila::class, 'upazila');
+    }
+
+    public function bloodCamps(): HasMany
+    {
+        return $this->hasMany(BloodCamp::class);
+    }
+
+    public function broadcastLogs(): HasMany
+    {
+        return $this->hasMany(BroadcastLog::class);
     }
 }

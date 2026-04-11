@@ -156,6 +156,17 @@ Route::middleware(['auth', 'role:org_admin'])->group(function () {
     Route::get('/org/donor/{id}/verify', [VerificationController::class, 'show'])->name('org.donor.verify');
     Route::post('/org/donor/{id}/approve', [VerificationController::class, 'approve'])->name('org.donor.approve');
     Route::post('/org/donor/{id}/reject', [VerificationController::class, 'reject'])->name('org.donor.reject');
+
+    // Blood Requests & Broadcast
+    Route::get('/org/requests', [\App\Http\Controllers\OrgAdmin\BloodRequestController::class, 'index'])->name('org.requests.index');
+    Route::post('/org/requests/{bloodRequest}/broadcast', [\App\Http\Controllers\OrgAdmin\BloodRequestController::class, 'broadcast'])->name('org.requests.broadcast');
+
+    // Campaigns/Camps
+    Route::get('/org/camps', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'index'])->name('org.camps.index');
+    Route::get('/org/camps/create', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'create'])->name('org.camps.create');
+    Route::post('/org/camps', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'store'])->name('org.camps.store');
+    Route::get('/org/camps/{camp}', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'show'])->name('org.camps.show');
+    Route::post('/org/camps/{camp}/attendance', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'logAttendance'])->name('org.camps.attendance');
 });
 
 // --- ৭. AJAX লোকেশন রাউটস ---

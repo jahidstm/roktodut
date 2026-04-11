@@ -64,6 +64,11 @@ class BloodRequest extends Model
         return $this->hasMany(Donation::class);
     }
 
+    public function broadcastLogs(): HasMany
+    {
+        return $this->hasMany(BroadcastLog::class, 'blood_request_id');
+    }
+
     // 📍 নতুন যুক্ত করা লোকেশন রিলেশনশিপস (Eager Loading এর জন্য)
 
     public function division(): BelongsTo
