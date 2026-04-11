@@ -29,6 +29,7 @@ class PointLog extends Model
     const ACTION_RECIPIENT_REVIEW         = 'recipient_review';
     const ACTION_PROFILE_COMPLETION       = 'profile_completion';
     const ACTION_MANUAL_ADJUSTMENT        = 'manual_adjustment'; // অ্যাডমিন কর্তৃক
+    const ACTION_CAMP_DONATION            = 'camp_donation';
 
     // ─── বাংলা লেবেল ──────────────────────────────────────────────────
     public function actionLabel(): string
@@ -41,6 +42,7 @@ class PointLog extends Model
             self::ACTION_RECIPIENT_REVIEW        => '💬 গ্রহীতার রিভিউ',
             self::ACTION_PROFILE_COMPLETION      => '✅ প্রোফাইল কমপ্লিট',
             self::ACTION_MANUAL_ADJUSTMENT       => '🔧 অ্যাডমিন অ্যাডজাস্টমেন্ট',
+            self::ACTION_CAMP_DONATION           => '🏕️ ক্যাম্প ডোনেশন',
             default                              => $this->action_type,
         };
     }

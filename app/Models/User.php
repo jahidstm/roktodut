@@ -65,6 +65,7 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         'provider',
         'provider_id',
         'is_shadowbanned',
+        'opt_out_org_broadcast',
     ];
 
     protected $hidden = [
@@ -96,6 +97,7 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
             'is_onboarded'      => 'boolean',
             'is_campus_hero'    => 'boolean',
             'is_shadowbanned'   => 'boolean',
+            'opt_out_org_broadcast' => 'boolean',
         ];
     }
 
@@ -182,7 +184,20 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         return $this->hasMany(PointLog::class);
     }
 
+    public function campAttendances(): HasMany
+    {
+        return $this->hasMany(CampAttendance::class);
+    }
 
+    public function createdCamps(): HasMany
+    {
+        return $this->hasMany(BloodCamp::class, 'created_by');
+    }
+
+    public function broadcastLogs(): HasMany
+    {
+        return $this->hasMany(BroadcastLog::class, 'broadcasted_by');
+    }
 
     // ==================== Helper Methods (THE FIX) ====================
 

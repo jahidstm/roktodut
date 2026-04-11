@@ -522,6 +522,13 @@ class GamificationService
                 'color' => 'text-indigo-700 bg-indigo-50 border-indigo-200',
                 'glow'  => 'shadow-indigo-200',
             ],
+            'camp_donor' => [
+                'label' => 'Camp Donor',
+                'bn'    => 'ক্যাম্প ডোনার',
+                'emoji' => '🏕️',
+                'color' => 'text-teal-700 bg-teal-50 border-teal-200',
+                'glow'  => 'shadow-teal-200',
+            ],
             default => [
                 'label' => $slug,
                 'bn'    => $slug,

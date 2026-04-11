@@ -142,9 +142,10 @@
                         <p class="text-slate-500 font-medium mb-8">আপনি কি নিশ্চিত যে আপনি এই ডোনারের ভেরিফিকেশন আবেদনটি বাতিল করতে চান? এই অ্যাকশনটি ডেটাবেসে লগ করা হবে।</p>
                         <div class="flex justify-end gap-3">
                             <button @click="showRejectModal = false" type="button" class="px-5 py-2.5 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition">বাতিল</button>
-                            <form action="{{ route('org.donor.reject', $donor->id) }}" method="POST">
+                            <form action="{{ route('org.donor.reject', $donor->id) }}" method="POST" class="flex-grow flex items-center gap-2">
                                 @csrf
-                                <button type="submit" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-black transition shadow-sm">
+                                <input type="text" name="reject_reason" placeholder="বাতিলের যুক্তিসঙ্গত কারণ লিখুন..." required class="flex-grow rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-500 text-sm py-2.5">
+                                <button type="submit" class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-black transition shadow-sm whitespace-nowrap">
                                     হ্যাঁ, রিজেক্ট করুন
                                 </button>
                             </form>

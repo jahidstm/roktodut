@@ -32,14 +32,39 @@ class DashboardController extends Controller
 
         $members = $query->latest()->paginate(15)->withQueryString();
 
-        // 📊 সামারি স্ট্যাটাস (অ্যানালিটিক্স এর জন্য) - 🚀 Updated to count only 'donors'
+        // 📊 সামারি স্ট্যাটাস (অ্যানালিটিক্স এর জন্য)
+        $verifiedMembers = User::where('organization_id', $admin->organization_id)->where('role', 'donor')->where('nid_status', 'verified')->get();
+        $verifiedCount = $verifiedMembers->count();
+        $readyCount = $verifiedMembers->where('is_available', true)->count();
+        
+        // Online vs Camp donations
+        $orgUsersIds = User::where('organization_id', $admin->organization_id)->pluck('id');
+        $onlineDonations = \App\Models\Donation::whereIn('donor_id', $orgUsersIds)->count();
+        $campDonations = \App\Models\CampAttendance::whereHas('bloodCamp', function($q) use ($admin) {
+            $q->where('organization_id', $admin->organization_id);
+        })->count();
+
         $stats = [
             'total'    => User::where('organization_id', $admin->organization_id)->where('role', 'donor')->count(),
             'pending'  => User::where('organization_id', $admin->organization_id)->where('role', 'donor')->where('nid_status', 'pending')->count(),
-            'verified' => User::where('organization_id', $admin->organization_id)->where('role', 'donor')->where('nid_status', 'verified')->count(),
+            'verified' => $verifiedCount,
+            'ready'    => $readyCount,
+            'online_donations' => $onlineDonations,
+            'camp_donations' => $campDonations,
         ];
 
-        return view('org.dashboard', compact('members', 'stats', 'request'));
+        // Chart Data (District wise verified members)
+        $districtWiseMembers = User::where('organization_id', $admin->organization_id)
+            ->where('role', 'donor')
+            ->where('nid_status', 'verified')
+            ->with('district')
+            ->get()
+            ->groupBy(function($user) {
+                return $user->district ? $user->district->bn_name : 'অজানা জেলা';
+            })
+            ->map->count();
+
+        return view('org.dashboard', compact('members', 'stats', 'request', 'districtWiseMembers'));
     }
 
     /**
@@ -55,7 +80,8 @@ class DashboardController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|in:verified,rejected'
+            'status' => 'required|in:verified,rejected',
+            'reject_reason' => 'required_if:status,rejected|string|max:255'
         ]);
 
         // স্ট্যাটাস আপডেট এবং ব্লু ব্যাজ (verified) লজিক
@@ -64,9 +90,14 @@ class DashboardController extends Controller
         if ($request->status === 'verified') {
             $donor->is_onboarded = true; // ডোনার ভেরিফাইড হলে তাকে ফুল্লি অনবোর্ডেড ধরা হবে
             $donor->verified_badge = true; // ব্লু ব্যাজ এনাবেল করা
+            $donor->rejected_reason = null;
         } else {
             $donor->verified_badge = false; // রিজেক্ট হলে ব্যাজ রিমুভ করা (নিরাপত্তার জন্য)
+            $donor->rejected_reason = $request->reject_reason;
         }
+
+        $donor->reviewed_by = $admin->id;
+        $donor->reviewed_at = now();
 
         $donor->save();
 
