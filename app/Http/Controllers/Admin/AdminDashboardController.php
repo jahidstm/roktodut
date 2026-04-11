@@ -95,4 +95,20 @@ class AdminDashboardController extends Controller
         $this->gamification->revokeVerifiedBadge($user);
         return back()->with('error', "❌ {$user->name}-এর NID ভেরিফিকেশন বাতিল হয়েছে।");
     }
+
+    /**
+     * View Organization document securely
+     */
+    public function viewOrgDocument(Request $request, \App\Models\Organization $organization)
+    {
+        if (!$organization->document_path) {
+            abort(404, 'ডকুমেন্ট আপলোড করা হয়নি।');
+        }
+
+        if (!\Illuminate\Support\Facades\Storage::disk('private')->exists($organization->document_path)) {
+            abort(404, 'ফাইলটি সার্ভারে পাওয়া যায়নি।');
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('private')->response($organization->document_path);
+    }
 }

@@ -164,7 +164,7 @@ class ProfileController extends Controller
 
         // NID ডকুমেন্ট আপলোড করা (Private Storage)
         if ($request->hasFile('nid_document')) {
-            $path           = $request->file('nid_document')->store('nid_uploads', 'local');
+            $path           = $request->file('nid_document')->store('nid_uploads', 'private');
             $user->nid_path = $path;
             $user->nid_status = 'pending'; // নতুন ডকুমেন্টে সর্বদা pending
             $changed = true;
@@ -220,19 +220,17 @@ class ProfileController extends Controller
         $isOrgAdmin = $request->user()->isOrgAdmin() && $request->user()->organization_id === $user->organization_id;
 
         if (!$isOwner && !$isAdmin && !$isOrgAdmin) {
-            abort(403, 'Unauthorized access to NID document.');
+            abort(403, 'এই ডকুমেন্টটি দেখার অনুমতি আপনার নেই।');
         }
 
         if (!$user->nid_path) {
-            abort(404, 'NID document not found.');
+            abort(404, 'ডোনার এখনো এনআইডি ডকুমেন্ট আপলোড করেননি।');
         }
 
-        $path = storage_path('app/private/' . $user->nid_path);
-
-        if (!file_exists($path)) {
-            abort(404, 'File not found on server: ' . $path);
+        if (!\Illuminate\Support\Facades\Storage::disk('private')->exists($user->nid_path)) {
+            abort(404, 'ফাইলটি সার্ভারে পাওয়া যায়নি।');
         }
 
-        return response()->file($path);
+        return \Illuminate\Support\Facades\Storage::disk('private')->response($user->nid_path);
     }
 }

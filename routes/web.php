@@ -132,6 +132,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::post('/admin/donations/{response}/verify', [DonationClaimController::class, 'adminVerify'])->name('admin.donations.verify');
     Route::post('/admin/users/{user}/verify-nid', [AdminDashboardController::class, 'verifyNid'])->name('admin.nid.verify');
+    Route::get('/admin/orgs/{organization}/document', [AdminDashboardController::class, 'viewOrgDocument'])->name('admin.org.document');
 
     Route::prefix('admin/gamification')->name('admin.gamification.')->group(function () {
         Route::get('/',                          [GamificationGovernanceController::class, 'index'])->name('index');
