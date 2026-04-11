@@ -56,11 +56,29 @@ class AdminDashboardController extends Controller
             ->orderBy('donor_claimed_at', 'desc')
             ->get();
 
-        // 🏅 ৫. পেন্ডিং NID ভেরিফিকেশন (System Admin Review)
+        // 🏅 ৫. পেন্ডিং NID ভেরিফিকেশন (System Admin Review - Only org-less users)
         $pendingNids = User::where('nid_status', 'pending')
             ->whereNotNull('nid_path')
-            ->with(['district', 'organization'])
+            ->whereNull('organization_id')
             ->orderBy('updated_at', 'asc')
+            ->get();
+
+        // 🏢 ৭. Pending Organization Applications
+        $pendingOrgs = \App\Models\Organization::where('status', 'pending')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        // 📑 ৮. Recent Audit Logs
+        $recentAuditLogs = \App\Models\AdminAuditLog::with('admin')
+            ->orderBy('created_at', 'desc')
+            ->limit(20)
+            ->get();
+
+        // 🚨 ৯. Security Radar
+        $todaysSecurityEventsCount = \App\Models\SecurityRadarEvent::whereDate('created_at', today())->count();
+        $recentSecurityLogs = \App\Models\SecurityRadarEvent::with('user')
+            ->orderBy('created_at', 'desc')
+            ->limit(10)
             ->get();
 
         // 📝 ৬. পেন্ডিং ব্লগ পোস্ট (Blog Moderation)
@@ -77,7 +95,25 @@ class AdminDashboardController extends Controller
             'pendingClaims',
             'pendingNids',
             'pendingBlogCount',
+            'pendingOrgs',
+            'recentAuditLogs',
+            'todaysSecurityEventsCount',
+            'recentSecurityLogs'
         ));
+    }
+
+    /**
+     * Helper to log admin audit
+     */
+    private function logAudit(string $actionType, $targetId, string $targetType, array $details = [])
+    {
+        \App\Models\AdminAuditLog::create([
+            'admin_id' => auth()->id(),
+            'action_type' => $actionType,
+            'target_id' => $targetId,
+            'target_type' => $targetType,
+            'details' => $details,
+        ]);
     }
 
     /**
@@ -89,10 +125,68 @@ class AdminDashboardController extends Controller
 
         if ($decision === 'approve') {
             $this->gamification->awardVerifiedBadge($user);
+            $this->logAudit('nid_approve', $user->id, User::class);
             return back()->with('success', "✅ {$user->name}-এর NID ভেরিফাই সম্পন্ন হয়েছে। 'Verified Donor' ব্যাজ যুক্ত হয়েছে।");
         }
 
         $this->gamification->revokeVerifiedBadge($user);
+        
+        // Log to security radar if repeated rejections (e.g. > 2 times)
+        $rejectionCount = \App\Models\AdminAuditLog::where('target_id', $user->id)
+            ->where('target_type', User::class)
+            ->where('action_type', 'nid_reject')
+            ->count();
+            
+        if ($rejectionCount >= 2) {
+            \App\Models\SecurityRadarEvent::create([
+                'user_id' => $user->id,
+                'ip_address' => $request->ip(),
+                'event_type' => 'repeated_nid_rejection',
+                'description' => "ইউজারের NID " . ($rejectionCount + 1) . " বার রিজেক্ট করা হয়েছে।",
+            ]);
+        }
+
+        $this->logAudit('nid_reject', $user->id, User::class);
         return back()->with('error', "❌ {$user->name}-এর NID ভেরিফিকেশন বাতিল হয়েছে।");
+    }
+
+    /**
+     * অর্গানাইজেশন অ্যাপ্রুভ / রিজেক্ট
+     */
+    public function verifyOrg(Request $request, \App\Models\Organization $organization): RedirectResponse
+    {
+        $request->validate([
+            'status' => 'required|in:approved,rejected',
+            'rejection_reason' => 'required_if:status,rejected|string|max:500'
+        ]);
+
+        $status = $request->input('status');
+        
+        $organization->status = $status;
+        $organization->reviewed_by = auth()->id();
+        $organization->reviewed_at = now();
+
+        if ($status === 'approved') {
+            $organization->is_verified = true;
+            $organization->rejection_reason = null;
+            $organization->save();
+
+            // Set the creator as Org Admin via intermediate table
+            $organization->members()->syncWithoutDetaching([
+                $organization->admin_id => ['status' => 'approved', 'is_admin' => true]
+            ]);
+
+            $this->logAudit('org_approve', $organization->id, \App\Models\Organization::class);
+            return back()->with('success', "✅ {$organization->name} সফলভাবে অ্যাপ্রুভ করা হয়েছে।");
+        } else {
+            $organization->is_verified = false;
+            $organization->rejection_reason = $request->input('rejection_reason');
+            $organization->save();
+            
+            $this->logAudit('org_reject', $organization->id, \App\Models\Organization::class, [
+                'reason' => $request->input('rejection_reason')
+            ]);
+            return back()->with('error', "❌ {$organization->name} এর আবেদন বাতিল করা হয়েছে।");
+        }
     }
 }

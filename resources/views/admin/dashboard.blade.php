@@ -51,15 +51,18 @@
 
     {{-- 🪪 ২. NID ভেরিফিকেশন রিভিউ (Primary Queue) --}}
     <div class="mb-12">
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
                 <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">🪪</span>
-                NID ভেরিফিকেশন রিভিউ
+                NID ভেরিফিকেশন রিভিউ (অর্গানাইজেশন-বিহীন ইউজার)
             </h2>
             <span class="text-xs font-extrabold bg-blue-100 text-blue-700 px-3 py-1.5 rounded-full">
                 {{ $pendingNids->count() }} টি পেন্ডিং
             </span>
         </div>
+        <p class="text-sm font-semibold text-slate-500 mb-6 bg-blue-50 border border-blue-100 p-3 rounded-xl border-l-4 border-l-blue-500">
+            ℹ️ এখানে শুধুমাত্র সেইসব ইউজারদের NID অনুমোদনের জন্য দেখাবে যারা কোনো ক্লাব বা অর্গানাইজেশনের অধীনে নেই। অর্গানাইজেশনের মেম্বারদের NID তাদের নিজস্ব অর্গ-অ্যাডমিন ভেরিফাই করবেন।
+        </p>
 
         @if($pendingNids->isEmpty())
             <div class="bg-white rounded-3xl border border-slate-200 p-12 text-center flex flex-col items-center">
@@ -74,7 +77,6 @@
                         <thead>
                             <tr class="bg-slate-50 border-b border-slate-200 text-xs font-extrabold text-slate-500 uppercase tracking-wider">
                                 <th class="text-left px-6 py-4">ডোনার</th>
-                                <th class="text-left px-6 py-4">অর্গানাইজেশন</th>
                                 <th class="text-left px-6 py-4">জেলা</th>
                                 <th class="text-center px-6 py-4">ডকুমেন্ট</th>
                                 <th class="text-center px-6 py-4">অ্যাকশন</th>
@@ -93,15 +95,6 @@
                                                 <p class="text-xs text-slate-400 font-medium">{{ $donor->email }}</p>
                                             </div>
                                         </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        @if($donor->organization)
-                                            <span class="text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded-md">
-                                                {{ $donor->organization->name }}
-                                            </span>
-                                        @else
-                                            <span class="text-xs text-slate-400 font-semibold px-2">কোনো ক্লাব নেই</span>
-                                        @endif
                                     </td>
                                     <td class="px-6 py-4 text-sm text-slate-600 font-semibold">
                                         {{ $donor->district?->name ?? '—' }}
@@ -144,7 +137,163 @@
         @endif
     </div>
 
-    {{-- 🛡️ ৩. পেন্ডিং ভেরিফিকেশন (প্রুফ রিভিউ - Secondary Queue) --}}
+    {{-- 🏢 ৩. অর্গানাইজেশন/হাসপাতাল যাচাই --}}
+    <div class="mb-12" x-data="{ rejectModalOpen: false, currentOrgId: null, currentOrgName: '' }">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
+                <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">🏥</span>
+                অর্গানাইজেশন/হাসপাতাল যাচাই
+            </h2>
+            <span class="text-xs font-extrabold bg-indigo-100 text-indigo-700 px-3 py-1.5 rounded-full">
+                {{ $pendingOrgs->count() }} টি পেন্ডিং
+            </span>
+        </div>
+
+        @if($pendingOrgs->isEmpty())
+            <div class="bg-white rounded-3xl border border-slate-200 p-12 text-center flex flex-col items-center">
+                <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-300 mb-4 text-3xl">🎉</div>
+                <h3 class="text-xl font-extrabold text-slate-800">কোনো পেন্ডিং অর্গানাইজেশন নেই</h3>
+                <p class="font-medium text-slate-500 mt-2">সকল অ্যাপলিকেশন প্রসেসড। দুর্দান্ত কাজ!</p>
+            </div>
+        @else
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-xs font-extrabold text-slate-500 uppercase tracking-wider">
+                                <th class="text-left px-6 py-4">নাম ও ধরন</th>
+                                <th class="text-left px-6 py-4">ঠিকানা</th>
+                                <th class="text-left px-6 py-4">যোগাযোগ</th>
+                                <th class="text-center px-6 py-4">অফিশিয়াল ডকুমেন্ট</th>
+                                <th class="text-center px-6 py-4">অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            @foreach($pendingOrgs as $org)
+                                <tr class="hover:bg-slate-50/60 transition">
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center gap-3">
+                                            @if($org->logo)
+                                                <img src="{{ asset('storage/' . $org->logo) }}" class="w-10 h-10 rounded-full object-cover shadow-sm bg-white p-0.5 border border-slate-200">
+                                            @else
+                                                <div class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center font-black text-sm border border-indigo-100 shrink-0">
+                                                    {{ mb_substr($org->name, 0, 1) }}
+                                                </div>
+                                            @endif
+                                            <div>
+                                                <p class="font-bold text-slate-900">{{ $org->name }}</p>
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200">
+                                                    {{ ucfirst($org->type) }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm font-medium text-slate-600">
+                                        {{ $org->address }}, {{ $org->locationUpazila?->name ?? 'N/A' }}, {{ $org->locationDistrict?->name ?? 'N/A' }}
+                                    </td>
+                                    <td class="px-6 py-4 text-sm font-medium text-slate-600">
+                                        <div class="flex flex-col gap-0.5">
+                                            <span class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg> {{ $org->phone }}</span>
+                                            @if($org->email)
+                                            <span class="flex items-center gap-1.5"><svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> {{ $org->email }}</span>
+                                            @endif
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 text-center">
+                                        <a href="{{ route('admin.org.document', $org->id) }}" target="_blank"
+                                           class="inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-lg transition">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                            ডকুমেন্ট দেখুন
+                                        </a>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex items-center justify-center gap-2">
+                                            <form action="{{ route('admin.org.verify', $org->id) }}" method="POST">
+                                                @csrf
+                                                <input type="hidden" name="status" value="approved">
+                                                <button type="submit"
+                                                        class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold px-3 py-1.5 rounded-lg transition shadow-sm">
+                                                    অ্যাপ্রুভ
+                                                </button>
+                                            </form>
+                                            <button type="button" 
+                                                    @click="currentOrgId = {{ $org->id }}; currentOrgName = '{{ addslashes($org->name) }}'; rejectModalOpen = true;"
+                                                    class="bg-white border text-slate-600 hover:bg-red-50 hover:text-red-600 hover:border-red-200 text-xs font-extrabold px-3 py-1.5 rounded-lg transition">
+                                                বাতিল
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Reject Reason Modal -->
+            <div x-show="rejectModalOpen" 
+                 class="fixed inset-0 z-50 overflow-y-auto" 
+                 aria-labelledby="modal-title" role="dialog" aria-modal="true" style="display: none;">
+                <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+                    <div x-show="rejectModalOpen" 
+                         x-transition:enter="ease-out duration-300"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100"
+                         x-transition:leave="ease-in duration-200"
+                         x-transition:leave-start="opacity-100"
+                         x-transition:leave-end="opacity-0"
+                         class="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+                    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+                    
+                    <div x-show="rejectModalOpen"
+                         @click.away="rejectModalOpen = false"
+                         x-transition:enter="ease-out duration-300"
+                         x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                         x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                         x-transition:leave="ease-in duration-200"
+                         x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                         x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                         class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                        <form :action="'{{ url('/admin/orgs') }}/' + currentOrgId + '/verify'" method="POST">
+                            @csrf
+                            <input type="hidden" name="status" value="rejected">
+                            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                                <div class="sm:flex sm:items-start">
+                                    <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                                        <svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                                        <h3 class="text-lg leading-6 font-extrabold text-slate-900" id="modal-title">
+                                            অর্গানাইজেশন বাতিল করুন
+                                        </h3>
+                                        <div class="mt-2">
+                                            <p class="text-sm font-medium text-slate-500 mb-3">আপনি <span x-text="currentOrgName" class="font-bold text-slate-800"></span> এর আবেদন বাতিল করতে যাচ্ছেন। অনুগ্রহ করে কারণ উল্লেখ করুন:</p>
+                                            <textarea name="rejection_reason" rows="3" required
+                                                class="w-full border-slate-200 rounded-xl focus:ring-red-500 focus:border-red-500 text-sm font-medium"
+                                                placeholder="উদাঃ অফিশিয়াল ডকুমেন্ট স্পষ্ট নয়..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-slate-100">
+                                <button type="submit" class="w-full inline-flex justify-center rounded-xl border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-extrabold text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm transition">
+                                    নিশ্চিত করুন
+                                </button>
+                                <button type="button" @click="rejectModalOpen = false" class="mt-3 w-full inline-flex justify-center rounded-xl border border-slate-300 shadow-sm px-4 py-2 bg-white text-base font-bold text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition">
+                                    ক্যান্সেল
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @endif
+    </div>
+
+    {{-- 🛡️ ৪. পেন্ডিং ভেরিফিকেশন (প্রুফ রিভিউ - Secondary Queue) --}}
     <div class="mb-12">
         <div class="mb-6 flex items-center justify-between">
             <h2 class="text-xl font-extrabold text-slate-800 flex items-center gap-2">
@@ -325,7 +474,101 @@
         </div>
     </div>
 
-    {{-- 📈 ৪. চার্ট সেকশন (Professional Horizontal Bars) --}}
+    {{-- 🔒 ৫. সিকিউরিটি ও অডিট প্যানেল --}}
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
+        {{-- Security Radar Widget --}}
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[400px]">
+            <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0">
+                <div>
+                    <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center">🚨</span>
+                        সন্দেহজনক কার্যক্রম
+                    </h3>
+                    <p class="text-xs text-slate-500 font-bold mt-1">সিস্টেম সিকিউরিটি রাডার (MVP-Lite)</p>
+                </div>
+                <div class="flex flex-col items-end">
+                    <span class="text-2xl font-black {{ $todaysSecurityEventsCount > 0 ? 'text-red-600' : 'text-emerald-500' }}">
+                        {{ $todaysSecurityEventsCount }}
+                    </span>
+                    <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">আজকের ইভেন্ট</span>
+                </div>
+            </div>
+            <div class="p-0 flex-1 overflow-y-auto">
+                @if($recentSecurityLogs->isEmpty())
+                    <div class="p-8 text-center flex flex-col items-center justify-center h-full">
+                        <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-400 mb-3 text-2xl">🛡️</div>
+                        <p class="text-sm font-bold text-slate-500">কোনো সন্দেহজনক কার্যক্রম পাওয়া যায়নি। সিস্টেম নিরাপদ।</p>
+                    </div>
+                @else
+                    <ul class="divide-y divide-slate-100">
+                        @foreach($recentSecurityLogs as $log)
+                            <li class="p-4 hover:bg-slate-50 transition flex gap-3">
+                                <div class="w-2 h-2 mt-1.5 rounded-full bg-red-500 shrink-0 animate-pulse"></div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <span class="text-[10px] font-bold uppercase tracking-wider text-red-600 bg-red-50 px-2 py-0.5 rounded-md border border-red-100">{{ str_replace('_', ' ', $log->event_type) }}</span>
+                                        <span class="text-[10px] font-bold text-slate-400">{{ $log->created_at->diffForHumans() }}</span>
+                                    </div>
+                                    <p class="text-sm font-bold text-slate-800">{{ $log->description }}</p>
+                                    @if($log->user)
+                                        <p class="text-xs font-semibold text-slate-500 mt-1">ইউজার: <span class="text-slate-700">{{ $log->user->name }}</span> (ID: {{ $log->user->id }}) @if($log->ip_address) • IP: {{ $log->ip_address }} @endif</p>
+                                    @endif
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+        </div>
+
+        {{-- Admin Audit Trail Widget --}}
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[400px]">
+            <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0">
+                <div>
+                    <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                        <span class="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">📑</span>
+                        অ্যাডমিন অডিট ট্রেইল
+                    </h3>
+                    <p class="text-xs text-slate-500 font-bold mt-1">সর্বশেষ ২০টি অ্যাকশন</p>
+                </div>
+            </div>
+            <div class="p-0 flex-1 overflow-y-auto">
+                @if($recentAuditLogs->isEmpty())
+                    <div class="p-8 text-center flex flex-col items-center justify-center h-full">
+                        <div class="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-400 mb-3 text-2xl">📋</div>
+                        <p class="text-sm font-bold text-slate-500">এখনো কোনো অডিট লগ তৈরি হয়নি।</p>
+                    </div>
+                @else
+                    <ul class="divide-y divide-slate-100">
+                        @foreach($recentAuditLogs as $audit)
+                            <li class="p-4 hover:bg-slate-50 transition flex items-start gap-3">
+                                <div class="w-8 h-8 rounded-full bg-slate-100 text-indigo-600 flex items-center justify-center font-black text-xs shrink-0 border border-slate-200">
+                                    {{ mb_substr($audit->admin->name ?? 'A', 0, 1) }}
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex justify-between items-start mb-0.5">
+                                        <p class="text-sm font-extrabold text-slate-900 truncate pr-2">{{ $audit->admin->name ?? 'System Admin' }}</p>
+                                        <span class="text-[10px] font-bold text-slate-400 whitespace-nowrap shrink-0">{{ $audit->created_at->diffForHumans() }}</span>
+                                    </div>
+                                    <div class="text-xs font-semibold text-slate-500 mb-1.5 flex items-center gap-1.5 flex-wrap">
+                                        <span class="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded border border-indigo-100 uppercase tracking-wider text-[9px]">{{ str_replace('_', ' ', $audit->action_type) }}</span>
+                                        @if($audit->target_id)
+                                            <span>টার্গেট আইডি: <strong class="text-slate-700">{{ $audit->target_id }}</strong></span>
+                                        @endif
+                                    </div>
+                                    @if(isset($audit->details['reason']))
+                                        <p class="text-xs font-medium text-red-600 bg-red-50 p-2 rounded border border-red-100 mt-1">কারণ: {{ $audit->details['reason'] }}</p>
+                                    @endif
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    {{-- 📈 ৬. চার্ট সেকশন (Professional Horizontal Bars) --}}
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
 
         {{-- Pie Chart: ব্লাড গ্রুপ ডিমান্ড --}}

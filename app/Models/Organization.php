@@ -30,6 +30,9 @@ class Organization extends Model
         'admin_id',
         'status',
         'is_verified',
+        'reviewed_by',
+        'reviewed_at',
+        'rejection_reason',
     ];
 
     protected function casts(): array
