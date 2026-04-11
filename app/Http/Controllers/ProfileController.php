@@ -98,7 +98,7 @@ class ProfileController extends Controller
     /**
      * 🚨 Emergency Mode টগল + Ready Now ব্যাজ সিঙ্ক
      */
-    public function toggleEmergencyMode(Request $request): RedirectResponse
+    public function toggleEmergencyMode(Request $request)
     {
         $user = $request->user();
         $user->is_available = !$user->is_available;
@@ -110,6 +110,14 @@ class ProfileController extends Controller
         $msg = $user->is_available
             ? '✅ ইমার্জেন্সি মোড চালু! আপনি এখন ডোনার সার্চে দৃশ্যমান এবং 🏅 Ready Now ব্যাজ পেয়েছেন।'
             : '⏸ ইমার্জেন্সি মোড বন্ধ করা হয়েছে এবং Ready Now ব্যাজ সরানো হয়েছে।';
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'is_available' => (bool)$user->is_available,
+                'message' => $msg
+            ]);
+        }
 
         return Redirect::route('profile.edit')
             ->with('status', 'emergency-updated')
@@ -139,7 +147,7 @@ class ProfileController extends Controller
     {
         $request->validate([
             'nid_number'   => ['nullable', 'string', 'min:10', 'max:20'],
-            'nid_document' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
+            'nid_document' => ['nullable', 'file', 'mimes:jpeg,png,jpg', 'max:2048'],
         ]);
 
         $user    = $request->user();
@@ -151,9 +159,9 @@ class ProfileController extends Controller
             $changed = true;
         }
 
-        // NID ডকুমেন্ট আপলোড করা
+        // NID ডকুমেন্ট আপলোড করা (Private Storage)
         if ($request->hasFile('nid_document')) {
-            $path           = $request->file('nid_document')->store('donor_nids', 'public');
+            $path           = $request->file('nid_document')->store('nid_uploads', 'local');
             $user->nid_path = $path;
             $user->nid_status = 'pending'; // নতুন ডকুমেন্টে সর্বদা pending
             $changed = true;
@@ -193,5 +201,31 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * Secure NID Viewer Method
+     * Only the actual user or an Administrator can view the private NID file.
+     */
+    public function viewNid(Request $request, $id)
+    {
+        $user = \App\Models\User::findOrFail($id);
+
+        // পারমিশন চেক: নিজে অথবা অ্যাডমিন কি না
+        if ($request->user()->id !== $user->id && !$request->user()->isAdmin()) {
+            abort(403, 'Unauthorized access to NID document.');
+        }
+
+        if (!$user->nid_path) {
+            abort(404, 'NID document not found.');
+        }
+
+        $path = storage_path('app/private/' . $user->nid_path);
+
+        if (!file_exists($path)) {
+            abort(404, 'File not found on server.');
+        }
+
+        return response()->file($path);
     }
 }

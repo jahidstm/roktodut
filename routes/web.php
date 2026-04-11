@@ -117,6 +117,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::post('/welcome-back/update', [ProfileController::class, 'welcomeBackUpdate'])->name('welcome_back.update');
     Route::post('/donor/upload-nid', [ProfileController::class, 'uploadNid'])->name('donor.upload_nid');
+    Route::get('/donor/{id}/nid-document', [ProfileController::class, 'viewNid'])->name('donor.view_nid');
     Route::post('/blog', [BlogSubmissionController::class, 'store'])->name('blog.store');
     Route::post('/donation-record', [DonationRecordController::class, 'update'])->name('donation.record.update');
 });

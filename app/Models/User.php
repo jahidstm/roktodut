@@ -252,4 +252,24 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
     {
         return $query->where('is_shadowbanned', false);
     }
+
+    /**
+     * Get Profile Completion Percentage
+     * 
+     * @return int
+     */
+    public function getProfileCompletionAttribute(): int
+    {
+        $completion = 0;
+
+        if (!empty($this->name)) $completion += 15;
+        if (!empty($this->phone)) $completion += 15;
+        if (!empty($this->blood_group)) $completion += 20;
+        if (!empty($this->division_id)) $completion += 10;
+        if (!empty($this->district_id)) $completion += 10;
+        if (!empty($this->upazila_id)) $completion += 10;
+        if ($this->nid_status === 'verified') $completion += 20;
+
+        return $completion;
+    }
 }
