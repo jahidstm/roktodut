@@ -40,7 +40,8 @@ class OnboardingController extends Controller
         ];
 
         // ২. যদি ইউজার 'ডোনার' হয়, তবে তার জন্য অতিরিক্ত ফিল্ড ভ্যালিডেশন
-        if ($user->role === 'donor') {
+        $roleValue = $user->role instanceof \App\Enums\UserRole ? $user->role->value : $user->role;
+        if ($roleValue === 'donor') {
             $rules['gender'] = 'required|in:male,female';
             $rules['weight'] = 'required|numeric|min:30';
             $rules['last_donation_date'] = 'nullable|date|before_or_equal:today';

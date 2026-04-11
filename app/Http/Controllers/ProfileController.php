@@ -92,6 +92,9 @@ class ProfileController extends Controller
             }
         }
 
+        // ─── গ্যামিফিকেশন: ব্যাজ রিচেক (লগইন করা ছাড়াও প্রোফাইল আপডেট করলে যেন ব্যাজ পায়) ────────
+        $this->gamification->checkAndAwardBadges($user);
+
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
 
@@ -211,8 +214,12 @@ class ProfileController extends Controller
     {
         $user = \App\Models\User::findOrFail($id);
 
-        // পারমিশন চেক: নিজে অথবা অ্যাডমিন কি না
-        if ($request->user()->id !== $user->id && !$request->user()->isAdmin()) {
+        // পারমিশন চেক: নিজে অথবা অ্যাডমিন অথবা নিজ প্রতিষ্ঠানের অ্যাডমিন কি না
+        $isOwner = $request->user()->id === $user->id;
+        $isAdmin = $request->user()->isAdmin();
+        $isOrgAdmin = $request->user()->isOrgAdmin() && $request->user()->organization_id === $user->organization_id;
+
+        if (!$isOwner && !$isAdmin && !$isOrgAdmin) {
             abort(403, 'Unauthorized access to NID document.');
         }
 
@@ -223,7 +230,7 @@ class ProfileController extends Controller
         $path = storage_path('app/private/' . $user->nid_path);
 
         if (!file_exists($path)) {
-            abort(404, 'File not found on server.');
+            abort(404, 'File not found on server: ' . $path);
         }
 
         return response()->file($path);

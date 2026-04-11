@@ -286,11 +286,13 @@
         </div>
 
         {{-- ৫. আইডেন্টিটি ভেরিফিকেশন (NID) কার্ড (Premium UI) --}}
+        @php 
+            $nidStatus = strtolower($user->nid_status ?? 'unverified'); 
+            if($nidStatus === 'approved') $nidStatus = 'verified';
+        @endphp
+        
+        @if($nidStatus !== 'verified')
         <div class="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200 hover:border-slate-300 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden">
-            @php 
-                $nidStatus = strtolower($user->nid_status ?? 'unverified'); 
-                if($nidStatus === 'approved') $nidStatus = 'verified';
-            @endphp
             
             <div class="absolute right-0 top-0 m-6 sm:m-10">
                 @if($nidStatus === 'unverified' || empty($nidStatus))
@@ -302,11 +304,6 @@
                     <span class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-700 border border-amber-200 px-4 py-2 rounded-xl text-sm font-bold shadow-sm">
                         <svg class="w-4 h-4 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                         Pending Review
-                    </span>
-                @elseif($nidStatus === 'verified')
-                    <span class="inline-flex items-center gap-1.5 bg-green-50 text-green-700 border border-green-200 px-4 py-2 rounded-xl text-sm font-bold shadow-sm">
-                        <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
-                        Verified
                     </span>
                 @endif
             </div>
@@ -353,6 +350,7 @@
                 </div>
             </form>
         </div>
+        @endif
 
         {{-- ৬. পাসওয়ার্ড পরিবর্তন কার্ড --}}
         <div class="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200 hover:border-slate-300 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300">

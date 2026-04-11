@@ -47,7 +47,7 @@
             </div>
             <div>
                 <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">মোট ভেরিফাইড</p>
-                <h3 class="text-3xl font-black text-slate-900">{{ $stats['approved'] ?? 0 }} <span class="text-base text-slate-400 font-medium">জন</span></h3>
+                <h3 class="text-3xl font-black text-slate-900">{{ $stats['verified'] ?? 0 }} <span class="text-base text-slate-400 font-medium">জন</span></h3>
             </div>
         </div>
     </div>
@@ -65,7 +65,7 @@
             <div class="flex bg-white border border-slate-200 rounded-lg p-1 shadow-sm">
                 <a href="{{ route('org.dashboard') }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ !request('status') ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-900' }}">সবাই</a>
                 <a href="{{ route('org.dashboard', ['status' => 'pending']) }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ request('status') === 'pending' ? 'bg-amber-100 text-amber-800' : 'text-slate-500 hover:text-slate-900' }}">পেন্ডিং</a>
-                <a href="{{ route('org.dashboard', ['status' => 'approved']) }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ request('status') === 'approved' ? 'bg-emerald-100 text-emerald-800' : 'text-slate-500 hover:text-slate-900' }}">অ্যাপ্রুভড</a>
+                <a href="{{ route('org.dashboard', ['status' => 'verified']) }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ request('status') === 'verified' ? 'bg-emerald-100 text-emerald-800' : 'text-slate-500 hover:text-slate-900' }}">ভেরিফাইড</a>
             </div>
         </div>
 
@@ -91,7 +91,7 @@
                                 <div class="text-[10px] text-slate-400 font-bold">{{ $user->district?->name ?? 'লোকেশন নেই' }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                @if($user->nid_status === 'approved')
+                                @if($user->nid_status === 'verified')
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700 uppercase">Verified</span>
                                 @elseif($user->nid_status === 'pending')
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black bg-amber-100 text-amber-700 uppercase">Pending Review</span>
@@ -116,7 +116,7 @@
                                         <form action="{{ route('org.members.verify', $user->id) }}" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত যে এই ডোনার আপনাদের ক্লাবের ভেরিফাইড মেম্বার?');">
                                             @csrf
                                             @method('PATCH')
-                                            <input type="hidden" name="status" value="approved">
+                                            <input type="hidden" name="status" value="verified">
                                             <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white rounded-md font-bold transition-colors text-xs">
                                                 ✓
                                             </button>
@@ -132,10 +132,10 @@
                                             </button>
                                         </form>
                                     </div>
-                                @elseif($user->nid_status === 'approved')
+                                @elseif($user->nid_status === 'verified')
                                     <span class="inline-flex items-center text-emerald-600 font-extrabold text-sm">
                                         <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                                        Verified
+                                        Accepted
                                     </span>
                                 @else
                                     <span class="text-slate-400 font-bold text-sm">Rejected</span>

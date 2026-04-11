@@ -107,7 +107,7 @@
                                         {{ $donor->district?->name ?? '—' }}
                                     </td>
                                     <td class="px-6 py-4 text-center">
-                                        <a href="{{ asset('storage/' . $donor->nid_path) }}"
+                                        <a href="{{ route('donor.view_nid', $donor->id) }}"
                                            target="_blank"
                                            class="inline-flex items-center justify-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold px-3 py-1.5 rounded-lg transition">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
@@ -229,53 +229,6 @@
         </div>
     </div>
 
-    {{-- 📈 ৪. চার্ট সেকশন (Professional Horizontal Bars) --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-
-        {{-- Pie Chart: ব্লাড গ্রুপ ডিমান্ড --}}
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-7">
-            <div class="mb-5 border-b border-slate-100 pb-4">
-                <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                    <span class="w-8 h-8 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-sm">🩸</span>
-                    ব্লাড গ্রুপ ডিমান্ড
-                </h3>
-                <p class="text-xs text-slate-500 font-semibold mt-1.5">কোন রক্তের গ্রুপ সবচেয়ে বেশি রিকোয়েস্ট হয়েছে</p>
-            </div>
-            
-            @if(empty($bloodGroupDemand))
-                <div class="flex flex-col items-center justify-center h-[240px] text-slate-400">
-                    <span class="text-4xl mb-3">📊</span>
-                    <span class="text-sm font-semibold">গত ৩০ দিনে কোনো ডিমান্ড নেই</span>
-                </div>
-            @else
-                <div style="height:260px;">
-                    <canvas id="bloodGroupChart"></canvas>
-                </div>
-            @endif
-        </div>
-
-        {{-- Bar Chart: জেলা ভিত্তিক ইমার্জেন্সি --}}
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-7">
-            <div class="mb-5 border-b border-slate-100 pb-4">
-                <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-sm">📍</span>
-                    শীর্ষ ৫ ইমার্জেন্সি জেলা (গত ৩০ দিন)
-                </h3>
-            </div>
-            
-            @if(empty($districtDemand))
-                <div class="flex flex-col items-center justify-center h-[240px] text-slate-400">
-                    <span class="text-4xl mb-3">📉</span>
-                    <span class="text-sm font-semibold">গত ৩০ দিনে কোনো রিকোয়েস্ট নেই</span>
-                </div>
-            @else
-                <div style="height:260px;">
-                    <canvas id="districtChart"></canvas>
-                </div>
-            @endif
-        </div>
-    </div>
-
     {{-- ⚙️ ৫. Governance & Moderation Tools (Expandable Accordion) --}}
     <div x-data="{ activeAccordion: null }" class="space-y-4 mb-8">
         <div class="flex items-center gap-2 mb-4 mt-8">
@@ -369,6 +322,53 @@
                     </a>
                 </div>
             </div>
+        </div>
+    </div>
+
+    {{-- 📈 ৪. চার্ট সেকশন (Professional Horizontal Bars) --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+
+        {{-- Pie Chart: ব্লাড গ্রুপ ডিমান্ড --}}
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-7">
+            <div class="mb-5 border-b border-slate-100 pb-4">
+                <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-sm">🩸</span>
+                    ব্লাড গ্রুপ ডিমান্ড
+                </h3>
+                <p class="text-xs text-slate-500 font-semibold mt-1.5">কোন রক্তের গ্রুপ সবচেয়ে বেশি রিকোয়েস্ট হয়েছে</p>
+            </div>
+            
+            @if(empty($bloodGroupDemand))
+                <div class="flex flex-col items-center justify-center h-[240px] text-slate-400">
+                    <span class="text-4xl mb-3">📊</span>
+                    <span class="text-sm font-semibold">গত ৩০ দিনে কোনো ডিমান্ড নেই</span>
+                </div>
+            @else
+                <div style="height:260px;">
+                    <canvas id="bloodGroupChart"></canvas>
+                </div>
+            @endif
+        </div>
+
+        {{-- Bar Chart: জেলা ভিত্তিক ইমার্জেন্সি --}}
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-7">
+            <div class="mb-5 border-b border-slate-100 pb-4">
+                <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-sm">📍</span>
+                    শীর্ষ ৫ ইমার্জেন্সি জেলা (গত ৩০ দিন)
+                </h3>
+            </div>
+            
+            @if(empty($districtDemand))
+                <div class="flex flex-col items-center justify-center h-[240px] text-slate-400">
+                    <span class="text-4xl mb-3">📉</span>
+                    <span class="text-sm font-semibold">গত ৩০ দিনে কোনো রিকোয়েস্ট নেই</span>
+                </div>
+            @else
+                <div style="height:260px;">
+                    <canvas id="districtChart"></canvas>
+                </div>
+            @endif
         </div>
     </div>
 

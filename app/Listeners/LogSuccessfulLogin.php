@@ -24,5 +24,8 @@ class LogSuccessfulLogin
         // বর্তমান লগইন টাইম আপডেট
         $user->last_login_at = now();
         $user->save(); // ✅ এখন আর এরর দেখাবে না
+        
+        // 🚀 প্রতিবার লগইনে গ্যামিফিকেশন ব্যাজ (যেমন Campus Hero) চেক করে দেওয়া হবে
+        app(\App\Services\GamificationService::class)->checkAndAwardBadges($user);
     }
 }

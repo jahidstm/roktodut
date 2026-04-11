@@ -55,9 +55,11 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         // 🚀 ডাইনামিক রিডাইরেকশন লজিক
-        if ($user->role === 'recipient') {
-            // Recipient হলে সরাসরি ড্যাশবোর্ডে
-            return redirect()->route('dashboard');
+        $roleValue = $user->role instanceof \App\Enums\UserRole ? $user->role->value : $user->role;
+        
+        if ($roleValue === 'recipient') {
+            // Recipient হলে সরাসরি হোম পেজে
+            return redirect()->route('home');
         }
 
         // Donor হলে অনবোর্ডিং পেজে

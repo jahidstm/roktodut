@@ -60,6 +60,14 @@ class GamificationService
 
         Log::info("GamificationService: Profile completion bonus awarded.", ['user_id' => $user->id]);
 
+        // রেফারেল সাইন আপ বোনাস (নতুন ইউজার প্রোফাইল ১০০% করলে রেফারার পয়েন্ট পাবে)
+        if ($user->referred_by) {
+            $referrer = User::find($user->referred_by);
+            if ($referrer) {
+                $this->awardReferralSignupPoints($referrer);
+            }
+        }
+
         return true;
     }
 
@@ -129,6 +137,7 @@ class GamificationService
         User         $donor,
         BloodRequest $bloodRequest,
         bool         $isFirstResponder = false,
+        bool         $isMidnightSavior = false,
     ): void {
         // ─── ০. Anti-Cheat: ১২০-দিনের জৈবিক কুলডাউন গেটকিপার ─────────
         //
@@ -165,6 +174,11 @@ class GamificationService
                 metadata:   ['blood_request_id' => $bloodRequest->id],
             );
             $this->updateMonthlyPoints($donor, self::POINTS_FIRST_RESPONDER_BONUS);
+        }
+
+        // ─── ৩.৫ Midnight Savior 배지 (রাত ১২টা - ভোর ৫টা) ──────────
+        if ($isMidnightSavior) {
+            $this->awardBadgeIfNotOwned($donor, 'midnight_savior');
         }
 
         // ─── ৪. ব্যাজ চেক ও আনলক ─────────────────────────────────────

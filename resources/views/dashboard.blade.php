@@ -5,7 +5,7 @@
 @section('content')
 
 {{-- 🚀 Welcome Back Smart Prompt (The Re-engagement Loop) --}}
-@if(auth()->user()->is_onboarded && !auth()->user()->welcome_back_checked)
+@if(isset($showInactivePopup) && $showInactivePopup)
     <div class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
         <div class="bg-white rounded-3xl p-8 max-w-lg w-full mx-4 shadow-2xl animate-fade-in-up">
             <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-5">

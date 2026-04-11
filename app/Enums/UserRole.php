@@ -24,6 +24,7 @@ enum UserRole: string
         return match ($this) {
             self::ADMIN     => 'admin.dashboard',
             self::ORG_ADMIN => 'org.dashboard',
+            self::RECIPIENT => 'home',
             default         => 'dashboard',
         };
     }

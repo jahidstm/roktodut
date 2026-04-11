@@ -140,6 +140,20 @@ class DashboardController extends Controller
             'nextMilestone', 'progressPercent', 'myRank'
         );
 
+        // ৮. Inactive Donor Popup Logic (অনেক দিন পর দেখা!)
+        $showInactivePopup = false;
+        $isDonor = ($user->role?->value ?? $user->role) === 'donor';
+
+        if ($isDonor && $user->is_onboarded && !$user->welcome_back_checked) {
+            // Rule 2 & 3: New User Check & Inactivity Check
+            // অ্যাকাউন্ট অন্তত ৩০ দিনের পুরোনো হতে হবে। LogSuccessfulLogin ইভেন্ট ৩০ দিন পর welcome_back_checked অটোমেটিক false করে।
+            $accountAgeDays = $user->created_at ? $user->created_at->diffInDays(now()) : 0;
+            
+            if ($accountAgeDays >= 30) {
+                $showInactivePopup = true;
+            }
+        }
+
         return view('dashboard', compact(
             'totalRequestsMade',
             'fulfilledRequests',
@@ -149,7 +163,8 @@ class DashboardController extends Controller
             'pendingClaim',
             'acceptedDonations',
             'gamificationStats',
-            'radarRequests'
+            'radarRequests',
+            'showInactivePopup'
         ));
     }
 }

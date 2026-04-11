@@ -36,7 +36,7 @@ class DashboardController extends Controller
         $stats = [
             'total'    => User::where('organization_id', $admin->organization_id)->where('role', 'donor')->count(),
             'pending'  => User::where('organization_id', $admin->organization_id)->where('role', 'donor')->where('nid_status', 'pending')->count(),
-            'approved' => User::where('organization_id', $admin->organization_id)->where('role', 'donor')->where('nid_status', 'approved')->count(),
+            'verified' => User::where('organization_id', $admin->organization_id)->where('role', 'donor')->where('nid_status', 'verified')->count(),
         ];
 
         return view('org.dashboard', compact('members', 'stats', 'request'));
@@ -55,13 +55,13 @@ class DashboardController extends Controller
         }
 
         $request->validate([
-            'status' => 'required|in:approved,rejected'
+            'status' => 'required|in:verified,rejected'
         ]);
 
         // স্ট্যাটাস আপডেট এবং ব্লু ব্যাজ (verified) লজিক
         $donor->nid_status = $request->status;
 
-        if ($request->status === 'approved') {
+        if ($request->status === 'verified') {
             $donor->is_onboarded = true; // ডোনার ভেরিফাইড হলে তাকে ফুল্লি অনবোর্ডেড ধরা হবে
             $donor->verified_badge = true; // ব্লু ব্যাজ এনাবেল করা
         } else {
@@ -70,7 +70,7 @@ class DashboardController extends Controller
 
         $donor->save();
 
-        $message = $request->status === 'approved'
+        $message = $request->status === 'verified'
             ? 'ডোনারকে সফলভাবে ভেরিফাই করা হয়েছে এবং ব্লু ব্যাজ প্রদান করা হয়েছে।'
             : 'ডোনারের ভেরিফিকেশন রিকোয়েস্ট রিজেক্ট করা হয়েছে।';
 

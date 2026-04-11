@@ -40,25 +40,39 @@ class DonationClaimController extends Controller
 
                 $donor = Auth::user();
                 if ($donor) {
-                    $donor->increment('total_verified_donations');
-
-                    // 🎯 First Responder বোনাস চেক
                     $bloodRequest  = $response->bloodRequest;
                     $isFirstResponder = false;
+                    $isMidnightSavior = false;
+                    
                     if ($bloodRequest && $bloodRequest->urgency === 'emergency') {
+                        // 🎯 First Responder বোনাস চেক
                         $responseTimeHours = $bloodRequest->created_at->diffInHours($response->created_at);
                         if ($responseTimeHours <= 3) {
                             $isFirstResponder = true;
                         }
+
+                        // 🌙 Midnight Savior ব্যাজ চেক (রাত ১২টা - ভোর ৫টা)
+                        $responseHour = $response->created_at->hour;
+                        if ($responseHour >= 0 && $responseHour <= 5) {
+                            $isMidnightSavior = true;
+                        }
                     }
 
                     // 🏆 GamificationService দিয়ে পয়েন্ট ও ব্যাজ আপডেট
-                    $this->gamification->awardDonationPoints($donor, $isFirstResponder);
+                    $this->gamification->processDonationReward(
+                        donor: $donor,
+                        bloodRequest: $bloodRequest ?? new \App\Models\BloodRequest(),
+                        isFirstResponder: $isFirstResponder,
+                        isMidnightSavior: $isMidnightSavior
+                    );
                 }
 
                 $msg = '🎉 পিন মিলেছে! আপনার রক্তদান সফলভাবে ভেরিফাইড হয়েছে। +৫০ পয়েন্ট অর্জিত হয়েছে!';
                 if ($isFirstResponder ?? false) {
                     $msg .= ' এবং First Responder বোনাস হিসেবে আরও +১০ পয়েন্ট পেয়েছেন!';
+                }
+                if ($isMidnightSavior ?? false) {
+                    $msg .= ' 🌙 আপনি Midnight Savior ব্যাজ অর্জন করেছেন!';
                 }
 
                 return back()->with('success', $msg);
@@ -94,8 +108,28 @@ class DonationClaimController extends Controller
 
             $donor = $response->user;
             if ($donor) {
-                $donor->increment('total_verified_donations');
-                $this->gamification->awardDonationPoints($donor);
+                $bloodRequest = $response->bloodRequest;
+                $isFirstResponder = false;
+                $isMidnightSavior = false;
+                
+                if ($bloodRequest && $bloodRequest->urgency === 'emergency') {
+                    $responseTimeHours = $bloodRequest->created_at->diffInHours($response->created_at);
+                    if ($responseTimeHours <= 3) {
+                        $isFirstResponder = true;
+                    }
+
+                    $responseHour = $response->created_at->hour;
+                    if ($responseHour >= 0 && $responseHour <= 5) {
+                        $isMidnightSavior = true;
+                    }
+                }
+
+                $this->gamification->processDonationReward(
+                    donor: $donor,
+                    bloodRequest: $bloodRequest ?? new \App\Models\BloodRequest(),
+                    isFirstResponder: $isFirstResponder,
+                    isMidnightSavior: $isMidnightSavior
+                );
 
                 // 🎯 গ্রহীতার রিভিউ পয়েন্ট (+১০)
                 $this->gamification->awardReviewPoints($donor);
@@ -129,8 +163,28 @@ class DonationClaimController extends Controller
 
             $donor = $response->user;
             if ($donor) {
-                $donor->increment('total_verified_donations');
-                $this->gamification->awardDonationPoints($donor);
+                $bloodRequest = $response->bloodRequest;
+                $isFirstResponder = false;
+                $isMidnightSavior = false;
+                
+                if ($bloodRequest && $bloodRequest->urgency === 'emergency') {
+                    $responseTimeHours = $bloodRequest->created_at->diffInHours($response->created_at);
+                    if ($responseTimeHours <= 3) {
+                        $isFirstResponder = true;
+                    }
+
+                    $responseHour = $response->created_at->hour;
+                    if ($responseHour >= 0 && $responseHour <= 5) {
+                        $isMidnightSavior = true;
+                    }
+                }
+
+                $this->gamification->processDonationReward(
+                    donor: $donor,
+                    bloodRequest: $bloodRequest ?? new \App\Models\BloodRequest(),
+                    isFirstResponder: $isFirstResponder,
+                    isMidnightSavior: $isMidnightSavior
+                );
             }
 
             return back()->with('success', '✅ অ্যাপ্রুভ করা হয়েছে। ডোনারকে পয়েন্ট ও ব্যাজ দেওয়া হয়েছে।');
