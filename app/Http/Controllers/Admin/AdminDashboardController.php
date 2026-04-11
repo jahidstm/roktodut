@@ -151,7 +151,6 @@ class AdminDashboardController extends Controller
     }
 
     /**
-<<<<<<< HEAD
      * অর্গানাইজেশন অ্যাপ্রুভ / রিজেক্ট
      */
     public function verifyOrg(Request $request, \App\Models\Organization $organization): RedirectResponse
@@ -189,7 +188,9 @@ class AdminDashboardController extends Controller
             ]);
             return back()->with('error', "❌ {$organization->name} এর আবেদন বাতিল করা হয়েছে।");
         }
-=======
+    }
+
+    /**
      * View Organization document securely
      */
     public function viewOrgDocument(Request $request, \App\Models\Organization $organization)
@@ -203,6 +204,5 @@ class AdminDashboardController extends Controller
         }
 
         return \Illuminate\Support\Facades\Storage::disk('private')->response($organization->document_path);
->>>>>>> secure-private-storage
     }
 }

@@ -132,10 +132,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::post('/admin/donations/{response}/verify', [DonationClaimController::class, 'adminVerify'])->name('admin.donations.verify');
     Route::post('/admin/users/{user}/verify-nid', [AdminDashboardController::class, 'verifyNid'])->name('admin.nid.verify');
-<<<<<<< HEAD
     Route::post('/admin/orgs/{organization}/verify', [AdminDashboardController::class, 'verifyOrg'])->name('admin.org.verify');
-=======
->>>>>>> secure-private-storage
     Route::get('/admin/orgs/{organization}/document', [AdminDashboardController::class, 'viewOrgDocument'])->name('admin.org.document');
 
     Route::prefix('admin/gamification')->name('admin.gamification.')->group(function () {
