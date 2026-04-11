@@ -49,7 +49,7 @@ class OrgRegistrationController extends Controller
             DB::beginTransaction();
 
             // ২. ফাইল আপলোড হ্যান্ডেলিং
-            $documentPath = $request->file('official_document')->store('org_documents', 'public');
+            $documentPath = $request->file('official_document')->store('org_documents', 'private');
             $logoPath = $request->hasFile('logo') ? $request->file('logo')->store('org_logos', 'public') : null;
 
             // ৩. প্রথমে ইউজারের অ্যাকাউন্ট তৈরি (Org Admin হিসেবে)

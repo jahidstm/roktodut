@@ -151,6 +151,7 @@ class AdminDashboardController extends Controller
     }
 
     /**
+<<<<<<< HEAD
      * অর্গানাইজেশন অ্যাপ্রুভ / রিজেক্ট
      */
     public function verifyOrg(Request $request, \App\Models\Organization $organization): RedirectResponse
@@ -188,5 +189,20 @@ class AdminDashboardController extends Controller
             ]);
             return back()->with('error', "❌ {$organization->name} এর আবেদন বাতিল করা হয়েছে।");
         }
+=======
+     * View Organization document securely
+     */
+    public function viewOrgDocument(Request $request, \App\Models\Organization $organization)
+    {
+        if (!$organization->document_path) {
+            abort(404, 'ডকুমেন্ট আপলোড করা হয়নি।');
+        }
+
+        if (!\Illuminate\Support\Facades\Storage::disk('private')->exists($organization->document_path)) {
+            abort(404, 'ফাইলটি সার্ভারে পাওয়া যায়নি।');
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('private')->response($organization->document_path);
+>>>>>>> secure-private-storage
     }
 }
