@@ -55,57 +55,60 @@
             </div>
         @endif
 
-        {{-- ২. প্রোফাইল কমপ্লিশন কার্ড (Premium Dark UI) --}}
-        <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl border border-slate-700/50 overflow-hidden shadow-xl shadow-slate-900/10">
-            <div class="p-6 sm:p-8">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                            <h2 class="text-white font-extrabold text-xl tracking-wide">প্রোফাইল কমপ্লিশন</h2>
+        @if($completionPercent < 100)
+            {{-- ২. প্রোফাইল কমপ্লিশন কার্ড (Premium Dark UI) --}}
+            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl border border-slate-700/50 overflow-hidden shadow-xl shadow-slate-900/10 mb-10">
+                <div class="p-6 sm:p-8">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                                <h2 class="text-white font-extrabold text-xl tracking-wide">প্রোফাইল কমপ্লিশন</h2>
+                            </div>
+                            <p class="text-slate-400 text-sm font-medium">তথ্য সম্পূর্ণ করে আপনার প্রোফাইল শক্তিশালী করুন এবং টপ ডোনার লিস্টে যুক্ত হোন</p>
                         </div>
-                        <p class="text-slate-400 text-sm font-medium">তথ্য সম্পূর্ণ করে আপনার প্রোফাইল শক্তিশালী করুন এবং টপ ডোনার লিস্টে যুক্ত হোন</p>
-                    </div>
-                    <div class="flex flex-col w-full sm:w-1/3">
-                        <div class="flex justify-between items-end mb-2">
-                            <span class="text-slate-400 text-xs font-bold uppercase tracking-wider">Progress</span>
-                            <span class="text-3xl font-black text-white" style="{{ $completionPercent == 100 ? 'text-shadow: 0 0 15px rgba(34,197,94,0.5); color: #4ade80;' : '' }}">{{ $completionPercent }}%</span>
-                        </div>
-                        <div class="w-full bg-slate-700/50 h-3 rounded-full overflow-hidden backdrop-blur-sm border border-slate-600/50">
-                            <div class="bg-gradient-to-r from-emerald-500 to-green-400 h-full transition-all duration-1000 relative" style="width: {{ $completionPercent }}%">
-                                <div class="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
+                        <div class="flex flex-col w-full sm:w-1/3">
+                            <div class="flex justify-between items-end mb-2">
+                                <span class="text-slate-400 text-xs font-bold uppercase tracking-wider">Progress</span>
+                                <span class="text-2xl font-black text-white">{{ $completionPercent }}%</span>
+                            </div>
+                            <div class="w-full bg-slate-700/50 h-3 rounded-full overflow-hidden backdrop-blur-sm border border-slate-600/50">
+                                <div class="bg-gradient-to-r from-emerald-500 to-green-400 h-full transition-all duration-1000 relative" style="width: {{ $completionPercent }}%">
+                                    <div class="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                    @foreach($completionSteps as $step)
-                    <div class="flex items-center gap-3 p-3 rounded-2xl transition-all {{ $step['done'] ? 'bg-white/5 border border-white/10' : 'hover:bg-white/5 border border-transparent' }}">
-                        @if($step['done'])
-                            <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 border border-green-500/30">
-                                <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                            </div>
-                            <span class="text-sm font-semibold text-slate-200">{{ $step['label'] }}</span>
-                        @else
-                            <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700">
-                                <span class="w-2 h-2 rounded-full bg-slate-600"></span>
-                            </div>
-                            <span class="text-sm font-medium text-slate-500">{{ $step['label'] }}</span>
-                            <span class="ml-auto text-xs font-bold text-slate-600 px-2.5 py-1 bg-slate-800 rounded-lg border border-slate-700">+{{ $step['weight'] }}%</span>
-                        @endif
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        @foreach($completionSteps as $step)
+                        <div class="flex items-center gap-3 p-3 rounded-2xl transition-all {{ $step['done'] ? 'bg-white/5 border border-white/10' : 'hover:bg-white/5 border border-transparent' }}">
+                            @if($step['done'])
+                                <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 border border-green-500/30">
+                                    <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                                </div>
+                                <span class="text-sm font-semibold text-slate-200">{{ $step['label'] }}</span>
+                            @else
+                                <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700">
+                                    <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+                                </div>
+                                <span class="text-sm font-medium text-slate-500">{{ $step['label'] }}</span>
+                                <span class="ml-auto text-xs font-bold text-slate-600 px-2.5 py-1 bg-slate-800 rounded-lg border border-slate-700">+{{ $step['weight'] }}%</span>
+                            @endif
+                        </div>
+                        @endforeach
                     </div>
-                    @endforeach
                 </div>
-                
-                @if($completionPercent >= 100)
-                    <div class="mt-6 p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/10 border border-green-500/30 rounded-2xl flex items-center justify-center gap-3 transform animate-[bounce_1s_ease-out]">
-                        <span class="text-xl">🎉</span>
-                        <span class="font-bold text-green-400">অভিনন্দন! আপনার প্রোফাইল ১০০% সম্পূর্ণ হয়েছে!</span>
-                    </div>
-                @endif
             </div>
-        </div>
+        @else
+            {{-- ১০০% সম্পূর্ণ হওয়ার পর സুন্দর সাকসেস ব্যানার --}}
+            <div class="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-2xl shadow-sm mb-2 transform animate-[fadeIn_0.5s_ease-out]">
+                <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <span class="font-extrabold text-emerald-800 tracking-wide text-sm sm:text-base">✅ আপনার প্রোফাইল ১০০% সম্পূর্ণ এবং ভেরিফাইড।</span>
+            </div>
+        @endif
 
         {{-- ৩. অ্যাভেইলেবল স্ট্যাটাস কার্ড (Premium Alpine.js Toggle) --}}
         <div x-data="emergencyToggle({{ $user->is_available ? 'true' : 'false' }})" 
@@ -235,7 +238,16 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-7 pt-2">
                      <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">শেষ রক্তদানের তারিখ</label>
-                        <input name="last_donation_date" type="date" value="{{ old('last_donation_date', $user->last_donation_date?->format('Y-m-d') ?? $user->last_donation_date) }}" max="{{ date('Y-m-d') }}" class="w-full rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 px-4 py-3 text-slate-800 font-medium cursor-pointer transition-all outline-none">
+                        @php
+                            $hasVerifiedDonation = \App\Models\BloodRequestResponse::where('user_id', auth()->id())->whereNotNull('fulfilled_at')->exists();
+                        @endphp
+                        <input name="last_donation_date" type="date" value="{{ old('last_donation_date', $user->last_donation_date?->format('Y-m-d') ?? $user->last_donation_date) }}" max="{{ date('Y-m-d') }}" {{ $hasVerifiedDonation ? 'readonly' : '' }} class="w-full rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 px-4 py-3 text-slate-800 font-medium {{ $hasVerifiedDonation ? 'cursor-not-allowed opacity-70' : 'cursor-pointer' }} transition-all outline-none">
+                        @if($hasVerifiedDonation)
+                            <p class="text-[11px] font-semibold text-slate-500 mt-1.5 flex items-start gap-1">
+                                <svg class="w-3.5 h-3.5 text-blue-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
+                                আপনার সর্বশেষ রক্তদানের রেকর্ডের ভিত্তিতে এটি স্বয়ংক্রিয়ভাবে নিয়ন্ত্রিত।
+                            </p>
+                        @endif
                         @error('last_donation_date') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
                     </div>
                     <div>
@@ -316,19 +328,19 @@
             </div>
             
             <p class="text-sm font-medium text-slate-500 mb-8 pb-5 border-b border-slate-100 max-w-2xl">
-                প্ল্যাটফর্মে 'Verified' ব্যাজ পেতে আপনার সঠিক NID নম্বর এবং ডকুমেন্টের ছবি প্রদান করুন। এটি আপনার ডোনার প্রোফাইলের বিশ্বাসযোগ্যতা বাড়াবে।
+                প্ল্যাটফর্মে 'Verified' ব্যাজ পেতে আপনার সঠিক NID নম্বর অথবা ডকুমেন্টের ছবি যেকোনো একটি প্রদান করুন। এটি আপনার প্রোফাইলের বিশ্বাসযোগ্যতা বাড়াবে।
             </p>
             
             <form method="POST" action="{{ route('donor.upload_nid') }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-7">
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">NID নম্বর <span class="text-red-500">*</span></label>
-                        <input name="nid_number" type="text" value="{{ old('nid_number', $user->nid_number ?? '') }}" placeholder="আপনার ১০ বা ১৭ ডিজিটের NID নম্বর" required class="w-full rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 px-4 py-3 text-slate-800 font-medium transition-all outline-none">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">NID নম্বর</label>
+                        <input name="nid_number" type="text" value="{{ old('nid_number', $user->nid_number ?? '') }}" placeholder="আপনার ১০ বা ১৭ ডিজিটের NID নম্বর" class="w-full rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 px-4 py-3 text-slate-800 font-medium transition-all outline-none">
                         @error('nid_number') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-2">NID ডকুমেন্টের ছবি <span class="text-red-500">*</span></label>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">NID ডকুমেন্টের ছবি</label>
                         <div class="relative group">
                             <label class="flex flex-col items-center justify-center w-full h-[3.25rem] bg-slate-50/50 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:bg-slate-50 hover:border-red-300 transition-all">
                                 <div class="flex items-center justify-center gap-2">

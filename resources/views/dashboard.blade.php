@@ -133,7 +133,19 @@
 
         {{-- Right: Details --}}
         <div class="flex-1 text-center sm:text-left mt-2 sm:mt-0 flex flex-col justify-center h-full w-full sm:pt-2">
-            <h2 class="text-3xl sm:text-4xl font-black text-slate-900 mb-2">{{ $user->name }}</h2>
+            <h2 class="text-3xl sm:text-4xl font-black text-slate-900 mb-2 flex items-center justify-center sm:justify-start gap-2">
+                {{ $user->name }}
+                @if($user->nid_status === 'verified' || $user->verified_badge)
+                    <div class="group relative flex items-center justify-center cursor-help">
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8 text-blue-500 drop-shadow-sm" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2.5 py-1 bg-slate-800 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+                            ভেরিফাইড ডোনার
+                        </span>
+                    </div>
+                @endif
+            </h2>
             
             <p class="text-slate-500 font-bold mb-4 flex items-center justify-center sm:justify-start gap-1.5 text-sm sm:text-base">
                 <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>

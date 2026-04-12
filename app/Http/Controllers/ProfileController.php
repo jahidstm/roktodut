@@ -29,8 +29,7 @@ class ProfileController extends Controller
             ['key' => 'gender',        'label' => 'লিঙ্গ',                  'weight' => 5,  'done' => !empty($user->gender)],
             ['key' => 'weight',        'label' => 'শরীরের ওজন',              'weight' => 5,  'done' => !empty($user->weight)],
             ['key' => 'district_id',   'label' => 'জেলা / লোকেশন',         'weight' => 15, 'done' => !empty($user->district_id)],
-            ['key' => 'is_available',  'label' => 'ইমার্জেন্সি মোড চালু',   'weight' => 5,  'done' => (bool) $user->is_available],
-            ['key' => 'nid_path',      'label' => 'পরিচয়পত্র (NID) আপলোড', 'weight' => 10, 'done' => !empty($user->nid_path)],
+            ['key' => 'nid_path',      'label' => 'পরিচয়পত্র (NID)',      'weight' => 15, 'done' => !empty($user->nid_path) || !empty($user->nid_number)],
         ];
 
         $earned = collect($steps)->where('done', true)->sum('weight');
@@ -149,8 +148,8 @@ class ProfileController extends Controller
     public function uploadNid(Request $request): RedirectResponse
     {
         $request->validate([
-            'nid_number'   => ['nullable', 'string', 'min:10', 'max:20'],
-            'nid_document' => ['nullable', 'file', 'mimes:jpeg,png,jpg', 'max:2048'],
+            'nid_number'   => ['required_without:nid_document', 'nullable', 'string', 'min:10', 'max:20'],
+            'nid_document' => ['required_without:nid_number', 'nullable', 'file', 'mimes:jpeg,png,jpg,pdf', 'max:2048'],
         ]);
 
         $user    = $request->user();

@@ -90,6 +90,7 @@
         function loadUpazilas(distId, preSelectedUpz = null) {
             upzSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
             upzSelect.disabled = true;
+            upzSelect.value = '';
 
             if(distId) {
                 fetch(`/ajax/upazilas/${distId}`)
