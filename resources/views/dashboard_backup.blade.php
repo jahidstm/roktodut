@@ -64,7 +64,7 @@
                 
                 @if($pendingClaim->proof_image_path)
                     <div class="mt-4">
-                        <a href="{{ route('donations.proof', $pendingClaim->id) }}" target="_blank" class="text-sm font-bold text-blue-600 hover:underline">
+                        <a href="{{ asset('storage/' . $pendingClaim->proof_image_path) }}" target="_blank" class="text-sm font-bold text-blue-600 hover:underline">
                             🔍 ডোনারের দেওয়া প্রমাণ দেখুন
                         </a>
                     </div>
@@ -99,73 +99,29 @@
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     
-    {{-- A) ডোনার পরিচিতি কার্ড (Identity Zone) --}}
-    @php $user = auth()->user(); @endphp
-    <div class="mb-6 relative overflow-hidden bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-6 w-full">
-        
-        {{-- Top Right: Availability Toggle --}}
-        <div class="sm:absolute sm:top-6 sm:right-6 w-full sm:w-auto">
-            <form action="{{ route('donor_profile.is_available_now') }}" method="POST">
-                @csrf
-                <button type="submit" class="w-full sm:w-auto flex justify-center items-center gap-2 px-5 py-2.5 rounded-xl font-bold transition-all shadow-sm border text-sm {{ $user->is_available ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100' : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100' }}">
-                    <span class="relative flex h-2.5 w-2.5">
-                        @if($user->is_available)
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                        @else
-                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
-                        @endif
-                    </span>
-                    {{ $user->is_available ? 'উপলব্ধ' : 'ব্যস্ত' }}
-                </button>
-            </form>
-        </div>
-
-        {{-- Left: Big Blood Group Circle --}}
-        <div class="shrink-0 mt-4 sm:mt-0">
-            <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full bg-red-50 border-[6px] border-red-100 flex items-center justify-center shadow-inner relative">
-                <span class="absolute -top-3 -right-3 text-2xl">🩸</span>
-                <span class="text-4xl sm:text-5xl font-black text-red-600 drop-shadow-sm">
-                    {{ $user->blood_group?->value ?? '?' }}
-                </span>
-            </div>
-        </div>
-
-        {{-- Right: Details --}}
-        <div class="flex-1 text-center sm:text-left mt-2 sm:mt-0 flex flex-col justify-center h-full w-full sm:pt-2">
-            <h2 class="text-3xl sm:text-4xl font-black text-slate-900 mb-2">{{ $user->name }}</h2>
-            
-            <p class="text-slate-500 font-bold mb-4 flex items-center justify-center sm:justify-start gap-1.5 text-sm sm:text-base">
-                <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-                {{ $user->upazila?->name ?? 'উপজেলা দেওয়া নেই' }}, {{ $user->district?->name ?? 'জেলা দেওয়া নেই' }}
-            </p>
-
-            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                @if($user->nid_status === 'verified' || $user->verified_badge)
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-black rounded-lg shadow-sm">
-                        <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                        </svg>
-                        এনআইডি যাচাইকৃত
-                    </span>
-                @elseif($user->nid_status === 'pending')
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-black rounded-lg shadow-sm">
-                        এনআইডি রিভিউ হচ্ছে
-                    </span>
-                @else
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-50 border border-slate-200 text-slate-600 text-xs font-black rounded-lg shadow-sm">
-                        এনআইডি যাচাইকৃত নয়
-                    </span>
-                @endif
+    {{-- 🎯 THE FIX: হেডারের স্পেসিং ঠিক করা হয়েছে --}}
+    <div class="mb-8">
+        <div class="flex items-center gap-3">
+            <h1 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                স্বাগতম, {{ auth()->user()->name }}!
                 
-                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 border border-red-200 text-red-700 text-xs font-black rounded-lg shadow-sm">
-                    মোট ডোনেশন: {{ $totalContributions ?? 0 }} বার
-                </span>
-            </div>
+                @if(auth()->user()->verified_badge)
+                    <div class="group relative flex items-center justify-center cursor-help">
+                        <svg class="w-7 h-7 text-blue-500 drop-shadow-sm" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2.5 py-1 bg-slate-800 text-white text-[10px] font-bold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none shadow-lg">
+                            ভেরিফাইড ডোনার
+                        </span>
+                    </div>
+                @endif
+            </h1>
         </div>
+        <p class="text-slate-500 font-medium mt-1">আপনার রক্তদান এবং রিকোয়েস্টের বিস্তারিত ড্যাশবোর্ড।</p>
     </div>
-    
+
     {{-- 🚀 NID Upload Prompt for Organization Members --}}
+    @php $user = auth()->user(); @endphp
     @if($user->organization_id && $user->nid_status === 'pending' && empty($user->nid_path))
         <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8 shadow-sm">
             <div class="flex flex-col md:flex-row md:items-start gap-4">
@@ -175,7 +131,7 @@
                 <div class="flex-1">
                     <h3 class="text-lg font-black text-amber-900">ভেরিফিকেশন প্রয়োজন!</h3>
                     <p class="text-sm text-amber-800 font-medium mt-1">
-                        আপনি একটি ব্লাড ক্লাবের সদস্য হিসেবে যুক্ত হতে চেয়েছেন। ভেরিফাইড ডোনার (ব্লু-ব্যাজ) হতে আপনার এনআইডি (NID), জন্মনিবন্ধন বা স্টুডেন্ট আইডি কার্ডের ছবি আপলোড করুন।
+                        আপনি একটি ব্লাড ক্লাবের সদস্য হিসেবে যুক্ত হতে চেয়েছেন। ভেরিফাইড ডোনার (ব্লু-ব্যাজ) হতে আপনার NID, জন্মনিবন্ধন বা স্টুডেন্ট আইডি কার্ডের ছবি আপলোড করুন।
                     </p>
                     
                     <form action="{{ route('donor.upload_nid') }}" method="POST" enctype="multipart/form-data" class="mt-4 flex flex-col sm:flex-row items-center gap-3">
@@ -201,7 +157,8 @@
         </div>
     @endif
 
-{{-- B) Eligibility + Availability --}}
+
+    {{-- 1. Real-Time Status / Eligibility --}}
     @php
         $isEligible = $user->is_eligible_to_donate;
         $nextDate = $user->next_eligible_date;
@@ -280,9 +237,9 @@
                     </div>
                 </div>
                 <div>
-                    <h2 class="text-lg font-black text-slate-900 leading-tight">আপনার এলাকায় জরুরি অনুরোধ</h2>
+                    <h2 class="text-lg font-black text-slate-900 leading-tight">লোকাল ইমার্জেন্সি রাডার</h2>
                     <p class="text-xs font-semibold text-slate-500">
-                        আপনার এলাকায় স্ক্যান করা হচ্ছে…
+                        {{ auth()->user()->district?->name ?? 'আপনার জেলা' }}-তে সক্রিয় জরুরি রিকোয়েস্টসমূহ
                     </p>
                 </div>
             </div>
@@ -428,51 +385,56 @@
     <div class="mb-10 rounded-2xl border border-slate-200 bg-white p-6 flex items-center gap-4 shadow-sm">
         <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 text-xl">✅</div>
         <div>
-            <p class="font-black text-slate-800">এই মুহূর্তে জরুরি অনুরোধ নেই—আপনার এলাকা পর্যবেক্ষণে আছে।</p>
+            <p class="font-black text-slate-800">আপনার এলাকায় এখন কোনো জরুরি রিকোয়েস্ট নেই</p>
             <p class="text-xs text-slate-500 font-medium mt-0.5">রাডার সক্রিয় আছে — নতুন রিকোয়েস্ট আসলে এখানে দেখা যাবে।</p>
         </div>
     </div>
     @endif
 
-    
-    {{-- E) My Commitments (Ongoing) --}}
-    @if(isset($ongoingCommitments) && $ongoingCommitments->count() > 0)
+    {{-- 🎯 ডোনারের ড্যাশবোর্ডে অ্যাকসেপ্ট করা রিকোয়েস্টের লিস্ট --}}
+    @if(isset($acceptedDonations) && $acceptedDonations->count() > 0)
     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-10">
-        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-blue-50/50">
+        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-red-50/50">
             <div>
-                <h2 class="text-lg font-extrabold text-blue-900 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    আমার চলমান কমিটমেন্ট
+                <h2 class="text-lg font-extrabold text-red-900 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    আপনার রেসপন্স করা রিকোয়েস্ট
                 </h2>
-                <p class="text-sm text-blue-700/70 font-medium mt-1">যে রিকোয়েস্টগুলোতে আপনি রক্ত দেওয়ার প্রতিশ্রুতি দিয়েছেন</p>
+                <p class="text-sm text-red-700/70 font-medium mt-1">রক্তদানের পর এখান থেকে প্রমাণ জমা দিন বা পিন দিন</p>
             </div>
-            <a href="{{ route('requests.index') }}" class="text-xs font-bold text-blue-600 hover:underline">সব দেখুন</a>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <tbody class="divide-y divide-slate-100 text-sm">
-                    @foreach($ongoingCommitments as $commitment)
+                    @foreach($acceptedDonations as $donation)
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-6 py-4">
-                                <div class="font-extrabold text-slate-900">রোগী: {{ $commitment->bloodRequest->patient_name ?? 'N/A' }}</div>
-                                <div class="text-xs font-bold text-slate-500 mt-0.5">গ্রুপ: <span class="text-blue-600">{{ $commitment->bloodRequest->blood_group?->value ?? $commitment->bloodRequest->blood_group }}</span></div>
+                                <div class="font-extrabold text-slate-900">রোগী: {{ $donation->bloodRequest->patient_name ?? 'N/A' }}</div>
+                                <div class="text-xs font-bold text-slate-500 mt-0.5">গ্রুপ: <span class="text-red-600">{{ $donation->bloodRequest->blood_group?->value ?? $donation->bloodRequest->blood_group }}</span></div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="font-semibold text-slate-700">{{ $commitment->bloodRequest->hospital ?? 'N/A' }}</div>
-                                <div class="text-xs font-bold text-slate-500 mt-0.5">{{ $commitment->bloodRequest->district?->name ?? 'অজানা জেলা' }}</div>
+                                <div class="font-semibold text-slate-700">{{ $donation->bloodRequest->needed_at?->format('d M, Y') ?? 'ASAP' }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                @if($commitment->verification_status === 'pending')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-blue-100 text-blue-800">চলমান</span>
-                                @elseif($commitment->verification_status === 'claimed')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">রিভিউ হচ্ছে</span>
+                                @if($donation->verification_status === 'pending')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800">অপেক্ষমাণ (Pending)</span>
+                                @elseif($donation->verification_status === 'claimed')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-blue-100 text-blue-800">রিভিউ হচ্ছে (Claimed)</span>
+                                @elseif($donation->verification_status === 'verified')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">ভেরিফাইড (Verified)</span>
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <a href="{{ route('requests.show', $commitment->blood_request_id) }}" class="inline-flex items-center justify-center px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-extrabold text-slate-700 hover:bg-slate-100 transition">
-                                    ডিটেইলস
-                                </a>
+                                @if($donation->verification_status === 'pending')
+                                    <a href="{{ route('requests.show', $donation->blood_request_id) }}" class="inline-flex items-center justify-center px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-extrabold shadow-sm hover:bg-slate-800 transition">
+                                        প্রমাণ জমা দিন (Claim)
+                                    </a>
+                                @else
+                                    <a href="{{ route('requests.show', $donation->blood_request_id) }}" class="inline-flex items-center justify-center px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-extrabold text-slate-700 hover:bg-slate-100 transition">
+                                        ভিউ রিকোয়েস্ট
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @endforeach
@@ -482,75 +444,8 @@
     </div>
     @endif
 
-    {{-- F) Impact Proof Zone --}}
-    <div class="mb-10">
-        <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 shadow-xl text-white mb-6">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
-                <div>
-                    <h2 class="text-3xl font-black text-rose-500 mb-2 flex items-center gap-3">
-                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                        {{ $successfulDonationsCount ?? 0 }} সফল ডোনেশন
-                    </h2>
-                    <p class="text-slate-300 font-medium text-sm max-w-lg">
-                        এখানে শুধুমাত্র আপনার ভেরিফাইড এবং সম্পন্ন হওয়া ডোনেশনগুলোর হিসাব রাখা হয়েছে।
-                    </p>
-                </div>
-            </div>
-        </div>
 
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-5 border-b border-slate-100">
-                <h3 class="text-lg font-extrabold text-slate-900">ভেরিফাইড রক্তদান হিস্ট্রি</h3>
-                <p class="text-sm text-slate-500 font-medium mt-1">আপনার অতীতের সফল রক্তদানের লগ</p>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-slate-50 border-b border-slate-100 text-xs uppercase tracking-wider font-bold text-slate-500">
-                            <th class="px-6 py-4">তারিখ</th>
-                            <th class="px-6 py-4">হাসপাতাল ও লোকেশন</th>
-                            <th class="px-6 py-4">রিকোয়েস্ট রেফারেন্স</th>
-                            <th class="px-6 py-4 text-right">স্ট্যাটাস</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100 text-sm">
-                        @if(isset($donationHistory))
-                            @forelse($donationHistory as $history)
-                                <tr class="hover:bg-slate-50 transition">
-                                    <td class="px-6 py-4">
-                                        <div class="font-extrabold text-slate-900">{{ $history->fulfilled_at ? $history->fulfilled_at->format('d M, Y') : 'N/A' }}</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="font-semibold text-slate-700">{{ $history->bloodRequest->hospital ?? 'N/A' }}</div>
-                                        <div class="text-xs text-slate-500 font-medium">{{ $history->bloodRequest->district?->name ?? 'N/A' }}, {{ $history->bloodRequest->upazila?->name ?? '' }}</div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <span class="text-xs font-bold text-slate-400 font-mono bg-slate-100 px-2 py-1 rounded-md">
-                                            REQ-{{ str_pad($history->blood_request_id, 4, '0', STR_PAD_LEFT) }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-right">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 uppercase tracking-widest">
-                                            সম্পন্ন
-                                        </span>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-6 py-12 text-center">
-                                        <div class="text-4xl mb-3">📋</div>
-                                        <p class="font-bold text-slate-600">কোনো হিস্ট্রি পাওয়া যায়নি</p>
-                                        <p class="text-xs text-slate-500 mt-1">আপনার প্রথম রক্তদানের পর এখানে তা সংরক্ষিত থাকবে।</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-{{-- 4. User Impact (Stats Grid) --}}
+    {{-- 4. User Impact (Stats Grid) --}}
     {{-- ══════════════════════════════════════════
          📊 Stats Grid
     ══════════════════════════════════════════ --}}
@@ -588,6 +483,166 @@
         </div>
     </div>
 
+
+    {{-- 5. Motivation Engine (Gamification Summary) --}}
+    {{-- ══════════════════════════════════════════
+         🪪 Digital Smart Card — QR Verified Identity
+    ══════════════════════════════════════════ --}}
+    @if($user->qr_token && $user->nid_status === 'verified')
+    <div class="mb-10 relative overflow-hidden rounded-3xl border border-slate-700/50 shadow-2xl"
+         style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #1c0808 100%);">
+
+        {{-- Decorative blobs --}}
+        <div class="absolute -top-16 -right-16 w-60 h-60 rounded-full pointer-events-none"
+             style="background: radial-gradient(circle, rgba(220,38,38,0.13) 0%, transparent 70%);"></div>
+        <div class="absolute -bottom-12 -left-12 w-48 h-48 rounded-full pointer-events-none"
+             style="background: radial-gradient(circle, rgba(153,27,27,0.10) 0%, transparent 70%);"></div>
+        <div class="absolute top-0 left-0 right-0 h-px pointer-events-none"
+             style="background: linear-gradient(to right, transparent, rgba(220,38,38,0.35), transparent);"></div>
+
+        <div class="relative z-10 p-6 sm:p-8">
+
+            {{-- ── Header Row ── --}}
+            <div class="flex items-start justify-between gap-4 mb-7">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0"
+                         style="background:rgba(220,38,38,.12); border:1px solid rgba(220,38,38,.22);">
+                        <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h2 class="text-white font-black text-base leading-tight">Digital Smart Card</h2>
+                        <p class="text-slate-500 text-xs font-semibold mt-0.5">QR কোড স্ক্যান করে পরিচয় যাচাই করুন</p>
+                    </div>
+                </div>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1.5 text-emerald-400 text-[11px] font-bold rounded-full shrink-0"
+                      style="background:rgba(74,222,128,.1); border:1px solid rgba(74,222,128,.25);">
+                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                    </svg>
+                    NID Verified
+                </span>
+            </div>
+
+            {{-- ── Card Body ── --}}
+            <div class="flex flex-col sm:flex-row items-center gap-7">
+
+                {{-- QR Code (JavaScript rendered) --}}
+                <div class="shrink-0 flex flex-col items-center gap-2">
+                    <div class="bg-white p-3.5 rounded-2xl"
+                         style="box-shadow: 0 20px 40px rgba(0,0,0,.55), 0 0 0 4px rgba(255,255,255,.06);">
+                        <div id="smart-card-qr" style="width:148px;height:148px;"></div>
+                    </div>
+                    <p class="text-slate-600 text-[10px] font-bold uppercase tracking-widest">হাসপাতালে স্ক্যান করুন</p>
+                </div>
+
+                {{-- Donor Details --}}
+                <div class="flex-1 w-full text-center sm:text-left">
+
+                    {{-- Name --}}
+                    <h3 class="text-2xl sm:text-3xl font-black text-white leading-tight mb-3">{{ $user->name }}</h3>
+
+                    {{-- Chips Row --}}
+                    <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-4">
+
+                        {{-- Blood Group --}}
+                        <span class="inline-flex items-center gap-1.5 text-lg font-black px-4 py-2 rounded-xl text-red-300"
+                              style="background:rgba(220,38,38,.15); border:1.5px solid rgba(220,38,38,.3);">
+                            🩸 {{ $user->blood_group?->value ?? 'N/A' }}
+                        </span>
+
+                        {{-- Availability Status --}}
+                        @if($isEligible && $user->is_available)
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl text-emerald-300"
+                                  style="background:rgba(22,163,74,.12); border:1.5px solid rgba(22,163,74,.25);">
+                                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                Available
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl text-amber-300"
+                                  style="background:rgba(217,119,6,.1); border:1.5px solid rgba(217,119,6,.25);">
+                                <span class="inline-block w-2 h-2 rounded-full bg-amber-400"></span>
+                                In Cooldown
+                            </span>
+                        @endif
+
+                        {{-- Verified Donor Badge --}}
+                        @if($user->verified_badge)
+                            <span class="inline-flex items-center gap-1 text-xs font-bold px-3 py-2 rounded-xl text-blue-300"
+                                  style="background:rgba(59,130,246,.12); border:1.5px solid rgba(59,130,246,.25);">
+                                <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                </svg>
+                                ভেরিফাইড ডোনার
+                            </span>
+                        @endif
+                    </div>
+
+                    {{-- Quick Stats --}}
+                    <div class="grid grid-cols-2 gap-2.5 mb-5">
+                        <div class="rounded-xl p-3 text-center sm:text-left"
+                             style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);">
+                            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">মোট ডোনেশন</p>
+                            <p class="text-white font-black text-xl leading-none">
+                                {{ $totalContributions ?? 0 }}
+                                <span class="text-slate-500 font-semibold text-xs ml-0.5">বার</span>
+                            </p>
+                        </div>
+                        <div class="rounded-xl p-3 text-center sm:text-left"
+                             style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);">
+                            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">গ্যামিফিকেশন পয়েন্ট</p>
+                            <p class="text-amber-400 font-black text-xl leading-none">
+                                {{ number_format($user->points ?? 0) }}
+                                <span class="text-slate-500 font-semibold text-xs ml-0.5">pts</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Shareable Link --}}
+                    <div class="flex items-center gap-2">
+                        <input id="smart-card-link"
+                               type="text"
+                               value="{{ route('public.verify', $user->qr_token) }}"
+                               class="flex-1 text-xs py-2.5 px-3 rounded-xl text-slate-400 font-mono focus:outline-none focus:ring-1 focus:ring-red-600/40 min-w-0 truncate"
+                               style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1);"
+                               readonly>
+                        <button onclick="copySmartCardLink()" id="smart-card-copy-btn"
+                                class="shrink-0 bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-colors whitespace-nowrap">
+                            কপি লিঙ্ক
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Security Note --}}
+            <p class="text-slate-600 text-[10px] font-semibold mt-5 pt-4 text-center"
+               style="border-top: 1px solid rgba(255,255,255,.06);">
+                🔒 এই QR কোডে ফোন নম্বর, ইমেইল বা ব্যক্তিগত তথ্য নেই — শুধুমাত্র পরিচয় যাচাই করা যাবে।
+            </p>
+        </div>
+    </div>
+
+    {{-- QR Code Generator via CDN (no PHP extension required) --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var verifyUrl = @json(route('public.verify', $user->qr_token));
+            var container = document.getElementById('smart-card-qr');
+            if (container) {
+                new QRCode(container, {
+                    text: verifyUrl,
+                    width: 148,
+                    height: 148,
+                    colorDark : "#1e293b",
+                    colorLight : "#ffffff",
+                    correctLevel : QRCode.CorrectLevel.M
+                });
+            }
+        });
+    </script>
+    @endif
 
     {{-- ══════════════════════════════════════════
          🏆 গ্যামিফিকেশন উইজেট

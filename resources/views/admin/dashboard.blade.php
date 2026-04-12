@@ -310,8 +310,8 @@
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
                     <div class="bg-slate-100 h-48 w-full relative group">
                         @if($claim->proof_image_path)
-                            <img src="{{ asset('storage/' . $claim->proof_image_path) }}" class="w-full h-full object-cover">
-                            <a href="{{ asset('storage/' . $claim->proof_image_path) }}" target="_blank" class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                            <img src="{{ route('donations.proof', $claim->id) }}" class="w-full h-full object-cover">
+                            <a href="{{ route('donations.proof', $claim->id) }}" target="_blank" class="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
                                 <span class="bg-white text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm">বড় করে দেখুন</span>
                             </a>
                         @else

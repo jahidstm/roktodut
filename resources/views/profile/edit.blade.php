@@ -438,7 +438,7 @@
                 this.isLoading = true;
                 
                 try {
-                    const response = await axios.post('{{ route('profile.emergency.toggle') }}', {}, {
+                    const response = await axios.post('{{ route('donor_profile.is_available_now') }}', {}, {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')

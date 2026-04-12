@@ -113,13 +113,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    Route::post('/profile/emergency-mode', [ProfileController::class, 'toggleEmergencyMode'])->name('profile.emergency.toggle');
+    Route::post('/profile/availability', [ProfileController::class, 'toggleEmergencyMode'])->name('donor_profile.is_available_now');
 
     Route::post('/welcome-back/update', [ProfileController::class, 'welcomeBackUpdate'])->name('welcome_back.update');
     Route::post('/donor/upload-nid', [ProfileController::class, 'uploadNid'])->name('donor.upload_nid');
     Route::get('/donor/{id}/nid-document', [ProfileController::class, 'viewNid'])->name('donor.view_nid');
     Route::post('/blog', [BlogSubmissionController::class, 'store'])->name('blog.store');
     Route::post('/donation-record', [DonationRecordController::class, 'update'])->name('donation.record.update');
+    Route::get('/donations/{response}/proof', [DonationClaimController::class, 'viewProof'])->name('donations.proof');
 });
 
 // --- ৫. ড্যাশবোর্ড রাউটস (রোল ভিত্তিক) ---

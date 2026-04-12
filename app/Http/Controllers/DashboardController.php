@@ -45,15 +45,28 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // 🎯 ৪. ডোনার হিসেবে আপনার একসেপ্ট করা সাম্প্রতিক ৫টি ডোনেশন
-        // ফিক্স: 'donor_id' এর বদলে 'user_id' ব্যবহার করা হয়েছে
-        $acceptedDonations = BloodRequestResponse::where('user_id', $user->id)
-            ->with(['bloodRequest'])
+        // 🎯 ৪. ডোনার হিসেবে আপনার চলমান কমিটমেন্ট (Top 3)
+        $ongoingCommitments = BloodRequestResponse::where('user_id', $user->id)
+            ->whereIn('verification_status', ['pending', 'claimed'])
+            ->with(['bloodRequest.district', 'bloodRequest.upazila'])
             ->orderByDesc('created_at')
-            ->limit(5)
+            ->limit(3)
             ->get();
 
-        // ৫. গ্রহীতার রিকোয়েস্টে কোনো ডোনার 'claimed' অবস্থায় আছে কি না (পপ-আপ লজিক)
+        // 🎯 ৫. ডোনেশন হিস্ট্রি (History Table)
+        $donationHistory = BloodRequestResponse::where('user_id', $user->id)
+            ->whereNotNull('fulfilled_at')
+            ->with(['bloodRequest.district', 'bloodRequest.upazila'])
+            ->orderByDesc('fulfilled_at')
+            ->get();
+
+        $successfulDonationsCount = BloodRequestResponse::where('user_id', $user->id)
+            ->whereNotNull('fulfilled_at')
+            ->count();
+
+        $livesSaved = $totalContributions * 3;
+
+        // ৬. গ্রহীতার রিকোয়েস্টে কোনো ডোনার 'claimed' অবস্থায় আছে কি না (পপ-আপ লজিক)
         $pendingClaim = BloodRequestResponse::whereHas('bloodRequest', function ($query) use ($user) {
             $query->where('requested_by', $user->id);
         })
@@ -161,7 +174,11 @@ class DashboardController extends Controller
             'successRate',
             'recentRequests',
             'pendingClaim',
-            'acceptedDonations',
+            'ongoingCommitments',
+            'donationHistory',
+            'successfulDonationsCount',
+            'livesSaved',
+            'totalDonations',
             'gamificationStats',
             'radarRequests',
             'showInactivePopup'

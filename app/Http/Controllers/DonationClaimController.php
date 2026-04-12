@@ -34,54 +34,17 @@ class DonationClaimController extends Controller
             if ($request->pin === $response->verification_pin) {
 
                 $response->update([
-                    'verification_status' => 'verified',
+                    'verification_status' => 'claimed',
                     'donor_claimed_at'    => now(),
                 ]);
 
-                $donor = Auth::user();
-                if ($donor) {
-                    $bloodRequest  = $response->bloodRequest;
-                    $isFirstResponder = false;
-                    $isMidnightSavior = false;
-                    
-                    if ($bloodRequest && $bloodRequest->urgency === 'emergency') {
-                        // 🎯 First Responder বোনাস চেক
-                        $responseTimeHours = $bloodRequest->created_at->diffInHours($response->created_at);
-                        if ($responseTimeHours <= 3) {
-                            $isFirstResponder = true;
-                        }
-
-                        // 🌙 Midnight Savior ব্যাজ চেক (রাত ১২টা - ভোর ৫টা)
-                        $responseHour = $response->created_at->hour;
-                        if ($responseHour >= 0 && $responseHour <= 5) {
-                            $isMidnightSavior = true;
-                        }
-                    }
-
-                    // 🏆 GamificationService দিয়ে পয়েন্ট ও ব্যাজ আপডেট
-                    $this->gamification->processDonationReward(
-                        donor: $donor,
-                        bloodRequest: $bloodRequest ?? new \App\Models\BloodRequest(),
-                        isFirstResponder: $isFirstResponder,
-                        isMidnightSavior: $isMidnightSavior
-                    );
-                }
-
-                $msg = '🎉 পিন মিলেছে! আপনার রক্তদান সফলভাবে ভেরিফাইড হয়েছে। +৫০ পয়েন্ট অর্জিত হয়েছে!';
-                if ($isFirstResponder ?? false) {
-                    $msg .= ' এবং First Responder বোনাস হিসেবে আরও +১০ পয়েন্ট পেয়েছেন!';
-                }
-                if ($isMidnightSavior ?? false) {
-                    $msg .= ' 🌙 আপনি Midnight Savior ব্যাজ অর্জন করেছেন!';
-                }
-
-                return back()->with('success', $msg);
+                return back()->with('success', '🎉 পিন মিলেছে! আপনার দাবিটি (Claim) রেকর্ড করা হয়েছে। গ্রহীতা বা অ্যাডমিন রিভিউয়ের পর আপনার পয়েন্ট ও ব্যাজ যুক্ত হবে।');
             }
             return back()->with('error', 'দুঃখিত, পিনটি সঠিক নয়।');
         }
 
         if ($request->claim_method === 'image') {
-            $path = $request->file('proof_image')->store('donation_proofs', 'public');
+            $path = $request->file('proof_image')->store('donation_proofs', 'private');
             $response->update([
                 'proof_image_path'    => $path,
                 'verification_status' => 'claimed',
@@ -104,7 +67,11 @@ class DonationClaimController extends Controller
         $request->validate(['decision' => 'required|in:approve,dispute']);
 
         if ($request->decision === 'approve') {
-            $response->update(['verification_status' => 'verified']);
+            $response->update([
+                'verification_status' => 'verified',
+                'fulfilled_at'        => now(),
+                'fulfilled_by'        => Auth::id()
+            ]);
 
             $donor = $response->user;
             if ($donor) {
@@ -159,7 +126,11 @@ class DonationClaimController extends Controller
         $request->validate(['status' => 'required|in:verified,rejected']);
 
         if ($request->status === 'verified') {
-            $response->update(['verification_status' => 'verified']);
+            $response->update([
+                'verification_status' => 'verified',
+                'fulfilled_at'        => now(),
+                'fulfilled_by'        => Auth::id()
+            ]);
 
             $donor = $response->user;
             if ($donor) {
@@ -194,5 +165,30 @@ class DonationClaimController extends Controller
             $response->update(['verification_status' => 'rejected']);
             return back()->with('error', 'বাতিল করা হয়েছে।');
         }
+    }
+
+    /**
+     * সিকিউরলি প্রুফ ইমেজ দেখার জন্য
+     */
+    public function viewProof(Request $request, BloodRequestResponse $response)
+    {
+        $user = Auth::user();
+        $isDonor = $user->id === $response->user_id;
+        $isRecipient = $user->id === $response->bloodRequest->requested_by;
+        $isAdmin = $user->role->value === 'admin' || $user->role === 'admin';
+        
+        if (!$isDonor && !$isRecipient && !$isAdmin) {
+            abort(403, 'এই ডকুমেন্টটি দেখার অনুমতি আপনার নেই।');
+        }
+
+        if (!$response->proof_image_path) {
+            abort(404, 'কোনো প্রমাণ সংযুক্ত নেই।');
+        }
+
+        if (!Storage::disk('private')->exists($response->proof_image_path)) {
+            abort(404, 'ফাইলটি সার্ভারে পাওয়া যায়নি।');
+        }
+
+        return Storage::disk('private')->response($response->proof_image_path);
     }
 }
