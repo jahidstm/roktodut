@@ -1,5 +1,12 @@
-<x-guest-layout>
-    <form method="POST" action="{{ route('password.store') }}">
+<x-auth-split-layout>
+    @section('title', 'নতুন পাসওয়ার্ড সেট করুন')
+    
+    <div class="mb-8 text-center pt-2">
+        <h2 class="text-3xl items-center font-bold text-slate-800 mb-2">নতুন পাসওয়ার্ড</h2>
+        <p class="text-slate-500">আপনার অ্যাকাউন্টের জন্য একটি শক্তিশালী নতুন পাসওয়ার্ড দিন</p>
+    </div>
+
+    <form method="POST" action="{{ route('password.store') }}" class="space-y-4">
         @csrf
 
         <!-- Password Reset Token -->
@@ -7,33 +14,27 @@
 
         <!-- Email Address -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <label for="email" class="block text-sm font-medium text-slate-700 mb-1">ইমেইল ঠিকানা <span class="text-red-500">*</span></label>
+            <input id="email" type="email" name="email" value="{{ old('email', $request->email) }}" required autofocus autocomplete="username" class="input-modern" />
+            <x-input-error :messages="$errors->get('email')" class="mt-1 text-sm text-red-600" />
         </div>
 
         <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div>
+            <label for="password" class="block text-sm font-medium text-slate-700 mb-1">নতুন পাসওয়ার্ড <span class="text-red-500">*</span></label>
+            <input id="password" type="password" name="password" required autocomplete="new-password" placeholder="সর্বনিম্ন ৮ অক্ষর" class="input-modern" />
+            <x-input-error :messages="$errors->get('password')" class="mt-1 text-sm text-red-600" />
         </div>
 
         <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                                type="password"
-                                name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        <div>
+            <label for="password_confirmation" class="block text-sm font-medium text-slate-700 mb-1">পাসওয়ার্ড নিশ্চিত করুন <span class="text-red-500">*</span></label>
+            <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" placeholder="পুনরায় লিখুন" class="input-modern" />
+            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-1 text-sm text-red-600" />
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
-        </div>
+        <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-xl shadow-lg shadow-red-600/30 transition-all hover:-translate-y-0.5 mt-2">
+            পাসওয়ার্ড পরিবর্তন করুন
+        </button>
     </form>
-</x-guest-layout>
+</x-auth-split-layout>
