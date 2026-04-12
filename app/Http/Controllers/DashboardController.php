@@ -21,19 +21,26 @@ class DashboardController extends Controller
         $user = Auth::user()->load('badges');
 
         // ২. স্ট্যাটিস্টিকস ক্যালকুলেশন
+        // "মোট রিকোয়েস্ট": Count of requests CREATED by this user.
         $totalRequestsMade = BloodRequest::where('requested_by', $user->id)->count();
 
-        $fulfilledRequests = BloodRequest::where('requested_by', $user->id)
-            ->where('status', 'fulfilled')
-            ->count();
-
+        // "আপনার অবদান": Count of successful donations (where fulfilled_at is NOT NULL).
         $totalContributions = BloodRequestResponse::where('user_id', $user->id)
-            ->where('status', 'accepted')
+            ->whereNotNull('fulfilled_at')
             ->count();
 
-        $successRate = $totalRequestsMade > 0
-            ? round(($fulfilledRequests / $totalRequestsMade) * 100, 1)
-            : 0;
+        // "সফল রিকোয়েস্ট": Count of requests user responded to that were fulfilled.
+        $fulfilledRequests = BloodRequestResponse::where('user_id', $user->id)
+            ->whereHas('bloodRequest', function ($q) {
+                $q->where('status', 'fulfilled');
+            })
+            ->count();
+
+        // "সফলতার হার": (Fulfilled Donations / Total Responses) * 100. If total responses is 0, show "N/A" (not 0%).
+        $totalUserResponses = BloodRequestResponse::where('user_id', $user->id)->count();
+        $successRate = $totalUserResponses > 0
+            ? round(($totalContributions / $totalUserResponses) * 100, 1)
+            : 'N/A';
 
         // ৩. সাম্প্রতিক ৫টি রিকোয়েস্টের হিস্ট্রি (Eager Loading সহ)
         $recentRequests = BloodRequest::where('requested_by', $user->id)

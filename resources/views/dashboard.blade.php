@@ -97,11 +97,11 @@
     </div>
 @endif
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
     
     {{-- A) ডোনার পরিচিতি কার্ড (Identity Zone) --}}
     @php $user = auth()->user(); @endphp
-    <div class="mb-6 relative overflow-hidden bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start gap-6 w-full">
+    <div class="relative overflow-hidden bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-start w-full">
         
         {{-- Top Right: Availability Toggle --}}
         <div class="sm:absolute sm:top-6 sm:right-6 w-full sm:w-auto">
@@ -116,7 +116,7 @@
                             <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
                         @endif
                     </span>
-                    {{ $user->is_available ? 'উপলব্ধ' : 'ব্যস্ত' }}
+                    {{ $user->is_available ? 'Available' : 'Busy' }}
                 </button>
             </form>
         </div>
@@ -179,7 +179,7 @@
     
     {{-- 🚀 NID Upload Prompt for Organization Members --}}
     @if($user->organization_id && $user->nid_status === 'pending' && empty($user->nid_path))
-        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8 shadow-sm">
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 shadow-sm">
             <div class="flex flex-col md:flex-row md:items-start gap-4">
                 <div class="shrink-0 text-amber-600 bg-amber-100 p-3 rounded-full hidden md:block">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
@@ -202,7 +202,7 @@
             </div>
         </div>
     @elseif($user->organization_id && $user->nid_status === 'pending' && !empty($user->nid_path))
-        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 mb-8 shadow-sm flex items-center gap-4">
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 shadow-sm flex items-center gap-4">
             <div class="shrink-0 text-blue-600 bg-blue-100 p-3 rounded-full">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
@@ -219,7 +219,7 @@
         $nextDate = $user->next_eligible_date;
     @endphp
 
-    <div class="mb-10 bg-white p-6 rounded-3xl border {{ $isEligible ? 'border-emerald-200 shadow-emerald-50' : 'border-amber-200 shadow-amber-50' }} shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
+    <div class="bg-white p-6 rounded-3xl border {{ $isEligible ? 'border-emerald-200 shadow-emerald-50' : 'border-amber-200 shadow-amber-50' }} shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
         <div class="flex items-center gap-4">
             <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full {{ $isEligible ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600' }}">
                 <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -257,7 +257,7 @@
 
 
     {{-- 2. Core Action (CTA Row) --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <a href="{{ route('requests.create') }}" class="group p-8 rounded-3xl bg-red-600 hover:bg-red-700 transition shadow-lg shadow-red-200">
             <div class="text-white font-black text-xl mb-2">জরুরি রক্তের দরকার?</div>
             <p class="text-red-100 text-sm font-medium">সহজেই নতুন রিকোয়েস্ট তৈরি করুন এবং ডোনারদের সাথে যোগাযোগ করুন।</p>
@@ -276,7 +276,7 @@
          ইউজারের জেলার সক্রিয় রক্তের রিকোয়েস্ট — Priority sorted
     ══════════════════════════════════════════════════════════════ --}}
     @if($radarRequests->isNotEmpty())
-    <div class="mb-10">
+    <div>
 
         {{-- ── Header ── --}}
         <div class="flex items-center justify-between mb-4">
@@ -437,7 +437,7 @@
     </div>
     @elseif(auth()->user()->district_id)
     {{-- Radar active but no requests --}}
-    <div class="mb-10 rounded-2xl border border-slate-200 bg-white p-6 flex items-center gap-4 shadow-sm">
+    <div class="rounded-2xl border border-slate-200 bg-white p-6 flex items-center gap-4 shadow-sm">
         <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0 text-xl">✅</div>
         <div>
             <p class="font-black text-slate-800">এই মুহূর্তে জরুরি অনুরোধ নেই—আপনার এলাকা পর্যবেক্ষণে আছে।</p>
@@ -449,7 +449,7 @@
     
     {{-- E) My Commitments (Ongoing) --}}
     @if(isset($ongoingCommitments) && $ongoingCommitments->count() > 0)
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden mb-10">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
         <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-blue-50/50">
             <div>
                 <h2 class="text-lg font-extrabold text-blue-900 flex items-center gap-2">
@@ -494,22 +494,46 @@
     </div>
     @endif
 
-    {{-- F) Impact Proof Zone --}}
-    <div class="mb-10">
-        <div class="bg-gradient-to-br from-slate-900 to-slate-800 rounded-3xl p-8 shadow-xl text-white mb-6">
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
-                <div>
-                    <h2 class="text-3xl font-black text-rose-500 mb-2 flex items-center gap-3">
-                        <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                        {{ $successfulDonationsCount ?? 0 }} সফল ডোনেশন
-                    </h2>
-                    <p class="text-slate-300 font-medium text-sm max-w-lg">
-                        এখানে শুধুমাত্র আপনার ভেরিফাইড এবং সম্পন্ন হওয়া ডোনেশনগুলোর হিসাব রাখা হয়েছে।
-                    </p>
-                </div>
+    {{-- 4. User Impact (Stats Grid) --}}
+    {{-- ══════════════════════════════════════════
+         📊 Stats Grid
+    ══════════════════════════════════════════ --}}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-slate-500 text-sm font-bold uppercase tracking-wider">মোট রিকোয়েস্ট</div>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-4xl font-black text-slate-900">{{ $totalRequestsMade ?? 0 }}</span>
+                <span class="text-slate-400 font-bold text-sm">টি</span>
             </div>
         </div>
 
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-emerald-600 text-sm font-bold uppercase tracking-wider">আপনার অবদান</div>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-4xl font-black text-emerald-600">{{ $totalContributions ?? 0 }}</span>
+                <span class="text-emerald-400 font-bold text-sm">বার</span>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-red-600 text-sm font-bold uppercase tracking-wider">সফল রিকোয়েস্ট</div>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-4xl font-black text-red-600">{{ $fulfilledRequests ?? 0 }}</span>
+                <span class="text-red-400 font-bold text-sm">টি</span>
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="text-blue-600 text-sm font-bold uppercase tracking-wider">সফলতার হার</div>
+            <div class="mt-2 flex items-baseline gap-2">
+                <span class="text-4xl font-black text-blue-600">{{ $successRate ?? 0 }}</span>
+                @if($successRate !== 'N/A')<span class="text-blue-400 font-bold text-sm">%</span>@endif
+            </div>
+        </div>
+    </div>
+
+    {{-- 7. Verified Donation History --}}
+    <div>
         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
             <div class="px-6 py-5 border-b border-slate-100">
                 <h3 class="text-lg font-extrabold text-slate-900">ভেরিফাইড রক্তদান হিস্ট্রি</h3>
@@ -562,51 +586,79 @@
             </div>
         </div>
     </div>
-{{-- 4. User Impact (Stats Grid) --}}
-    {{-- ══════════════════════════════════════════
-         📊 Stats Grid
-    ══════════════════════════════════════════ --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div class="text-slate-500 text-sm font-bold uppercase tracking-wider">মোট রিকোয়েস্ট</div>
-            <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-4xl font-black text-slate-900">{{ $totalRequestsMade ?? 0 }}</span>
-                <span class="text-slate-400 font-bold text-sm">টি</span>
+
+    @if(isset($recentRequests))
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+            <div>
+                <h2 class="text-lg font-extrabold text-slate-900">আপনার সাম্প্রতিক রিকোয়েস্টসমূহ</h2>
+                <p class="text-sm text-slate-500 font-medium mt-1">সর্বশেষ ৫টি রিকোয়েস্টের আপডেট</p>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div class="text-emerald-600 text-sm font-bold uppercase tracking-wider">আপনার অবদান</div>
-            <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-4xl font-black text-emerald-600">{{ $totalContributions ?? 0 }}</span>
-                <span class="text-emerald-400 font-bold text-sm">বার</span>
-            </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div class="text-red-600 text-sm font-bold uppercase tracking-wider">সফল রিকোয়েস্ট</div>
-            <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-4xl font-black text-red-600">{{ $fulfilledRequests ?? 0 }}</span>
-                <span class="text-red-400 font-bold text-sm">টি</span>
-            </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div class="text-blue-600 text-sm font-bold uppercase tracking-wider">সফলতার হার</div>
-            <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-4xl font-black text-blue-600">{{ $successRate ?? 0 }}</span>
-                <span class="text-blue-400 font-bold text-sm">%</span>
-            </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold">
+                        <th class="px-6 py-4 border-b border-slate-100">রোগীর নাম ও গ্রুপ</th>
+                        <th class="px-6 py-4 border-b border-slate-100">দরকার</th>
+                        <th class="px-6 py-4 border-b border-slate-100">সাড়া (Accepted)</th>
+                        <th class="px-6 py-4 border-b border-slate-100">স্ট্যাটাস</th>
+                        <th class="px-6 py-4 border-b border-slate-100 text-right">অ্যাকশন</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-sm">
+                    @forelse($recentRequests as $req)
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4">
+                                <div class="font-extrabold text-slate-900">{{ $req->patient_name ?? 'রোগী' }}</div>
+                                <div class="text-xs font-bold text-red-600 mt-0.5">{{ $req->blood_group?->value ?? (string) $req->blood_group }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-semibold text-slate-700">{{ $req->needed_at?->format('d M, Y') ?? 'ASAP' }}</div>
+                                <div class="text-xs text-slate-500 font-medium">{{ $req->needed_at?->format('h:i A') ?? '' }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-extrabold text-emerald-600">{{ $req->accepted_responses ?? 0 }}</span>
+                                    <span class="text-slate-400 font-bold">/</span>
+                                    <span class="font-semibold text-slate-500">{{ $req->total_responses ?? 0 }}</span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                @if(strtolower($req->status) === 'fulfilled')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 uppercase">
+                                        Fulfilled
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 uppercase">
+                                        {{ $req->status }}
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <a href="{{ route('requests.show', $req->id) }}" class="inline-flex items-center justify-center px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-extrabold text-slate-700 hover:bg-slate-100 hover:text-red-600 transition">
+                                    ডিটেইলস
+                                </a>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-10 text-center text-slate-500 font-medium">আপনি এখনো কোনো রক্তের রিকোয়েস্ট করেননি।</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-
+    @endif
 
     {{-- ══════════════════════════════════════════
          🏆 গ্যামিফিকেশন উইজেট
     ══════════════════════════════════════════ --}}
     @if(isset($gamificationStats))
     @php extract($gamificationStats); @endphp
-    <div class="mb-10 rounded-3xl overflow-hidden border border-slate-100 shadow-lg bg-white">
+    <div class="rounded-3xl overflow-hidden border border-slate-100 shadow-lg bg-white">
 
         {{-- Header --}}
         <div class="bg-gradient-to-r from-red-600 to-red-800 px-6 py-5 flex items-center justify-between">
@@ -701,140 +753,13 @@
     </div>
     @endif
 
-
-    {{-- 6. Growth Loop (Referral / Invite) --}}
-    {{-- ══════════════════════════════════════════
-         🎁 Referral Banner — বন্ধুকে আমন্ত্রণ জানান
-    ══════════════════════════════════════════ --}}
-    @auth
-    @php
-        $gamification = app(\App\Services\GamificationService::class);
-        $myCode       = $gamification->generateReferralCode(auth()->user());
-        $referralLink = url('/register?ref=' . $myCode);
-    @endphp
-    <div class="mb-8 relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 p-6 sm:p-8 shadow-xl">
-        <div class="absolute -top-8 -right-8 w-40 h-40 bg-white/10 rounded-full pointer-events-none"></div>
-        <div class="absolute -bottom-10 right-24 w-28 h-28 bg-white/10 rounded-full pointer-events-none"></div>
-
-        <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-            {{-- Left: Text --}}
-            <div class="flex-1">
-                <div class="flex items-center gap-3 mb-2">
-                    <span class="text-3xl">👥</span>
-                    <h2 class="text-white font-black text-lg sm:text-xl leading-tight">
-                        বন্ধুকে আমন্ত্রণ জানান &amp; আয় করুন!
-                    </h2>
-                </div>
-                <p class="text-emerald-100 text-sm font-medium max-w-sm">
-                    বন্ধু সাইন-আপ করলে <span class="text-white font-black">+১০ পয়েন্ট</span>,
-                    প্রথমবার রক্তদিলে আরও <span class="text-white font-black">+৩০ পয়েন্ট</span> পাবেন!
-                </p>
-                <div class="flex flex-wrap gap-2 mt-3">
-                    <span class="inline-flex items-center gap-1 bg-white/20 border border-white/30 text-white text-xs font-extrabold px-3 py-1 rounded-full">
-                        🎉 সাইন-আপ বোনাস: +১০ pts
-                    </span>
-                    <span class="inline-flex items-center gap-1 bg-white/20 border border-white/30 text-white text-xs font-extrabold px-3 py-1 rounded-full">
-                        🩸 প্রথম ডোনেশন বোনাস: +৩০ pts
-                    </span>
-                </div>
-            </div>
-
-            {{-- Right: Code + Copy --}}
-            <div class="flex-shrink-0 w-full sm:w-auto">
-                <div class="bg-white/15 border border-white/25 backdrop-blur rounded-2xl p-4 text-center mb-3">
-                    <div class="text-white/75 text-[10px] font-extrabold uppercase tracking-widest mb-1">আপনার রেফারেল কোড</div>
-                    <div class="text-white font-black text-2xl tracking-[0.2em]">{{ $myCode }}</div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <input id="referral-link-dashboard"
-                           type="text"
-                           value="{{ $referralLink }}"
-                           class="flex-1 text-xs py-2.5 px-3 rounded-xl bg-white/15 border border-white/25 text-white font-semibold focus:outline-none focus:ring-2 focus:ring-white/50 min-w-0"
-                           readonly>
-                    <button onclick="copyDashboardReferral()" id="dash-copy-btn"
-                            class="flex-shrink-0 bg-white text-emerald-700 font-black text-xs px-4 py-2.5 rounded-xl hover:bg-emerald-50 transition-colors shadow-sm whitespace-nowrap">
-                        কপি করুন
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    @endauth
-
-    @if(isset($recentRequests))
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
-            <div>
-                <h2 class="text-lg font-extrabold text-slate-900">আপনার সাম্প্রতিক রিকোয়েস্টসমূহ</h2>
-                <p class="text-sm text-slate-500 font-medium mt-1">সর্বশেষ ৫টি রিকোয়েস্টের আপডেট</p>
-            </div>
-        </div>
-
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold">
-                        <th class="px-6 py-4 border-b border-slate-100">রোগীর নাম ও গ্রুপ</th>
-                        <th class="px-6 py-4 border-b border-slate-100">দরকার</th>
-                        <th class="px-6 py-4 border-b border-slate-100">সাড়া (Accepted)</th>
-                        <th class="px-6 py-4 border-b border-slate-100">স্ট্যাটাস</th>
-                        <th class="px-6 py-4 border-b border-slate-100 text-right">অ্যাকশন</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 text-sm">
-                    @forelse($recentRequests as $req)
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="px-6 py-4">
-                                <div class="font-extrabold text-slate-900">{{ $req->patient_name ?? 'রোগী' }}</div>
-                                <div class="text-xs font-bold text-red-600 mt-0.5">{{ $req->blood_group?->value ?? (string) $req->blood_group }}</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="font-semibold text-slate-700">{{ $req->needed_at?->format('d M, Y') ?? 'ASAP' }}</div>
-                                <div class="text-xs text-slate-500 font-medium">{{ $req->needed_at?->format('h:i A') ?? '' }}</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-1.5">
-                                    <span class="font-extrabold text-emerald-600">{{ $req->accepted_responses ?? 0 }}</span>
-                                    <span class="text-slate-400 font-bold">/</span>
-                                    <span class="font-semibold text-slate-500">{{ $req->total_responses ?? 0 }}</span>
-                                </div>
-                            </td>
-                            <td class="px-6 py-4">
-                                @if(strtolower($req->status) === 'fulfilled')
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 uppercase">
-                                        Fulfilled
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 uppercase">
-                                        {{ $req->status }}
-                                    </span>
-                                @endif
-                            </td>
-                            <td class="px-6 py-4 text-right">
-                                <a href="{{ route('requests.show', $req->id) }}" class="inline-flex items-center justify-center px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-extrabold text-slate-700 hover:bg-slate-100 hover:text-red-600 transition">
-                                    ডিটেইলস
-                                </a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="5" class="px-6 py-10 text-center text-slate-500 font-medium">আপনি এখনো কোনো রক্তের রিকোয়েস্ট করেননি।</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-    @endif
-
-
     {{-- 7. Static Info (Points & Badges Rules) --}}
     {{-- ══════════════════════════════════════════
          🪙 পয়েন্ট ও ব্যাজ সিস্টেম — Quick Guide Teaser
          ব্যবহারকারী কীভাবে পয়েন্ট আয় করতে পারে সেটা
          সংক্ষেপে দেখানো হচ্ছে, পূর্ণ গাইডে লিঙ্ক সহ।
     ══════════════════════════════════════════ --}}
-    <div class="mt-10 rounded-3xl overflow-hidden border border-slate-200 shadow-sm bg-white">
+    <div class="rounded-3xl overflow-hidden border border-slate-200 shadow-sm bg-white">
 
         {{-- Header --}}
         <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -936,9 +861,68 @@
         </div>
     </div>
 
+    {{-- 6. Growth Loop (Referral / Invite) --}}
+    {{-- ══════════════════════════════════════════
+         🎁 Referral Banner — বন্ধুকে আমন্ত্রণ জানান
+    ══════════════════════════════════════════ --}}
+    @auth
+    @php
+        $gamification = app(\App\Services\GamificationService::class);
+        $myCode       = $gamification->generateReferralCode(auth()->user());
+        $referralLink = url('/register?ref=' . $myCode);
+    @endphp
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 p-6 sm:p-8 shadow-xl">
+        <div class="absolute -top-8 -right-8 w-40 h-40 bg-white/10 rounded-full pointer-events-none"></div>
+        <div class="absolute -bottom-10 right-24 w-28 h-28 bg-white/10 rounded-full pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            {{-- Left: Text --}}
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-2">
+                    <span class="text-3xl">👥</span>
+                    <h2 class="text-white font-black text-lg sm:text-xl leading-tight">
+                        বন্ধুকে আমন্ত্রণ জানান &amp; আয় করুন!
+                    </h2>
+                </div>
+                <p class="text-emerald-100 text-sm font-medium max-w-sm">
+                    বন্ধু সাইন-আপ করলে <span class="text-white font-black">+১০ পয়েন্ট</span>,
+                    প্রথমবার রক্তদিলে আরও <span class="text-white font-black">+৩০ পয়েন্ট</span> পাবেন!
+                </p>
+                <div class="flex flex-wrap gap-2 mt-3">
+                    <span class="inline-flex items-center gap-1 bg-white/20 border border-white/30 text-white text-xs font-extrabold px-3 py-1 rounded-full">
+                        🎉 সাইন-আপ বোনাস: +১০ pts
+                    </span>
+                    <span class="inline-flex items-center gap-1 bg-white/20 border border-white/30 text-white text-xs font-extrabold px-3 py-1 rounded-full">
+                        🩸 প্রথম ডোনেশন বোনাস: +৩০ pts
+                    </span>
+                </div>
+            </div>
+
+            {{-- Right: Code + Copy --}}
+            <div class="flex-shrink-0 w-full sm:w-auto">
+                <div class="bg-white/15 border border-white/25 backdrop-blur rounded-2xl p-4 text-center mb-3">
+                    <div class="text-white/75 text-[10px] font-extrabold uppercase tracking-widest mb-1">আপনার রেফারেল কোড</div>
+                    <div class="text-white font-black text-2xl tracking-[0.2em]">{{ $myCode }}</div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input id="referral-link-dashboard"
+                           type="text"
+                           value="{{ $referralLink }}"
+                           class="flex-1 text-xs py-2.5 px-3 rounded-xl bg-white/15 border border-white/25 text-white font-semibold focus:outline-none focus:ring-2 focus:ring-white/50 min-w-0"
+                           readonly>
+                    <button onclick="copyDashboardReferral()" id="dash-copy-btn"
+                            class="flex-shrink-0 bg-white text-emerald-700 font-black text-xs px-4 py-2.5 rounded-xl hover:bg-emerald-50 transition-colors shadow-sm whitespace-nowrap">
+                        কপি করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endauth
 </div>
 
 <script>
+
 function copyDashboardReferral() {
     const input = document.getElementById('referral-link-dashboard');
     const btn   = document.getElementById('dash-copy-btn');

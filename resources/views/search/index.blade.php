@@ -112,11 +112,23 @@
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden group relative">
                         
                         {{-- Smart Priority Tags --}}
-                        @if($donor->is_ready_now)
-                            <div class="absolute top-0 right-0 bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded-bl-lg uppercase tracking-wider z-10">
-                                Ready Now
-                            </div>
-                        @endif
+                        <div class="absolute top-0 right-0 flex flex-col z-10 rounded-bl-[12px] overflow-hidden">
+                            @if($donor->is_ready_now)
+                                <div class="bg-emerald-600 text-white text-[10px] font-black px-2 py-1 text-center uppercase tracking-wider">
+                                    Available
+                                </div>
+                            @endif
+                            @if($donor->organization_id && $donor->org_status === 'approved')
+                                <div class="bg-amber-500 text-white text-[10px] font-black px-2 py-1 text-center tracking-wider border-t border-white/20">
+                                    অর্গ ভেরিফাইড
+                                </div>
+                            @endif
+                            @if($donor->nid_status === 'approved' || $donor->nid_status === 'verified')
+                                <div class="bg-blue-600 text-white text-[10px] font-black px-2 py-1 text-center tracking-wider border-t border-white/20">
+                                    NID ভেরিফাইড
+                                </div>
+                            @endif
+                        </div>
 
                         <div class="p-6">
                             <div class="flex justify-between items-start mb-4">
@@ -125,8 +137,8 @@
                                         <h4 class="font-bold text-lg text-gray-900 group-hover:text-red-600 transition-colors">{{ $donor->name }}</h4>
                                         
                                         {{-- Verified Badges --}}
-                                        @if($donor->verified_badge || $donor->nid_status === 'approved')
-                                            <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20" title="Verified Member"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                        @if($donor->verified_badge || $donor->nid_status === 'approved' || $donor->nid_status === 'verified')
+                                            <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20" title="ভেরিফাইড মেম্বার"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
                                         @endif
                                     </div>
                                     

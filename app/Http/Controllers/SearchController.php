@@ -46,10 +46,18 @@ class SearchController extends Controller
         }
 
         // 🎯 ৪. দ্য স্মার্ট প্রায়োরিটি অ্যালগরিদম (Smart Sorting)
-        $query->orderByDesc('is_ready_now') // যারা ইমার্জেন্সির জন্য রেডি, তারা সবার আগে
-            ->orderByDesc('verified_badge') // এরপর ব্লু ব্যাজধারী ভেরিফাইড মেম্বার
-            ->orderByRaw("FIELD(nid_status, 'approved', 'pending', 'none')") // এনআইডি স্ট্যাটাস অনুযায়ী
-            ->latest(); // সবশেষে নতুন ডোনার
+        $query->leftJoin('organizations', 'users.organization_id', '=', 'organizations.id')
+            ->select('users.*', 'organizations.verification_status as org_status')
+            ->selectRaw("
+                (
+                    (CASE WHEN users.is_ready_now = 1 THEN 1000 ELSE 0 END) +
+                    (CASE WHEN users.organization_id IS NOT NULL AND organizations.verification_status = 'approved' THEN 100 ELSE 0 END) +
+                    (CASE WHEN users.nid_status = 'approved' OR users.nid_status = 'verified' THEN 10 ELSE 0 END)
+                ) as priority_score
+            ")
+            ->orderBy('priority_score', 'desc')
+            ->orderBy('users.last_donated_at', 'asc') // Tie-breaker: those who haven't donated recently or at all
+            ->orderBy('users.created_at', 'desc');
 
         $donors = $query->paginate(12)->withQueryString();
 
