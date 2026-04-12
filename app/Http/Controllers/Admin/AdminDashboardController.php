@@ -173,7 +173,7 @@ class AdminDashboardController extends Controller
 
             // Set the creator as Org Admin via intermediate table
             $organization->members()->syncWithoutDetaching([
-                $organization->admin_id => ['status' => 'approved', 'is_admin' => true]
+                $organization->admin_id => ['status' => 'approved']
             ]);
 
             $this->logAudit('org_approve', $organization->id, \App\Models\Organization::class);
