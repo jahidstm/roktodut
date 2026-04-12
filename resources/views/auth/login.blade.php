@@ -36,7 +36,7 @@
         <div class="flex items-center">
             <input id="remember_me" type="checkbox" name="remember" class="w-4 h-4 text-red-600 bg-slate-100 border-slate-300 rounded focus:ring-red-500 focus:ring-2 cursor-pointer transition-colors">
             <label for="remember_me" class="ml-2 text-sm text-slate-600 cursor-pointer select-none">
-                আমাকে মনে রাখুন
+                Remember me
             </label>
         </div>
 

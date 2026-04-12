@@ -36,7 +36,16 @@ class RegisteredUserController extends Controller
             'role' => ['required', 'string', 'in:donor,recipient'],
             'phone' => ['required_if:role,donor', 'nullable', 'string', 'max:20', 'unique:users,phone'],
             'blood_group' => ['required_if:role,donor', 'nullable', 'string', 'in:A+,A-,B+,B-,O+,O-,AB+,AB-'],
+            'referred_by_code' => ['nullable', 'string', 'exists:users,referral_code'],
         ]);
+
+        $referredById = null;
+        if ($request->filled('referred_by_code')) {
+            $referrer = User::where('referral_code', $request->referred_by_code)->first();
+            if ($referrer) {
+                $referredById = $referrer->id;
+            }
+        }
 
         $user = User::create([
             'name' => $request->name,
@@ -45,10 +54,19 @@ class RegisteredUserController extends Controller
             'role' => $request->role,
             'phone' => $request->role === 'donor' ? $request->phone : null,
             'blood_group' => $request->role === 'donor' ? $request->blood_group : null,
+            'referred_by' => $referredById,
 
             // 🎯 THE FIX: Recipient হলে সরাসরি onboarded হিসেবে মার্ক করা হচ্ছে
             'is_onboarded' => $request->role === 'recipient' ? true : false,
         ]);
+
+        // Award 10 points right at registration as promised (+10 pts signup bonus)
+        if ($referredById) {
+            $referrerModel = User::find($referredById);
+            if ($referrerModel) {
+                app(\App\Services\GamificationService::class)->awardReferralSignupPoints($referrerModel);
+            }
+        }
 
         event(new Registered($user));
 

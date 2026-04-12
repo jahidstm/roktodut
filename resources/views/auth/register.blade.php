@@ -70,6 +70,19 @@
             </div>
         </div>
 
+        <!-- Referral Code -->
+        <div>
+            <label for="referred_by_code" class="block text-sm font-medium text-slate-700 mb-1">রেফারেল কোড (যদি থাকে) <span class="text-xs text-slate-400 font-normal ml-1">- ঐচ্ছিক</span></label>
+            <input id="referred_by_code" type="text" name="referred_by_code" value="{{ request('ref', old('referred_by_code')) }}" placeholder="যেমন: SEUZ38" class="input-modern {{ request()->has('ref') ? 'bg-emerald-50 focus:border-emerald-500 focus:ring-emerald-200 border-emerald-200' : 'bg-white focus:border-red-500 focus:ring-red-200' }}" />
+            @if(request()->has('ref'))
+                <p class="text-xs text-emerald-600 font-bold mt-1 inline-flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    রেফারেল কোড অটো-অ্যাপ্লাই হয়েছে
+                </p>
+            @endif
+            <x-input-error :messages="$errors->get('referred_by_code')" class="mt-1 text-sm text-red-600" />
+        </div>
+
         <!-- Passwords Row to save vertical space -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <!-- Password -->
