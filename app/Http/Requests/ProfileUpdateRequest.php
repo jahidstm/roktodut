@@ -8,6 +8,13 @@ use Illuminate\Validation\Rule;
 
 class ProfileUpdateRequest extends FormRequest
 {
+    public function messages(): array
+    {
+        return [
+            'date_of_birth.before_or_equal' => 'রক্তদানের জন্য আপনার বয়স ন্যূনতম ১৮ বছর হতে হবে।',
+        ];
+    }
+
     public function rules(): array
     {
         return [
@@ -26,7 +33,7 @@ class ProfileUpdateRequest extends FormRequest
             'division_id' => ['nullable', 'exists:divisions,id'],
             'district_id' => ['nullable', 'exists:districts,id'],
             'upazila_id' => ['nullable', 'exists:upazilas,id'],
-            'date_of_birth' => ['nullable', 'date'],
+            'date_of_birth' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(18)->format('Y-m-d')],
             'gender' => ['nullable', 'string', 'in:male,female'],
             'weight' => ['nullable', 'numeric', 'min:30'],
             'organization_id' => ['nullable', 'exists:organizations,id'],

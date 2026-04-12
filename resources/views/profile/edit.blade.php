@@ -101,12 +101,14 @@
                 </div>
             </div>
         @else
-            {{-- ১০০% সম্পূর্ণ হওয়ার পর സুন্দর সাকসেস ব্যানার --}}
-            <div class="flex items-center justify-center gap-3 p-4 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-2xl shadow-sm mb-2 transform animate-[fadeIn_0.5s_ease-out]">
-                <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
-                    <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+            {{-- ১০০% সম্পূর্ণ হওয়ার পর সাকসেস ব্যাজ (Sleek Compact UI) --}}
+            <div class="flex justify-center mb-10">
+                <div class="inline-flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-xl border border-emerald-200/60 rounded-2xl shadow-[0_8px_30px_rgb(16,185,129,0.08)] transform transition-all hover:scale-[1.02]">
+                    <div class="w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <span class="font-extrabold text-emerald-900 tracking-wide text-sm sm:text-base">✅ আপনার Profile ১০০% সম্পূর্ণ এবং ভেরিফাইড।</span>
                 </div>
-                <span class="font-extrabold text-emerald-800 tracking-wide text-sm sm:text-base">✅ আপনার প্রোফাইল ১০০% সম্পূর্ণ এবং ভেরিফাইড।</span>
             </div>
         @endif
 
@@ -236,6 +238,11 @@
 
                 {{-- Additional Fields --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-7 pt-2">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">জন্ম তারিখ</label>
+                        <input name="date_of_birth" type="date" value="{{ old('date_of_birth', $user->date_of_birth ? \Carbon\Carbon::parse($user->date_of_birth)->format('Y-m-d') : '') }}" class="w-full rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 px-4 py-3 text-slate-800 font-medium transition-all outline-none cursor-pointer">
+                        @error('date_of_birth') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
+                    </div>
                      <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">শেষ রক্তদানের তারিখ</label>
                         @php
@@ -269,7 +276,7 @@
                         <input name="weight" type="number" step="0.1" value="{{ old('weight', $user->weight) }}" placeholder="যেমন: 65" class="w-full rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 px-4 py-3 text-slate-800 font-medium transition-all outline-none">
                         @error('weight') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
                     </div>
-                    <div>
+                    <div class="md:col-span-2">
                         <label class="block text-sm font-bold text-slate-700 mb-2">অর্গানাইজেশন/ক্লাব</label>
                         <div class="relative">
                             <select name="organization_id" class="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 px-4 py-3 text-slate-800 font-medium pr-10 cursor-pointer transition-all outline-none">
