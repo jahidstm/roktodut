@@ -209,7 +209,7 @@
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">রক্তের গ্রুপ <span class="text-red-500">*</span></label>
                         <div class="relative">
-                            <select name="blood_group" required class="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 px-4 py-3 text-slate-800 font-bold pr-10 cursor-pointer transition-all outline-none">
+                            <select name="blood_group" required class="w-full appearance-none bg-none rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 px-4 py-3 text-slate-800 font-bold pr-10 cursor-pointer transition-all outline-none">
                                 <option value="">নির্বাচন করুন</option>
                                 @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bg)
                                     <option value="{{ $bg }}" {{ old('blood_group', $user->blood_group?->value ?? $user->blood_group) == $bg ? 'selected' : '' }}>{{ $bg }}</option>
@@ -260,7 +260,7 @@
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">লিঙ্গ</label>
                         <div class="relative">
-                            <select name="gender" class="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 px-4 py-3 text-slate-800 font-medium pr-10 cursor-pointer transition-all outline-none">
+                            <select name="gender" class="w-full appearance-none bg-none rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 px-4 py-3 text-slate-800 font-medium pr-10 cursor-pointer transition-all outline-none">
                                 <option value="">নির্বাচন করুন</option>
                                 <option value="male" {{ old('gender', $user->gender) == 'male' ? 'selected' : '' }}>পুরুষ</option>
                                 <option value="female" {{ old('gender', $user->gender) == 'female' ? 'selected' : '' }}>মহিলা</option>
@@ -279,7 +279,7 @@
                     <div class="md:col-span-2">
                         <label class="block text-sm font-bold text-slate-700 mb-2">অর্গানাইজেশন/ক্লাব</label>
                         <div class="relative">
-                            <select name="organization_id" class="w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 px-4 py-3 text-slate-800 font-medium pr-10 cursor-pointer transition-all outline-none">
+                            <select name="organization_id" class="w-full appearance-none bg-none rounded-xl border border-slate-200 bg-slate-50/50 focus:bg-white focus:border-red-600 focus:ring-4 focus:ring-red-600/10 px-4 py-3 text-slate-800 font-medium pr-10 cursor-pointer transition-all outline-none">
                                 <option value="">কোনো ক্লাবের সাথে যুক্ত নই</option>
                                 @if(isset($organizations))
                                     @foreach($organizations as $org)

@@ -95,7 +95,7 @@ class Post extends Model
     {
         $this->attributes['body_raw'] = $value;
         // HTMLPurifier produces the safe, render-ready version.
-        $this->attributes['body_sanitized'] = clean($value);
+        $this->attributes['body_sanitized'] = app('purifier')->clean($value);
     }
 
     // =========================================================================

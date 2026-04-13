@@ -111,24 +111,7 @@
 
                     <div class="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden group relative">
                         
-                        {{-- Smart Priority Tags --}}
-                        <div class="absolute top-0 right-0 flex flex-col z-10 rounded-bl-[12px] overflow-hidden">
-                            @if($donor->is_ready_now)
-                                <div class="bg-emerald-600 text-white text-[10px] font-black px-2 py-1 text-center uppercase tracking-wider">
-                                    Available
-                                </div>
-                            @endif
-                            @if($donor->organization_id && $donor->org_status === 'approved')
-                                <div class="bg-amber-500 text-white text-[10px] font-black px-2 py-1 text-center tracking-wider border-t border-white/20">
-                                    অর্গ ভেরিফাইড
-                                </div>
-                            @endif
-                            @if($donor->nid_status === 'approved' || $donor->nid_status === 'verified')
-                                <div class="bg-blue-600 text-white text-[10px] font-black px-2 py-1 text-center tracking-wider border-t border-white/20">
-                                    NID ভেরিফাইড
-                                </div>
-                            @endif
-                        </div>
+
 
                         <div class="p-6">
                             <div class="flex justify-between items-start mb-4">
