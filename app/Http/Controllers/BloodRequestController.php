@@ -29,6 +29,11 @@ class BloodRequestController extends Controller
                 'district:id,name', // 🚀 ইগার লোডিং (পারফরম্যান্স অপ্টিমাইজেশন)
                 'upazila:id,name'
             ])
+            ->withCount([
+                'responses as accepted_responses_count' => fn($q) => $q->where('status', 'accepted'),
+                'responses as claimed_verifications_count' => fn($q) => $q->where('verification_status', 'claimed'),
+                'responses as verified_verifications_count' => fn($q) => $q->where('verification_status', 'verified'),
+            ])
             ->where('status', 'pending');
 
         // 🎯 স্মার্ট ফিল্টারিং লজিক (Relational IDs)

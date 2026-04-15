@@ -13,7 +13,12 @@ class PublicBloodRequestController extends Controller
     public function index(Request $request)
     {
         $query = BloodRequest::active()
-            ->with(['district:id,name', 'upazila:id,name']);
+            ->with(['district:id,name', 'upazila:id,name'])
+            ->withCount([
+                'responses as accepted_responses_count' => fn($q) => $q->where('status', 'accepted'),
+                'responses as claimed_verifications_count' => fn($q) => $q->where('verification_status', 'claimed'),
+                'responses as verified_verifications_count' => fn($q) => $q->where('verification_status', 'verified'),
+            ]);
 
         if ($request->filled('blood_group')) {
             $query->where('blood_group', $request->blood_group);
