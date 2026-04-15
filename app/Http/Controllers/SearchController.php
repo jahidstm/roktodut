@@ -17,19 +17,15 @@ class SearchController extends Controller
      */
     public function index(Request $request)
     {
-        $onlyAvailable = $request->boolean('only_available', true);
-
         // 🛡️ বেস কোয়েরি: শুধুমাত্র ডোনার এবং অর্গ-অ্যাডমিনরা
         $query = User::query()
             ->with(['district:id,name', 'upazila:id,name'])
             ->whereIn('users.role', ['donor', 'org_admin'])
-            ->when($onlyAvailable, function ($q) {
-                $q->where('users.is_available', true) // ম্যানুয়াল অফলাইন স্ট্যাটাস চেক
-                    ->where(function ($inner) {
-                        // ⚙️ অটো-কুলডাউন ইঞ্জিন (৪ মাসের গ্যাপ চেক)
-                        $inner->whereNull('users.cooldown_until')
-                            ->orWhere('users.cooldown_until', '<=', now());
-                    });
+            ->where('users.is_available', true) // ম্যানুয়াল অফলাইন স্ট্যাটাস চেক
+            ->where(function ($inner) {
+                // ⚙️ অটো-কুলডাউন ইঞ্জিন (৪ মাসের গ্যাপ চেক)
+                $inner->whereNull('users.cooldown_until')
+                    ->orWhere('users.cooldown_until', '<=', now());
             });
 
         // 🔍 ১. রক্তের গ্রুপ ফিল্টার
@@ -94,10 +90,6 @@ class SearchController extends Controller
                 $selectedFilters[] = 'উপজেলা: ' . $upazilaName;
             }
         }
-        if ($onlyAvailable) {
-            $selectedFilters[] = 'Available';
-        }
-
-        return view('search.index', compact('donors', 'request', 'bloodGroups', 'selectedFilters', 'onlyAvailable'));
+        return view('search.index', compact('donors', 'request', 'bloodGroups', 'selectedFilters'));
     }
 }

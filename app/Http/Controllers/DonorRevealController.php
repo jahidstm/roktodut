@@ -69,6 +69,7 @@ class DonorRevealController extends Controller
                 'ok' => true,
                 'donor_id' => $donor->id,
                 'challenge_set' => true,
+                'question' => "$a + $b = ?",
                 'expires_in_seconds' => 300,
             ]);
         }
@@ -122,6 +123,7 @@ class DonorRevealController extends Controller
                 'ok' => true,
                 'donor_id' => $donor->id,
                 'revealed' => true,
+                'phone' => (string) ($donor->phone ?? ''),
             ]);
         }
 

@@ -27,8 +27,7 @@
     @endif
 
     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8">
-        <form method="GET" action="{{ route('search') }}" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
+        <form method="GET" action="{{ route('search') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1">রক্তের গ্রুপ</label>
                     <select name="blood_group" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
@@ -40,52 +39,44 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">বিভাগ</label>
-                    <select name="division_id" id="division" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+                    <label for="filter_division" class="block text-sm font-bold text-slate-700 mb-1">বিভাগ</label>
+                    <select name="division_id" id="filter_division" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
                         <option value="">বিভাগ নির্বাচন</option>
+                        @foreach(\App\Models\Division::orderBy('name', 'asc')->get() as $div)
+                            <option value="{{ $div->id }}" {{ ($request['division_id'] ?? '') == $div->id ? 'selected' : '' }}>{{ $div->name }}</option>
+                        @endforeach
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">জেলা</label>
-                    <select name="district_id" id="district" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
-                        <option value="">জেলা নির্বাচন</option>
+                    <label for="filter_district" class="block text-sm font-bold text-slate-700 mb-1">জেলা</label>
+                    <select name="district_id" id="filter_district" disabled class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed">
+                        <option value="">প্রথমে বিভাগ নির্বাচন করুন</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">উপজেলা/থানা</label>
-                    <select name="upazila_id" id="upazila" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
-                        <option value="">সব এলাকা</option>
+                    <label for="filter_upazila" class="block text-sm font-bold text-slate-700 mb-1">উপজেলা/থানা</label>
+                    <select name="upazila_id" id="filter_upazila" disabled class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed">
+                        <option value="">প্রথমে জেলা নির্বাচন করুন</option>
                     </select>
                 </div>
-
-                <div class="lg:col-span-2">
-                    <label class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700">
-                        <input type="checkbox" name="only_available" value="1" @checked($onlyAvailable) class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
-                        শুধু Available ডোনার
-                    </label>
-                    <p class="mt-1 text-xs font-semibold text-slate-500">বিশ্বাসযোগ্য ডোনার আগে দেখানো হয়</p>
+                <div class="md:col-span-4 flex justify-end gap-2 mt-2">
+                    @if(request()->hasAny(['blood_group', 'division_id', 'district_id', 'upazila_id']))
+                        <a href="{{ route('search') }}"
+                           class="shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg font-extrabold transition-colors flex items-center justify-center">
+                            রিসেট
+                        </a>
+                    @endif
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-8 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
+                        খুঁজুন
+                    </button>
                 </div>
-            </div>
 
-            <div class="flex flex-wrap justify-end gap-2">
-                @if(request()->hasAny(['blood_group', 'division_id', 'district_id', 'upazila_id', 'only_available']))
-                    <a href="{{ route('search') }}"
-                       class="inline-flex items-center justify-center bg-slate-100 hover:bg-slate-200 text-slate-700 px-5 py-2.5 rounded-lg font-extrabold transition-colors">
-                        রিসেট
-                    </a>
-                @endif
-                <button type="submit"
-                        class="inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
-                    খুঁজুন
-                </button>
-            </div>
-
-            <input type="hidden" id="selectedDivision" value="{{ $selectedDivision }}">
-            <input type="hidden" id="selectedDistrict" value="{{ $selectedDistrict }}">
-            <input type="hidden" id="selectedUpazila" value="{{ $selectedUpazila }}">
-        </form>
+                <input type="hidden" id="selectedDivision" value="{{ $selectedDivision }}">
+                <input type="hidden" id="selectedDistrict" value="{{ $selectedDistrict }}">
+                <input type="hidden" id="selectedUpazila" value="{{ $selectedUpazila }}">
+            </form>
     </div>
 
     <div class="mb-5">
@@ -190,6 +181,86 @@
     </template>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const divSelect = document.getElementById('filter_division');
+            const distSelect = document.getElementById('filter_district');
+            const upzSelect = document.getElementById('filter_upazila');
+
+            if (!divSelect || !distSelect || !upzSelect) return;
+
+            const oldDiv = "{{ $selectedDivision }}";
+            const oldDist = "{{ $selectedDistrict }}";
+            const oldUpz = "{{ $selectedUpazila }}";
+
+            function loadDistricts(divId, preSelectedDist = null) {
+                distSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
+                distSelect.disabled = true;
+                upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
+                upzSelect.disabled = true;
+
+                fetch(`/ajax/districts/${divId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        distSelect.innerHTML = '<option value="">জেলা নির্বাচন</option>';
+                        distSelect.disabled = false;
+                        data.forEach(dist => {
+                            const selected = (String(dist.id) === String(preSelectedDist)) ? 'selected' : '';
+                            distSelect.innerHTML += `<option value="${dist.id}" ${selected}>${dist.name}</option>`;
+                        });
+
+                        if (preSelectedDist) {
+                            loadUpazilas(preSelectedDist, oldUpz);
+                        }
+                    })
+                    .catch(() => {
+                        distSelect.innerHTML = '<option value="">জেলা লোড করা যায়নি</option>';
+                    });
+            }
+
+            function loadUpazilas(distId, preSelectedUpz = null) {
+                upzSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
+                upzSelect.disabled = true;
+
+                fetch(`/ajax/upazilas/${distId}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        upzSelect.innerHTML = '<option value="">উপজেলা/থানা নির্বাচন</option>';
+                        upzSelect.disabled = false;
+                        data.forEach(upz => {
+                            const selected = (String(upz.id) === String(preSelectedUpz)) ? 'selected' : '';
+                            upzSelect.innerHTML += `<option value="${upz.id}" ${selected}>${upz.name}</option>`;
+                        });
+                    })
+                    .catch(() => {
+                        upzSelect.innerHTML = '<option value="">উপজেলা লোড করা যায়নি</option>';
+                    });
+            }
+
+            divSelect.addEventListener('change', function() {
+                if (!this.value) {
+                    distSelect.innerHTML = '<option value="">প্রথমে বিভাগ নির্বাচন করুন</option>';
+                    distSelect.disabled = true;
+                    upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
+                    upzSelect.disabled = true;
+                    return;
+                }
+                loadDistricts(this.value);
+            });
+
+            distSelect.addEventListener('change', function() {
+                if (!this.value) {
+                    upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
+                    upzSelect.disabled = true;
+                    return;
+                }
+                loadUpazilas(this.value);
+            });
+
+            if (oldDiv) {
+                loadDistricts(oldDiv, oldDist);
+            }
+        });
+
         document.querySelectorAll('form').forEach((form) => {
             form.addEventListener('submit', () => {
                 sessionStorage.setItem('donorScrollPosition', window.scrollY);
