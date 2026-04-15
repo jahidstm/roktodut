@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Division;
+use App\Models\District;
+use App\Models\Upazila;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Enums\BloodGroup;
@@ -14,14 +17,19 @@ class SearchController extends Controller
      */
     public function index(Request $request)
     {
-        // 🛡️ বেস কোয়েরি: শুধুমাত্র ডোনার এবং অর্গ-অ্যাডমিনরা আসবে যারা এই মুহূর্তে অ্যাভেইলেবল
+        $onlyAvailable = $request->boolean('only_available', true);
+
+        // 🛡️ বেস কোয়েরি: শুধুমাত্র ডোনার এবং অর্গ-অ্যাডমিনরা
         $query = User::query()
+            ->with(['district:id,name', 'upazila:id,name'])
             ->whereIn('users.role', ['donor', 'org_admin'])
-            ->where('users.is_available', true) // ম্যানুয়াল অফলাইন স্ট্যাটাস চেক
-            ->where(function ($q) {
-                // ⚙️ অটো-কুলডাউন ইঞ্জিন (৪ মাসের গ্যাপ চেক)
-                $q->whereNull('users.cooldown_until')
-                    ->orWhere('users.cooldown_until', '<=', now());
+            ->when($onlyAvailable, function ($q) {
+                $q->where('users.is_available', true) // ম্যানুয়াল অফলাইন স্ট্যাটাস চেক
+                    ->where(function ($inner) {
+                        // ⚙️ অটো-কুলডাউন ইঞ্জিন (৪ মাসের গ্যাপ চেক)
+                        $inner->whereNull('users.cooldown_until')
+                            ->orWhere('users.cooldown_until', '<=', now());
+                    });
             });
 
         // 🔍 ১. রক্তের গ্রুপ ফিল্টার
@@ -64,6 +72,32 @@ class SearchController extends Controller
         // 🎯 ফ্রন্টএন্ড ড্রপডাউনের জন্য ব্লাড গ্রুপের লিস্ট নেওয়া হলো
         $bloodGroups = BloodGroup::cases();
 
-        return view('search.index', compact('donors', 'request', 'bloodGroups'));
+        $selectedFilters = [];
+        if ($request->filled('blood_group')) {
+            $selectedFilters[] = 'Blood Group: ' . $request->blood_group;
+        }
+        if ($request->filled('division_id')) {
+            $divisionName = Division::whereKey($request->division_id)->value('name');
+            if ($divisionName) {
+                $selectedFilters[] = 'বিভাগ: ' . $divisionName;
+            }
+        }
+        if ($request->filled('district_id')) {
+            $districtName = District::whereKey($request->district_id)->value('name');
+            if ($districtName) {
+                $selectedFilters[] = 'জেলা: ' . $districtName;
+            }
+        }
+        if ($request->filled('upazila_id')) {
+            $upazilaName = Upazila::whereKey($request->upazila_id)->value('name');
+            if ($upazilaName) {
+                $selectedFilters[] = 'উপজেলা: ' . $upazilaName;
+            }
+        }
+        if ($onlyAvailable) {
+            $selectedFilters[] = 'Available';
+        }
+
+        return view('search.index', compact('donors', 'request', 'bloodGroups', 'selectedFilters', 'onlyAvailable'));
     }
 }

@@ -1,90 +1,45 @@
 function csrfToken() {
     return document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') ?? '';
-}async function request(url, options = {}) {
-    const res = await fetch(url, {
-        credentials: 'same-origin',
-        ...options,
-        headers: {
-            'X-CSRF-TOKEN': csrfToken(),
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json',
-            ...(options.headers || {}),
-        },
-    });
+}
 
-    const contentType = res.headers.get('content-type') || '';
-    let payload = null;
+function toggleButtonLoading(btn, isLoading) {
+    if (!btn) return;
+    const spinner = btn.querySelector('.reveal-spinner');
+    const text = btn.querySelector('.reveal-btn-text');
+    btn.disabled = isLoading;
+    if (spinner) spinner.classList.toggle('hidden', !isLoading);
+    if (text && isLoading) text.textContent = 'লোড হচ্ছে...';
+    if (text && !isLoading) text.textContent = 'নম্বর দেখুন';
+}
 
-    try {
-        payload = contentType.includes('application/json') ? await res.json() : await res.text();
-    } catch {
-        payload = null;
-    }
-
-    return { res, payload };
-}async function post(url, body) {
-    const isForm = body instanceof FormData;
-    return request(url, {
-        method: 'POST',
-        body: isForm ? body : (body ? JSON.stringify(body) : null),
-        headers: isForm ? {} : { 'Content-Type': 'application/json' },
-    });
-}function getErrorMessage(payload, fallback) {
-    if (!payload) return fallback;
-    if (typeof payload === 'string') return payload || fallback;
-    return payload.message || fallback;
-}async function revealStart(url) {
-    const { res, payload } = await post(url);
-    if (!res.ok) throw new Error(getErrorMessage(payload, `Reveal start failed (HTTP ${res.status})`));
-}async function revealVerify(form) {
-    const fd = new FormData(form);
-    const { res, payload } = await post(form.action, fd);
-    if (!res.ok) throw new Error(getErrorMessage(payload, `Verify failed (HTTP ${res.status})`));
-}function wireRevealStartButtons() {
-    document.addEventListener('click', async (e) => {
-        const btn = e.target.closest('[data-reveal-start]');
-        if (!btn) return;
-
-        e.preventDefault();
-        e.stopPropagation();
-
-        const url = btn.getAttribute('data-reveal-start');
-        if (!url) return;
-
-        try {
-            btn.disabled = true;
-            await revealStart(url);
-            window.location.reload();
-        } catch (err) {
-            console.error(err);
-            alert(err.message);
-        } finally {
-            btn.disabled = false;
-        }
-    }, true);
-}function wireRevealVerifyForms() {
-    document.addEventListener('submit', async (e) => {
-        const form = e.target.closest('form[data-reveal-verify]');
+function wireRevealStartButtons() {
+    document.addEventListener('submit', (e) => {
+        const form = e.target.closest('form.js-reveal-form');
         if (!form) return;
 
-        e.preventDefault();
-        e.stopPropagation();
+        const startBtn = form.querySelector('[data-reveal-start]');
+        const isStart = !!startBtn;
+        if (!isStart) return;
 
-        try {
-            const submitBtn = form.querySelector('button[type="submit"]');
-            if (submitBtn) submitBtn.disabled = true;
+        // Let the normal form POST continue; only show loading UI.
+        toggleButtonLoading(startBtn, true);
+    });
+}
 
-            await revealVerify(form);
-            window.location.reload();
-        } catch (err) {
-            console.error(err);
-            alert(err.message);
-        } finally {
-            const submitBtn = form.querySelector('button[type="submit"]');
-            if (submitBtn) submitBtn.disabled = false;
-        }
-    }, true);
-}async function wireLocationsDropdowns() {
+function wireRevealVerifyForms() {
+    document.addEventListener('submit', (e) => {
+        const form = e.target.closest('form.js-reveal-form');
+        if (!form) return;
+
+        const verifyInput = form.querySelector('input[name="answer"]');
+        if (!verifyInput) return;
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+    });
+}
+
+async function wireLocationsDropdowns() {
     const divisionEl = document.getElementById('division');
     const districtEl = document.getElementById('district');
     const upazilaEl = document.getElementById('upazila');
@@ -154,8 +109,27 @@ function csrfToken() {
     populateDivisions();
     populateDistricts();
     populateUpazilas();
-}export async function initSearchPage() {
+}
+
+function wireSearchFormLoading() {
+    const form = document.querySelector('form[action*="/search"]');
+    if (!form) return;
+    const skeletonTemplate = document.getElementById('donor-loading-skeleton-template');
+
+    form.addEventListener('submit', () => {
+        if (!skeletonTemplate) return;
+        const parent = form.closest('.max-w-7xl');
+        if (!parent) return;
+        const wrap = document.createElement('div');
+        wrap.id = 'search-loading-skeleton';
+        wrap.innerHTML = skeletonTemplate.innerHTML;
+        parent.appendChild(wrap);
+    });
+}
+
+export async function initSearchPage() {
     wireRevealStartButtons();
     wireRevealVerifyForms();
+    wireSearchFormLoading();
     await wireLocationsDropdowns();
 }
