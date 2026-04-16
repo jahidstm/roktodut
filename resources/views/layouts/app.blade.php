@@ -6,6 +6,14 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>@yield('title', 'রক্তদূত')</title>
 
+    {{-- JS globals for Alpine + Echo (auth'd users only) --}}
+    @auth
+    <script>
+        window.__userId      = {{ auth()->id() }};
+        window.__unreadCount = {{ auth()->user()->unreadNotifications()->count() }};
+    </script>
+    @endauth
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -53,71 +61,118 @@
             </a>
             
             @auth
-                {{-- ৩. Notification Bell --}}
-                <div class="relative" x-data="{ openNotification: false }" @click.outside="openNotification = false" @close.stop="openNotification = false">
-                    <button @click="openNotification = ! openNotification" class="relative p-2 text-slate-500 hover:text-red-600 transition rounded-full hover:bg-red-50 focus:outline-none">
+                {{-- ৩. Notification Bell (Real-time via Reverb) --}}
+                <div class="relative"
+                     x-data="notificationBell()"
+                     @click.outside="open = false">
+
+                    {{-- Bell Button --}}
+                    <button @click="toggle()"
+                            id="notif-bell-btn"
+                            class="relative p-2 text-slate-500 hover:text-red-600 transition rounded-full hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-300"
+                            aria-label="নোটিফিকেশন">
                         <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                         </svg>
-                        @if(auth()->user()->unreadNotifications->count() > 0)
-                            <span class="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-extrabold text-white shadow-sm ring-2 ring-white">
-                                {{ auth()->user()->unreadNotifications->count() }}
-                            </span>
-                        @endif
+                        {{-- Unread badge (Alpine-driven) --}}
+                        <span x-show="unreadCount > 0"
+                              x-text="unreadCount > 99 ? '99+' : unreadCount"
+                              id="notif-badge"
+                              class="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[9px] font-black text-white shadow-sm ring-2 ring-white"
+                              style="display:none;"></span>
                     </button>
 
                     {{-- Notification Dropdown --}}
-                    <div x-show="openNotification"
+                    <div x-show="open"
                          x-transition:enter="transition ease-out duration-200"
                          x-transition:enter-start="opacity-0 scale-95 translate-y-2"
                          x-transition:enter-end="opacity-100 scale-100 translate-y-0"
                          x-transition:leave="transition ease-in duration-150"
                          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                          x-transition:leave-end="opacity-0 scale-95 translate-y-2"
-                         class="absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl bg-white shadow-xl ring-1 ring-slate-200 overflow-hidden"
-                         style="display: none;">
-                        <div class="px-4 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                            <h3 class="text-sm font-extrabold text-slate-800">নোটিফিকেশন</h3>
-                            @if(auth()->user()->unreadNotifications->count() > 0)
-                                <span class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-black uppercase">{{ auth()->user()->unreadNotifications->count() }} নতুন</span>
-                            @endif
+                         class="absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200 overflow-hidden z-50"
+                         style="display:none;"
+                         role="dialog"
+                         aria-label="নোটিফিকেশন তালিকা">
+
+                        {{-- Header --}}
+                        <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+                            <div class="flex items-center gap-2">
+                                <h3 class="text-sm font-extrabold text-slate-800">নোটিফিকেশন</h3>
+                                <span x-show="unreadCount > 0"
+                                      x-text="unreadCount + ' নতুন'"
+                                      class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-black"
+                                      style="display:none;"></span>
+                            </div>
+                            <button x-show="unreadCount > 0"
+                                    @click.prevent="markAllRead()"
+                                    class="text-[11px] text-slate-500 hover:text-red-600 font-bold transition-colors focus:outline-none focus:underline"
+                                    style="display:none;">
+                                সব পড়া হয়েছে ✓
+                            </button>
                         </div>
-                        <div class="max-h-80 overflow-y-auto divide-y divide-slate-50">
-                            @forelse(auth()->user()->unreadNotifications as $notification)
-                                <form action="{{ route('notifications.read', $notification->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="w-full text-left p-4 hover:bg-slate-50 transition flex gap-3 items-start group">
-                                        <div class="mt-0.5 rounded-full p-2 shrink-0 {{ isset($notification->data['status']) && $notification->data['status'] === 'approved' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600' }}">
-                                            @if(isset($notification->data['status']) && $notification->data['status'] === 'approved')
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                            @else
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                            @endif
-                                        </div>
-                                        <div>
-                                            <div class="text-sm font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
-                                                {{ $notification->data['message'] ?? 'নতুন নোটিফিকেশন' }}
-                                            </div>
-                                            <div class="text-[10px] text-slate-400 mt-1 font-bold uppercase tracking-wide">
-                                                @if(isset($notification->data['patient_name']))
-                                                    {{ $notification->data['patient_name'] }} • 
-                                                @endif
-                                                {{ $notification->created_at->diffForHumans() }}
-                                            </div>
-                                        </div>
-                                    </button>
-                                </form>
-                            @empty
-                                <div class="p-8 text-center flex flex-col items-center justify-center">
-                                    <div class="bg-slate-50 p-3 rounded-full mb-3 text-slate-300">
-                                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
-                                    </div>
-                                    <span class="text-sm font-bold text-slate-400">নতুন কোনো নোটিফিকেশন নেই।</span>
+
+                        {{-- List Body --}}
+                        <div id="notif-list" class="max-h-80 overflow-y-auto divide-y divide-slate-50">
+
+                            {{-- Loading State --}}
+                            <div x-show="loading" class="flex items-center justify-center gap-2 py-10 text-slate-400">
+                                <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                                </svg>
+                                <span class="text-sm font-semibold">লোড হচ্ছে...</span>
+                            </div>
+
+                            {{-- Empty State --}}
+                            <div x-show="!loading && notifications.length === 0"
+                                 data-empty-state
+                                 class="py-10 text-center flex flex-col items-center gap-3">
+                                <div class="w-14 h-14 rounded-full bg-slate-50 flex items-center justify-center text-slate-300">
+                                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                                    </svg>
                                 </div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
+                                <p class="text-sm font-bold text-slate-400">এখনো কোনো নোটিফিকেশন নেই</p>
+                            </div>
+
+                            {{-- Notification Items (Alpine x-for reactive list) --}}
+                            <template x-for="n in notifications" :key="n.id">
+                                <a :href="n.url"
+                                   :class="n.read_at ? 'bg-white' : 'bg-red-50/40'"
+                                   class="flex gap-3 items-start px-4 py-3.5 hover:bg-slate-50 transition-colors focus:outline-none focus:bg-slate-100"
+                                   tabindex="0">
+                                    <div class="shrink-0 mt-0.5 w-9 h-9 rounded-full bg-red-100 flex items-center justify-center text-red-600">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-semibold text-slate-800 leading-snug line-clamp-2" x-text="n.message"></p>
+                                        <div class="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                                            <template x-if="n.blood_group">
+                                                <span x-text="n.blood_group"
+                                                      :class="bloodGroupColor(n.blood_group)"
+                                                      class="text-[10px] font-black px-1.5 py-0.5 rounded-full"></span>
+                                            </template>
+                                            <span x-text="urgencyText(n.urgency)"
+                                                  :class="urgencyClass(n.urgency)"
+                                                  class="text-[10px] font-bold px-1.5 py-0.5 rounded-full"></span>
+                                            <span x-text="n.time_ago" class="text-[10px] text-slate-400 font-medium"></span>
+                                        </div>
+                                    </div>
+                                    <div x-show="!n.read_at"
+                                         class="shrink-0 mt-2 w-2 h-2 rounded-full bg-red-500"
+                                         style="display:none;"></div>
+                                </a>
+                            </template>
+
+                        </div>{{-- /#notif-list --}}
+                    </div>{{-- /dropdown --}}
+                </div>{{-- /notification bell --}}
 
                 {{-- ৪. User Profile Chip & Dropdown --}}
                 <div x-data="{ openProfile: false }" class="relative inline-block text-left ml-1 sm:ml-2">
@@ -229,6 +284,13 @@
 </main>
 
 @include('layouts.footer')
+
+    {{-- Toast container for real-time notification toasts --}}
+    <div id="notif-toast-container"
+         class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"
+         aria-live="polite"
+         aria-label="নোটিফিকেশন">
+    </div>
 
     {{-- Per-page scripts pushed by child views (modals, WYSIWYG init, etc.) --}}
     @stack('scripts')

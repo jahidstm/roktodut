@@ -8,9 +8,11 @@ use App\Models\BloodRequest;
 use App\Models\BloodRequestResponse;
 use App\Models\District;
 use App\Models\User;
-use App\Models\CustomNotification;
+use App\Notifications\BloodRequestMatchedNotification;
+use App\Services\DonorMatchingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Notification;
 use Carbon\Carbon;
 
 class BloodRequestController extends Controller
@@ -86,39 +88,16 @@ class BloodRequestController extends Controller
         // ২. জেলার নাম বের করা (নোটিফিকেশনে দেখানোর জন্য)
         $districtName = District::find($bloodRequest->district_id)->name ?? 'আপনার';
 
-        // ⚙️ ৩. স্মার্ট ডোনার ম্যাচিং অ্যালগরিদম (The Active Engine)
-        $eligibleCutoff = Carbon::now()->subDays(120); // ১২০ দিনের জৈবিক কুলডাউন
+        // ⚙️ ৩. স্মার্ট ডোনার ম্যাচিং সার্ভিস (fixes last_donation_date bug)
+        $donors = app(DonorMatchingService::class)->match($bloodRequest);
 
-        // ওই জেলার ডোনারদের খুঁজে বের করা (is_verified কলামটি রিমুভ করা হয়েছে)
-        $matchingDonors = User::where('blood_group', $bloodRequest->blood_group)
-            ->where('district_id', $bloodRequest->district_id)
-            ->where('id', '!=', $bloodRequest->requested_by)
-            ->whereIn('role', ['donor', 'org_admin'])
-            ->where(function ($q) use ($eligibleCutoff) {
-                $q->whereNull('last_donation_date')
-                    ->orWhere('last_donation_date', '<=', $eligibleCutoff);
-            })
-            ->get();
-
-        // 🚀 ৪. টার্গেটেড নোটিফিকেশন পাঠানো
-        if ($matchingDonors->count() > 0) {
-            $notifications = [];
-            foreach ($matchingDonors as $donor) {
-                $notifications[] = [
-                    'user_id' => $donor->id,
-                    'title'   => 'জরুরি রক্তের প্রয়োজন!',
-                    'message' => "{$districtName} জেলায় {$bloodRequest->blood_group} রক্তের জন্য একটি ইমার্জেন্সি রিকোয়েস্ট এসেছে।",
-                    'link'    => route('requests.show', $bloodRequest->id),
-                    'is_read' => false,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-            CustomNotification::insert($notifications);
+        // 🚀 ৪. টার্গেটেড নোটিফিকেশন: database + Reverb real-time broadcast
+        if ($donors->isNotEmpty()) {
+            Notification::send($donors, new BloodRequestMatchedNotification($bloodRequest, $districtName));
         }
 
         return redirect()->route('requests.index')
-            ->with('success', 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে এবং ' . $matchingDonors->count() . ' জন ডোনারকে অ্যালার্ট পাঠানো হয়েছে।');
+            ->with('success', 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে এবং ' . $donors->count() . ' জন ডোনারকে অ্যালার্ট পাঠানো হয়েছে।');
     }
 
     /**
