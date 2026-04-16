@@ -284,6 +284,45 @@
 
 
 {{-- ══════════════════════════════════════════════════════
+     REQUEST FEED PREVIEW
+══════════════════════════════════════════════════════ --}}
+<section class="bg-slate-50/70 py-14 md:py-16 border-y border-slate-100">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+        <div class="flex items-center justify-between gap-3 mb-7">
+            <div>
+                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">সাম্প্রতিক রক্তের অনুরোধ</h2>
+                <p class="mt-1 text-sm md:text-base text-slate-600 font-medium">জরুরি ও চলমান রিকোয়েস্টগুলো দ্রুত দেখে নিন</p>
+            </div>
+            <a href="{{ route('public.requests.index') }}"
+               class="hidden sm:inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-red-200 hover:text-red-600 hover:bg-red-50/70">
+                Show more
+            </a>
+        </div>
+
+        @if(isset($homeRequests) && $homeRequests->count() > 0)
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-5">
+                @foreach($homeRequests as $request)
+                    <x-request-feed-card :request="$request" :is-public="true" :show-requester="false" />
+                @endforeach
+            </div>
+        @else
+            <div class="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+                <p class="text-slate-700 font-bold">এই মুহূর্তে কোনো রক্তের অনুরোধ নেই</p>
+                <p class="mt-1 text-sm text-slate-500">কিছুক্ষণ পর আবার দেখে নিন</p>
+            </div>
+        @endif
+
+        <div class="mt-6 sm:hidden">
+            <a href="{{ route('public.requests.index') }}"
+               class="inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-red-200 hover:text-red-600 hover:bg-red-50/70">
+                Show more
+            </a>
+        </div>
+    </div>
+</section>
+
+
+{{-- ══════════════════════════════════════════════════════
      VALUE PROPOSITION GRID (migrated from donate page)
 ══════════════════════════════════════════════════════ --}}
 <section class="py-20 bg-white" id="features">

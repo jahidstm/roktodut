@@ -40,6 +40,18 @@ Route::get('/verify/{token}', [PublicVerificationController::class, 'show'])
 
 Route::get('/', function () {
     $divisions  = \App\Models\Division::all();
+    $homeRequests = \App\Models\BloodRequest::active()
+        ->with(['district:id,name', 'upazila:id,name'])
+        ->withCount([
+            'responses as accepted_responses_count' => fn($q) => $q->where('status', 'accepted'),
+            'responses as claimed_verifications_count' => fn($q) => $q->where('verification_status', 'claimed'),
+            'responses as verified_verifications_count' => fn($q) => $q->where('verification_status', 'verified'),
+        ])
+        ->orderByRaw("FIELD(urgency, 'emergency', 'urgent', 'normal')")
+        ->orderBy('needed_at', 'asc')
+        ->limit(3)
+        ->get();
+
     $topDonors  = \App\Models\User::where('role', 'donor')
         ->notShadowbanned()
         ->where(function ($q) {
@@ -60,7 +72,7 @@ Route::get('/', function () {
     $totalDonations = \App\Models\User::sum('total_verified_donations');
     $livesSaved     = ($totalDonations * 3) + 120;
 
-    return view('home', compact('divisions', 'topDonors', 'verifiedDonors', 'livesSaved'));
+    return view('home', compact('divisions', 'topDonors', 'verifiedDonors', 'livesSaved', 'homeRequests'));
 })->name('home');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
