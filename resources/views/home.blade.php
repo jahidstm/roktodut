@@ -225,21 +225,20 @@
 ══════════════════════════════════════════════════════ --}}
 <section class="relative bg-white overflow-hidden">
     <div class="absolute inset-0 bg-gradient-to-b from-red-50 via-white to-white"></div>
-    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 pt-16 pb-28 lg:pt-24 lg:pb-36">
-        <div class="flex flex-col lg:flex-row items-center gap-14">
-            <div class="lg:w-1/2 text-center lg:text-left">
+    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 pt-16 pb-20 lg:pt-24 lg:pb-24">
+        <div class="max-w-4xl mx-auto text-center">
                 <span class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-red-100">
                     ইমার্জেন্সি ব্লাড ডোনেশন নেটওয়ার্ক
                 </span>
                 <h1 class="mt-6 text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.12] tracking-tight">
                     জরুরি মুহূর্তে রক্তের সন্ধানে—<span class="text-red-600">আমরা আছি আপনার পাশে</span>
                 </h1>
-                <p class="mt-6 text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto lg:mx-0 font-medium">
+                <p class="mt-6 text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto font-medium">
                     বাংলাদেশের সবচেয়ে বিশ্বাসযোগ্য NID-ভেরিফাইড ডোনার নেটওয়ার্ক — জরুরি মুহূর্তে সঠিক রক্ত, সঠিক সময়ে।
                 </p>
 
                 {{-- Micro-bullets: core value at a glance --}}
-                <ul class="mt-5 flex flex-col sm:flex-row flex-wrap gap-3 justify-center lg:justify-start text-sm font-semibold text-slate-700">
+                <ul class="mt-5 flex flex-col sm:flex-row flex-wrap gap-3 justify-center text-sm font-semibold text-slate-700">
                     <li class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full">
                         <span class="text-emerald-500">✓</span> লগইন ছাড়াই ডোনার সার্চ
                     </li>
@@ -248,7 +247,7 @@
                     </li>
                 </ul>
 
-                <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                     <a href="{{ route('search') }}"
                        class="inline-flex items-center justify-center bg-red-600 text-white px-7 py-3.5 rounded-lg font-extrabold shadow-sm shadow-red-200 hover:bg-red-700 transition gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -259,54 +258,37 @@
                         জরুরি রক্তের অনুরোধ
                     </a>
                 </div>
-            </div>
 
-            <div class="lg:w-1/2 flex justify-center relative">
-                <div class="relative w-72 h-72 md:w-96 md:h-96 bg-red-50 rounded-full flex items-center justify-center">
-                    <div class="absolute inset-0 border-[18px] border-white rounded-full shadow-2xl z-10"></div>
-                    <div class="absolute inset-0 bg-red-100 rounded-full animate-ping opacity-20"></div>
-                    <svg class="w-24 md:w-36 text-red-500 z-20" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
+                <div class="mt-10 bg-white rounded-2xl shadow-md ring-1 ring-black/5 border border-slate-100 p-6 md:p-8 text-left">
+                    <h2 class="text-lg font-extrabold text-slate-800 mb-4 text-center">দ্রুত ডোনার অনুসন্ধান করুন</h2>
+                    <form action="{{ route('search') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                        <select id="division_select" name="division" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200">
+                            <option value="">বিভাগ নির্বাচন</option>
+                            @if(isset($divisions))
+                                @foreach($divisions as $division)
+                                    <option value="{{ $division->id }}">{{ $division->name }}</option>
+                                @endforeach
+                            @endif
+                        </select>
+                        <select id="district_select" name="district" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200" disabled>
+                            <option value="">জেলা নির্বাচন</option>
+                        </select>
+                        <select id="upazila_select" name="upazila" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200" disabled>
+                            <option value="">উপজেলা/এরিয়া</option>
+                        </select>
+                        <select name="blood_group" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200" required>
+                            <option value="">রক্তের গ্রুপ</option>
+                            <option value="A+">A+</option><option value="A-">A-</option>
+                            <option value="B+">B+</option><option value="B-">B-</option>
+                            <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                            <option value="O+">O+</option><option value="O-">O-</option>
+                        </select>
+                        <button type="submit" class="bg-red-600 text-white font-extrabold rounded-lg py-3.5 hover:bg-red-700 transition shadow-sm shadow-red-200">
+                            সার্চ করুন
+                        </button>
+                    </form>
                 </div>
-            </div>
         </div>
-    </div>
-</section>
-
-
-{{-- ══════════════════════════════════════════════════════
-     QUICK SEARCH WIDGET
-══════════════════════════════════════════════════════ --}}
-<section class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 relative -mt-16 md:-mt-20">
-    <div class="bg-white rounded-2xl shadow-md ring-1 ring-black/5 border border-slate-100 p-6 md:p-8">
-        <h2 class="text-lg font-extrabold text-slate-800 mb-4">দ্রুত ডোনার অনুসন্ধান করুন</h2>
-        <form action="{{ route('search') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <select id="division_select" name="division" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200">
-                <option value="">বিভাগ নির্বাচন</option>
-                @if(isset($divisions))
-                    @foreach($divisions as $division)
-                        <option value="{{ $division->id }}">{{ $division->name }}</option>
-                    @endforeach
-                @endif
-            </select>
-            <select id="district_select" name="district" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200" disabled>
-                <option value="">জেলা নির্বাচন</option>
-            </select>
-            <select id="upazila_select" name="upazila" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200" disabled>
-                <option value="">উপজেলা/এরিয়া</option>
-            </select>
-            <select name="blood_group" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200" required>
-                <option value="">রক্তের গ্রুপ</option>
-                <option value="A+">A+</option><option value="A-">A-</option>
-                <option value="B+">B+</option><option value="B-">B-</option>
-                <option value="AB+">AB+</option><option value="AB-">AB-</option>
-                <option value="O+">O+</option><option value="O-">O-</option>
-            </select>
-            <button type="submit" class="bg-red-600 text-white font-extrabold rounded-lg py-3.5 hover:bg-red-700 transition shadow-sm shadow-red-200">
-                সার্চ করুন
-            </button>
-        </form>
     </div>
 </section>
 
