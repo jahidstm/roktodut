@@ -237,16 +237,6 @@
                     বাংলাদেশের সবচেয়ে বিশ্বাসযোগ্য NID-ভেরিফাইড ডোনার নেটওয়ার্ক — জরুরি মুহূর্তে সঠিক রক্ত, সঠিক সময়ে।
                 </p>
 
-                {{-- Micro-bullets: core value at a glance --}}
-                <ul class="mt-5 flex flex-col sm:flex-row flex-wrap gap-3 justify-center text-sm font-semibold text-slate-700">
-                    <li class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full">
-                        <span class="text-emerald-500">✓</span> লগইন ছাড়াই ডোনার সার্চ
-                    </li>
-                    <li class="flex items-center gap-2 bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-full">
-                        <span class="text-emerald-500">✓</span> মোবাইল নম্বর প্রাইভেসি-শিল্ডেড
-                    </li>
-                </ul>
-
                 <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
                     <a href="{{ route('search') }}"
                        class="inline-flex items-center justify-center bg-red-600 text-white px-7 py-3.5 rounded-lg font-extrabold shadow-sm shadow-red-200 hover:bg-red-700 transition gap-2">
