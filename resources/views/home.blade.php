@@ -325,49 +325,56 @@
 {{-- ══════════════════════════════════════════════════════
      VALUE PROPOSITION GRID (migrated from donate page)
 ══════════════════════════════════════════════════════ --}}
-<section class="py-20 bg-white" id="features">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
-        <div class="text-center mb-14">
-            <span class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-red-100">কেন আমরা আলাদা</span>
-            <h2 class="mt-4 text-3xl md:text-4xl font-extrabold text-slate-900">রক্তদূত বেছে নেওয়ার কারণ</h2>
-            <p class="mt-3 text-slate-500 font-medium max-w-xl mx-auto">আমাদের প্ল্যাটফর্ম বিশ্বাস, প্রযুক্তি এবং সম্মানের ওপর নির্মিত।</p>
+<section class="relative py-20 md:py-24 bg-gradient-to-b from-white via-rose-50/35 to-white overflow-hidden" id="features">
+    <div class="absolute -top-24 -left-20 w-72 h-72 bg-red-100/60 blur-3xl rounded-full pointer-events-none"></div>
+    <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-rose-100/70 blur-3xl rounded-full pointer-events-none"></div>
+
+    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
+        <div class="text-center mb-14 md:mb-16">
+            <span class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-red-100 shadow-sm shadow-red-100/70">
+                কেন আমরা আলাদা
+            </span>
+            <h2 class="mt-4 text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">রক্তদূত বেছে নেওয়ার কারণ</h2>
+            <p class="mt-3 text-slate-600 font-medium max-w-xl mx-auto">আমাদের প্ল্যাটফর্ম বিশ্বাস, প্রযুক্তি এবং সম্মানের ওপর নির্মিত।</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-7">
             {{-- NID Verified Trust --}}
-            <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-lg hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-full -z-10 group-hover:scale-[2] transition-transform duration-500 ease-out"></div>
-                <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-emerald-200 group-hover:bg-emerald-500 group-hover:text-white transition-colors duration-300">
+            <div class="group relative rounded-3xl border border-red-100/70 bg-white/95 backdrop-blur-sm p-7 md:p-8 shadow-[0_8px_28px_rgba(15,23,42,0.08)] hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-red-500 to-rose-400"></div>
+                <div class="absolute -top-14 -right-10 w-28 h-28 bg-red-100/70 rounded-full blur-2xl opacity-70 group-hover:opacity-100 transition"></div>
+                <div class="relative w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mb-6 border border-red-100 shadow-sm">
                     <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 mb-3">NID Verified Trust</h3>
+                <h3 class="text-xl font-extrabold text-slate-900 mb-3 tracking-tight">NID Verified Trust</h3>
                 <p class="text-slate-600 font-medium leading-relaxed">আমাদের প্ল্যাটফর্মের ডোনাররা জাতীয় পরিচয়পত্র দ্বারা ভেরিফাইড। আপনার তথ্য শতভাগ সুরক্ষিত ও নির্ভরযোগ্য থাকবে।</p>
             </div>
 
             {{-- Dynamic Smart Card --}}
-            <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-lg hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-blue-50 rounded-bl-full -z-10 group-hover:scale-[2] transition-transform duration-500 ease-out"></div>
-                <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-blue-200 group-hover:bg-blue-500 group-hover:text-white transition-colors duration-300">
+            <div class="group relative rounded-3xl border border-red-100/70 bg-white/95 backdrop-blur-sm p-7 md:p-8 shadow-[0_8px_28px_rgba(15,23,42,0.08)] hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-rose-500 to-red-500"></div>
+                <div class="absolute -top-14 -right-10 w-28 h-28 bg-rose-100/70 rounded-full blur-2xl opacity-70 group-hover:opacity-100 transition"></div>
+                <div class="relative w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mb-6 border border-red-100 shadow-sm">
                     <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 mb-3">Dynamic Smart Card</h3>
+                <h3 class="text-xl font-extrabold text-slate-900 mb-3 tracking-tight">Dynamic Smart Card</h3>
                 <p class="text-slate-600 font-medium leading-relaxed">ভেরিফায়েড ডোনারদের জন্য ডিজিটাল QR স্মার্ট কার্ড, যার মাধ্যমে আপনার রক্তদানের স্ট্যাটাস সহজেই প্রমাণ করা যাবে।</p>
             </div>
 
             {{-- Gamification Badges --}}
-            <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-lg hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden group">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-bl-full -z-10 group-hover:scale-[2] transition-transform duration-500 ease-out"></div>
-                <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-6 shadow-sm border border-amber-200 group-hover:bg-amber-500 group-hover:text-white transition-colors duration-300">
+            <div class="group relative rounded-3xl border border-red-100/70 bg-white/95 backdrop-blur-sm p-7 md:p-8 shadow-[0_8px_28px_rgba(15,23,42,0.08)] hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+                <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-red-400 to-rose-500"></div>
+                <div class="absolute -top-14 -right-10 w-28 h-28 bg-red-100/70 rounded-full blur-2xl opacity-70 group-hover:opacity-100 transition"></div>
+                <div class="relative w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mb-6 border border-red-100 shadow-sm">
                     <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                     </svg>
                 </div>
-                <h3 class="text-xl font-bold text-slate-900 mb-3">Gamification Badges</h3>
+                <h3 class="text-xl font-extrabold text-slate-900 mb-3 tracking-tight">Gamification Badges</h3>
                 <p class="text-slate-600 font-medium leading-relaxed">রক্তদানের মাধ্যমে পয়েন্ট অর্জন করুন এবং প্ল্যাটিনাম, গোল্ডেন সহ বিভিন্ন আকর্ষণীয় রিবন ও ব্যাজ আনলক করুন।</p>
             </div>
         </div>
@@ -378,8 +385,11 @@
 {{-- ══════════════════════════════════════════════════════
      SOCIAL PROOF (migrated from donate page)
 ══════════════════════════════════════════════════════ --}}
-<section class="py-20 bg-gradient-to-br from-slate-50 to-red-50/40" id="social-proof">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 text-center">
+<section class="relative py-20 md:py-24 bg-gradient-to-b from-slate-50 via-rose-50/35 to-white overflow-hidden" id="social-proof">
+    <div class="absolute -top-24 -left-20 h-72 w-72 rounded-full bg-red-100/70 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-16 -right-16 h-80 w-80 rounded-full bg-rose-100/70 blur-3xl pointer-events-none"></div>
+
+    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 text-center">
         <p class="text-slate-600 text-lg sm:text-2xl font-bold mb-6">আমাদের প্ল্যাটফর্মে এখন পর্যন্ত</p>
         @php
             $engNum = ['0','1','2','3','4','5','6','7','8','9'];
@@ -387,30 +397,32 @@
             $vDonorsBn = str_replace($engNum, $bngNum, $verifiedDonors ?? 6);
             $lSavedBn  = str_replace($engNum, $bngNum, $livesSaved ?? 120);
         @endphp
-        <h2 class="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-tight">
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-rose-500 font-black">{{ $vDonorsBn }}+</span>
+        <h2 class="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-tight tracking-tight">
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-rose-500">{{ $vDonorsBn }}+</span>
             ডোনার যাচাইকৃত হয়েছেন এবং <br class="hidden lg:block"/>
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 font-black inline-block mt-2 sm:mt-0">{{ $lSavedBn }}+</span>
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 inline-block mt-2 sm:mt-0">{{ $lSavedBn }}+</span>
             জীবন বাঁচানো হয়েছে।
         </h2>
 
-        <div class="mt-14 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-                <div class="text-4xl font-extrabold text-red-600">৫০০+</div>
-                <div class="text-slate-500 mt-2 font-semibold">নিবন্ধিত ডোনার</div>
+        <div class="mt-14 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-8 shadow-[0_8px_30px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
+                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-red-500 to-rose-400"></div>
+                <div class="text-4xl font-black text-red-600">৫০০+</div>
+                <div class="text-slate-600 mt-2 font-bold">নিবন্ধিত ডোনার</div>
             </div>
-            <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-                <div class="text-4xl font-extrabold text-emerald-600">১২০+</div>
-                <div class="text-slate-500 mt-2 font-semibold">সফল রক্ত সংযোগ</div>
+            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-8 shadow-[0_8px_30px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
+                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+                <div class="text-4xl font-black text-emerald-600">১২০+</div>
+                <div class="text-slate-600 mt-2 font-bold">সফল রক্ত সংযোগ</div>
             </div>
-            <div class="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-                <div class="text-4xl font-extrabold text-blue-600">৬৪</div>
-                <div class="text-slate-500 mt-2 font-semibold">জেলায় সক্রিয় ডোনার</div>
+            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-8 shadow-[0_8px_30px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
+                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+                <div class="text-4xl font-black text-blue-600">৬৪</div>
+                <div class="text-slate-600 mt-2 font-bold">জেলায় সক্রিয় ডোনার</div>
             </div>
         </div>
 
-        {{-- Task 3: Credibility note --}}
-        <p class="mt-8 text-slate-400 text-sm font-medium">
+        <p class="mt-8 text-slate-500 text-sm font-medium">
             📊 তথ্য ভেরিফাইড প্রোফাইলের ভিত্তিতে গণনা করা হয়েছে এবং নিয়মিত আপডেট হয়।
         </p>
     </div>
@@ -540,30 +552,39 @@
 {{-- ══════════════════════════════════════════════════════
      HOW IT WORKS
 ══════════════════════════════════════════════════════ --}}
-<section class="py-20 bg-white" id="how-it-works">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
-        <div class="text-center mb-14">
-            <span class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-blue-100">সহজ প্রক্রিয়া</span>
-            <h2 class="mt-4 text-3xl md:text-4xl font-extrabold text-slate-900">রক্তদূত কীভাবে কাজ করে?</h2>
-            <p class="mt-3 text-slate-500 font-medium max-w-xl mx-auto">মাত্র কয়েকটি সহজ ধাপে রক্তের সংযোগ তৈরি করুন।</p>
+<section class="relative py-20 md:py-24 bg-gradient-to-b from-white via-rose-50/30 to-white overflow-hidden" id="how-it-works">
+    <div class="absolute -top-20 -right-24 h-72 w-72 rounded-full bg-red-100/70 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-20 -left-24 h-72 w-72 rounded-full bg-rose-100/70 blur-3xl pointer-events-none"></div>
+
+    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
+        <div class="text-center mb-14 md:mb-16">
+            <span class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-red-100 shadow-sm shadow-red-100/70">
+                সহজ প্রক্রিয়া
+            </span>
+            <h2 class="mt-4 text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">রক্তদূত কীভাবে কাজ করে?</h2>
+            <p class="mt-3 text-slate-600 font-medium max-w-xl mx-auto">মাত্র কয়েকটি সহজ ধাপে রক্তের সংযোগ তৈরি করুন।</p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
             @foreach([
-                ['num' => '১', 'icon' => '🔍', 'title' => 'ডোনার সার্চ করুন', 'desc' => 'লগইন ছাড়াই রক্তের গ্রুপ ও এলাকা দিয়ে কাছের ডোনার খুঁজুন।', 'colorBg' => 'bg-red-100', 'colorText' => 'text-red-600'],
-                ['num' => '২', 'icon' => '📋', 'title' => 'রিকোয়েস্ট করুন', 'desc' => 'জরুরি রক্তের প্রয়োজনে অনলাইনে রিকোয়েস্ট পোস্ট করুন — ডোনার নিজেই সাড়া দেবেন।', 'colorBg' => 'bg-blue-100', 'colorText' => 'text-blue-600'],
-                ['num' => '৩', 'icon' => '🤝', 'title' => 'ম্যাচ হলে সংযোগ', 'desc' => 'সিস্টেম রিকোয়েস্ট ও ডোনার ম্যাচ করিয়ে দেবে — প্রাইভেসি-শিল্ডেড পদ্ধতিতে যোগাযোগ হবে।', 'colorBg' => 'bg-emerald-100', 'colorText' => 'text-emerald-600'],
-                ['num' => '৪', 'icon' => '🩸', 'title' => 'রক্ত দিন', 'desc' => 'রক্তদান সম্পন্ন হলে উভয়পক্ষ নিশ্চিত করুন — ডোনারের প্রোফাইলে তা রেকর্ড হয়।', 'colorBg' => 'bg-amber-100', 'colorText' => 'text-amber-600'],
+                ['num' => '১', 'icon' => '🔍', 'title' => 'ডোনার সার্চ করুন', 'desc' => 'লগইন ছাড়াই রক্তের গ্রুপ ও এলাকা দিয়ে কাছের ডোনার খুঁজুন।', 'colorBg' => 'bg-red-50', 'colorText' => 'text-red-600', 'line' => 'from-red-500 to-rose-400'],
+                ['num' => '২', 'icon' => '📋', 'title' => 'রিকোয়েস্ট করুন', 'desc' => 'জরুরি রক্তের প্রয়োজনে অনলাইনে রিকোয়েস্ট পোস্ট করুন — ডোনার নিজেই সাড়া দেবেন।', 'colorBg' => 'bg-indigo-50', 'colorText' => 'text-indigo-600', 'line' => 'from-indigo-500 to-blue-500'],
+                ['num' => '৩', 'icon' => '🤝', 'title' => 'ম্যাচ হলে সংযোগ', 'desc' => 'সিস্টেম রিকোয়েস্ট ও ডোনার ম্যাচ করিয়ে দেবে — প্রাইভেসি-শিল্ডেড পদ্ধতিতে যোগাযোগ হবে।', 'colorBg' => 'bg-emerald-50', 'colorText' => 'text-emerald-600', 'line' => 'from-emerald-500 to-teal-500'],
+                ['num' => '৪', 'icon' => '🩸', 'title' => 'রক্ত দিন', 'desc' => 'রক্তদান সম্পন্ন হলে উভয়পক্ষ নিশ্চিত করুন — ডোনারের প্রোফাইলে তা রেকর্ড হয়।', 'colorBg' => 'bg-amber-50', 'colorText' => 'text-amber-600', 'line' => 'from-amber-500 to-orange-500'],
             ] as $step)
-                <div class="text-center group">
-                    <div class="relative inline-block mb-5">
-                        <div class="w-16 h-16 {{ $step['colorBg'] }} {{ $step['colorText'] }} rounded-2xl flex items-center justify-center text-2xl shadow-sm group-hover:-translate-y-1.5 transition-transform duration-300">
+                <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 backdrop-blur-sm p-6 md:p-7 shadow-[0_8px_28px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
+                    <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r {{ $step['line'] }}"></div>
+                    <div class="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-red-100/50 blur-2xl opacity-70 group-hover:opacity-100 transition"></div>
+
+                    <div class="relative mb-5 flex items-center justify-between">
+                        <div class="w-14 h-14 {{ $step['colorBg'] }} {{ $step['colorText'] }} rounded-2xl border border-slate-200/70 flex items-center justify-center text-2xl shadow-sm">
                             {{ $step['icon'] }}
                         </div>
-                        <span class="absolute -top-2.5 -right-2.5 w-6 h-6 bg-slate-900 text-white text-xs font-black rounded-full flex items-center justify-center">{{ $step['num'] }}</span>
+                        <span class="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-slate-900 px-2.5 text-xs font-black text-white">{{ $step['num'] }}</span>
                     </div>
-                    <h3 class="text-lg font-extrabold text-slate-900 mb-2">{{ $step['title'] }}</h3>
-                    <p class="text-slate-500 font-medium text-sm leading-relaxed">{{ $step['desc'] }}</p>
+
+                    <h3 class="text-lg font-extrabold text-slate-900 mb-2 tracking-tight">{{ $step['title'] }}</h3>
+                    <p class="text-slate-600 font-medium text-sm leading-relaxed">{{ $step['desc'] }}</p>
                 </div>
             @endforeach
         </div>
@@ -574,33 +595,45 @@
 {{-- ══════════════════════════════════════════════════════
      PRIVACY & TRUST
 ══════════════════════════════════════════════════════ --}}
-<section class="py-20 bg-slate-50" id="trust">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
-        <div class="text-center mb-14">
-            <span class="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-emerald-100">🔒 নিরাপত্তা</span>
-            <h2 class="mt-4 text-3xl md:text-4xl font-extrabold text-slate-900">প্রাইভেসি ও ট্রাস্ট</h2>
-            <p class="mt-3 text-slate-500 font-medium max-w-xl mx-auto">আপনার তথ্য সুরক্ষায় আমরা সর্বোচ্চ প্রযুক্তিগত ব্যবস্থা নিয়েছি।</p>
+<section class="relative py-20 md:py-24 bg-gradient-to-b from-white via-red-50/25 to-white overflow-hidden" id="trust">
+    <div class="absolute -top-20 -left-24 h-72 w-72 rounded-full bg-red-100/70 blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-20 -right-24 h-72 w-72 rounded-full bg-rose-100/70 blur-3xl pointer-events-none"></div>
+
+    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
+        <div class="text-center mb-14 md:mb-16">
+            <span class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-red-100 shadow-sm shadow-red-100/70">
+                🔒 নিরাপত্তা
+            </span>
+            <h2 class="mt-4 text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">প্রাইভেসি ও ট্রাস্ট</h2>
+            <p class="mt-3 text-slate-600 font-medium max-w-xl mx-auto">আপনার তথ্য সুরক্ষায় আমরা সর্বোচ্চ প্রযুক্তিগত ব্যবস্থা নিয়েছি।</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div class="bg-white rounded-2xl border border-emerald-100 p-7 shadow-sm hover:shadow-md transition">
-                <div class="text-3xl mb-4">🔐</div>
-                <h3 class="font-extrabold text-slate-900 text-lg mb-2">ফোন নম্বর মাস্কড</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
+            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-7 shadow-[0_8px_28px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
+                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+                <div class="mb-4 text-3xl">🔐</div>
+                <h3 class="font-extrabold text-slate-900 text-xl mb-2 tracking-tight">ফোন নম্বর মাস্কড</h3>
                 <p class="text-slate-600 font-medium text-sm leading-relaxed">ডোনারের ফোন নম্বর সরাসরি দেখানো হয় না। একটি গণিত যাচাই চ্যালেঞ্জ পার হলে তবেই নম্বর প্রকাশ পায়।</p>
             </div>
-            <div class="bg-white rounded-2xl border border-blue-100 p-7 shadow-sm hover:shadow-md transition">
-                <div class="text-3xl mb-4">⚡</div>
-                <h3 class="font-extrabold text-slate-900 text-lg mb-2">Rate-Limit সুরক্ষা</h3>
+
+            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-7 shadow-[0_8px_28px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
+                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-indigo-500 to-blue-500"></div>
+                <div class="mb-4 text-3xl">⚡</div>
+                <h3 class="font-extrabold text-slate-900 text-xl mb-2 tracking-tight">Rate-Limit সুরক্ষা</h3>
                 <p class="text-slate-600 font-medium text-sm leading-relaxed">স্প্যাম ও ব্রুট-ফোর্স প্রতিরোধে প্রতি মিনিটে সর্বোচ্চ নম্বর প্রকাশের অনুরোধ সীমিত রাখা হয়।</p>
             </div>
-            <div class="bg-white rounded-2xl border border-amber-100 p-7 shadow-sm hover:shadow-md transition">
-                <div class="text-3xl mb-4">🪪</div>
-                <h3 class="font-extrabold text-slate-900 text-lg mb-2">NID ভেরিফিকেশন</h3>
+
+            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-7 shadow-[0_8px_28px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
+                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-amber-500 to-orange-500"></div>
+                <div class="mb-4 text-3xl">🪪</div>
+                <h3 class="font-extrabold text-slate-900 text-xl mb-2 tracking-tight">NID ভেরিফিকেশন</h3>
                 <p class="text-slate-600 font-medium text-sm leading-relaxed">ডোনারকে জাতীয় পরিচয়পত্র দিয়ে যাচাই করা হয় — অ্যানোনিমাস বা ভুয়া প্রোফাইলের সুযোগ নেই।</p>
             </div>
-            <div class="bg-white rounded-2xl border border-violet-100 p-7 shadow-sm hover:shadow-md transition">
-                <div class="text-3xl mb-4">🏥</div>
-                <h3 class="font-extrabold text-slate-900 text-lg mb-2">অর্গানাইজেশন ভেরিফিকেশন</h3>
+
+            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-7 shadow-[0_8px_28px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
+                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-violet-500 to-fuchsia-500"></div>
+                <div class="mb-4 text-3xl">🏥</div>
+                <h3 class="font-extrabold text-slate-900 text-xl mb-2 tracking-tight">অর্গানাইজেশন ভেরিফিকেশন</h3>
                 <p class="text-slate-600 font-medium text-sm leading-relaxed">নিবন্ধিত ব্লাড ব্যাঙ্ক ও সংগঠন ডোনারের ভেরিফিকেশনে অংশ নেয় — দ্বি-স্তরীয় নিশ্চিতকরণ।</p>
             </div>
         </div>
@@ -611,47 +644,47 @@
 {{-- ══════════════════════════════════════════════════════
      HIGH-CONTRAST FINAL CTA
 ══════════════════════════════════════════════════════ --}}
-<section class="bg-red-700 py-24" id="cta">
+<section class="bg-red-700 py-16 md:py-18" id="cta">
     <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-10 text-center">
-        <div class="inline-flex items-center justify-center w-16 h-16 bg-white/20 rounded-full mb-7 border border-white/30">
+        <div class="inline-flex items-center justify-center w-14 h-14 bg-white/20 rounded-full mb-5 border border-white/30">
             <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
             </svg>
         </div>
-        <h2 class="text-3xl sm:text-5xl font-extrabold text-white leading-tight">
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
             আজই একটি জীবন বাঁচান
         </h2>
-        <p class="mt-5 text-red-100 text-lg font-medium max-w-2xl mx-auto leading-relaxed">
+        <p class="mt-4 text-red-100 text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
             আপনার একটি রক্তদান তিনটি প্রাণ বাঁচাতে পারে। বাংলাদেশের সবচেয়ে নির্ভরযোগ্য ভেরিফায়েড ডোনার নেটওয়ার্কে এখনই যোগ দিন।
         </p>
-        <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+        <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
             @guest
                 <a href="{{ route('register') }}"
-                   class="inline-flex items-center justify-center bg-white text-red-700 px-8 py-4 rounded-xl font-extrabold text-lg hover:bg-red-50 transition shadow-lg gap-2">
+                   class="inline-flex items-center justify-center bg-white text-red-700 px-7 py-3.5 rounded-xl font-extrabold text-base sm:text-lg hover:bg-red-50 transition shadow-lg gap-2">
                     ডোনার হিসেবে যোগ দিন
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                 </a>
                 <a href="{{ route('search') }}"
-                   class="inline-flex items-center justify-center bg-white/15 border border-white/30 text-white px-8 py-4 rounded-xl font-extrabold text-lg hover:bg-white/25 transition gap-2">
+                   class="inline-flex items-center justify-center bg-white/15 border border-white/30 text-white px-7 py-3.5 rounded-xl font-extrabold text-base sm:text-lg hover:bg-white/25 transition gap-2">
                     ডোনার সার্চ করুন
                 </a>
             @endguest
             @auth
                 <a href="{{ route('requests.create') }}"
-                   class="inline-flex items-center justify-center bg-white text-red-700 px-8 py-4 rounded-xl font-extrabold text-lg hover:bg-red-50 transition shadow-lg gap-2">
+                   class="inline-flex items-center justify-center bg-white text-red-700 px-7 py-3.5 rounded-xl font-extrabold text-base sm:text-lg hover:bg-red-50 transition shadow-lg gap-2">
                     রক্তের রিকোয়েস্ট করুন
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
                 </a>
                 <a href="{{ route('search') }}"
-                   class="inline-flex items-center justify-center bg-white/15 border border-white/30 text-white px-8 py-4 rounded-xl font-extrabold text-lg hover:bg-white/25 transition gap-2">
+                   class="inline-flex items-center justify-center bg-white/15 border border-white/30 text-white px-7 py-3.5 rounded-xl font-extrabold text-base sm:text-lg hover:bg-white/25 transition gap-2">
                     ডোনার সার্চ করুন
                 </a>
             @endauth
         </div>
-        <p class="mt-6 text-white/80 text-sm font-semibold">
+        <p class="mt-5 text-white/80 text-sm font-semibold">
             🔒 মোবাইল নম্বর কখনো পাবলিক করা হয় না।
         </p>
-        <p class="mt-2 text-red-200 text-xs font-medium">
+        <p class="mt-1.5 text-red-200 text-xs font-medium">
             বিনামূল্যে · NID ভেরিফায়েড নেটওয়ার্ক · ৬৪ জেলায় সক্রিয়
         </p>
     </div>
