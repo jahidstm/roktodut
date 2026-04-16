@@ -3,7 +3,7 @@
 @section('title', 'লিডারবোর্ড – রক্তদূত')
 
 @section('content')
-<div class="max-w-5xl mx-auto px-4 py-8 sm:py-12">
+<div id="leaderboard-root" class="max-w-5xl mx-auto px-4 py-8 sm:py-12">
 
     {{-- ══════════════════════════════════════════
          Hero Section — dynamic based on filters
@@ -413,4 +413,74 @@
     </div>
 
 </div>
+@push('scripts')
+<script>
+(() => {
+    const root = document.getElementById('leaderboard-root');
+    if (!root) return;
+
+    const tabSelector = '#tab-time-all, #tab-time-month, #tab-scope-bd, #tab-scope-district';
+
+    const loadLeaderboard = async (url, { pushState = true } = {}) => {
+        try {
+            const response = await fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+            });
+
+            if (!response.ok) {
+                window.location.href = url;
+                return;
+            }
+
+            const html = await response.text();
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const nextRoot = doc.getElementById('leaderboard-root');
+
+            if (!nextRoot) {
+                window.location.href = url;
+                return;
+            }
+
+            root.innerHTML = nextRoot.innerHTML;
+
+            if (pushState) {
+                window.history.pushState({ leaderboard: true }, '', url);
+            }
+
+            if (window.Alpine && typeof window.Alpine.initTree === 'function') {
+                window.Alpine.initTree(root);
+            }
+        } catch (error) {
+            window.location.href = url;
+        }
+    };
+
+    root.addEventListener('click', (event) => {
+        const link = event.target.closest(tabSelector);
+        if (!link) return;
+
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        loadLeaderboard(link.href);
+    });
+
+    root.addEventListener('change', (event) => {
+        if (event.target.id !== 'district-select') return;
+
+        const form = event.target.closest('form');
+        if (!form) return;
+
+        const params = new URLSearchParams(new FormData(form));
+        const url = `${form.action}?${params.toString()}`;
+        loadLeaderboard(url);
+    });
+
+    window.addEventListener('popstate', () => {
+        loadLeaderboard(window.location.href, { pushState: false });
+    });
+})();
+</script>
+@endpush
+
 @endsection
