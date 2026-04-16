@@ -14,22 +14,43 @@ class LeaderboardController extends Controller
 
     public function index(Request $request)
     {
-        $scope      = $request->get('scope', 'national');
-        $districtId = $request->get('district_id');
-        $period     = $request->get('period', 'all_time');
-        $limit      = min((int) $request->get('limit', 10), 50); // টপ ১০ ডিফল্ট, সর্বোচ্চ ৫০
+        // ─── প্যারামিটার রিড (নতুন + পুরনো backward-compat) ───────────────
+        // নতুন: time=all|month | পুরনো: period=all_time|monthly
+        $rawTime = $request->get('time', $request->get('period', 'all'));
+        $time = match ($rawTime) {
+            'monthly', 'month' => 'month',
+            default            => 'all',
+        };
 
-        $districts = District::orderBy('name')->get();
-        $donors    = $this->gamification->getLeaderboard($scope, $districtId, $period, $limit);
+        // নতুন: scope=bd|district | পুরনো: scope=national
+        $rawScope = $request->get('scope', 'bd');
+        $scope = match ($rawScope) {
+            'district'         => 'district',
+            default            => 'bd',
+        };
 
-        // ─── বর্তমান লগইন ইউজারের র‌্যাঙ্ক ও পয়েন্ট ──────────────────
+        $districtId = $request->get('district_id') ? (int) $request->get('district_id') : null;
+        $limit      = 50; // সর্বদা Top 50
+
+        // ─── লোকেশন ডেটা ──────────────────────────────────────────────────
+        $districts        = District::orderBy('name')->get();
+        $selectedDistrict = ($scope === 'district' && $districtId)
+            ? $districts->firstWhere('id', $districtId)
+            : null;
+
+        // ─── লিডারবোর্ড কোয়েরি ────────────────────────────────────────────
+        // top3 পোডিয়ামের জন্য আলাদা — N+1 নেই, eager load সহ
+        $top3   = $this->gamification->getTop3($scope, $districtId, $time);
+        // পুরো তালিকা (Top 50)
+        $donors = $this->gamification->getLeaderboard($scope, $districtId, $time, $limit);
+
+        // ─── লগইন ইউজারের র‌্যাঙ্ক ও পয়েন্ট ─────────────────────────────
         $myRank   = null;
         $myPoints = null;
 
         if (Auth::check()) {
             $authUser = Auth::user();
 
-            // পুরো লিডারবোর্ডে ইউজার কতজনের পরে আছে তা গণনা করি
             $baseQuery = User::where('role', 'donor')
                 ->notShadowbanned()
                 ->where(function ($q) {
@@ -37,26 +58,23 @@ class LeaderboardController extends Controller
                       ->orWhere('points', '>', 0);
                 });
 
-            // Scope ফিল্টার
             if ($scope === 'district' && $districtId) {
                 $baseQuery->where('district_id', $districtId);
             }
 
-            if ($period === 'monthly') {
-                $currentMonth = now()->format('Y-m');
-                $myPoints     = $authUser->monthly_points_month === $currentMonth
+            if ($time === 'month') {
+                $currentYm = now()->format('Y-m');
+                $myPoints  = $authUser->monthly_points_month === $currentYm
                     ? ($authUser->monthly_points ?? 0)
                     : 0;
 
-                // monthly_points এর চেয়ে বেশি যারা আছে তাদের সংখ্যা + 1
                 $myRank = $baseQuery
-                    ->where('monthly_points_month', $currentMonth)
+                    ->where('monthly_points_month', $currentYm)
                     ->where('monthly_points', '>', $myPoints)
                     ->count() + 1;
             } else {
                 $myPoints = $authUser->points ?? 0;
 
-                // all-time: total_verified_donations > আমার, অথবা donations same কিন্তু points বেশি
                 $myRank = $baseQuery->where(function ($q) use ($authUser) {
                     $q->where('total_verified_donations', '>', $authUser->total_verified_donations ?? 0)
                       ->orWhere(function ($q2) use ($authUser) {
@@ -67,21 +85,27 @@ class LeaderboardController extends Controller
             }
         }
 
-        // ─── বর্তমান মাস বাংলায় ─────────────────────────────────────
+        // ─── বাংলা UI লেবেল ────────────────────────────────────────────────
         $monthNames = [
-            1 => 'জানুয়ারি', 2 => 'ফেব্রুয়ারি', 3 => 'মার্চ',    4 => 'এপ্রিল',
-            5 => 'মে',        6 => 'জুন',         7 => 'জুলাই',    8 => 'আগস্ট',
-            9 => 'সেপ্টেম্বর', 10 => 'অক্টোবর',  11 => 'নভেম্বর', 12 => 'ডিসেম্বর',
+            1 => 'জানুয়ারি', 2 => 'ফেব্রুয়ারি', 3 => 'মার্চ',     4 => 'এপ্রিল',
+            5 => 'মে',        6 => 'জুন',          7 => 'জুলাই',     8 => 'আগস্ট',
+            9 => 'সেপ্টেম্বর', 10 => 'অক্টোবর',   11 => 'নভেম্বর', 12 => 'ডিসেম্বর',
         ];
         $currentMonth = $monthNames[(int) now()->format('n')] . ' ' . now()->format('Y');
 
+        // পয়েন্ট লেবেল (view-এ ব্যবহার হবে)
+        $pointsLabel = $time === 'month' ? 'মাসিক পয়েন্ট' : 'পয়েন্ট';
+
         return view('leaderboard', compact(
             'donors',
+            'top3',
             'districts',
             'scope',
             'districtId',
-            'period',
+            'selectedDistrict',
+            'time',
             'currentMonth',
+            'pointsLabel',
             'myRank',
             'myPoints',
         ));

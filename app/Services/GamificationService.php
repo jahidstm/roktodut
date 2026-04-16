@@ -373,32 +373,56 @@ class GamificationService
     // লিডারবোর্ড
     // ==========================================
 
-    public function getLeaderboard(string $scope = 'national', ?int $districtId = null, string $period = 'all_time', int $limit = 50)
+    /**
+     * লিডারবোর্ড কোয়েরি — সময় ও অঞ্চল ফিল্টার সহ।
+     *
+     * @param  string   $scope      'bd' বা 'district' (পুরনো: 'national')
+     * @param  int|null $districtId জেলার ID (scope=district হলে)
+     * @param  string   $time       'all' বা 'month' (পুরনো: 'all_time'/'monthly')
+     * @param  int      $limit      সর্বোচ্চ কতজন (ডিফল্ট ৫০)
+     */
+    public function getLeaderboard(string $scope = 'bd', ?int $districtId = null, string $time = 'all', int $limit = 50)
     {
+        // পুরনো param মান normalize করো (backward compat)
+        if ($time === 'all_time') $time = 'all';
+        if ($time === 'monthly')  $time = 'month';
+        if ($scope === 'national') $scope = 'bd';
+
         $query = User::where('role', 'donor')
-            ->notShadowbanned()                          // ← শ্যাডোব্যান্ড ইউজার বাদ
+            ->notShadowbanned()
             ->where(function ($q) {
                 $q->where('total_verified_donations', '>', 0)
                   ->orWhere('points', '>', 0);
             })
             ->with(['badges', 'district']);
 
+        // অঞ্চল ফিল্টার
         if ($scope === 'district' && $districtId) {
             $query->where('district_id', $districtId);
         }
 
-        if ($period === 'monthly') {
+        // সময় ফিল্টার
+        if ($time === 'month') {
             $currentMonth = now()->format('Y-m');
             $query->where('monthly_points_month', $currentMonth)
                   ->orderByDesc('monthly_points')
                   ->orderByDesc('total_verified_donations');
         } else {
-            // All-time: প্রথমে ডোনেশন কাউন্ট, তারপর পয়েন্ট
+            // সর্বকাল: প্রথমে ডোনেশন কাউন্ট, তারপর পয়েন্ট
             $query->orderByDesc('total_verified_donations')
                   ->orderByDesc('points');
         }
 
         return $query->limit($limit)->get();
+    }
+
+    /**
+     * পোডিয়ামের জন্য শীর্ষ ৩ ডোনার।
+     * getLeaderboard() এর মতোই কিন্তু limit=3।
+     */
+    public function getTop3(string $scope = 'bd', ?int $districtId = null, string $time = 'all')
+    {
+        return $this->getLeaderboard($scope, $districtId, $time, 3);
     }
 
     // ==========================================
