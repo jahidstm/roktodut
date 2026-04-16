@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class ProfileController extends Controller
@@ -147,10 +148,32 @@ class ProfileController extends Controller
      */
     public function uploadNid(Request $request): RedirectResponse
     {
-        $request->validate([
-            'nid_number'   => ['required_without:nid_document', 'nullable', 'string', 'min:10', 'max:20'],
-            'nid_document' => ['required_without:nid_number', 'nullable', 'file', 'mimes:jpeg,png,jpg,pdf', 'max:2048'],
-        ]);
+        $validator = Validator::make(
+            $request->all(),
+            [
+                'nid_number'   => ['nullable', 'string', 'min:10', 'max:20'],
+                'nid_document' => ['nullable', 'file', 'mimes:jpeg,png,jpg,pdf', 'max:2048'],
+            ],
+            [
+                'nid_document.uploaded' => 'NID ডকুমেন্ট আপলোড করা যায়নি। ফাইল সাইজ কমিয়ে আবার চেষ্টা করুন।',
+                'nid_document.max'      => 'NID ডকুমেন্টের সাইজ সর্বোচ্চ 2MB হতে হবে।',
+                'nid_document.mimes'    => 'শুধুমাত্র JPG, PNG অথবা PDF ফাইল দিন।',
+            ]
+        );
+
+        $validator->after(function ($validator) use ($request) {
+            $hasNidNumber = filled(trim((string) $request->input('nid_number', '')));
+            $hasNidDocument = $request->hasFile('nid_document');
+            $hasNidDocumentError = $validator->errors()->has('nid_document');
+
+            // Either NID number or document is required.
+            // If document is present but invalid, show only document error (avoid confusing nid_number error).
+            if (!$hasNidNumber && !$hasNidDocument && !$hasNidDocumentError) {
+                $validator->errors()->add('nid_number', 'NID নম্বর অথবা ডকুমেন্টের যেকোনো একটি দিন।');
+            }
+        });
+
+        $validator->validate();
 
         $user    = $request->user();
         $changed = false;
