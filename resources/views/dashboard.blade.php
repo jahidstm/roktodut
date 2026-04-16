@@ -4,30 +4,54 @@
 
 @section('content')
 
-{{-- 🚀 Welcome Back Smart Prompt (The Re-engagement Loop) --}}
-@if(isset($showInactivePopup) && $showInactivePopup)
-    <div class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl p-8 max-w-lg w-full mx-4 shadow-2xl animate-fade-in-up">
-            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-5">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+{{-- 🚀 Welcome Back Prompt — shows once right after login (session flash) --}}
+@if(session('welcome_back_prompt'))
+    <div x-data="{ open: true }"
+         x-show="open"
+         x-cloak
+         x-on:keydown.escape.window="open = false"
+         class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div x-show="open"
+             x-transition.opacity.duration.200ms
+             class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm"
+             @click="open = false"></div>
+
+        <div x-show="open"
+             x-transition:enter="ease-out duration-300"
+             x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+             x-transition:leave="ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+             x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+             @click.stop
+             class="relative w-full max-w-lg rounded-3xl border border-slate-200 bg-white/95 p-7 sm:p-8 shadow-2xl ring-1 ring-black/5">
+            <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-red-50 text-red-600">
+                <svg class="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" d="M12 21s-7-4.35-7-10a4 4 0 0 1 7-2.65A4 4 0 0 1 19 11c0 5.65-7 10-7 10Z"/>
+                </svg>
             </div>
-            <h2 class="text-2xl font-black text-slate-900 text-center">অনেক দিন পর দেখা!</h2>
-            <p class="text-slate-500 text-center font-medium mt-2 mb-6">দীর্ঘদিন পর রক্তদূতে আপনাকে আবার স্বাগতম। আপনি কি বর্তমানে জরুরি প্রয়োজনে রক্তদানে প্রস্তুত আছেন?</p>
-            
-            <form action="{{ route('welcome_back.update') }}" method="POST">
-                @csrf
-                <label class="flex items-center gap-3 p-4 border-2 border-slate-100 rounded-xl cursor-pointer hover:border-blue-500 transition-colors bg-slate-50">
-                    <input type="checkbox" name="is_available" value="1" class="w-5 h-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500" {{ auth()->user()->is_available ? 'checked' : '' }}>
-                    <div>
-                        <p class="font-bold text-slate-800">হ্যাঁ, আমি রক্তদানে প্রস্তুত</p>
-                        <p class="text-xs text-slate-500 font-medium">আপনার প্রোফাইল ডোনার সার্চে দৃশ্যমান হবে</p>
-                    </div>
-                </label>
-                
-                <button type="submit" class="w-full mt-6 bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-3.5 rounded-xl shadow-sm transition">
-                    স্ট্যাটাস আপডেট করুন
+
+            <h2 class="text-center text-2xl font-black text-slate-900">ফিরে আসায় স্বাগতম!</h2>
+            <p class="mt-2 text-center text-slate-600 font-medium leading-relaxed">
+                আপনি কি এই মুহূর্তে জরুরি প্রয়োজনে রক্ত দিতে প্রস্তুত?
+            </p>
+
+            <div class="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button type="button"
+                        @click="
+                            // TODO: এখানে future-এ availability=true DB update API call যোগ করা হবে
+                            open = false
+                        "
+                        class="inline-flex items-center justify-center rounded-xl bg-emerald-600 px-5 py-3 text-sm font-black text-white shadow-sm shadow-emerald-200 transition hover:bg-emerald-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2">
+                    হ্যাঁ, আমি প্রস্তুত
                 </button>
-            </form>
+
+                <button type="button"
+                        @click="open = false"
+                        class="inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
+                    এখন নয়
+                </button>
+            </div>
         </div>
     </div>
 @endif

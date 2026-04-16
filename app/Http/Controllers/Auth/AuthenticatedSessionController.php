@@ -27,6 +27,7 @@ class AuthenticatedSessionController extends Controller
     {
         $request->authenticate();
         $request->session()->regenerate();
+        $request->session()->flash('welcome_back_prompt', true);
 
         $role = $request->user()?->role;
 
