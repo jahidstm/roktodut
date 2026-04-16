@@ -84,6 +84,9 @@ class AdminDashboardController extends Controller
         // 📝 ৬. পেন্ডিং ব্লগ পোস্ট (Blog Moderation)
         $pendingBlogCount = Post::pendingReview()->count();
 
+        // 📬 ১০. Support Inbox
+        $pendingSupportMessages = \App\Models\ContactMessage::where('status', 'new')->count();
+
         return view('admin.dashboard', compact(
             'totalUsers',
             'totalDonors',
@@ -98,7 +101,8 @@ class AdminDashboardController extends Controller
             'pendingOrgs',
             'recentAuditLogs',
             'todaysSecurityEventsCount',
-            'recentSecurityLogs'
+            'recentSecurityLogs',
+            'pendingSupportMessages'
         ));
     }
 

@@ -52,6 +52,26 @@ class AppServiceProvider extends ServiceProvider
                 ->line('আপনি যদি পাসওয়ার্ড রিসেটের অনুরোধ না করে থাকেন, তবে আর কোনো পদক্ষেপের প্রয়োজন নেই।');
         });
 
+        // ─── Contact Form Throttle ────────────────────────────────────────────
+        // গেস্ট: ১ মিনিটে সর্বোচ্চ ২ রিকোয়েস্ট (IP ভিত্তিক)
+        RateLimiter::for('contact-guest', function (Request $request) {
+            return Limit::perMinute(2)
+                ->by($request->ip())
+                ->response(function () {
+                    return back()->with('error', 'অত্যধিক বার্তা পাঠানো হচ্ছে। অনুগ্রহ করে ১ মিনিট পরে আবার চেষ্টা করুন।');
+                });
+        });
+
+        // লগইন ইউজার: ১ মিনিটে সর্বোচ্চ ৫ রিকোয়েস্ট (ইউজার ID ভিত্তিক)
+        RateLimiter::for('contact-auth', function (Request $request) {
+            return Limit::perMinute(5)
+                ->by($request->user()?->id ?? $request->ip())
+                ->response(function () {
+                    return back()->with('error', 'অত্যধিক বার্তা পাঠানো হচ্ছে। অনুগ্রহ করে ১ মিনিট পরে আবার চেষ্টা করুন।');
+                });
+        });
+        // ────────────────────────────────────────────────────────────────────
+
         RateLimiter::for('phone-reveal', function (Request $request) {
             if ($request->user() && $request->user()->isAdmin()) {
                 return Limit::none();

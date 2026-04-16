@@ -473,6 +473,55 @@
             </div>
         </div>
 
+        {{-- Support Inbox Governance --}}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+             :class="{'border-blue-200 ring-2 ring-blue-50': activeAccordion === 4}">
+            <button @click="activeAccordion = activeAccordion === 4 ? null : 4" 
+                    @keydown.enter="activeAccordion = activeAccordion === 4 ? null : 4"
+                    @keydown.space.prevent="activeAccordion = activeAccordion === 4 ? null : 4"
+                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-blue-50/30 transition-colors focus:outline-none">
+                <div class="flex items-center gap-4 text-left">
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 4}">📬</div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                            <h3 class="text-lg font-extrabold text-slate-900">সাপোর্ট ইনবক্স</h3>
+                            @if(isset($pendingSupportMessages) && $pendingSupportMessages > 0)
+                                <span class="bg-red-100 text-red-600 text-[10px] font-black px-2 py-0.5 rounded-full border border-red-200 animate-pulse">
+                                    🔴 {{ $pendingSupportMessages }} নতুন
+                                </span>
+                            @else
+                                <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-100">
+                                    ✅ সব ক্লিয়ার
+                                </span>
+                            @endif
+                        </div>
+                        <p class="text-sm text-slate-500 font-medium">ইউজারদের পাঠানো সমস্যা এবং জিজ্ঞাসার উত্তর দিন</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex flex-wrap gap-2">
+                        <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-blue-100">💬 রিপ্লাই</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-blue-100 text-blue-600': activeAccordion === 4}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </button>
+            <div x-show="activeAccordion === 4" 
+                 x-collapse
+                 style="display: none;">
+                <div class="p-6 border-t border-slate-100 bg-slate-50/50">
+                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">
+                        আমাদের প্ল্যাটফর্ম ব্যবহারকারীদের ফিডব্যাক এবং সমস্যাগুলি নিরীক্ষণ করুন। দ্রুত উত্তর প্রদানের মাধ্যমে ইউজারদের সুন্দর একটি অভিজ্ঞতা উপহার দিন।
+                    </p>
+                    <a href="{{ route('admin.support.messages.index') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
+                        ইনবক্স খুলুন
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
         {{-- Analytics Dashboard --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
              :class="{'border-red-200 ring-2 ring-red-50': activeAccordion === 3}">

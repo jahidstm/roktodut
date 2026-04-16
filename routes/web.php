@@ -25,6 +25,8 @@ use App\Http\Controllers\PublicVerificationController;
 use App\Http\Controllers\PublicBloodRequestController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BlogSubmissionController;
+use App\Http\Controllers\ContactController;
+use App\Http\Controllers\Admin\SupportMessageController;
 use App\Models\Division;
 use Illuminate\Support\Facades\Route;
 
@@ -96,6 +98,22 @@ Route::get('/blog/create', [BlogSubmissionController::class, 'create'])
     ->name('blog.create');
 Route::get('/blog/{slug}', [BlogController::class, 'show'])->name('blog.show');
 
+// ─────────────────────────────────────────────────────────────────────────
+// 📬 যোগাযোগ করুন — Contact Form
+// POST রুটে ভিন্ন throttle: Guest (2/min), Auth (5/min)
+// ─────────────────────────────────────────────────────────────────────────
+Route::get('/contact', [ContactController::class, 'create'])->name('contact.create');
+
+// Guest: প্রতি মিনিটে সর্বোচ্চ ২ বার
+Route::middleware(['guest', 'throttle:contact-guest'])
+    ->post('/contact', [ContactController::class, 'store'])
+    ->name('contact.store.guest');
+
+// Auth: প্রতি মিনিটে সর্বোচ্চ ৫ বার
+Route::middleware(['auth', 'throttle:contact-auth'])
+    ->post('/contact', [ContactController::class, 'store'])
+    ->name('contact.store');
+
 // --- ২. সোশ্যাল লগইন ---
 Route::get('/auth/{provider}/redirect', [SocialAuthController::class, 'redirect'])->name('social.redirect');
 Route::get('/auth/{provider}/callback', [SocialAuthController::class, 'callback'])->name('social.callback');
@@ -166,6 +184,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/',                  [BlogModerationController::class, 'index'])->name('index');
         Route::patch('/{post:id}/approve',  [BlogModerationController::class, 'approve'])->name('approve'); // ✅ FIX
         Route::patch('/{post:id}/reject',   [BlogModerationController::class, 'reject'])->name('reject'); // ✅ FIX
+    });
+
+    // 📬 সাপোর্ট / যোগাযোগ বার্তা — Admin Inbox
+    Route::prefix('admin/support/messages')->name('admin.support.messages.')->group(function () {
+        Route::get('/',          [SupportMessageController::class, 'index'])->name('index');
+        Route::get('/{message}', [SupportMessageController::class, 'show'])->name('show');
+        Route::post('/{message}/status', [SupportMessageController::class, 'updateStatus'])->name('status');
     });
 });
 
