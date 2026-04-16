@@ -102,13 +102,12 @@
                 </ul>
             </div>
 
-            {{-- Column 4: Support & Legal — exactly 4 items --}}
-            {{-- All are placeholder (#) — no dedicated pages yet, non-clickable feel kept minimal --}}
+            {{-- Column 4: Support & Legal --}}
             <div>
                 <h3 class="text-xs font-extrabold text-white uppercase tracking-widest mb-5">সাপোর্ট ও লিগ্যাল</h3>
                 <ul class="space-y-3.5">
                     <li>
-                        <a href="#" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
+                        <a href="{{ route('about') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
                             আমাদের সম্পর্কে
                         </a>
                     </li>
@@ -118,12 +117,12 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
+                        <a href="{{ route('privacy') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
                             প্রাইভেসি পলিসি
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
+                        <a href="{{ route('terms') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
                             ব্যবহারের শর্তাবলী
                         </a>
                     </li>

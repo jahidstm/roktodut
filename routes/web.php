@@ -88,6 +88,18 @@ Route::get('/gamification-guide', function () {
     return view('pages.gamification-guide');
 })->name('gamification.guide');
 
+Route::get('/about', function () {
+    return view('pages.about');
+})->name('about');
+
+Route::get('/privacy-policy', function () {
+    return view('pages.privacy');
+})->name('privacy');
+
+Route::get('/terms', function () {
+    return view('pages.terms');
+})->name('terms');
+
 
 
 Route::get('/urgent-requests', [PublicBloodRequestController::class, 'index'])->name('public.requests.index');
