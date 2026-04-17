@@ -4,15 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Events\DonationCompleted;
 use App\Http\Requests\StoreBloodRequestRequest;
+use App\Jobs\SendEmergencyBloodRequestNotificationJob;
 use App\Models\BloodRequest;
 use App\Models\BloodRequestResponse;
 use App\Models\District;
-use App\Models\User;
-use App\Notifications\BloodRequestMatchedNotification;
 use App\Services\DonorMatchingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Notification;
 use Carbon\Carbon;
 
 class BloodRequestController extends Controller
@@ -91,9 +89,13 @@ class BloodRequestController extends Controller
         // ⚙️ ৩. স্মার্ট ডোনার ম্যাচিং সার্ভিস (fixes last_donation_date bug)
         $donors = app(DonorMatchingService::class)->match($bloodRequest);
 
-        // 🚀 ৪. টার্গেটেড নোটিফিকেশন: database + Reverb real-time broadcast
+        // 🚀 ৪. টার্গেটেড নোটিফিকেশন ব্যাকগ্রাউন্ড জবে পাঠানো (UI ব্লক হবে না)
         if ($donors->isNotEmpty()) {
-            Notification::send($donors, new BloodRequestMatchedNotification($bloodRequest, $districtName));
+            SendEmergencyBloodRequestNotificationJob::dispatch(
+                bloodRequestId: $bloodRequest->id,
+                districtName: $districtName,
+                donorIds: $donors->pluck('id')->all()
+            );
         }
 
         return redirect()->route('requests.index')

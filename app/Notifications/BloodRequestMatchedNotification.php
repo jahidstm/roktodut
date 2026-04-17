@@ -4,11 +4,9 @@ namespace App\Notifications;
 
 use App\Models\BloodRequest;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Broadcasting\PrivateChannel;
 
 /**
  * BloodRequestMatchedNotification
@@ -16,7 +14,7 @@ use Illuminate\Broadcasting\PrivateChannel;
  * রক্তের অনুরোধ তৈরি হলে ম্যাচড ডোনারদের notify করে।
  * Channels: database (persistent) + broadcast (real-time via Reverb)
  */
-class BloodRequestMatchedNotification extends Notification implements ShouldQueue, ShouldBroadcast
+class BloodRequestMatchedNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -32,7 +30,14 @@ class BloodRequestMatchedNotification extends Notification implements ShouldQueu
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'broadcast'];
+        $channels = ['database'];
+
+        $broadcastDriver = (string) config('broadcasting.default', 'null');
+        if (!in_array($broadcastDriver, ['null', 'log'], true)) {
+            $channels[] = 'broadcast';
+        }
+
+        return $channels;
     }
 
     /**
@@ -49,23 +54,6 @@ class BloodRequestMatchedNotification extends Notification implements ShouldQueu
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage($this->buildPayload());
-    }
-
-    /**
-     * Private channel: শুধু recipient user-ই এটা শুনতে পারবে।
-     */
-    public function broadcastOn(): PrivateChannel
-    {
-        return new PrivateChannel('user.' . $this->notifiable?->id ?? 0);
-    }
-
-    /**
-     * Frontend Echo-এ listen করার event name।
-     * Echo.private('user.X').listen('BloodRequestMatched', ...)
-     */
-    public function broadcastAs(): string
-    {
-        return 'BloodRequestMatched';
     }
 
     // ─── Private ────────────────────────────────────────────────────────────

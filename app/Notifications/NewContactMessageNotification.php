@@ -4,11 +4,9 @@ namespace App\Notifications;
 
 use App\Models\ContactMessage;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Broadcasting\PrivateChannel;
 
 /**
  * NewContactMessageNotification
@@ -19,7 +17,7 @@ use Illuminate\Broadcasting\PrivateChannel;
  * Recipients: User::where('role', 'admin')->get()
  *   → ContactController@store এ notify() কল হবে
  */
-class NewContactMessageNotification extends Notification implements ShouldQueue, ShouldBroadcast
+class NewContactMessageNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -34,7 +32,14 @@ class NewContactMessageNotification extends Notification implements ShouldQueue,
      */
     public function via(object $notifiable): array
     {
-        return ['database', 'broadcast'];
+        $channels = ['database'];
+
+        $broadcastDriver = (string) config('broadcasting.default', 'null');
+        if (!in_array($broadcastDriver, ['null', 'log'], true)) {
+            $channels[] = 'broadcast';
+        }
+
+        return $channels;
     }
 
     /**
@@ -51,25 +56,6 @@ class NewContactMessageNotification extends Notification implements ShouldQueue,
     public function toBroadcast(object $notifiable): BroadcastMessage
     {
         return new BroadcastMessage($this->buildPayload());
-    }
-
-    /**
-     * Private channel: শুধু Admin ইউজারই শুনতে পারবে।
-     * প্রতিটি Admin-এর নিজস্ব প্রাইভেট চ্যানেলে পৌঁছাবে।
-     */
-    public function broadcastOn(): PrivateChannel
-    {
-        // $this->notifiable এখানে inject হয় Laravel-এর notification system থেকে
-        return new PrivateChannel('user.' . ($this->notifiable?->id ?? 0));
-    }
-
-    /**
-     * Frontend Echo-এ listen করার event name।
-     * Echo.private('user.X').listen('NewContactMessage', ...)
-     */
-    public function broadcastAs(): string
-    {
-        return 'NewContactMessage';
     }
 
     // ─── Private ────────────────────────────────────────────────────────────

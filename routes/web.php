@@ -28,6 +28,7 @@ use App\Http\Controllers\BlogSubmissionController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\SupportMessageController;
 use App\Models\Division;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -67,13 +68,24 @@ Route::get('/', function () {
         ->limit(3)
         ->get();
 
-    // Social proof stats (migrated from donate page)
-    $verifiedDonors = \App\Models\User::where('role', 'donor')
-        ->where(function ($q) {
-            $q->where('nid_status', 'approved')->orWhere('verified_badge', 1);
-        })->count();
-    $totalDonations = \App\Models\User::sum('total_verified_donations');
-    $totalDonors    = \App\Models\User::where('role', 'donor')->count();
+    // Social proof stats (cached for 5 minutes; DB is used when cache expires)
+    $impactMetrics = Cache::remember('home:impact_metrics', now()->addMinutes(5), function () {
+        $verifiedDonors = \App\Models\User::where('role', 'donor')
+            ->where(function ($q) {
+                $q->where('nid_status', 'approved')->orWhere('verified_badge', 1);
+            })
+            ->count();
+
+        return [
+            'verified_donors' => $verifiedDonors,
+            'total_donations' => (int) \App\Models\User::sum('total_verified_donations'),
+            'total_donors' => \App\Models\User::where('role', 'donor')->count(),
+        ];
+    });
+
+    $verifiedDonors = $impactMetrics['verified_donors'];
+    $totalDonations = $impactMetrics['total_donations'];
+    $totalDonors    = $impactMetrics['total_donors'];
     $recentPosts    = \App\Models\Post::where('status', 'published')
         ->orderByDesc('published_at')
         ->limit(2)
