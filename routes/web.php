@@ -74,7 +74,7 @@ Route::get('/', function () {
         })->count();
     $totalDonations = \App\Models\User::sum('total_verified_donations');
     $totalDonors    = \App\Models\User::where('role', 'donor')->count();
-    $recentPosts    = \App\Models\Post::where('status', 'approved')
+    $recentPosts    = \App\Models\Post::where('status', 'published')
         ->orderByDesc('published_at')
         ->limit(2)
         ->get();
