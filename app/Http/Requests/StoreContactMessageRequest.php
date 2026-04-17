@@ -47,30 +47,38 @@ class StoreContactMessageRequest extends FormRequest
     {
         return [
             // Honeypot — দেখানো হবে না (বট ধরার জন্য silent reject)
-            'website.max'      => 'অবৈধ অনুরোধ।',
+            'website.max'      => __('contact.validation.honeypot'),
 
             // নাম
-            'name.required'    => 'আপনার নাম দেওয়া বাধ্যতামূলক।',
-            'name.min'         => 'নাম কমপক্ষে ২ অক্ষরের হতে হবে।',
-            'name.max'         => 'নাম সর্বোচ্চ ১২০ অক্ষরের হতে পারবে।',
+            'name.required'    => __('contact.validation.name_required'),
+            'name.min'         => __('contact.validation.name_min'),
+            'name.max'         => __('contact.validation.name_max'),
 
             // ইমেইল
-            'email.required'   => 'ইমেইল ঠিকানা দেওয়া বাধ্যতামূলক।',
-            'email.email'      => 'সঠিক ইমেইল ঠিকানা দিন।',
-            'email.max'        => 'ইমেইল ঠিকানা বড় হয়ে গেছে।',
+            'email.required'   => __('contact.validation.email_required'),
+            'email.email'      => __('contact.validation.email_email'),
+            'email.max'        => __('contact.validation.email_max'),
 
             // ফোন
-            'phone.max'        => 'ফোন নম্বর সর্বোচ্চ ২০ সংখ্যার হতে পারবে।',
+            'phone.max'        => __('contact.validation.phone_max'),
 
             // বিষয়
-            'subject.required' => 'বার্তার বিষয় দেওয়া বাধ্যতামূলক।',
-            'subject.min'      => 'বিষয় কমপক্ষে ৫ অক্ষরের হতে হবে।',
-            'subject.max'      => 'বিষয় সর্বোচ্চ ১২০ অক্ষরের হতে পারবে।',
+            'subject.required' => __('contact.validation.subject_required'),
+            'subject.min'      => __('contact.validation.subject_min'),
+            'subject.max'      => __('contact.validation.subject_max'),
 
             // বার্তা
-            'message.required' => 'বার্তার মূল বিষয়বস্তু লেখা বাধ্যতামূলক।',
-            'message.min'      => 'বার্তা কমপক্ষে ২০ অক্ষরের হতে হবে।',
-            'message.max'      => 'বার্তা সর্বোচ্চ ২০০০ অক্ষরের হতে পারবে।',
+            'message.required' => __('contact.validation.message_required'),
+            'message.min'      => __('contact.validation.message_min'),
+            'message.max'      => __('contact.validation.message_max'),
+
+            // Throttle exceeded (HTTP 429 — ThrottleRequests middleware)
+            // web.php: throttle:contact-guest / throttle:contact-auth
+            // Laravel এই key দেখে: auth::throttle
+            'auth.throttle'    => __('contact.validation.throttle', [
+                'seconds' => ':seconds',
+                'minutes' => ':minutes',
+            ]),
         ];
     }
 
