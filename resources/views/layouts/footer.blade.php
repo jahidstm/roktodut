@@ -11,8 +11,8 @@
             {{-- Column 1: Brand & Trust --}}
             <div class="space-y-5 sm:col-span-2 lg:col-span-1 lg:pr-8">
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2.5">
-                    <div class="h-9 w-9 rounded-xl bg-red-600 flex items-center justify-center shrink-0">
-                        <span class="text-white font-extrabold tracking-tight text-sm">RD</span>
+                    <div class="h-10 w-10 rounded-xl bg-white flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
+                        <img src="{{ asset('images/image_14.png') }}" alt="RoktoDut" class="w-full h-full object-contain p-1">
                     </div>
                     <span class="text-xl font-extrabold text-white tracking-tight">রক্তদূত</span>
                 </a>

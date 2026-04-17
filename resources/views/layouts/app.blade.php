@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>@yield('title', 'রক্তদূত')</title>
 
+    <link rel="icon" href="{{ asset('images/image_14.png') }}" type="image/png">
     {{-- JS globals for Alpine + Echo (auth'd users only) --}}
     @auth
     <script>
@@ -42,8 +43,8 @@
         
         {{-- 🩸 Logo & Brand --}}
         <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-            <div class="h-9 w-9 sm:h-10 sm:w-10 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center group-hover:bg-red-100 transition-colors">
-                <span class="text-red-600 font-extrabold tracking-tight">RD</span>
+            <div class="h-9 w-9 sm:h-10 sm:w-10 rounded-xl border border-slate-100 flex items-center justify-center overflow-hidden bg-white shadow-sm group-hover:shadow-md transition-shadow">
+                <img src="{{ asset('images/image_14.png') }}" alt="RoktoDut Logo" class="w-full h-full object-contain p-1">
             </div>
             <div class="leading-tight hidden sm:block">
                 <div class="font-extrabold tracking-tight text-slate-900 group-hover:text-red-600 transition-colors">রক্তদূত</div>

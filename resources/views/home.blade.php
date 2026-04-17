@@ -21,7 +21,7 @@
         <div class="inline-flex items-center gap-2 bg-white border border-red-100 text-[#D32F2F] text-xs font-black px-5 py-2 rounded-full mb-8 shadow-sm">
             ইমার্জেন্সি ব্লাড ডোনেশন নেটওয়ার্ক
         </div>
-        
+
         {{-- Headline --}}
         <h1 class="text-4xl sm:text-5xl lg:text-[4rem] font-black text-[#1e293b] leading-[1.15] mb-6 tracking-tight">
             জরুরি মুহূর্তে রক্তের সন্ধানে—
@@ -35,7 +35,7 @@
         
         {{-- Buttons --}}
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 w-full sm:w-auto">
-            <x-primary-button onclick="document.getElementById('search-section').scrollIntoView({behavior: 'smooth'})" class="w-full sm:w-auto px-8 py-4 text-base shadow-lg shadow-red-500/30">
+            <x-primary-button type="button" onclick="document.getElementById('search-section').scrollIntoView({behavior: 'smooth', block: 'start'})" class="w-full sm:w-auto px-8 py-4 text-base shadow-lg shadow-red-500/30">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> এখনই ডোনার খুঁজুন
             </x-primary-button>
             <x-secondary-button href="{{ route('requests.create') }}" class="w-full sm:w-auto px-8 py-4 text-base border-[#D32F2F] text-[#D32F2F] hover:bg-red-50 hover:text-[#D32F2F]">
