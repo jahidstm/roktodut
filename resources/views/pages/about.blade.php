@@ -20,10 +20,22 @@
             আমরা রক্ত এবং মানুষের<br class="hidden sm:block"> মধ্যে সেতু তৈরি করি
         </h1>
         <p class="mt-4 text-red-100 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
-            রক্তদূত বাংলাদেশের প্রথম ভেরিফাইড ব্লাড ডোনেশন প্ল্যাটফর্ম — যেখানে প্রতিটি ডোনার পরিচয় যাচাইকৃত, প্রতিটি রক্তের অনুরোধ নিরাপদ।
+            রক্তদূত বাংলাদেশের একটি স্বেচ্ছাসেবী ভিত্তিক রক্তদান সমন্বয় প্ল্যাটফর্ম — যেখানে ডোনারের পরিচয় ম্যানুয়ালি যাচাইযোগ্য, রক্তের অনুরোধ দ্রুত ও নিরাপদ।
         </p>
     </div>
 </section>
+
+{{-- ══════════════════════════════════════════════════════════
+     MEDICAL DISCLAIMER NOTICE
+══════════════════════════════════════════════════════════ --}}
+<div class="bg-amber-50 border-b border-amber-200">
+    <div class="mx-auto max-w-4xl px-4 py-3 flex items-start gap-3">
+        <span class="text-amber-500 text-base shrink-0 mt-0.5">⚠️</span>
+        <p class="text-xs text-amber-800 font-semibold leading-relaxed">
+            <strong>গুরুত্বপূর্ণ ডিসক্লেইমার:</strong> রক্তদূত একটি স্বেচ্ছাসেবী সংযোগ প্ল্যাটফর্ম। এটি কোনো চিকিৎসা পরামর্শ, রোগ নির্ণয় বা চিকিৎসা সেবা প্রদান করে না। রক্তগ্রহণের আগে অবশ্যই রেজিস্টার্ড চিকিৎসক বা হাসপাতালের পরামর্শ নিন এবং প্রয়োজনীয় ক্রস-ম্যাচিং ও স্ক্রিনিং নিশ্চিত করুন।
+        </p>
+    </div>
+</div>
 
 {{-- ══════════════════════════════════════════════════════════
      STATS STRIP
@@ -32,10 +44,10 @@
     <div class="mx-auto max-w-4xl px-4 py-8 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
         @php
         $stats = [
-            ['value' => '৫,০০০+', 'label' => 'ভেরিফাইড ডোনার',   'icon' => '🛡️'],
-            ['value' => '১,২০০+', 'label' => 'সফল রক্তদান',       'icon' => '🩸'],
-            ['value' => '৬৪',    'label' => 'জেলায় সক্রিয়',     'icon' => '🗺️'],
-            ['value' => '৩,৬০০+','label' => 'জীবন বাঁচানো হয়েছে', 'icon' => '❤️'],
+            ['value' => '৫,০০০+', 'label' => 'নিবন্ধিত ডোনার',       'icon' => '🛡️'],
+            ['value' => '৬৪',     'label' => 'জেলায় সক্রিয়',         'icon' => '🗺️'],
+            ['value' => '৮টি',    'label' => 'রক্তের গ্রুপ সমর্থিত', 'icon' => '🩸'],
+            ['value' => '২৪/৭',   'label' => 'অনুরোধ পাঠানো সম্ভব',  'icon' => '⏰'],
         ];
         @endphp
         @foreach($stats as $s)
@@ -62,35 +74,30 @@
             </h2>
             <div class="space-y-4 text-slate-600 text-sm leading-relaxed font-medium">
                 <p>
-                    ২০২৪ সালে একটি রাস্তার দুর্ঘটনায় জরুরি রক্তের প্রয়োজন পড়ে। সেদিন ফেসবুক পোস্ট, ফোন কল — কিছুতেই সময়মতো সঠিক গ্রুপের ডোনার পাওয়া যায়নি। সেই অভিজ্ঞতা থেকে অনুপ্রাণিত হয়ে আমাদের দল একটি নির্ভরযোগ্য, ভেরিফাইড সিস্টেম তৈরির লক্ষ্যে কাজ শুরু করে।
+                    রাতের বেলায় হাসপাতালে দৌড়াদৌড়ি, ফেসবুকে পোস্ট, একের পর এক ফোন — তবু সঠিক গ্রুপের ডোনার সময়মতো পাওয়া গেল না। এই হতাশার অভিজ্ঞতা থেকেই রক্তদূতের যাত্রা শুরু হয়।
                 </p>
                 <p>
-                    রক্তদূত শুধু একটি ডোনার-তালিকা নয় — এটি একটি পূর্ণ ইকোসিস্টেম। NID ভেরিফিকেশন, রিয়েল-টাইম নোটিফিকেশন, গ্যামিফিকেশন, এবং অর্গানাইজেশন ইন্টিগ্রেশনের মাধ্যমে আমরা রক্তের অনুরোধ এবং ডোনারের মধ্যে সংযোগ যতটা সম্ভব নিরাপদ ও দ্রুত করতে চাই।
+                    আমরা বিশ্বাস করি, একটি বিশ্বস্ত ডিজিটাল সেতু থাকলে রক্তের সংকট অনেকটাই কমানো সম্ভব। রক্তদূত সেই সেতু — ডোনার ও অনুরোধকারীর মধ্যে দ্রুততম, নিরাপদ সংযোগ।
                 </p>
             </div>
         </div>
 
-        {{-- Visual Card --}}
+        {{-- Mission/Vision Card --}}
         <div class="relative">
             <div class="bg-gradient-to-br from-red-50 to-rose-50 border border-red-100 rounded-3xl p-7">
-                <div class="space-y-4">
-                    @php
-                    $values = [
-                        ['emoji' => '🛡️', 'title' => 'বিশ্বাসযোগ্যতা', 'desc' => 'প্রতিটি ডোনারের পরিচয় NID দিয়ে যাচাই করা হয়।'],
-                        ['emoji' => '⚡', 'title' => 'দ্রুততা',        'desc' => 'রিয়েল-টাইম নোটিফিকেশনে সেকেন্ডের মধ্যে ডোনার খুঁজুন।'],
-                        ['emoji' => '🔒', 'title' => 'গোপনীয়তা',     'desc' => 'ডোনারের নম্বর লুকানো — শুধু অনুরোধকারী দেখতে পান।'],
-                        ['emoji' => '🤝', 'title' => 'কমিউনিটি',      'desc' => 'হাসপাতাল, ক্লাব ও ব্যক্তি — সবাই এক প্ল্যাটফর্মে।'],
-                    ];
-                    @endphp
-                    @foreach($values as $v)
-                    <div class="flex items-start gap-3">
-                        <div class="shrink-0 w-9 h-9 rounded-xl bg-white border border-red-100 shadow-sm flex items-center justify-center text-lg">{{ $v['emoji'] }}</div>
-                        <div>
-                            <p class="text-sm font-bold text-slate-800">{{ $v['title'] }}</p>
-                            <p class="text-xs text-slate-500 leading-relaxed">{{ $v['desc'] }}</p>
-                        </div>
+                <div class="space-y-5">
+                    <div>
+                        <p class="text-xs font-black text-red-600 uppercase tracking-widest mb-1">🎯 মিশন</p>
+                        <p class="text-sm font-semibold text-slate-700 leading-relaxed">
+                            বাংলাদেশের প্রতিটি জেলায় স্বেচ্ছাসেবী রক্তদাতা ও রোগীর পরিজনের মধ্যে দ্রুত, নির্ভরযোগ্য এবং নিরাপদ সংযোগ তৈরি করা।
+                        </p>
                     </div>
-                    @endforeach
+                    <div class="border-t border-red-100 pt-4">
+                        <p class="text-xs font-black text-rose-600 uppercase tracking-widest mb-1">🔭 ভিশন</p>
+                        <p class="text-sm font-semibold text-slate-700 leading-relaxed">
+                            এমন একটি বাংলাদেশ, যেখানে রক্তের অভাবে কোনো জীবন হারাতে হবে না — কারণ সঠিক ডোনার সঠিক সময়ে পৌঁছাবেই।
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -98,33 +105,113 @@
 </section>
 
 {{-- ══════════════════════════════════════════════════════════
-     HOW IT WORKS
+     HOW ROKTODUT IS DIFFERENT
 ══════════════════════════════════════════════════════════ --}}
 <section class="bg-slate-50 border-y border-slate-100">
     <div class="mx-auto max-w-4xl px-4 py-14">
         <div class="text-center mb-10">
-            <span class="inline-block text-xs font-black text-red-600 uppercase tracking-widest mb-2">কার্যক্রম</span>
-            <h2 class="text-2xl sm:text-3xl font-black text-slate-900">আমরা যেভাবে কাজ করি</h2>
+            <span class="inline-block text-xs font-black text-red-600 uppercase tracking-widest mb-2">আমাদের বৈশিষ্ট্য</span>
+            <h2 class="text-2xl sm:text-3xl font-black text-slate-900">রক্তদূত কেন আলাদা</h2>
+            <p class="mt-2 text-sm text-slate-500 font-medium max-w-xl mx-auto">
+                শুধু খোঁজার তালিকা নয় — একটি সম্পূর্ণ নিরাপদ সমন্বয় ব্যবস্থা।
+            </p>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
             @php
-            $steps = [
-                ['num' => '০১', 'icon' => '📝', 'title' => 'রেজিস্ট্রেশন ও ভেরিফিকেশন',
-                 'desc' => 'ডোনার রেজিস্ট্রেশন করেন এবং NID আপলোড করে পরিচয় যাচাই করান। ভেরিফাইড ব্যাজ পান।'],
-                ['num' => '০২', 'icon' => '🔔', 'title' => 'রক্তের অনুরোধ ও ম্যাচিং',
-                 'desc' => 'রোগীর পরিজন রক্তের অনুরোধ পাঠান। সিস্টেম স্বয়ংক্রিয়ভাবে কাছের ডোনারদের নোটিফাই করে।'],
-                ['num' => '০৩', 'icon' => '✅', 'title' => 'দান নিশ্চিত ও পয়েন্ট',
-                 'desc' => 'রক্তদান সম্পন্ন হলে উভয় পক্ষ নিশ্চিত করেন। ডোনার পয়েন্ট ও ব্যাজ পান।'],
+            $features = [
+                [
+                    'icon'  => '🔍',
+                    'title' => 'পাবলিক ডোনার সার্চ (লগইন ছাড়া)',
+                    'desc'  => 'যেকেউ লগইন ছাড়াই রক্তের গ্রুপ, জেলা ও উপজেলা দিয়ে ডোনার খুঁজতে পারেন। জরুরি মুহূর্তে সাইন-আপের ঝামেলা নেই।',
+                    'color' => 'bg-blue-50 border-blue-100',
+                ],
+                [
+                    'icon'  => '⚡',
+                    'title' => 'স্মার্ট প্রায়রিটি সর্টিং',
+                    'desc'  => 'সার্চ রেজাল্ট শুধু নামের তালিকা নয় — যোগ্যতার তারিখ, শেষ দানের ব্যবধান ও লোকেশন বিবেচনায় সবচেয়ে উপযুক্ত ডোনার আগে দেখানো হয়।',
+                    'color' => 'bg-emerald-50 border-emerald-100',
+                ],
+                [
+                    'icon'  => '🛡️',
+                    'title' => 'প্রাইভেসি শিল্ড',
+                    'desc'  => 'ডোনারের ফোন নম্বর ডিফল্টভাবে মাস্কড। দেখতে হলে OTP চ্যালেঞ্জ পাস করতে হয়; প্রতিদিন সীমিত সংখ্যক নম্বর দেখার সুযোগ — অপব্যবহার রোধে রেট লিমিট সক্রিয়।',
+                    'color' => 'bg-orange-50 border-orange-100',
+                ],
+                [
+                    'icon'  => '🪪',
+                    'title' => 'NID ভেরিফিকেশন ও Org যাচাই',
+                    'desc'  => 'ডোনার স্বেচ্ছায় NID আপলোড করে "ভেরিফাইড" ব্যাজ পেতে পারেন — অ্যাডমিন ম্যানুয়ালি যাচাই করেন। হাসপাতাল ও ক্লাবও অর্গানাইজেশন ভেরিফিকেশনের মাধ্যমে প্ল্যাটফর্মে যুক্ত হতে পারে।',
+                    'color' => 'bg-red-50 border-red-100',
+                ],
             ];
             @endphp
-            @foreach($steps as $step)
-            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
-                <div class="flex items-center gap-3 mb-3">
-                    <span class="text-[11px] font-black text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full">{{ $step['num'] }}</span>
-                    <span class="text-2xl">{{ $step['icon'] }}</span>
+            @foreach($features as $f)
+            <div class="rounded-2xl border {{ $f['color'] }} p-5 flex gap-4 items-start">
+                <div class="shrink-0 w-10 h-10 rounded-xl bg-white border border-slate-100 shadow-sm flex items-center justify-center text-xl">{{ $f['icon'] }}</div>
+                <div>
+                    <p class="text-sm font-black text-slate-800 mb-1">{{ $f['title'] }}</p>
+                    <p class="text-xs text-slate-600 leading-relaxed">{{ $f['desc'] }}</p>
                 </div>
-                <h3 class="text-sm font-black text-slate-800 mb-1.5">{{ $step['title'] }}</h3>
-                <p class="text-xs text-slate-500 leading-relaxed">{{ $step['desc'] }}</p>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+{{-- ══════════════════════════════════════════════════════════
+     HOW IT WORKS
+══════════════════════════════════════════════════════════ --}}
+<section class="mx-auto max-w-4xl px-4 py-14">
+    <div class="text-center mb-10">
+        <span class="inline-block text-xs font-black text-red-600 uppercase tracking-widest mb-2">কার্যক্রম</span>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-900">আমরা যেভাবে কাজ করি</h2>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        @php
+        $steps = [
+            ['num' => '০১', 'icon' => '📝', 'title' => 'নিবন্ধন ও প্রোফাইল',
+             'desc' => 'ডোনার নিজের রক্তের গ্রুপ, লোকেশন ও উপলব্ধতা দিয়ে রেজিস্ট্রেশন করেন। ঐচ্ছিকভাবে NID আপলোড করে ভেরিফাইড ব্যাজ পান।'],
+            ['num' => '০২', 'icon' => '🔔', 'title' => 'অনুরোধ ও ম্যাচিং',
+             'desc' => 'রোগীর পরিজন রক্তের গ্রুপ ও লোকেশন দিয়ে অনুরোধ পাঠান। সিস্টেম কাছের উপযুক্ত ডোনারদের নোটিফাই করে।'],
+            ['num' => '০৩', 'icon' => '🤝', 'title' => 'সংযোগ ও নিশ্চিতকরণ',
+             'desc' => 'অনুরোধকারী OTP চ্যালেঞ্জ পাস করে ডোনারের সাথে যোগাযোগ করেন। হাসপাতালে স্ক্রিনিং ও ক্রস-ম্যাচিং করে রক্তদান সম্পন্ন হয়।'],
+        ];
+        @endphp
+        @foreach($steps as $step)
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+            <div class="flex items-center gap-3 mb-3">
+                <span class="text-[11px] font-black text-red-500 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full">{{ $step['num'] }}</span>
+                <span class="text-2xl">{{ $step['icon'] }}</span>
+            </div>
+            <h3 class="text-sm font-black text-slate-800 mb-1.5">{{ $step['title'] }}</h3>
+            <p class="text-xs text-slate-500 leading-relaxed">{{ $step['desc'] }}</p>
+        </div>
+        @endforeach
+    </div>
+</section>
+
+{{-- ══════════════════════════════════════════════════════════
+     VALUES
+══════════════════════════════════════════════════════════ --}}
+<section class="bg-slate-50 border-t border-slate-100">
+    <div class="mx-auto max-w-4xl px-4 py-14">
+        <div class="text-center mb-10">
+            <span class="inline-block text-xs font-black text-red-600 uppercase tracking-widest mb-2">আমাদের মূল্যবোধ</span>
+            <h2 class="text-2xl sm:text-3xl font-black text-slate-900">আমরা যা বিশ্বাস করি</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            @php
+            $values = [
+                ['emoji' => '🛡️', 'title' => 'বিশ্বাসযোগ্যতা', 'desc' => 'ডামি তথ্য বা অযাচাইকৃত দাবি ছাড়াই একটি স্বচ্ছ, সৎ প্ল্যাটফর্ম পরিচালনা করি।'],
+                ['emoji' => '🔒', 'title' => 'গোপনীয়তা',     'desc' => 'ডোনারের পরিচয় প্রাইভেসি শিল্ড দিয়ে সুরক্ষিত। তথ্য কখনো তৃতীয় পক্ষের কাছে বিক্রি হয় না।'],
+                ['emoji' => '🤝', 'title' => 'সম্প্রদায়',    'desc' => 'ব্যক্তি, হাসপাতাল ও ক্লাব — সবাইকে একটি কমন প্ল্যাটফর্মে যুক্ত করে রক্তদানকে সহজ করাই লক্ষ্য।'],
+            ];
+            @endphp
+            @foreach($values as $v)
+            <div class="bg-white rounded-2xl border border-slate-200 p-5 text-center shadow-sm">
+                <div class="text-3xl mb-3">{{ $v['emoji'] }}</div>
+                <p class="text-sm font-black text-slate-800 mb-1">{{ $v['title'] }}</p>
+                <p class="text-xs text-slate-500 leading-relaxed">{{ $v['desc'] }}</p>
             </div>
             @endforeach
         </div>
@@ -162,6 +249,25 @@
 </section>
 
 {{-- ══════════════════════════════════════════════════════════
+     MEDICAL DISCLAIMER (FULL)
+══════════════════════════════════════════════════════════ --}}
+<section class="bg-amber-50 border-y border-amber-200">
+    <div class="mx-auto max-w-4xl px-4 py-8">
+        <div class="flex gap-4 items-start">
+            <div class="shrink-0 w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-xl">⚕️</div>
+            <div>
+                <p class="text-sm font-black text-amber-900 mb-2">চিকিৎসা সংক্রান্ত ডিসক্লেইমার</p>
+                <div class="space-y-2 text-xs text-amber-800 leading-relaxed font-medium">
+                    <p>রক্তদূত একটি স্বেচ্ছাসেবী সমন্বয় প্ল্যাটফর্ম এবং এটি কোনোভাবেই চিকিৎসা প্রতিষ্ঠান, ব্লাড ব্যাংক বা স্বাস্থ্যসেবা সংস্থা নয়।</p>
+                    <p>প্ল্যাটফর্মে প্রদর্শিত কোনো তথ্যকেই চিকিৎসা পরামর্শ হিসেবে বিবেচনা করা যাবে না। রক্তগ্রহণ, ট্রান্সফিউশন বা যেকোনো চিকিৎসা সিদ্ধান্তের জন্য অবশ্যই লাইসেন্সপ্রাপ্ত চিকিৎসক ও হাসপাতালের পরামর্শ নিন।</p>
+                    <p>রক্তদানের পূর্বে ডোনারকে নিজের স্বাস্থ্যগত যোগ্যতা সম্পর্কে নিশ্চিত হতে হবে। রক্তগ্রহণের পূর্বে হাসপাতালে প্রয়োজনীয় টাইপিং, স্ক্রিনিং ও ক্রস-ম্যাচিং পরীক্ষা বাধ্যতামূলক।</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{{-- ══════════════════════════════════════════════════════════
      CTA
 ══════════════════════════════════════════════════════════ --}}
 <section class="bg-gradient-to-r from-slate-900 to-slate-800">
@@ -171,13 +277,14 @@
         <div class="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="{{ route('register') }}"
                class="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-black text-sm px-6 py-3 rounded-xl shadow-sm transition-all">
-                🩸 অ্যাকাউন্ট খুলুন
+                🩸 ডোনার হিসেবে যোগ দিন
             </a>
             <a href="{{ route('contact.create') }}"
                class="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm px-6 py-3 rounded-xl transition-all">
                 ✉️ যোগাযোগ করুন
             </a>
         </div>
+        <p class="mt-6 text-xs text-slate-500">সর্বশেষ আপডেট: ১৭ এপ্রিল, ২০২৬</p>
     </div>
 </section>
 

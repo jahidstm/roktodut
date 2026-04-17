@@ -1,13 +1,14 @@
 {{-- Privacy Policy TOC — included by both desktop sidebar and mobile accordion --}}
 @php
 $privacyLinks = [
-    ['href' => '#intro',         'label' => 'ভূমিকা'],
+    ['href' => '#intro',          'label' => 'ভূমিকা'],
     ['href' => '#data-collection','label' => 'তথ্য সংগ্রহ'],
     ['href' => '#data-use',       'label' => 'তথ্য ব্যবহার'],
-    ['href' => '#phone-reveal',   'label' => 'ফোন নম্বর নীতি'],
-    ['href' => '#nid-security',   'label' => 'NID সুরক্ষা'],
-    ['href' => '#cookies',        'label' => 'কুকিজ ও ট্র্যাকিং'],
+    ['href' => '#phone-reveal',   'label' => 'ফোন নম্বর প্রাইভেসি'],
+    ['href' => '#nid-security',   'label' => 'NID ডকুমেন্ট সুরক্ষা'],
+    ['href' => '#cookies',        'label' => 'কুকিজ ও সেশন'],
     ['href' => '#user-rights',    'label' => 'আপনার অধিকার'],
+    ['href' => '#policy-updates', 'label' => 'নীতিমালা আপডেট'],
     ['href' => '#contact-us',     'label' => 'যোগাযোগ'],
 ];
 @endphp

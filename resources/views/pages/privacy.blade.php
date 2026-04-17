@@ -12,7 +12,10 @@
             <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">আইনি দলিল</span>
         </div>
         <h1 class="text-2xl sm:text-3xl font-black text-white leading-tight">প্রাইভেসি পলিসি</h1>
-        <p class="mt-2 text-slate-400 text-sm font-medium">সর্বশেষ আপডেট: ১৬ এপ্রিল, ২০২৬ · কার্যকর থেকে: ১ জানুয়ারি, ২০২৬</p>
+        <p class="mt-2 text-slate-400 text-sm font-medium">সর্বশেষ আপডেট: ১৭ এপ্রিল, ২০২৬ · কার্যকর থেকে: ১৭ এপ্রিল, ২০২৬</p>
+        <p class="mt-1 text-slate-500 text-xs font-medium max-w-2xl">
+            রক্তদূত প্ল্যাটফর্ম ব্যবহার করলে আপনি এই প্রাইভেসি পলিসিতে সম্মতি জানাচ্ছেন বলে গণ্য হবে। অনুগ্রহ করে সম্পূর্ণ পড়ুন।
+        </p>
     </div>
 </div>
 
@@ -28,7 +31,8 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 <p class="text-sm text-blue-800 font-medium leading-relaxed">
-                    রক্তদূত প্ল্যাটফর্ম ব্যবহার করে আপনি এই প্রাইভেসি পলিসিতে সম্মতি জানাচ্ছেন। কোনো প্রশ্ন থাকলে <a href="{{ route('contact.create') }}" class="font-bold underline hover:text-blue-600 transition-colors">যোগাযোগ করুন</a>।
+                    রক্তদূত আপনার গোপনীয়তাকে সর্বোচ্চ গুরুত্ব দেয়। এই নীতিমালা ব্যাখ্যা করে আমরা কী তথ্য সংগ্রহ করি, কেন করি, এবং কীভাবে সুরক্ষিত রাখি।
+                    কোনো প্রশ্ন থাকলে <a href="{{ route('contact.create') }}" class="font-bold underline hover:text-blue-600 transition-colors">যোগাযোগ করুন</a>।
                 </p>
             </div>
 
@@ -49,37 +53,68 @@
             </div>
 
             {{-- ───────────────────────────────────────── --}}
-            {{-- Section 1 --}}
+            {{-- Section 1: ভূমিকা --}}
             <section id="intro" class="mb-10 scroll-mt-20">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-base">📄</div>
                     <h2 class="text-xl font-black text-slate-900">ভূমিকা</h2>
                 </div>
                 <div class="prose-custom">
-                    <p>রক্তদূত ("আমরা", "আমাদের") বাংলাদেশে পরিচালিত একটি রক্তদান সহায়তা প্ল্যাটফর্ম। এই পলিসি ব্যাখ্যা করে যে আমরা কীভাবে আপনার ব্যক্তিগত তথ্য সংগ্রহ করি, ব্যবহার করি, এবং সুরক্ষিত রাখি।</p>
-                    <p>আমরা বাংলাদেশের ডিজিটাল নিরাপত্তা আইন ২০১৮ এবং ব্যক্তিগত তথ্য সুরক্ষার প্রচলিত আন্তর্জাতিক মান মেনে চলি।</p>
+                    <p>রক্তদূত ("আমরা", "আমাদের", "প্ল্যাটফর্ম") বাংলাদেশে পরিচালিত একটি স্বেচ্ছাসেবী রক্তদান সমন্বয় প্ল্যাটফর্ম। এই প্রাইভেসি পলিসি ("পলিসি") ব্যাখ্যা করে যে আমরা কীভাবে আপনার ব্যক্তিগত তথ্য সংগ্রহ করি, ব্যবহার করি, সংরক্ষণ করি এবং কোন পরিস্থিতিতে প্রকাশ করি।</p>
+                    <p>আমরা বাংলাদেশের ডিজিটাল নিরাপত্তা আইন ২০১৮ এবং ব্যক্তিগত তথ্য সুরক্ষার প্রচলিত সর্বোত্তম অনুশীলন মেনে চলার চেষ্টা করি। এই পলিসি শুধুমাত্র রক্তদূতের ওয়েবসাইট ও মোবাইল সেবার ক্ষেত্রে প্রযোজ্য।</p>
                 </div>
             </section>
 
             <hr class="border-slate-100 mb-10">
 
-            {{-- Section 2 --}}
+            {{-- Section 2: তথ্য সংগ্রহ --}}
             <section id="data-collection" class="mb-10 scroll-mt-20">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-base">📋</div>
                     <h2 class="text-xl font-black text-slate-900">আমরা কী তথ্য সংগ্রহ করি</h2>
                 </div>
                 <div class="prose-custom">
-                    <p>নিচের ধরনের তথ্য আমরা সংগ্রহ ও প্রক্রিয়া করি:</p>
+                    <p>আপনি যখন রক্তদূতে নিবন্ধন করেন বা সেবা ব্যবহার করেন, তখন নিচের ধরনের তথ্য সংগ্রহ ও প্রক্রিয়া করা হয়:</p>
                 </div>
                 <div class="mt-4 space-y-3">
                     @php
                     $dataTypes = [
-                        ['icon' => '👤', 'title' => 'পরিচয়গত তথ্য', 'items' => 'নাম, জন্মতারিখ, রক্তের গ্রুপ, ঠিকানা (জেলা/উপজেলা স্তর)', 'color' => 'bg-blue-50 border-blue-100'],
-                        ['icon' => '📞', 'title' => 'যোগাযোগ তথ্য', 'items' => 'ফোন নম্বর, ইমেইল ঠিকানা', 'color' => 'bg-emerald-50 border-emerald-100'],
-                        ['icon' => '🪪', 'title' => 'পরিচয়পত্র (ঐচ্ছিক)', 'items' => 'NID নম্বর ও স্ক্যান কপি — শুধুমাত্র ভেরিফিকেশনের জন্য', 'color' => 'bg-amber-50 border-amber-100'],
-                        ['icon' => '🩸', 'title' => 'স্বাস্থ্য সংক্রান্ত', 'items' => 'রক্তদানের ইতিহাস, সর্বশেষ দানের তারিখ', 'color' => 'bg-red-50 border-red-100'],
-                        ['icon' => '📊', 'title' => 'ব্যবহার তথ্য', 'items' => 'লগইন সময়, পেজ ভিজিট, সার্চ কোয়েরি (অ্যানোনিমাস)', 'color' => 'bg-slate-50 border-slate-200'],
+                        [
+                            'icon'  => '👤',
+                            'title' => 'পরিচয়গত তথ্য',
+                            'items' => 'পূর্ণ নাম, জন্মতারিখ, লিঙ্গ, রক্তের গ্রুপ, ঠিকানা (জেলা ও উপজেলা স্তর পর্যন্ত)',
+                            'color' => 'bg-blue-50 border-blue-100',
+                        ],
+                        [
+                            'icon'  => '📞',
+                            'title' => 'যোগাযোগ তথ্য',
+                            'items' => 'ফোন নম্বর (ডিফল্টভাবে মাস্কড, সীমিত শর্তে প্রকাশিত) এবং ইমেইল ঠিকানা',
+                            'color' => 'bg-emerald-50 border-emerald-100',
+                        ],
+                        [
+                            'icon'  => '🪪',
+                            'title' => 'পরিচয়পত্র (ঐচ্ছিক — শুধু ভেরিফিকেশনের জন্য)',
+                            'items' => 'জাতীয় পরিচয়পত্র (NID) নম্বর ও স্ক্যান কপি। ভেরিফাইড ব্যাজের জন্য আপলোড করতে হয়, বাধ্যতামূলক নয়।',
+                            'color' => 'bg-amber-50 border-amber-100',
+                        ],
+                        [
+                            'icon'  => '🩸',
+                            'title' => 'স্বাস্থ্য সংক্রান্ত তথ্য',
+                            'items' => 'রক্তদানের ইতিহাস, সর্বশেষ দানের তারিখ, দানের মোট সংখ্যা (স্ব-প্রদত্ত)',
+                            'color' => 'bg-red-50 border-red-100',
+                        ],
+                        [
+                            'icon'  => '📊',
+                            'title' => 'ব্যবহার তথ্য',
+                            'items' => 'লগইন সময়, পেজ ভিজিট, সার্চ কোয়েরি — সাধারণত অ্যানোনিমাস বা অ্যাগ্রিগেটেড ফর্মে',
+                            'color' => 'bg-slate-50 border-slate-200',
+                        ],
+                        [
+                            'icon'  => '🔗',
+                            'title' => 'তৃতীয় পক্ষের OAuth তথ্য',
+                            'items' => 'Google বা Facebook দিয়ে লগইন করলে সংশ্লিষ্ট সেবা থেকে নাম, ইমেইল ও প্রোফাইল ছবি পাওয়া যায়',
+                            'color' => 'bg-purple-50 border-purple-100',
+                        ],
                     ];
                     @endphp
                     @foreach($dataTypes as $dt)
@@ -96,103 +131,117 @@
 
             <hr class="border-slate-100 mb-10">
 
-            {{-- Section 3 --}}
+            {{-- Section 3: তথ্য ব্যবহার --}}
             <section id="data-use" class="mb-10 scroll-mt-20">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-base">🎯</div>
                     <h2 class="text-xl font-black text-slate-900">তথ্য ব্যবহারের উদ্দেশ্য</h2>
                 </div>
                 <div class="prose-custom">
-                    <p>আপনার তথ্য নিচের উদ্দেশ্যে ব্যবহার করা হয়:</p>
+                    <p>সংগৃহীত তথ্য কেবলমাত্র নিচের সুনির্দিষ্ট উদ্দেশ্যে ব্যবহার করা হয়:</p>
                     <ul>
-                        <li>ডোনার ও রক্তের অনুরোধকারীর মধ্যে সংযোগ স্থাপন</li>
-                        <li>ডোনারের পরিচয় যাচাই (NID Verification)</li>
-                        <li>রিয়েল-টাইম রক্তের অনুরোধ নোটিফিকেশন পাঠানো</li>
-                        <li>গ্যামিফিকেশন পয়েন্ট ও ব্যাজ ব্যবস্থাপনা</li>
-                        <li>প্ল্যাটফর্মের নিরাপত্তা ও অপব্যবহার প্রতিরোধ</li>
-                        <li>প্ল্যাটফর্ম উন্নয়নের জন্য অ্যানোনিমাস পরিসংখ্যান</li>
+                        <li>রক্তের গ্রুপ ও লোকেশন অনুযায়ী ডোনার ও অনুরোধকারীর মধ্যে সংযোগ স্থাপন</li>
+                        <li>ডোনারের পরিচয় যাচাই (NID ভেরিফিকেশন, ম্যানুয়াল প্রক্রিয়া)</li>
+                        <li>রিয়েল-টাইম রক্তের অনুরোধ নোটিফিকেশন ও অ্যালার্ট পাঠানো</li>
+                        <li>গ্যামিফিকেশন পয়েন্ট, ব্যাজ ও লিডারবোর্ড ব্যবস্থাপনা</li>
+                        <li>প্ল্যাটফর্মের নিরাপত্তা নিশ্চিত করা ও অপব্যবহার প্রতিরোধ</li>
+                        <li>প্ল্যাটফর্ম উন্নয়নের জন্য অ্যানোনিমাস পরিসংখ্যান বিশ্লেষণ</li>
+                        <li>আইনি দায়িত্ব পালন ও বিরোধ নিষ্পত্তিতে সহায়তা</li>
                     </ul>
                     <p class="text-sm font-semibold text-slate-700 bg-emerald-50 border border-emerald-100 rounded-xl px-4 py-3 mt-4">
-                        ✅ আমরা কখনো আপনার তথ্য তৃতীয় পক্ষের কাছে বিক্রি করি না।
+                        ✅ আমরা আপনার ব্যক্তিগত তথ্য কখনো তৃতীয় পক্ষের কাছে বিক্রি করি না বা বিজ্ঞাপনের উদ্দেশ্যে শেয়ার করি না।
                     </p>
                 </div>
             </section>
 
             <hr class="border-slate-100 mb-10">
 
-            {{-- Section 4 --}}
+            {{-- Section 4: ফোন নম্বর প্রাইভেসি --}}
             <section id="phone-reveal" class="mb-10 scroll-mt-20">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-8 h-8 rounded-lg bg-orange-100 flex items-center justify-center text-base">📞</div>
-                    <h2 class="text-xl font-black text-slate-900">ফোন নম্বর প্রকাশ নীতি</h2>
+                    <h2 class="text-xl font-black text-slate-900">ফোন নম্বর প্রাইভেসি</h2>
                 </div>
                 <div class="prose-custom">
-                    <p>ডোনারের ফোন নম্বর ডিফল্টভাবে লুকানো থাকে। শুধুমাত্র নিচের শর্তে প্রকাশ করা হয়:</p>
+                    <p>ডোনারের ফোন নম্বর ডিফল্টভাবে মাস্কড (লুকানো) থাকে এবং কেবল নিচের শর্তে প্রকাশিত হয়:</p>
                     <ul>
-                        <li>রক্তের অনুরোধকারী OTP যাচাই করলে</li>
-                        <li>প্রতি ২৪ ঘণ্টায় সর্বোচ্চ ৩টি নম্বর দেখা যাবে</li>
-                        <li>সিস্টেমে প্রতিটি রিভিল লগ করা হয়</li>
+                        <li>রক্তের অনুরোধকারী OTP চ্যালেঞ্জ সফলভাবে পাস করলে</li>
+                        <li>প্রতি ২৪ ঘণ্টায় একটি অ্যাকাউন্ট থেকে সর্বোচ্চ নির্দিষ্ট সংখ্যক নম্বর দেখার সুযোগ (রেট লিমিট প্রযোজ্য)</li>
+                        <li>রেট লিমিট অতিক্রম করলে অনুরোধ ব্লক হয় এবং লগে সংরক্ষিত হয়</li>
                     </ul>
+                    <p>প্রতিটি নম্বর-প্রকাশ ঘটনা সিস্টেমে লগ করা হয়। অপব্যবহার শনাক্ত হলে অ্যাকাউন্ট স্বয়ংক্রিয়ভাবে পর্যালোচনায় পাঠানো হয়।</p>
                 </div>
                 <div class="mt-4 rounded-xl border border-orange-200 bg-orange-50 px-5 py-4">
                     <p class="text-sm font-bold text-orange-800 mb-1">⚠️ গুরুত্বপূর্ণ</p>
-                    <p class="text-xs text-orange-700 leading-relaxed">ডোনারের নম্বর ব্যবহার করে হয়রানি, স্প্যাম বা অনাকাঙ্ক্ষিত যোগাযোগ করলে অ্যাকাউন্ট স্থগিত ও আইনি ব্যবস্থা নেওয়া হবে।</p>
+                    <p class="text-xs text-orange-700 leading-relaxed">ডোনারের নম্বর ব্যবহার করে হয়রানি, স্প্যাম বা অনাকাঙ্ক্ষিত যোগাযোগ করা সম্পূর্ণ নিষিদ্ধ। এই নিয়ম লঙ্ঘনে অ্যাকাউন্ট স্থায়ীভাবে নিষিদ্ধ এবং প্রযোজ্য ক্ষেত্রে আইনি ব্যবস্থা নেওয়া হবে।</p>
                 </div>
             </section>
 
             <hr class="border-slate-100 mb-10">
 
-            {{-- Section 5 --}}
+            {{-- Section 5: NID ডকুমেন্ট সুরক্ষা --}}
             <section id="nid-security" class="mb-10 scroll-mt-20">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-base">🪪</div>
                     <h2 class="text-xl font-black text-slate-900">NID ডকুমেন্ট সুরক্ষা</h2>
                 </div>
                 <div class="prose-custom">
-                    <p>আপলোড করা NID ডকুমেন্টের ক্ষেত্রে আমাদের নিরাপত্তা ব্যবস্থা:</p>
+                    <p>আপলোড করা জাতীয় পরিচয়পত্র (NID) ডকুমেন্টের ক্ষেত্রে আমাদের নিরাপত্তা ব্যবস্থা নিচে বর্ণিত:</p>
                     <ul>
-                        <li>এনক্রিপ্টেড স্টোরেজে সংরক্ষিত, পাবলিক অ্যাক্সেস নেই</li>
-                        <li>শুধুমাত্র অ্যাডমিন ভেরিফিকেশনের জন্য অ্যাক্সেস করা হয়</li>
-                        <li>ভেরিফিকেশনের পর ডকুমেন্ট ডিলিট করার অনুরোধ করা যাবে</li>
-                        <li>ডেটা রিটেনশন: সর্বোচ্চ ১ বছর (অ্যাকাউন্ট সক্রিয় থাকলে)</li>
+                        <li>ফাইলগুলো প্রাইভেট স্টোরেজে সংরক্ষিত — সরাসরি পাবলিক URL নেই</li>
+                        <li>শুধুমাত্র অ্যাডমিন রোলধারী ব্যক্তি ভেরিফিকেশনের উদ্দেশ্যে অ্যাক্সেস করতে পারেন</li>
+                        <li>অ্যাডমিন অ্যাক্সেস লগে সংরক্ষিত হয়</li>
+                        <li>ভেরিফিকেশন সম্পন্ন হলে ডোনার অনুরোধ করলে ডকুমেন্ট মুছে ফেলা যাবে</li>
+                        <li>ডেটা রিটেনশন নীতি: অ্যাকাউন্ট সক্রিয় থাকলে সর্বোচ্চ ১ বছর; অ্যাকাউন্ট ডিলিটে সাথে সাথে মুছে যাবে</li>
+                        <li>NID স্ক্যান কখনো তৃতীয় পক্ষের সাথে শেয়ার করা হয় না</li>
                     </ul>
+                </div>
+                <div class="mt-4 rounded-xl border border-slate-200 bg-slate-50 px-5 py-4">
+                    <p class="text-xs text-slate-600 leading-relaxed font-medium">
+                        <strong>দ্রষ্টব্য:</strong> NID ভেরিফিকেশন একটি ঐচ্ছিক সেবা। ভেরিফিকেশন ছাড়াও রক্তদাতা হিসেবে নিবন্ধন করা সম্ভব — তবে ভেরিফাইড ব্যাজ ও সংশ্লিষ্ট বিশেষ সুবিধা পাওয়া যাবে না।
+                    </p>
                 </div>
             </section>
 
             <hr class="border-slate-100 mb-10">
 
-            {{-- Section 6 --}}
+            {{-- Section 6: কুকিজ ও ট্র্যাকিং --}}
             <section id="cookies" class="mb-10 scroll-mt-20">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center text-base">🍪</div>
-                    <h2 class="text-xl font-black text-slate-900">কুকিজ ও ট্র্যাকিং</h2>
+                    <h2 class="text-xl font-black text-slate-900">কুকিজ ও সেশন</h2>
                 </div>
                 <div class="prose-custom">
-                    <p>আমরা নিচের কারণে কুকিজ ব্যবহার করি:</p>
+                    <p>রক্তদূত কেবল প্রয়োজনীয় ও কার্যকরী কুকিজ ব্যবহার করে:</p>
                     <ul>
-                        <li><strong>সেশন কুকি:</strong> লগইন অবস্থা বজায় রাখতে (আবশ্যক)</li>
-                        <li><strong>CSRF টোকেন:</strong> ফর্ম নিরাপত্তার জন্য (আবশ্যক)</li>
-                        <li><strong>পছন্দ কুকি:</strong> ভাষা ও সেটিংস সংরক্ষণে (ঐচ্ছিক)</li>
+                        <li><strong>সেশন কুকি:</strong> লগইন অবস্থা বজায় রাখতে (আবশ্যক, ব্রাউজার বন্ধে মুছে যায়)</li>
+                        <li><strong>CSRF টোকেন:</strong> ফর্ম জমা দেওয়ার সময় নিরাপত্তা নিশ্চিত করতে (আবশ্যক)</li>
+                        <li><strong>পছন্দ কুকি:</strong> ভাষা বা থিম সেটিংস সংরক্ষণে (ঐচ্ছিক)</li>
                     </ul>
-                    <p>আমরা কোনো তৃতীয় পক্ষের বিজ্ঞাপন ট্র্যাকিং কুকিজ ব্যবহার করি না।</p>
+                    <p>আমরা কোনো তৃতীয় পক্ষের বিজ্ঞাপন ট্র্যাকিং কুকিজ, ক্রস-সাইট ট্র্যাকিং বা ফিঙ্গারপ্রিন্টিং প্রযুক্তি ব্যবহার করি না। ব্রাউজারের কুকি সেটিংস পরিবর্তন করলে প্ল্যাটফর্মের কিছু কার্যকারিতা সীমিত হতে পারে।</p>
                 </div>
             </section>
 
             <hr class="border-slate-100 mb-10">
 
-            {{-- Section 7 --}}
+            {{-- Section 7: আপনার অধিকার --}}
             <section id="user-rights" class="mb-10 scroll-mt-20">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-8 h-8 rounded-lg bg-teal-100 flex items-center justify-center text-base">⚖️</div>
                     <h2 class="text-xl font-black text-slate-900">আপনার অধিকার</h2>
                 </div>
+                <div class="prose-custom mb-4">
+                    <p>রক্তদূতে নিবন্ধিত প্রতিটি ব্যবহারকারী নিচের অধিকার প্রয়োগ করতে পারেন:</p>
+                </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     @php
                     $rights = [
-                        ['icon' => '👁️', 'title' => 'তথ্য দেখার অধিকার', 'desc' => 'আপনার সম্পর্কে কী তথ্য আছে তা দেখতে পারবেন।'],
-                        ['icon' => '✏️', 'title' => 'সংশোধনের অধিকার', 'desc' => 'ভুল তথ্য প্রোফাইল সেটিংস থেকে সংশোধন করুন।'],
-                        ['icon' => '🗑️', 'title' => 'মুছে ফেলার অধিকার', 'desc' => 'অ্যাকাউন্ট ডিলিট করলে সব ব্যক্তিগত তথ্য সরানো হবে।'],
-                        ['icon' => '🚫', 'title' => 'প্রক্রিয়ার বিরোধিতা', 'desc' => 'মার্কেটিং বা অপ্রয়োজনীয় প্রক্রিয়া বন্ধ করতে পারবেন।'],
+                        ['icon' => '👁️', 'title' => 'তথ্য দেখার অধিকার',  'desc' => 'আপনার সম্পর্কে কী তথ্য সংরক্ষিত আছে তা প্রোফাইল পেজ থেকে দেখতে পারবেন।'],
+                        ['icon' => '✏️', 'title' => 'সংশোধনের অধিকার',    'desc' => 'ভুল বা পুরনো তথ্য প্রোফাইল সেটিংস থেকে সরাসরি সংশোধন করুন। গুরুত্বপূর্ণ তথ্যের জন্য যোগাযোগ করুন।'],
+                        ['icon' => '🗑️', 'title' => 'মুছে ফেলার অধিকার',  'desc' => 'অ্যাকাউন্ট ডিলিট করলে আপনার ব্যক্তিগত তথ্য সিস্টেম থেকে সরিয়ে ফেলা হবে (লিগ্যাল লগ ব্যতীত)।'],
+                        ['icon' => '📤', 'title' => 'তথ্য পোর্টেবিলিটি',  'desc' => 'আপনার ডেটার একটি কপি চাইতে পারেন। অনুরোধের ৭ কার্যদিবসের মধ্যে ইমেইলে পাঠানো হবে।'],
+                        ['icon' => '🚫', 'title' => 'প্রক্রিয়ার আপত্তি',  'desc' => 'অতিরিক্ত বা অপ্রয়োজনীয় তথ্য প্রক্রিয়া বন্ধ করার অনুরোধ করতে পারেন।'],
+                        ['icon' => '📬', 'title' => 'অভিযোগ দাখিল',      'desc' => 'গোপনীয়তা লঙ্ঘনের অভিযোগ সরাসরি privacy@roktodut.com ঠিকানায় পাঠান।'],
                     ];
                     @endphp
                     @foreach($rights as $r)
@@ -209,20 +258,34 @@
 
             <hr class="border-slate-100 mb-10">
 
-            {{-- Section 8 --}}
+            {{-- Section 8: পলিসি আপডেট --}}
+            <section id="policy-updates" class="mb-10 scroll-mt-20">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center text-base">🔄</div>
+                    <h2 class="text-xl font-black text-slate-900">নীতিমালা আপডেট</h2>
+                </div>
+                <div class="prose-custom">
+                    <p>রক্তদূত যেকোনো সময় এই প্রাইভেসি পলিসি আপডেট করার অধিকার রাখে। গুরুত্বপূর্ণ পরিবর্তন হলে নিবন্ধিত ইমেইলে বা প্ল্যাটফর্মের ইন-অ্যাপ নোটিফিকেশনের মাধ্যমে অবহিত করা হবে।</p>
+                    <p>পরিবর্তনের পরেও প্ল্যাটফর্ম ব্যবহার অব্যাহত রাখলে আপনি হালনাগাদ পলিসিতে সম্মতি দিয়েছেন বলে গণ্য হবে। নিয়মিত এই পৃষ্ঠাটি পরীক্ষা করার পরামর্শ দেওয়া হচ্ছে।</p>
+                </div>
+            </section>
+
+            <hr class="border-slate-100 mb-10">
+
+            {{-- Section 9: যোগাযোগ --}}
             <section id="contact-us" class="mb-10 scroll-mt-20">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-base">✉️</div>
                     <h2 class="text-xl font-black text-slate-900">যোগাযোগ করুন</h2>
                 </div>
                 <div class="prose-custom">
-                    <p>প্রাইভেসি সংক্রান্ত যেকোনো অভিযোগ বা অনুরোধের জন্য:</p>
+                    <p>প্রাইভেসি সংক্রান্ত যেকোনো প্রশ্ন, অভিযোগ বা তথ্য সংশোধনের অনুরোধের জন্য:</p>
                 </div>
                 <div class="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-5 flex flex-col sm:flex-row gap-4 items-start">
                     <div class="flex-1">
                         <p class="text-sm font-bold text-slate-800 mb-1">রক্তদূত প্রাইভেসি টিম</p>
                         <p class="text-sm text-slate-600">ইমেইল: <a href="mailto:privacy@roktodut.com" class="text-red-600 font-semibold hover:underline">privacy@roktodut.com</a></p>
-                        <p class="text-sm text-slate-600 mt-0.5">সাড়া দেওয়ার সময়: ৭২ ঘণ্টার মধ্যে</p>
+                        <p class="text-sm text-slate-600 mt-0.5">সাড়া দেওয়ার সময়: ৭২ ঘণ্টার মধ্যে (কর্মদিবস)</p>
                     </div>
                     <a href="{{ route('contact.create') }}"
                        class="shrink-0 inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-sm font-bold px-5 py-2.5 rounded-xl transition-colors">

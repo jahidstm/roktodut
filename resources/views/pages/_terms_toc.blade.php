@@ -1,14 +1,15 @@
 {{-- Terms of Service TOC — included by both desktop sidebar and mobile accordion --}}
 @php
 $termsLinks = [
-    ['href' => '#acceptance',    'label' => 'শর্ত গ্রহণ'],
-    ['href' => '#eligibility',   'label' => 'যোগ্যতার শর্ত'],
-    ['href' => '#account',       'label' => 'অ্যাকাউন্ট দায়িত্ব'],
-    ['href' => '#donor-rules',   'label' => 'ডোনার বিধিমালা'],
-    ['href' => '#prohibited',    'label' => 'নিষিদ্ধ কার্যক্রম'],
-    ['href' => '#liability',     'label' => 'দায়বদ্ধতার সীমা'],
-    ['href' => '#termination',   'label' => 'অ্যাকাউন্ট স্থগিত'],
-    ['href' => '#governing-law', 'label' => 'প্রযোজ্য আইন'],
+    ['href' => '#platform-nature', 'label' => 'প্ল্যাটফর্মের পরিচয়'],
+    ['href' => '#acceptance',      'label' => 'শর্ত গ্রহণ ও যোগ্যতা'],
+    ['href' => '#account',         'label' => 'অ্যাকাউন্ট দায়িত্ব'],
+    ['href' => '#donor-rules',     'label' => 'ডোনারের দায়িত্ব'],
+    ['href' => '#recipient-rules', 'label' => 'রক্তগ্রহীতার দায়িত্ব'],
+    ['href' => '#prohibited',      'label' => 'নিষিদ্ধ কার্যক্রম'],
+    ['href' => '#termination',     'label' => 'সাসপেনশন ও ব্যান'],
+    ['href' => '#liability',       'label' => 'দায়বদ্ধতার সীমা'],
+    ['href' => '#governing-law',   'label' => 'প্রযোজ্য আইন'],
 ];
 @endphp
 <ul class="space-y-0.5">
