@@ -17,6 +17,7 @@ use App\Events\DonationCompleted;
 use App\Listeners\RewardDonorPoints;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Support\Facades\Vite;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->configureViteDevServer();
+
         Event::listen(
             Login::class,
             LogSuccessfulLogin::class,
@@ -92,5 +95,19 @@ class AppServiceProvider extends ServiceProvider
         View::composer('admin.layouts.sidebar', function ($view) {
             $view->with('pendingBlogCount', Post::pendingReview()->count());
         });
+    }
+
+    private function configureViteDevServer(): void
+    {
+        if (! $this->app->environment('local')) {
+            return;
+        }
+
+        if (config('app.vite_dev_server')) {
+            return;
+        }
+
+        // Force built assets even if a stale public/hot file exists.
+        Vite::useHotFile(storage_path('framework/vite.hot'));
     }
 }

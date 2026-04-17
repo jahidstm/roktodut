@@ -56,6 +56,18 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Vite Dev Server (Local Only)
+    |--------------------------------------------------------------------------
+    |
+    | When true, Laravel will honor the Vite dev server (public/hot). When false,
+    | it will always use the built assets even if public/hot exists.
+    |
+    */
+
+    'vite_dev_server' => filter_var(env('VITE_DEV_SERVER', false), FILTER_VALIDATE_BOOLEAN),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Timezone
     |--------------------------------------------------------------------------
     |
