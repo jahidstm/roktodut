@@ -28,25 +28,25 @@
 
     {{-- 📊 ১. গ্লোবাল স্ট্যাটিস্টিকস --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <x-card>
             <div class="text-slate-500 text-sm font-bold uppercase tracking-wider">মোট ইউজার</div>
             <div class="mt-2 text-4xl font-black text-slate-900">{{ $totalUsers }}</div>
-        </div>
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        </x-card>
+        <x-card>
             <div class="text-blue-600 text-sm font-bold uppercase tracking-wider">মোট ডোনার</div>
             <div class="mt-2 text-4xl font-black text-blue-600">{{ $totalDonors }}</div>
-        </div>
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        </x-card>
+        <x-card>
             <div class="text-red-600 text-sm font-bold uppercase tracking-wider">সফল রিকোয়েস্ট</div>
             <div class="mt-2 text-4xl font-black text-red-600">{{ $fulfilledRequests }} / {{ $totalRequests }}</div>
-        </div>
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        </x-card>
+        <x-card>
             <div class="text-emerald-600 text-sm font-bold uppercase tracking-wider">সাকসেস রেট</div>
             <div class="mt-2 flex items-baseline gap-2">
                 <span class="text-4xl font-black text-emerald-600">{{ $successRate }}</span>
                 <span class="text-emerald-400 font-bold text-sm">%</span>
             </div>
-        </div>
+        </x-card>
     </div>
 
     {{-- 🪪 ২. NID ভেরিফিকেশন রিভিউ (Primary Queue) --}}

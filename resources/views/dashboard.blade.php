@@ -449,37 +449,37 @@
          📊 Stats Grid
     ══════════════════════════════════════════ --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <x-card>
             <div class="text-slate-500 text-sm font-bold uppercase tracking-wider">মোট রিকোয়েস্ট</div>
             <div class="mt-2 flex items-baseline gap-2">
                 <span class="text-4xl font-black text-slate-900">{{ $totalRequestsMade ?? 0 }}</span>
                 <span class="text-slate-400 font-bold text-sm">টি</span>
             </div>
-        </div>
+        </x-card>
 
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <x-card>
             <div class="text-emerald-600 text-sm font-bold uppercase tracking-wider">আপনার অবদান</div>
             <div class="mt-2 flex items-baseline gap-2">
                 <span class="text-4xl font-black text-emerald-600">{{ $totalContributions ?? 0 }}</span>
                 <span class="text-emerald-400 font-bold text-sm">বার</span>
             </div>
-        </div>
+        </x-card>
 
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <x-card>
             <div class="text-red-600 text-sm font-bold uppercase tracking-wider">সফল রিকোয়েস্ট</div>
             <div class="mt-2 flex items-baseline gap-2">
                 <span class="text-4xl font-black text-red-600">{{ $fulfilledRequests ?? 0 }}</span>
                 <span class="text-red-400 font-bold text-sm">টি</span>
             </div>
-        </div>
+        </x-card>
 
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
+        <x-card>
             <div class="text-blue-600 text-sm font-bold uppercase tracking-wider">সফলতার হার</div>
             <div class="mt-2 flex items-baseline gap-2">
                 <span class="text-4xl font-black text-blue-600">{{ $successRate ?? 0 }}</span>
                 @if($successRate !== 'N/A')<span class="text-blue-400 font-bold text-sm">%</span>@endif
             </div>
-        </div>
+        </x-card>
     </div>
 
     {{-- 7. Verified Donation History --}}

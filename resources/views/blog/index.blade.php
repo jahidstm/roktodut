@@ -10,64 +10,41 @@
      ═══════════════════════════════════════════════════════════════════════ --}}
 
 {{-- ── Hero Banner ─────────────────────────────────────────────────────── --}}
-<section class="relative bg-gradient-to-br from-red-700 via-red-600 to-rose-500 overflow-hidden">
-    {{-- Grid pattern overlay --}}
-    <div class="absolute inset-0 opacity-10"
-         style="background-image: linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px),
-                                  linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px);
-                background-size: 28px 28px;">
-    </div>
-    {{-- Ambient glow circles --}}
-    <div class="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-10 -left-10 w-60 h-60 bg-red-900/30 rounded-full blur-2xl pointer-events-none"></div>
+<x-page-header variant="marketing" label="🩸 রক্তদূত ব্লগ" title="স্বাস্থ্য তথ্য ও <span class='text-yellow-300'>সাফল্যের গল্প</span>" subtitle="রক্তদানের অভিজ্ঞতা, চিকিৎসা পরামর্শ এবং আমাদের ডোনারদের অনুপ্রেরণামূলক গল্প পড়ুন।">
+    <x-slot name="actions">
+        <div class="flex flex-col items-center w-full">
+            @auth
+            <div class="mb-6">
+                <x-secondary-button href="{{ route('blog.create') }}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    নতুন পোস্ট লিখুন
+                </x-secondary-button>
+            </div>
+            @endauth
 
-    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 py-16 md:py-20 text-center">
-        <span class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white text-xs font-extrabold tracking-widest uppercase px-4 py-1.5 rounded-full mb-5">
-            🩸 রক্তদূত ব্লগ
-        </span>
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight tracking-tight drop-shadow-sm">
-            স্বাস্থ্য তথ্য ও <span class="text-yellow-300">সাফল্যের গল্প</span>
-        </h1>
-        <p class="mt-4 text-white/80 text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
-            রক্তদানের অভিজ্ঞতা, চিকিৎসা পরামর্শ এবং আমাদের ডোনারদের অনুপ্রেরণামূলক গল্প পড়ুন।
-        </p>
-
-        {{-- Write Post CTA (auth only) --}}
-        @auth
-        <div class="mt-6">
-            <a href="{{ route('blog.create') }}"
-               id="blog-write-cta"
-               class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full
-                      bg-white text-red-600 font-extrabold text-sm shadow-md
-                      hover:bg-red-50 hover:shadow-lg transition-all duration-200 active:scale-[0.97]">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
-                </svg>
-                নতুন পোস্ট লিখুন
-            </a>
+            {{-- Category Filter Pills --}}
+            <div class="flex flex-wrap justify-center gap-3 w-full" id="blog-filter-pills">
+                <a href="{{ route('blog.index') }}"
+                   class="filter-pill {{ !request('type') ? 'active-pill' : '' }} inline-flex items-center gap-1.5 px-5 py-2 rounded-full font-bold text-sm transition-all duration-200
+                          {{ !request('type') ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }}">
+                    📋 সব পোস্ট
+                </a>
+                <a href="{{ route('blog.index', ['type' => 'health']) }}"
+                   class="filter-pill {{ request('type') === 'health' ? 'active-pill' : '' }} inline-flex items-center gap-1.5 px-5 py-2 rounded-full font-bold text-sm transition-all duration-200
+                          {{ request('type') === 'health' ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }}">
+                    🏥 স্বাস্থ্য ব্লগ
+                </a>
+                <a href="{{ route('blog.index', ['type' => 'story']) }}"
+                   class="filter-pill {{ request('type') === 'story' ? 'active-pill' : '' }} inline-flex items-center gap-1.5 px-5 py-2 rounded-full font-bold text-sm transition-all duration-200
+                          {{ request('type') === 'story' ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }}">
+                    💪 সাফল্যের গল্প
+                </a>
+            </div>
         </div>
-        @endauth
-
-        {{-- Category Filter Pills --}}
-        <div class="mt-6 flex flex-wrap justify-center gap-3" id="blog-filter-pills">
-            <a href="{{ route('blog.index') }}"
-               class="filter-pill {{ !request('type') ? 'active-pill' : '' }} inline-flex items-center gap-1.5 px-5 py-2 rounded-full font-bold text-sm transition-all duration-200
-                      {{ !request('type') ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }}">
-                📋 সব পোস্ট
-            </a>
-            <a href="{{ route('blog.index', ['type' => 'health']) }}"
-               class="filter-pill {{ request('type') === 'health' ? 'active-pill' : '' }} inline-flex items-center gap-1.5 px-5 py-2 rounded-full font-bold text-sm transition-all duration-200
-                      {{ request('type') === 'health' ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }}">
-                🏥 স্বাস্থ্য ব্লগ
-            </a>
-            <a href="{{ route('blog.index', ['type' => 'story']) }}"
-               class="filter-pill {{ request('type') === 'story' ? 'active-pill' : '' }} inline-flex items-center gap-1.5 px-5 py-2 rounded-full font-bold text-sm transition-all duration-200
-                      {{ request('type') === 'story' ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }}">
-                💪 সাফল্যের গল্প
-            </a>
-        </div>
-    </div>
-</section>
+    </x-slot>
+</x-page-header>
 
 {{-- ── Main Content Area ────────────────────────────────────────────────── --}}
 <div class="mx-auto max-w-6xl px-4 sm:px-6 py-10 lg:py-14">

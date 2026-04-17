@@ -3,13 +3,9 @@
 @section('title', 'স্মার্ট ডোনার সার্চ — রক্তদূত')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <div class="mb-8">
-        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 border-l-4 border-red-600 pl-4">
-            স্মার্ট ডোনার সার্চ
-        </h1>
-    </div>
+<x-page-header variant="app" title="স্মার্ট ডোনার সার্চ" />
 
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     @php
         $selectedDivision = $request['division_id'] ?? '';
         $selectedDistrict = $request['district_id'] ?? '';
@@ -26,7 +22,7 @@
         </div>
     @endif
 
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8">
+    <x-card class="mb-8" paddings="p-5">
         <form method="GET" action="{{ route('search') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1">রক্তের গ্রুপ</label>
@@ -63,21 +59,20 @@
                 </div>
                 <div class="md:col-span-4 flex justify-end gap-2 mt-2">
                     @if(request()->hasAny(['blood_group', 'division_id', 'district_id', 'upazila_id']))
-                        <a href="{{ route('search') }}"
-                           class="shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg font-extrabold transition-colors flex items-center justify-center">
+                        <x-secondary-button href="{{ route('search') }}">
                             রিসেট
-                        </a>
+                        </x-secondary-button>
                     @endif
-                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-8 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
+                    <x-primary-button>
                         খুঁজুন
-                    </button>
+                    </x-primary-button>
                 </div>
 
                 <input type="hidden" id="selectedDivision" value="{{ $selectedDivision }}">
                 <input type="hidden" id="selectedDistrict" value="{{ $selectedDistrict }}">
                 <input type="hidden" id="selectedUpazila" value="{{ $selectedUpazila }}">
             </form>
-    </div>
+    </x-card>
 
     <div class="mb-5">
         <div class="flex items-center justify-between gap-3">
@@ -103,7 +98,7 @@
     </div>
 
     @if($donors->isEmpty())
-        <div class="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
+        <x-card paddings="p-10" class="text-center">
             <div class="mx-auto mb-4 h-14 w-14 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center">
                 <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75 18 18m-9.75-5.25h.008v.008H8.25V12.5Zm3.75 0h.008v.008H12V12.5Zm3.75 0h.008v.008h-.008V12.5ZM3 10.5h18m-1.5 9h-15A1.5 1.5 0 0 1 3 18V7.5A1.5 1.5 0 0 1 4.5 6h15A1.5 1.5 0 0 1 21 7.5V18a1.5 1.5 0 0 1-1.5 1.5Z"/>
@@ -111,10 +106,12 @@
             </div>
             <h3 class="text-lg font-black text-slate-800">এই ফিল্টারে কোনো ডোনার পাওয়া যায়নি</h3>
             <p class="mt-2 text-sm font-medium text-slate-500">অন্য লোকেশন বা ব্লাড গ্রুপ দিয়ে চেষ্টা করুন।</p>
-            <a href="{{ route('search') }}" class="inline-flex mt-5 rounded-lg bg-red-600 px-5 py-2.5 text-sm font-black text-white hover:bg-red-700 transition">
-                ফিল্টার রিসেট করুন
-            </a>
-        </div>
+            <div class="mt-5">
+                <x-primary-button href="{{ route('search') }}">
+                    ফিল্টার রিসেট করুন
+                </x-primary-button>
+            </div>
+        </x-card>
     @else
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             @foreach($donors as $donor)

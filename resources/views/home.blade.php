@@ -35,12 +35,12 @@
         
         {{-- Buttons --}}
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 w-full sm:w-auto">
-            <button onclick="document.getElementById('search-section').scrollIntoView({behavior: 'smooth'})" class="w-full sm:w-auto bg-[#D32F2F] text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-red-500/30 hover:bg-[#B71C1C] transition-transform hover:scale-105 flex items-center justify-center gap-2">
+            <x-primary-button onclick="document.getElementById('search-section').scrollIntoView({behavior: 'smooth'})" class="w-full sm:w-auto px-8 py-4 text-base shadow-lg shadow-red-500/30">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> এখনই ডোনার খুঁজুন
-            </button>
-            <a href="{{ route('requests.create') }}" class="w-full sm:w-auto bg-white border-2 border-[#D32F2F] text-[#D32F2F] hover:bg-red-50 font-black px-8 py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm h-[56px]">
+            </x-primary-button>
+            <x-secondary-button href="{{ route('requests.create') }}" class="w-full sm:w-auto px-8 py-4 text-base border-[#D32F2F] text-[#D32F2F] hover:bg-red-50 hover:text-[#D32F2F]">
                 জরুরি রক্তের অনুরোধ
-            </a>
+            </x-secondary-button>
         </div>
         
         {{-- Mini Stats --}}
@@ -148,12 +148,11 @@
                 </div>
             </div>
 
-            {{-- Button --}}
             <div class="lg:col-span-1">
-                <button type="submit" class="w-full bg-[#D32F2F] hover:bg-[#B71C1C] text-white rounded-xl px-4 py-3.5 text-sm font-black transition-colors flex items-center justify-center gap-2 h-[50px]">
+                <x-primary-button class="w-full rounded-xl px-4 py-3.5 h-[50px]">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     সার্চ করুন
-                </button>
+                </x-primary-button>
             </div>
         </form>
     </div>
@@ -192,12 +191,12 @@
 <section class="py-24 bg-white" aria-label="জরুরি রক্তের অনুরোধ">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
-        {{-- Section Header --}}
-        <div class="text-center max-w-2xl mx-auto mb-16">
-            <p class="text-sm font-extrabold text-[#FF385C] uppercase tracking-widest mb-3">লাইভ আপডেট</p>
-            <h2 class="text-3xl lg:text-4xl font-black text-slate-900 mb-5">জরুরি রক্তের অনুরোধ</h2>
-            <p class="text-slate-500 font-medium">যেসব রোগীর এই মুহূর্তে জরুরি ভিত্তিতে রক্তের প্রয়োজন। আপনার একটু সাহায্য বাঁচাতে পারে একটি জীবন।</p>
-        </div>
+        <x-section-title 
+            label="লাইভ আপডেট" 
+            title="জরুরি রক্তের অনুরোধ" 
+            subtitle="যেসব রোগীর এই মুহূর্তে জরুরি ভিত্তিতে রক্তের প্রয়োজন। আপনার একটু সাহায্য বাঁচাতে পারে একটি জীবন।" 
+            alignment="center" 
+        />
 
         @if($homeRequests->isNotEmpty())
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -310,9 +309,9 @@
             </div>
             
             <div class="mt-12 text-center">
-                <a href="{{ route('public.requests.index') }}" class="inline-flex items-center justify-center gap-2 bg-[#FF385C] hover:bg-[#E31C5F] text-white font-black text-sm px-8 py-4 rounded-full transition-transform hover:scale-105 shadow-lg shadow-red-500/30">
+                <x-primary-button href="{{ route('public.requests.index') }}" class="px-8 py-4 shadow-lg shadow-red-500/30">
                     সব অনুরোধ দেখুন 
-                </a>
+                </x-primary-button>
             </div>
         @else
             <div class="text-center py-10 bg-slate-50 rounded-3xl border border-slate-100">
@@ -390,9 +389,9 @@
                     </li>
                 </ul>
                 
-                <a href="{{ route('register') }}" class="inline-flex items-center justify-center gap-2 bg-[#FF385C] hover:bg-[#E31C5F] text-white font-black text-sm px-8 py-4 rounded-full transition-transform hover:scale-105 shadow-lg shadow-red-500/30">
+                <x-primary-button href="{{ route('register') }}" class="px-8 py-4 shadow-lg shadow-red-500/30">
                     আজই যুক্ত হোন <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                </a>
+                </x-primary-button>
             </div>
             
         </div>
@@ -501,10 +500,10 @@
             </div>
             
             <div class="mt-16 text-center">
-                <a href="{{ route('leaderboard') }}" class="inline-flex items-center justify-center gap-2 bg-white border-2 border-slate-100 hover:border-slate-300 text-slate-700 font-bold text-sm px-8 py-4 rounded-full transition-all shadow-sm hover:shadow-md group">
+                <x-secondary-button href="{{ route('leaderboard') }}" class="px-8 py-4 group">
                     সম্পূর্ণ লিডারবোর্ড দেখুন 
                     <svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                </a>
+                </x-secondary-button>
             </div>
         @endif
     </div>
@@ -516,10 +515,11 @@
 <section class="py-24 bg-slate-50 border-t border-slate-200/50">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
-        <div class="text-center max-w-2xl mx-auto mb-16">
-            <p class="text-sm font-extrabold text-[#FF385C] uppercase tracking-widest mb-3">সংবাদ ও নিবন্ধ</p>
-            <h2 class="text-3xl lg:text-4xl font-black text-slate-900 mb-4">সর্বশেষ ব্লগ পোস্ট</h2>
-        </div>
+        <x-section-title 
+            label="সংবাদ ও নিবন্ধ" 
+            title="সর্বশেষ ব্লগ পোস্ট" 
+            alignment="center" 
+        />
 
         @if($recentPosts->isNotEmpty())
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -559,9 +559,9 @@
             </div>
             
             <div class="mt-12 text-center">
-                <a href="{{ route('blog.index') }}" class="inline-block border-2 border-slate-200 hover:border-slate-900 text-slate-700 hover:text-white hover:bg-slate-900 font-black text-sm px-8 py-4 rounded-full transition-all">
+                <x-secondary-button href="{{ route('blog.index') }}" class="px-8 py-4">
                     সব পোস্ট দেখুন
-                </a>
+                </x-secondary-button>
             </div>
         @else
             <div class="text-center py-10">
@@ -593,13 +593,13 @@
         
         {{-- Buttons --}}
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 w-full sm:w-auto">
-            <a href="{{ route('requests.create') }}" class="w-full sm:w-auto bg-white text-[#BE1B21] hover:bg-slate-50 font-black px-8 py-3.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-[15px]">
+            <x-secondary-button href="{{ route('requests.create') }}" class="w-full sm:w-auto px-8 py-4 border-white text-[#BE1B21] hover:bg-slate-50 hover:text-[#BE1B21]">
                 রক্তের রিকোয়েস্ট করুন
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-            </a>
-            <a href="{{ route('search') }}" class="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/30 text-white font-black px-8 py-3.5 rounded-xl transition-all flex items-center justify-center text-[15px]">
+            </x-secondary-button>
+            <x-secondary-button href="{{ route('search') }}" class="w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 border-white/30 text-white hover:text-white hover:border-white/40 shadow-none">
                 ডোনার সার্চ করুন
-            </a>
+            </x-secondary-button>
         </div>
         
         {{-- Security Info --}}
