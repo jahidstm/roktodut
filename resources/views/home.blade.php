@@ -1,757 +1,670 @@
-<!doctype html>
-<html lang="bn">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>রক্তদূত — জরুরি রক্ত সহায়তা</title>
-    <meta name="description" content="রক্তদূত — বাংলাদেশের সবচেয়ে নির্ভরযোগ্য ভেরিফায়েড রক্তদাতা নেটওয়ার্ক। জরুরি রক্তের প্রয়োজনে দ্রুত ডোনারের সাথে সংযুক্ত হন।">
+@extends('layouts.app')
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+@section('title', 'রক্তদূত — রক্ত দিন, জীবন বাঁচান')
 
-    @vite(['resources/css/app.css','resources/js/app.js'])
+@section('content')
 
-    <style>
-        :root { font-family: 'Hind Siliguri', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; }
-    </style>
-</head>
-
-<body class="bg-slate-50 text-slate-900 antialiased overflow-x-hidden">
-
-{{-- ══════════════════════════════════════════════════════
-     HEADER — Sticky, Responsive, Auth-Aware
-══════════════════════════════════════════════════════ --}}
-<header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-100 shadow-sm">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 py-3 flex items-center justify-between">
-
-        {{-- Logo --}}
-        <a href="{{ route('home') }}" class="flex items-center gap-3">
-            <div class="h-9 w-9 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center shrink-0">
-                <span class="text-red-600 font-extrabold tracking-tight text-sm">RD</span>
-            </div>
-            <div class="leading-tight">
-                <div class="text-base font-extrabold tracking-tight">রক্তদূত</div>
-                <div class="text-[10px] text-slate-500 font-semibold hidden sm:block">BLOOD DONATION PLATFORM</div>
-            </div>
-        </a>
-
-        {{-- Desktop Nav — 5 exact items --}}
-        <nav class="hidden md:flex items-center gap-1 text-[15px] font-semibold text-slate-600">
-            <a href="{{ route('home') }}" class="px-3 py-2 rounded-lg text-red-600 font-bold bg-red-50">হোম</a>
-            @auth
-                <a href="{{ route('requests.index') }}" class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition">রক্ত দিন</a>
-            @endauth
-            @guest
-                <a href="{{ route('public.requests.index') }}" class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition">রক্ত দিন</a>
-            @endguest
-            <a href="{{ route('search') }}" class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition">স্মার্ট ডোনার সার্চ</a>
-            <a href="{{ route('leaderboard') }}" class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition">লিডারবোর্ড</a>
-            <a href="{{ route('blog.index') }}" class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition">ব্লগ</a>
-        </nav>
-
-        {{-- Auth Buttons & Profile Chip --}}
-        <div class="flex items-center gap-3">
-            @guest
-                <a href="{{ route('login') }}" class="hidden sm:inline-flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-slate-700 hover:text-red-600 transition text-sm">লগইন</a>
-                <a href="{{ route('register') }}" class="inline-flex items-center justify-center bg-red-600 text-white px-5 py-2 rounded-lg font-extrabold hover:bg-red-700 transition shadow-sm text-sm">রেজিস্টার</a>
-            @endguest
-
-            @auth
-                {{-- 🔔 Notification Bell --}}
-                <div class="relative flex items-center" x-data="{ openNotification: false }" @click.outside="openNotification = false">
-                    <button @click="openNotification = ! openNotification" class="relative p-2 text-slate-500 hover:text-red-600 transition rounded-full hover:bg-red-50 focus:outline-none">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-                        </svg>
-                        @if(auth()->user()->unreadNotifications->count() > 0)
-                            <span class="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-600 text-[10px] font-extrabold text-white shadow-sm ring-2 ring-white">
-                                {{ auth()->user()->unreadNotifications->count() }}
-                            </span>
-                        @endif
-                    </button>
-
-                    <div x-show="openNotification"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 scale-95 translate-y-2"
-                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                         x-transition:leave="transition ease-in duration-150"
-                         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                         x-transition:leave-end="opacity-0 scale-95 translate-y-2"
-                         class="absolute right-0 mt-3 top-12 w-80 sm:w-96 rounded-2xl bg-white shadow-xl ring-1 ring-slate-200 overflow-hidden z-50"
-                         style="display: none;">
-                        <div class="px-4 py-3 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                            <h3 class="text-sm font-extrabold text-slate-800">নোটিফিকেশন</h3>
-                            @if(auth()->user()->unreadNotifications->count() > 0)
-                                <span class="text-[10px] bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-black uppercase">{{ auth()->user()->unreadNotifications->count() }} নতুন</span>
-                            @endif
-                        </div>
-                        <div class="max-h-80 overflow-y-auto divide-y divide-slate-50">
-                            @forelse(auth()->user()->unreadNotifications as $notification)
-                                <form action="{{ route('notifications.read', $notification->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="w-full text-left p-4 hover:bg-slate-50 transition flex gap-3 items-start group">
-                                        <div class="mt-0.5 rounded-full p-2 shrink-0 {{ isset($notification->data['status']) && $notification->data['status'] === 'approved' ? 'bg-emerald-100 text-emerald-600' : 'bg-red-100 text-red-600' }}">
-                                            @if(isset($notification->data['status']) && $notification->data['status'] === 'approved')
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
-                                            @else
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                            @endif
-                                        </div>
-                                        <div>
-                                            <div class="text-sm font-semibold text-slate-800 group-hover:text-blue-600 transition-colors">
-                                                {{ $notification->data['message'] ?? 'নতুন নোটিফিকেশন' }}
-                                            </div>
-                                            <div class="text-[10px] text-slate-400 mt-1 font-bold uppercase tracking-wide">
-                                                @if(isset($notification->data['patient_name']))
-                                                    {{ $notification->data['patient_name'] }} •
-                                                @endif
-                                                {{ $notification->created_at->diffForHumans() }}
-                                            </div>
-                                        </div>
-                                    </button>
-                                </form>
-                            @empty
-                                <div class="p-8 text-center">
-                                    <span class="text-sm font-bold text-slate-400">নতুন কোনো নোটিফিকেশন নেই।</span>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-
-                {{-- 🎯 Profile Chip & Dropdown --}}
-                <div x-data="{ openProfile: false }" class="relative inline-block text-left">
-                    <button @click="openProfile = !openProfile" @click.away="openProfile = false" type="button"
-                            class="flex items-center gap-2 p-1.5 sm:pr-4 bg-white border border-slate-200 rounded-full hover:bg-slate-50 hover:border-red-200 transition-all shadow-sm focus:outline-none">
-                        <div class="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
-                            @if(auth()->user()->profile_image)
-                                <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="Profile" class="w-full h-full object-cover" loading="lazy">
-                            @else
-                                <span class="text-slate-600 font-black text-xs sm:text-sm">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
-                            @endif
-                        </div>
-                        <span class="text-sm font-bold text-slate-800 hidden sm:block">{{ explode(' ', auth()->user()->name)[0] }}</span>
-                        <svg class="w-3.5 h-3.5 text-slate-400 transition-transform duration-200 hidden sm:block" :class="openProfile ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-
-                    <div x-show="openProfile"
-                         x-transition:enter="transition ease-out duration-200"
-                         x-transition:enter-start="opacity-0 scale-95 translate-y-2"
-                         x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                         x-transition:leave="transition ease-in duration-150"
-                         x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                         x-transition:leave-end="opacity-0 scale-95 translate-y-2"
-                         style="display: none;"
-                         class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50">
-                        <div class="px-5 py-4 bg-slate-50/50 border-b border-slate-100">
-                            <p class="text-base font-black text-slate-900 truncate">{{ auth()->user()->name }}</p>
-                            <p class="text-xs font-semibold text-slate-500 mt-0.5 flex items-center gap-1.5">
-                                @if(auth()->user()->role?->value === 'org_admin' || auth()->user()->role === 'org_admin')
-                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span> অর্গানাইজেশন অ্যাডমিন
-                                @else
-                                    <span class="w-2 h-2 rounded-full bg-red-500"></span> ডোনার •
-                                    <span class="text-red-600 font-bold">{{ auth()->user()->blood_group?->value ?? auth()->user()->blood_group ?? 'N/A' }}</span>
-                                @endif
-                            </p>
-                        </div>
-                        <div class="py-2 border-b border-slate-100">
-                            @php
-                                $dashboardRoute = 'dashboard';
-                                if(auth()->user()->role === 'org_admin' || auth()->user()->role?->value === 'org_admin') {
-                                    $dashboardRoute = 'org.dashboard';
-                                } elseif(auth()->user()->role === 'admin' || auth()->user()->role?->value === 'admin') {
-                                    $dashboardRoute = 'admin.dashboard';
-                                }
-                            @endphp
-                            <a href="{{ route($dashboardRoute) }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-red-600 transition-colors">
-                                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
-                                ড্যাশবোর্ড
-                            </a>
-                            <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-5 py-2.5 text-sm font-bold text-slate-700 hover:bg-slate-50 hover:text-red-600 transition-colors">
-                                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                অ্যাকাউন্ট সেটিংস
-                            </a>
-                        </div>
-                        <div class="py-2 bg-red-50/30">
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit" class="w-full text-left flex items-center gap-3 px-5 py-2.5 text-sm font-black text-red-600 hover:bg-red-50 transition-colors">
-                                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                                    লগআউট করুন
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            @endauth
-
-            {{-- Mobile Hamburger --}}
-            <button class="md:hidden p-2 text-slate-500 hover:text-red-600 rounded-lg hover:bg-slate-50 transition"
-                    onclick="document.getElementById('mobile-nav-home').classList.toggle('hidden')">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-            </button>
-        </div>
-    </div>
-
-    {{-- Mobile Nav Menu --}}
-    <div id="mobile-nav-home" class="hidden md:hidden border-t border-slate-100 bg-white/95 backdrop-blur-md px-4 pb-4 pt-2 space-y-1">
-        <a href="{{ route('home') }}" class="block py-2.5 font-bold text-red-600 text-sm border-b border-slate-50">হোম</a>
-        @auth
-            <a href="{{ route('requests.index') }}" class="block py-2.5 font-semibold text-slate-700 hover:text-red-600 text-sm transition border-b border-slate-50">রক্ত দিন</a>
-        @endauth
-        @guest
-            <a href="{{ route('public.requests.index') }}" class="block py-2.5 font-semibold text-slate-700 hover:text-red-600 text-sm transition border-b border-slate-50">রক্ত দিন</a>
-        @endguest
-        <a href="{{ route('search') }}" class="block py-2.5 font-semibold text-slate-700 hover:text-red-600 text-sm transition border-b border-slate-50">স্মার্ট ডোনার সার্চ</a>
-        <a href="{{ route('leaderboard') }}" class="block py-2.5 font-semibold text-slate-700 hover:text-red-600 text-sm transition border-b border-slate-50">লিডারবোর্ড</a>
-        <a href="{{ route('blog.index') }}" class="block py-2.5 font-semibold text-slate-700 hover:text-red-600 text-sm transition border-b border-slate-50">Blog</a>
-        @guest
-            <div class="flex gap-3 pt-3">
-                <a href="{{ route('login') }}" class="flex-1 text-center py-2.5 border border-slate-200 rounded-lg font-semibold text-slate-700 text-sm hover:border-red-200 transition">লগইন</a>
-                <a href="{{ route('register') }}" class="flex-1 text-center py-2.5 bg-red-600 text-white rounded-lg font-extrabold text-sm hover:bg-red-700 transition">রেজিস্টার</a>
-            </div>
-        @endguest
-    </div>
-</header>
-
-
-{{-- ══════════════════════════════════════════════════════
-     HERO SECTION
-══════════════════════════════════════════════════════ --}}
-<section class="relative bg-white overflow-hidden">
-    <div class="absolute inset-0 bg-gradient-to-b from-red-50 via-white to-white"></div>
-    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10 pt-16 pb-20 lg:pt-24 lg:pb-24">
-        <div class="max-w-4xl mx-auto text-center">
-                <span class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-red-100">
-                    ইমার্জেন্সি ব্লাড ডোনেশন নেটওয়ার্ক
-                </span>
-                <h1 class="mt-6 text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 leading-[1.12] tracking-tight">
-                    জরুরি মুহূর্তে রক্তের সন্ধানে—<span class="text-red-600">আমরা আছি আপনার পাশে</span>
-                </h1>
-                <p class="mt-6 text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto font-medium">
-                    বাংলাদেশের সবচেয়ে বিশ্বাসযোগ্য NID-ভেরিফাইড ডোনার নেটওয়ার্ক — জরুরি মুহূর্তে সঠিক রক্ত, সঠিক সময়ে।
-                </p>
-
-                <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="{{ route('search') }}"
-                       class="inline-flex items-center justify-center bg-red-600 text-white px-7 py-3.5 rounded-lg font-extrabold shadow-sm shadow-red-200 hover:bg-red-700 transition gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        এখনই ডোনার খুঁজুন
-                    </a>
-                    <a href="{{ route('requests.create') }}"
-                       class="inline-flex items-center justify-center border-2 border-red-600 text-red-600 px-7 py-3.5 rounded-lg font-extrabold hover:bg-red-50 transition">
-                        জরুরি রক্তের অনুরোধ
-                    </a>
-                </div>
-
-                <div class="mt-10 bg-white rounded-2xl shadow-md ring-1 ring-black/5 border border-slate-100 p-6 md:p-8 text-left">
-                    <h2 class="text-lg font-extrabold text-slate-800 mb-4 text-center">দ্রুত ডোনার অনুসন্ধান করুন</h2>
-                    <form action="{{ route('search') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                        <select id="division_select" name="division" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200">
-                            <option value="">বিভাগ নির্বাচন</option>
-                            @if(isset($divisions))
-                                @foreach($divisions as $division)
-                                    <option value="{{ $division->id }}">{{ $division->name }}</option>
-                                @endforeach
-                            @endif
-                        </select>
-                        <select id="district_select" name="district" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200" disabled>
-                            <option value="">জেলা নির্বাচন</option>
-                        </select>
-                        <select id="upazila_select" name="upazila" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200" disabled>
-                            <option value="">উপজেলা/এরিয়া</option>
-                        </select>
-                        <select name="blood_group" class="p-3.5 border border-slate-200 rounded-lg bg-slate-50 text-slate-700 font-semibold focus:outline-none focus:border-red-500 focus:ring-red-200" required>
-                            <option value="">রক্তের গ্রুপ</option>
-                            <option value="A+">A+</option><option value="A-">A-</option>
-                            <option value="B+">B+</option><option value="B-">B-</option>
-                            <option value="AB+">AB+</option><option value="AB-">AB-</option>
-                            <option value="O+">O+</option><option value="O-">O-</option>
-                        </select>
-                        <button type="submit" class="bg-red-600 text-white font-extrabold rounded-lg py-3.5 hover:bg-red-700 transition shadow-sm shadow-red-200">
-                            সার্চ করুন
-                        </button>
-                    </form>
-                </div>
-        </div>
-    </div>
-</section>
-
-
-{{-- ══════════════════════════════════════════════════════
-     REQUEST FEED PREVIEW
-══════════════════════════════════════════════════════ --}}
-<section class="bg-slate-50/70 py-14 md:py-16 border-y border-slate-100">
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
-        <div class="flex items-center justify-between gap-3 mb-7">
-            <div>
-                <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">সাম্প্রতিক রক্তের অনুরোধ</h2>
-                <p class="mt-1 text-sm md:text-base text-slate-600 font-medium">জরুরি ও চলমান রিকোয়েস্টগুলো দ্রুত দেখে নিন</p>
-            </div>
-            <a href="{{ route('public.requests.index') }}"
-               class="hidden sm:inline-flex items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 transition hover:border-red-200 hover:text-red-600 hover:bg-red-50/70">
-                Show more
-            </a>
-        </div>
-
-        @if(isset($homeRequests) && $homeRequests->count() > 0)
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-5">
-                @foreach($homeRequests as $request)
-                    <x-request-feed-card :request="$request" :is-public="true" :show-requester="false" />
-                @endforeach
-            </div>
-        @else
-            <div class="rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
-                <p class="text-slate-700 font-bold">এই মুহূর্তে কোনো রক্তের অনুরোধ নেই</p>
-                <p class="mt-1 text-sm text-slate-500">কিছুক্ষণ পর আবার দেখে নিন</p>
-            </div>
-        @endif
-
-        <div class="mt-6 sm:hidden">
-            <a href="{{ route('public.requests.index') }}"
-               class="inline-flex w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-bold text-slate-700 transition hover:border-red-200 hover:text-red-600 hover:bg-red-50/70">
-                Show more
-            </a>
-        </div>
-    </div>
-</section>
-
-
-{{-- ══════════════════════════════════════════════════════
-     VALUE PROPOSITION GRID (migrated from donate page)
-══════════════════════════════════════════════════════ --}}
-<section class="relative py-20 md:py-24 bg-gradient-to-b from-white via-rose-50/35 to-white overflow-hidden" id="features">
-    <div class="absolute -top-24 -left-20 w-72 h-72 bg-red-100/60 blur-3xl rounded-full pointer-events-none"></div>
-    <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-rose-100/70 blur-3xl rounded-full pointer-events-none"></div>
-
-    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
-        <div class="text-center mb-14 md:mb-16">
-            <span class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-red-100 shadow-sm shadow-red-100/70">
-                কেন আমরা আলাদা
-            </span>
-            <h2 class="mt-4 text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">রক্তদূত বেছে নেওয়ার কারণ</h2>
-            <p class="mt-3 text-slate-600 font-medium max-w-xl mx-auto">আমাদের প্ল্যাটফর্ম বিশ্বাস, প্রযুক্তি এবং সম্মানের ওপর নির্মিত।</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-7">
-            {{-- NID Verified Trust --}}
-            <div class="group relative rounded-3xl border border-red-100/70 bg-white/95 backdrop-blur-sm p-7 md:p-8 shadow-[0_8px_28px_rgba(15,23,42,0.08)] hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-red-500 to-rose-400"></div>
-                <div class="absolute -top-14 -right-10 w-28 h-28 bg-red-100/70 rounded-full blur-2xl opacity-70 group-hover:opacity-100 transition"></div>
-                <div class="relative w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mb-6 border border-red-100 shadow-sm">
-                    <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                </div>
-                <h3 class="text-xl font-extrabold text-slate-900 mb-3 tracking-tight">NID Verified Trust</h3>
-                <p class="text-slate-600 font-medium leading-relaxed">আমাদের প্ল্যাটফর্মের ডোনাররা জাতীয় পরিচয়পত্র দ্বারা ভেরিফাইড। আপনার তথ্য শতভাগ সুরক্ষিত ও নির্ভরযোগ্য থাকবে।</p>
-            </div>
-
-            {{-- Dynamic Smart Card --}}
-            <div class="group relative rounded-3xl border border-red-100/70 bg-white/95 backdrop-blur-sm p-7 md:p-8 shadow-[0_8px_28px_rgba(15,23,42,0.08)] hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-rose-500 to-red-500"></div>
-                <div class="absolute -top-14 -right-10 w-28 h-28 bg-rose-100/70 rounded-full blur-2xl opacity-70 group-hover:opacity-100 transition"></div>
-                <div class="relative w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mb-6 border border-red-100 shadow-sm">
-                    <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                    </svg>
-                </div>
-                <h3 class="text-xl font-extrabold text-slate-900 mb-3 tracking-tight">Dynamic Smart Card</h3>
-                <p class="text-slate-600 font-medium leading-relaxed">ভেরিফায়েড ডোনারদের জন্য ডিজিটাল QR স্মার্ট কার্ড, যার মাধ্যমে আপনার রক্তদানের স্ট্যাটাস সহজেই প্রমাণ করা যাবে।</p>
-            </div>
-
-            {{-- Gamification Badges --}}
-            <div class="group relative rounded-3xl border border-red-100/70 bg-white/95 backdrop-blur-sm p-7 md:p-8 shadow-[0_8px_28px_rgba(15,23,42,0.08)] hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)] hover:-translate-y-1 transition-all duration-300 overflow-hidden">
-                <div class="absolute inset-x-0 top-0 h-1.5 bg-gradient-to-r from-red-400 to-rose-500"></div>
-                <div class="absolute -top-14 -right-10 w-28 h-28 bg-red-100/70 rounded-full blur-2xl opacity-70 group-hover:opacity-100 transition"></div>
-                <div class="relative w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mb-6 border border-red-100 shadow-sm">
-                    <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                    </svg>
-                </div>
-                <h3 class="text-xl font-extrabold text-slate-900 mb-3 tracking-tight">Gamification Badges</h3>
-                <p class="text-slate-600 font-medium leading-relaxed">রক্তদানের মাধ্যমে পয়েন্ট অর্জন করুন এবং প্ল্যাটিনাম, গোল্ডেন সহ বিভিন্ন আকর্ষণীয় রিবন ও ব্যাজ আনলক করুন।</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-{{-- ══════════════════════════════════════════════════════
-     SOCIAL PROOF (migrated from donate page)
-══════════════════════════════════════════════════════ --}}
-<section class="relative py-20 md:py-24 bg-gradient-to-b from-slate-50 via-rose-50/35 to-white overflow-hidden" id="social-proof">
-    <div class="absolute -top-24 -left-20 h-72 w-72 rounded-full bg-red-100/70 blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-16 -right-16 h-80 w-80 rounded-full bg-rose-100/70 blur-3xl pointer-events-none"></div>
-
-    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 text-center">
-        <p class="text-slate-600 text-lg sm:text-2xl font-bold mb-6">আমাদের প্ল্যাটফর্মে এখন পর্যন্ত</p>
-        @php
-            $engNum = ['0','1','2','3','4','5','6','7','8','9'];
-            $bngNum = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
-            $vDonorsBn = str_replace($engNum, $bngNum, $verifiedDonors ?? 6);
-            $lSavedBn  = str_replace($engNum, $bngNum, $livesSaved ?? 120);
-        @endphp
-        <h2 class="text-3xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-tight tracking-tight">
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-rose-500">{{ $vDonorsBn }}+</span>
-            ডোনার যাচাইকৃত হয়েছেন এবং <br class="hidden lg:block"/>
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 inline-block mt-2 sm:mt-0">{{ $lSavedBn }}+</span>
-            জীবন বাঁচানো হয়েছে।
-        </h2>
-
-        <div class="mt-14 grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
-            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-8 shadow-[0_8px_30px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
-                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-red-500 to-rose-400"></div>
-                <div class="text-4xl font-black text-red-600">৫০০+</div>
-                <div class="text-slate-600 mt-2 font-bold">নিবন্ধিত ডোনার</div>
-            </div>
-            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-8 shadow-[0_8px_30px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
-                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-emerald-500 to-teal-500"></div>
-                <div class="text-4xl font-black text-emerald-600">১২০+</div>
-                <div class="text-slate-600 mt-2 font-bold">সফল রক্ত সংযোগ</div>
-            </div>
-            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-8 shadow-[0_8px_30px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
-                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-blue-500 to-indigo-500"></div>
-                <div class="text-4xl font-black text-blue-600">৬৪</div>
-                <div class="text-slate-600 mt-2 font-bold">জেলায় সক্রিয় ডোনার</div>
-            </div>
-        </div>
-
-        <p class="mt-8 text-slate-500 text-sm font-medium">
-            📊 তথ্য ভেরিফাইড প্রোফাইলের ভিত্তিতে গণনা করা হয়েছে এবং নিয়মিত আপডেট হয়।
-        </p>
-    </div>
-</section>
-
-
-{{-- ══════════════════════════════════════════════════════
-     LEADERBOARD PREVIEW (Real data — kept)
-══════════════════════════════════════════════════════ --}}
-<section id="leaderboard-preview" class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-10 py-20">
-
-    <div class="text-center mb-12">
-        <span class="inline-flex items-center gap-2 bg-amber-50 text-amber-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-amber-100">🏆 লিডারবোর্ড</span>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-4">আমাদের <span class="text-red-600">সেরা রক্তবীর</span></h2>
-        <p class="text-slate-500 mt-3 font-medium max-w-lg mx-auto">রক্তদাতাদের সম্মান দিতে আমাদের লিডারবোর্ড — যারা বারবার জীবন বাঁচিয়েছেন তাদের বিশেষ স্বীকৃতি।</p>
-    </div>
-
-    @if(isset($topDonors) && $topDonors->count() > 0)
-    <div class="grid grid-cols-3 gap-4 sm:gap-6 items-end mb-8">
-
-        {{-- ২য় স্থান (বাম) --}}
-        @if($topDonors->count() >= 2)
-        @php $d2 = $topDonors[1]; @endphp
-        <div class="flex flex-col items-center group">
-            <div class="relative mb-3">
-                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br from-slate-300 to-slate-400 flex items-center justify-center text-white font-black text-2xl shadow-lg group-hover:scale-105 transition-transform duration-300 overflow-hidden border-2 border-white">
-                    @if($d2->profile_image)
-                        <img src="{{ asset('storage/' . $d2->profile_image) }}" class="w-full h-full object-cover" alt="{{ $d2->name }}" loading="lazy">
-                    @else
-                        {{ mb_substr($d2->name, 0, 1) }}
-                    @endif
-                </div>
-                <span class="absolute -top-3 -right-2 text-xl drop-shadow">🥈</span>
-            </div>
-            <div class="text-center mb-2 w-full px-1">
-                <p class="font-black text-slate-800 text-xs sm:text-sm truncate">{{ explode(' ', $d2->name)[0] }}</p>
-                <p class="text-xs text-red-600 font-bold">{{ $d2->blood_group?->value ?? $d2->blood_group ?? '?' }}</p>
-                @if($d2->badges->count() > 0)
-                    <div class="flex justify-center gap-0.5 mt-1">@foreach($d2->badges->take(2) as $b)<span class="text-sm" title="{{ $b->bn_name ?? $b->name }}">{{ $b->emoji ?? $b->icon }}</span>@endforeach</div>
-                @endif
-            </div>
-            <div class="h-28 sm:h-36 w-full rounded-t-2xl bg-gradient-to-b from-slate-300 to-slate-500 flex flex-col items-center justify-start pt-3 shadow-lg">
-                <p class="text-white font-black text-xl">{{ $d2->total_verified_donations ?? 0 }}</p>
-                <p class="text-white/80 text-[10px] sm:text-xs font-semibold">রক্তদান</p>
-            </div>
-        </div>
-        @endif
-
-        {{-- ১ম স্থান (মাঝে) --}}
-        @php $d1 = $topDonors[0]; @endphp
-        <div class="flex flex-col items-center group">
-            <div class="relative mb-3">
-                <div class="absolute inset-0 rounded-2xl bg-yellow-400 opacity-30 blur-md scale-110"></div>
-                <div class="relative w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-br from-yellow-300 to-amber-500 flex items-center justify-center text-white font-black text-3xl shadow-xl group-hover:scale-105 transition-transform duration-300 overflow-hidden border-2 border-yellow-200">
-                    @if($d1->profile_image)
-                        <img src="{{ asset('storage/' . $d1->profile_image) }}" class="w-full h-full object-cover" alt="{{ $d1->name }}" loading="lazy">
-                    @else
-                        {{ mb_substr($d1->name, 0, 1) }}
-                    @endif
-                </div>
-                <span class="absolute -top-4 -right-2 text-2xl drop-shadow-lg">👑</span>
-            </div>
-            <div class="text-center mb-2 w-full px-1">
-                <p class="font-black text-slate-900 text-sm sm:text-base truncate">{{ explode(' ', $d1->name)[0] }}</p>
-                <p class="text-xs text-red-600 font-black">{{ $d1->blood_group?->value ?? $d1->blood_group ?? '?' }}</p>
-                @if($d1->badges->count() > 0)
-                    <div class="flex justify-center gap-0.5 mt-1">@foreach($d1->badges->take(3) as $b)<span class="text-base" title="{{ $b->bn_name ?? $b->name }}">{{ $b->emoji ?? $b->icon }}</span>@endforeach</div>
-                @endif
-                @if(($d1->total_verified_donations ?? 0) >= 20 || ($d1->points ?? 0) >= 1500)
-                    <span class="inline-block mt-1 text-[10px] font-black text-purple-700 bg-purple-100 border border-purple-200 rounded-full px-2 py-0.5 animate-pulse">✨ Platinum</span>
-                @endif
-            </div>
-            <div class="h-40 sm:h-48 w-full rounded-t-2xl bg-gradient-to-b from-yellow-300 to-amber-500 flex flex-col items-center justify-start pt-3 shadow-xl">
-                <p class="text-white font-black text-2xl sm:text-3xl">{{ $d1->total_verified_donations ?? 0 }}</p>
-                <p class="text-white/80 text-xs font-semibold">রক্তদান</p>
-                <p class="text-white/70 text-[10px] font-bold mt-1">{{ number_format($d1->points ?? 0) }} pts</p>
-            </div>
-        </div>
-
-        {{-- ৩য় স্থান (ডান) --}}
-        @if($topDonors->count() >= 3)
-        @php $d3 = $topDonors[2]; @endphp
-        <div class="flex flex-col items-center group">
-            <div class="relative mb-3">
-                <div class="w-14 h-14 sm:w-18 sm:h-18 rounded-2xl bg-gradient-to-br from-amber-600 to-amber-700 flex items-center justify-center text-white font-black text-xl shadow-lg group-hover:scale-105 transition-transform duration-300 overflow-hidden border-2 border-white">
-                    @if($d3->profile_image)
-                        <img src="{{ asset('storage/' . $d3->profile_image) }}" class="w-full h-full object-cover" alt="{{ $d3->name }}" loading="lazy">
-                    @else
-                        {{ mb_substr($d3->name, 0, 1) }}
-                    @endif
-                </div>
-                <span class="absolute -top-3 -right-2 text-xl drop-shadow">🥉</span>
-            </div>
-            <div class="text-center mb-2 w-full px-1">
-                <p class="font-black text-slate-800 text-xs sm:text-sm truncate">{{ explode(' ', $d3->name)[0] }}</p>
-                <p class="text-xs text-red-600 font-bold">{{ $d3->blood_group?->value ?? $d3->blood_group ?? '?' }}</p>
-                @if($d3->badges->count() > 0)
-                    <div class="flex justify-center gap-0.5 mt-1">@foreach($d3->badges->take(2) as $b)<span class="text-sm" title="{{ $b->bn_name ?? $b->name }}">{{ $b->emoji ?? $b->icon }}</span>@endforeach</div>
-                @endif
-            </div>
-            <div class="h-24 sm:h-32 w-full rounded-t-2xl bg-gradient-to-b from-amber-600 to-amber-800 flex flex-col items-center justify-start pt-3 shadow-lg">
-                <p class="text-white font-black text-xl">{{ $d3->total_verified_donations ?? 0 }}</p>
-                <p class="text-white/80 text-[10px] sm:text-xs font-semibold">রক্তদান</p>
-            </div>
-        </div>
-        @endif
-
-    </div>
-    @else
-    <div class="text-center py-12 bg-white rounded-2xl border border-slate-100 mb-8">
-        <div class="text-5xl mb-3">🩸</div>
-        <p class="text-slate-500 font-semibold">এখনও কোনো শীর্ষ ডোনার নেই।</p>
-        <p class="text-slate-400 text-sm mt-1">রক্তদান করুন এবং তালিকায় প্রথম হন!</p>
-    </div>
-    @endif
-
-    <div class="text-center mt-14 sm:mt-16">
-        <a href="{{ route('leaderboard') }}"
-        class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-8 py-3.5 rounded-xl shadow-sm transition-all hover:shadow-md hover:-translate-y-0.5">
-            লিডারবোর্ড দেখুন
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-        </a>
-    </div>
-</section>
-
-
-{{-- ══════════════════════════════════════════════════════
-     HOW IT WORKS
-══════════════════════════════════════════════════════ --}}
-<section class="relative py-20 md:py-24 bg-gradient-to-b from-white via-rose-50/30 to-white overflow-hidden" id="how-it-works">
-    <div class="absolute -top-20 -right-24 h-72 w-72 rounded-full bg-red-100/70 blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-20 -left-24 h-72 w-72 rounded-full bg-rose-100/70 blur-3xl pointer-events-none"></div>
-
-    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
-        <div class="text-center mb-14 md:mb-16">
-            <span class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-red-100 shadow-sm shadow-red-100/70">
-                সহজ প্রক্রিয়া
-            </span>
-            <h2 class="mt-4 text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">রক্তদূত কীভাবে কাজ করে?</h2>
-            <p class="mt-3 text-slate-600 font-medium max-w-xl mx-auto">মাত্র কয়েকটি সহজ ধাপে রক্তের সংযোগ তৈরি করুন।</p>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
-            @foreach([
-                ['num' => '১', 'icon' => '🔍', 'title' => 'ডোনার সার্চ করুন', 'desc' => 'লগইন ছাড়াই রক্তের গ্রুপ ও এলাকা দিয়ে কাছের ডোনার খুঁজুন।', 'colorBg' => 'bg-red-50', 'colorText' => 'text-red-600', 'line' => 'from-red-500 to-rose-400'],
-                ['num' => '২', 'icon' => '📋', 'title' => 'রিকোয়েস্ট করুন', 'desc' => 'জরুরি রক্তের প্রয়োজনে অনলাইনে রিকোয়েস্ট পোস্ট করুন — ডোনার নিজেই সাড়া দেবেন।', 'colorBg' => 'bg-indigo-50', 'colorText' => 'text-indigo-600', 'line' => 'from-indigo-500 to-blue-500'],
-                ['num' => '৩', 'icon' => '🤝', 'title' => 'ম্যাচ হলে সংযোগ', 'desc' => 'সিস্টেম রিকোয়েস্ট ও ডোনার ম্যাচ করিয়ে দেবে — প্রাইভেসি-শিল্ডেড পদ্ধতিতে যোগাযোগ হবে।', 'colorBg' => 'bg-emerald-50', 'colorText' => 'text-emerald-600', 'line' => 'from-emerald-500 to-teal-500'],
-                ['num' => '৪', 'icon' => '🩸', 'title' => 'রক্ত দিন', 'desc' => 'রক্তদান সম্পন্ন হলে উভয়পক্ষ নিশ্চিত করুন — ডোনারের প্রোফাইলে তা রেকর্ড হয়।', 'colorBg' => 'bg-amber-50', 'colorText' => 'text-amber-600', 'line' => 'from-amber-500 to-orange-500'],
-            ] as $step)
-                <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 backdrop-blur-sm p-6 md:p-7 shadow-[0_8px_28px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
-                    <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r {{ $step['line'] }}"></div>
-                    <div class="absolute -top-10 -right-10 h-24 w-24 rounded-full bg-red-100/50 blur-2xl opacity-70 group-hover:opacity-100 transition"></div>
-
-                    <div class="relative mb-5 flex items-center justify-between">
-                        <div class="w-14 h-14 {{ $step['colorBg'] }} {{ $step['colorText'] }} rounded-2xl border border-slate-200/70 flex items-center justify-center text-2xl shadow-sm">
-                            {{ $step['icon'] }}
-                        </div>
-                        <span class="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-slate-900 px-2.5 text-xs font-black text-white">{{ $step['num'] }}</span>
-                    </div>
-
-                    <h3 class="text-lg font-extrabold text-slate-900 mb-2 tracking-tight">{{ $step['title'] }}</h3>
-                    <p class="text-slate-600 font-medium text-sm leading-relaxed">{{ $step['desc'] }}</p>
-                </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-
-
-{{-- ══════════════════════════════════════════════════════
-     PRIVACY & TRUST
-══════════════════════════════════════════════════════ --}}
-<section class="relative py-20 md:py-24 bg-gradient-to-b from-white via-red-50/25 to-white overflow-hidden" id="trust">
-    <div class="absolute -top-20 -left-24 h-72 w-72 rounded-full bg-red-100/70 blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-20 -right-24 h-72 w-72 rounded-full bg-rose-100/70 blur-3xl pointer-events-none"></div>
-
-    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
-        <div class="text-center mb-14 md:mb-16">
-            <span class="inline-flex items-center gap-2 bg-red-50 text-red-700 px-4 py-1.5 rounded-full text-sm font-extrabold tracking-wide border border-red-100 shadow-sm shadow-red-100/70">
-                🔒 নিরাপত্তা
-            </span>
-            <h2 class="mt-4 text-3xl md:text-4xl font-extrabold tracking-tight text-slate-900">প্রাইভেসি ও ট্রাস্ট</h2>
-            <p class="mt-3 text-slate-600 font-medium max-w-xl mx-auto">আপনার তথ্য সুরক্ষায় আমরা সর্বোচ্চ প্রযুক্তিগত ব্যবস্থা নিয়েছি।</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-7 shadow-[0_8px_28px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
-                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-emerald-500 to-teal-500"></div>
-                <div class="mb-4 text-3xl">🔐</div>
-                <h3 class="font-extrabold text-slate-900 text-xl mb-2 tracking-tight">ফোন নম্বর মাস্কড</h3>
-                <p class="text-slate-600 font-medium text-sm leading-relaxed">ডোনারের ফোন নম্বর সরাসরি দেখানো হয় না। একটি গণিত যাচাই চ্যালেঞ্জ পার হলে তবেই নম্বর প্রকাশ পায়।</p>
-            </div>
-
-            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-7 shadow-[0_8px_28px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
-                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-indigo-500 to-blue-500"></div>
-                <div class="mb-4 text-3xl">⚡</div>
-                <h3 class="font-extrabold text-slate-900 text-xl mb-2 tracking-tight">Rate-Limit সুরক্ষা</h3>
-                <p class="text-slate-600 font-medium text-sm leading-relaxed">স্প্যাম ও ব্রুট-ফোর্স প্রতিরোধে প্রতি মিনিটে সর্বোচ্চ নম্বর প্রকাশের অনুরোধ সীমিত রাখা হয়।</p>
-            </div>
-
-            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-7 shadow-[0_8px_28px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
-                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-amber-500 to-orange-500"></div>
-                <div class="mb-4 text-3xl">🪪</div>
-                <h3 class="font-extrabold text-slate-900 text-xl mb-2 tracking-tight">NID ভেরিফিকেশন</h3>
-                <p class="text-slate-600 font-medium text-sm leading-relaxed">ডোনারকে জাতীয় পরিচয়পত্র দিয়ে যাচাই করা হয় — অ্যানোনিমাস বা ভুয়া প্রোফাইলের সুযোগ নেই।</p>
-            </div>
-
-            <div class="group relative rounded-3xl border border-red-100/80 bg-white/95 p-7 shadow-[0_8px_28px_rgba(15,23,42,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_36px_rgba(220,38,38,0.14)]">
-                <div class="absolute inset-x-0 top-0 h-1.5 rounded-t-3xl bg-gradient-to-r from-violet-500 to-fuchsia-500"></div>
-                <div class="mb-4 text-3xl">🏥</div>
-                <h3 class="font-extrabold text-slate-900 text-xl mb-2 tracking-tight">অর্গানাইজেশন ভেরিফিকেশন</h3>
-                <p class="text-slate-600 font-medium text-sm leading-relaxed">নিবন্ধিত ব্লাড ব্যাঙ্ক ও সংগঠন ডোনারের ভেরিফিকেশনে অংশ নেয় — দ্বি-স্তরীয় নিশ্চিতকরণ।</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-{{-- ══════════════════════════════════════════════════════
-     HIGH-CONTRAST FINAL CTA
-══════════════════════════════════════════════════════ --}}
-<section class="bg-red-700 py-16 md:py-18" id="cta">
-    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-10 text-center">
-        <div class="inline-flex items-center justify-center w-14 h-14 bg-white/20 rounded-full mb-5 border border-white/30">
-            <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+{{-- ═══════════════════════════════════════════════════════════════
+     SECTION 1 — HERO (Listygo Inspired)
+═══════════════════════════════════════════════════════════════ --}}
+<section class="relative overflow-hidden bg-gradient-to-br from-[#fff5f5] via-white to-[#fff0f0] pt-16 pb-20 lg:pt-24 lg:pb-28" aria-label="হিরো সেকশন">
+    
+    {{-- Decorative Background Elements --}}
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        {{-- City/Building outline placeholder at bottom like Listygo --}}
+        <div class="absolute bottom-0 right-0 w-full md:w-1/2 opacity-[0.03]">
+            <svg viewBox="0 0 100 20" preserveAspectRatio="none" class="w-full h-32 fill-current text-slate-900">
+                <path d="M0,20 L0,10 L5,10 L5,5 L10,5 L10,15 L15,15 L15,8 L20,8 L20,20 Z M25,20 L25,12 L30,12 L30,20 Z M35,20 L35,5 L45,5 L45,20 Z M50,20 L50,15 L60,15 L60,20 Z M65,20 L65,10 L75,10 L75,20 Z M80,20 L80,5 L90,5 L90,20 Z M95,20 L95,10 L100,10 L100,20 Z"></path>
             </svg>
         </div>
-        <h2 class="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
-            আজই একটি জীবন বাঁচান
-        </h2>
-        <p class="mt-4 text-red-100 text-base sm:text-lg font-medium max-w-2xl mx-auto leading-relaxed">
-            আপনার একটি রক্তদান তিনটি প্রাণ বাঁচাতে পারে। বাংলাদেশের সবচেয়ে নির্ভরযোগ্য ভেরিফায়েড ডোনার নেটওয়ার্কে এখনই যোগ দিন।
-        </p>
-        <div class="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
-            @guest
-                <a href="{{ route('register') }}"
-                   class="inline-flex items-center justify-center bg-white text-red-700 px-7 py-3.5 rounded-xl font-extrabold text-base sm:text-lg hover:bg-red-50 transition shadow-lg gap-2">
-                    ডোনার হিসেবে যোগ দিন
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                </a>
-                <a href="{{ route('search') }}"
-                   class="inline-flex items-center justify-center bg-white/15 border border-white/30 text-white px-7 py-3.5 rounded-xl font-extrabold text-base sm:text-lg hover:bg-white/25 transition gap-2">
-                    ডোনার সার্চ করুন
-                </a>
-            @endguest
-            @auth
-                <a href="{{ route('requests.create') }}"
-                   class="inline-flex items-center justify-center bg-white text-red-700 px-7 py-3.5 rounded-xl font-extrabold text-base sm:text-lg hover:bg-red-50 transition shadow-lg gap-2">
-                    রক্তের রিকোয়েস্ট করুন
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                </a>
-                <a href="{{ route('search') }}"
-                   class="inline-flex items-center justify-center bg-white/15 border border-white/30 text-white px-7 py-3.5 rounded-xl font-extrabold text-base sm:text-lg hover:bg-white/25 transition gap-2">
-                    ডোনার সার্চ করুন
-                </a>
-            @endauth
+    </div>
+
+    <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+            
+            {{-- Left Content --}}
+            <div class="max-w-2xl">
+                <p class="text-sm font-bold text-[#FF385C] uppercase tracking-wider mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-[#FF385C]"></span>
+                    বাংলাদেশের ভেরিফায়েড ব্লাড নেটওয়ার্ক
+                </p>
+                <h1 class="text-4xl sm:text-5xl lg:text-[3.5rem] font-black text-slate-900 leading-[1.1] mb-6">
+                    সঠিক ডোনার খুঁজুন,<br>
+                    <span class="text-[#FF385C] relative">
+                        জীবন বাঁচান
+                        <svg class="absolute w-full h-3 -bottom-1 left-0 text-red-200" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0,5 Q50,10 100,5" stroke="currentColor" stroke-width="4" fill="none"/></svg>
+                    </span>
+                </h1>
+                <p class="text-lg text-slate-500 mb-8 font-medium max-w-lg">
+                    জরুরি মুহূর্তে আপনার নির্দিষ্ট এলাকায় রক্তের সন্ধানে। মাত্র কয়েক ক্লিকে খুঁজে নিন ভেরিফাইড রক্তদাতা।
+                </p>
+                
+                {{-- Horizontal Search Form (Listygo style) --}}
+                <div x-data="{
+                        districts: [],
+                        upazilas: [],
+                        loadingDistricts: false,
+                        fetchDistricts(divisionId) {
+                            this.districts = [];
+                            this.upazilas = [];
+                            if (!divisionId) return;
+                            this.loadingDistricts = true;
+                            fetch('/ajax/districts/' + divisionId)
+                                .then(r => r.json())
+                                .then(data => { this.districts = data; this.loadingDistricts = false; })
+                                .catch(() => { this.loadingDistricts = false; });
+                        }
+                    }" 
+                    class="bg-white p-2 rounded-3xl sm:rounded-full shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] mt-6 border border-slate-100 flex flex-col sm:flex-row items-center relative z-20">
+                    
+                    <form action="{{ route('search') }}" method="GET" class="flex flex-col sm:flex-row w-full items-center divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
+                        
+                        {{-- Blood Group --}}
+                        <div class="flex-1 w-full px-5 py-3 sm:py-2">
+                            <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">রক্তের গ্রুপ</label>
+                            <select name="blood_group" class="w-full bg-transparent border-none p-0 text-sm font-black text-slate-800 focus:ring-0 cursor-pointer">
+                                <option value="">সব গ্রুপ</option>
+                                @foreach(\App\Enums\BloodGroup::cases() as $bg)
+                                    <option value="{{ $bg->value }}">{{ $bg->value }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Division --}}
+                        <div class="flex-1 w-full px-5 py-3 sm:py-2">
+                            <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">বিভাগ</label>
+                            <select name="division_id" @change="fetchDistricts($event.target.value)" class="w-full bg-transparent border-none p-0 text-sm font-black text-slate-800 focus:ring-0 cursor-pointer">
+                                <option value="">সব বিভাগ</option>
+                                @foreach($divisions as $div)
+                                    <option value="{{ $div->id }}">{{ $div->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- District --}}
+                        <div class="flex-1 w-full px-5 py-3 sm:py-2">
+                            <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">জেলা</label>
+                            <select name="district_id" :disabled="districts.length === 0" class="w-full bg-transparent border-none p-0 text-sm font-black text-slate-800 focus:ring-0 cursor-pointer disabled:opacity-50">
+                                <option value="" x-text="loadingDistricts ? 'লোড হচ্ছে...' : (districts.length === 0 ? 'বিভাগ বাছুন' : 'সব জেলা')"></option>
+                                <template x-for="d in districts" :key="d.id">
+                                    <option :value="d.id" x-text="d.name"></option>
+                                </template>
+                            </select>
+                        </div>
+
+                        {{-- Button --}}
+                        <div class="w-full sm:w-auto p-2 sm:p-0 sm:pl-2 shrink-0">
+                            <button type="submit" class="w-full sm:w-auto bg-[#FF385C] hover:bg-[#E31C5F] text-white rounded-2xl sm:rounded-full px-8 py-4 text-sm font-black transition-transform hover:scale-105 whitespace-nowrap shadow-lg shadow-red-500/30 flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                সার্চ করুন
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                {{-- Quick links --}}
+                <div class="mt-8 flex flex-wrap items-center gap-3 text-sm">
+                    <span class="text-slate-400 font-bold text-xs uppercase tracking-widest">জনপ্রিয়:</span>
+                    <a href="{{ route('search', ['blood_group' => 'O+']) }}" class="bg-white border border-slate-200 px-4 py-1.5 rounded-full text-slate-700 font-black hover:border-[#FF385C] hover:text-[#FF385C] transition-colors shadow-sm">O+ পজিটিভ</a>
+                    <a href="{{ route('search', ['blood_group' => 'A+']) }}" class="bg-white border border-slate-200 px-4 py-1.5 rounded-full text-slate-700 font-black hover:border-[#FF385C] hover:text-[#FF385C] transition-colors shadow-sm">A+ পজিটিভ</a>
+                    <a href="{{ route('search', ['blood_group' => 'B+']) }}" class="bg-white border border-slate-200 px-4 py-1.5 rounded-full text-slate-700 font-black hover:border-[#FF385C] hover:text-[#FF385C] transition-colors shadow-sm">B+ পজিটিভ</a>
+                </div>
+
+            </div>
+
+            {{-- Right Image Collage (Listygo style) --}}
+            <div class="hidden lg:block relative h-[550px] w-full">
+                {{-- Decorative blobs --}}
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-red-100/50 rounded-full blur-3xl z-0"></div>
+                
+                {{-- Main Left Tall Image --}}
+                <div class="absolute right-[50%] top-10 w-[240px] h-[340px] rounded-[100px] border-8 border-white shadow-2xl overflow-hidden z-10 animate-[float_6s_ease-in-out_infinite]">
+                    <img src="https://images.unsplash.com/photo-1538108149393-cebb47cdf141?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Blood Donation" class="w-full h-full object-cover">
+                </div>
+                
+                {{-- Top Right Circle --}}
+                <div class="absolute right-[5%] top-0 w-[200px] h-[200px] rounded-full border-8 border-white shadow-2xl overflow-hidden z-20 animate-[float_7s_ease-in-out_infinite_reverse]">
+                    <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Medical Lab" class="w-full h-full object-cover">
+                </div>
+                
+                {{-- Bottom Right Circle --}}
+                <div class="absolute right-[10%] bottom-16 w-[220px] h-[220px] rounded-full border-8 border-white shadow-2xl overflow-hidden z-30 animate-[float_5s_ease-in-out_infinite]">
+                    <img src="https://images.unsplash.com/photo-1615461066841-6116e61058f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Doctor" class="w-full h-full object-cover object-top">
+                </div>
+                
+                {{-- Accent Icon --}}
+                <div class="absolute top-20 right-[55%] text-[#FF385C] animate-pulse">
+                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                </div>
+
+                {{-- Floating Stat Box --}}
+                <div class="absolute bottom-32 left-[5%] bg-white px-5 py-4 rounded-2xl shadow-xl flex items-center gap-4 z-40 border border-slate-50">
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <div>
+                        <div class="text-xs text-slate-400 font-extrabold uppercase tracking-wider">ভেরিফাইড ডোনার</div>
+                        <div class="text-2xl font-black text-slate-900">{{ number_format($verifiedDonors) }}+</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
-        <p class="mt-5 text-white/80 text-sm font-semibold">
-            🔒 মোবাইল নম্বর কখনো পাবলিক করা হয় না।
-        </p>
-        <p class="mt-1.5 text-red-200 text-xs font-medium">
-            বিনামূল্যে · NID ভেরিফায়েড নেটওয়ার্ক · ৬৪ জেলায় সক্রিয়
-        </p>
     </div>
 </section>
 
+{{-- ═══════════════════════════════════════════════════════════════
+     SECTION 2 — TRUST BAND (Dark background style)
+═══════════════════════════════════════════════════════════════ --}}
+<section class="bg-[#1e1e24] py-14 relative z-20">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center divide-y sm:divide-y-0 sm:divide-x divide-white/10">
+            
+            <div class="pt-4 sm:pt-0">
+                <div class="text-4xl lg:text-5xl font-black text-white mb-2"><span class="counter" data-target="{{ $totalDonors }}">0</span><span class="text-[#FF385C]">+</span></div>
+                <div class="text-sm font-bold text-slate-400">নিবন্ধিত ডোনার</div>
+            </div>
 
-{{-- ══════════════════════════════════════════════════════
-     FOOTER (shared component)
-══════════════════════════════════════════════════════ --}}
-@include('layouts.footer')
+            <div class="pt-8 sm:pt-0">
+                <div class="text-4xl lg:text-5xl font-black text-white mb-2"><span class="counter" data-target="{{ $verifiedDonors }}">0</span><span class="text-[#FF385C]">+</span></div>
+                <div class="text-sm font-bold text-slate-400">ভেরিফাইড ডোনার</div>
+            </div>
 
+            <div class="pt-8 sm:pt-0">
+                <div class="text-4xl lg:text-5xl font-black text-white mb-2"><span class="counter" data-target="{{ $totalDonations }}">0</span><span class="text-[#FF385C]">+</span></div>
+                <div class="text-sm font-bold text-slate-400">সফল রক্তদান</div>
+            </div>
 
+        </div>
+    </div>
+</section>
 
-{{-- ══════════════════════════════════════════════════════
-     AJAX LOCATION SCRIPT
-══════════════════════════════════════════════════════ --}}
+{{-- ═══════════════════════════════════════════════════════════════
+     SECTION 3 — EMERGENCY FEED (Listygo "Most Popular" style)
+═══════════════════════════════════════════════════════════════ --}}
+<section class="py-24 bg-white" aria-label="জরুরি রক্তের অনুরোধ">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        
+        {{-- Section Header --}}
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <p class="text-sm font-extrabold text-[#FF385C] uppercase tracking-widest mb-3">লাইভ আপডেট</p>
+            <h2 class="text-3xl lg:text-4xl font-black text-slate-900 mb-5">জরুরি রক্তের অনুরোধ</h2>
+            <p class="text-slate-500 font-medium">যেসব রোগীর এই মুহূর্তে জরুরি ভিত্তিতে রক্তের প্রয়োজন। আপনার একটু সাহায্য বাঁচাতে পারে একটি জীবন।</p>
+        </div>
+
+        @if($homeRequests->isNotEmpty())
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach($homeRequests as $req)
+                    @php
+                        $urgencyVal   = $req->urgency?->value ?? 'normal';
+                        $urgencyLabel = match($urgencyVal) { 'emergency' => 'অতি জরুরি', 'urgent' => 'জরুরি', default => 'সাধারণ' };
+                        $urgencyBg = match($urgencyVal) {
+                            'emergency' => 'bg-[#FF385C] text-white',
+                            'urgent'    => 'bg-amber-500 text-white',
+                            default     => 'bg-slate-800 text-white',
+                        };
+                        $bgGroup  = $req->blood_group?->value ?? '?';
+                    @endphp
+                    <div class="bg-white rounded-[2rem] overflow-hidden shadow-[0_4px_20px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.12)] transition-all duration-300 group border border-slate-100 flex flex-col">
+                        
+                        {{-- Top Banner Image area --}}
+                        <div class="h-36 bg-slate-50 relative overflow-hidden flex items-center justify-center">
+                            {{-- Placeholder pattern --}}
+                            <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#e5e7eb_2px,transparent_2px)] [background-size:16px_16px]"></div>
+                            
+                            {{-- Big Blood Group Watermark --}}
+                            <div class="text-[5rem] font-black text-slate-200/50 select-none z-0 transform -rotate-12">{{ $bgGroup }}</div>
+                            
+                            {{-- Badges --}}
+                            <div class="absolute top-5 left-5 flex gap-2 z-10">
+                                <span class="{{ $urgencyBg }} text-xs font-bold px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
+                                    @if($urgencyVal === 'emergency') <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> @endif
+                                    {{ $urgencyLabel }}
+                                </span>
+                            </div>
+                            
+                            <div class="absolute top-5 right-5 bg-white text-[#FF385C] font-black text-sm px-4 py-1.5 rounded-full shadow-sm border border-slate-100 z-10">
+                                {{ $bgGroup }}
+                            </div>
+                        </div>
+
+                        {{-- Content --}}
+                        <div class="p-8 flex-1 flex flex-col">
+                            <h3 class="text-xl font-black text-slate-900 mb-4 truncate group-hover:text-[#FF385C] transition-colors" title="{{ $req->patient_name }}">
+                                {{ $req->patient_name ?? 'রোগী' }}
+                            </h3>
+                            
+                            <div class="space-y-3 mb-6 flex-1">
+                                <p class="text-sm font-semibold text-slate-600 flex items-start gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center shrink-0 text-red-500">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                                    </span>
+                                    <span class="truncate mt-0.5">{{ $req->hospital ?? 'হাসপাতাল উল্লেখ নেই' }}</span>
+                                </p>
+                                <p class="text-sm font-semibold text-slate-600 flex items-start gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-500">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
+                                    </span>
+                                    <span class="truncate mt-0.5">{{ $req->district?->name ?? '' }}{{ $req->upazila?->name ? ', '.$req->upazila->name : '' }}</span>
+                                </p>
+                                <p class="text-sm font-bold text-slate-900 flex items-center gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-orange-50 flex items-center justify-center shrink-0 text-orange-500">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    </span>
+                                    <span class="mt-0.5">{{ $req->needed_at ? $req->needed_at->format('d M, Y (h:i A)') : 'যত দ্রুত সম্ভব' }}</span>
+                                </p>
+                            </div>
+
+                            <hr class="border-slate-100 mb-5">
+                            
+                            {{-- Footer actions --}}
+                            <div class="flex items-center justify-between">
+                                <div class="text-xs font-bold text-slate-500 flex items-center gap-2">
+                                    <span class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center">
+                                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    </span>
+                                    {{ $req->accepted_responses_count ?? 0 }} সাড়া
+                                </div>
+                                
+                                <a href="{{ route('requests.show', $req) }}" class="text-sm font-black text-[#FF385C] hover:text-white border-2 border-[#FF385C] hover:bg-[#FF385C] px-5 py-2 rounded-full transition-colors flex items-center gap-1.5">
+                                    বিস্তারিত <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            
+            <div class="mt-12 text-center">
+                <a href="{{ route('public.requests.index') }}" class="inline-flex items-center justify-center gap-2 bg-[#FF385C] hover:bg-[#E31C5F] text-white font-black text-sm px-8 py-4 rounded-full transition-transform hover:scale-105 shadow-lg shadow-red-500/30">
+                    সব অনুরোধ দেখুন 
+                </a>
+            </div>
+        @else
+            <div class="text-center py-10 bg-slate-50 rounded-3xl border border-slate-100">
+                <p class="text-slate-500 font-medium">বর্তমানে কোনো জরুরি অনুরোধ নেই।</p>
+            </div>
+        @endif
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════
+     SECTION 4 — HOW IT WORKS (Listygo "Explore" style split view)
+═══════════════════════════════════════════════════════════════ --}}
+<section class="py-24 bg-slate-50 overflow-hidden relative">
+    
+    {{-- Background decorations --}}
+    <div class="absolute right-0 top-0 w-1/3 h-full bg-[#FF385C]/5 rounded-l-[100px] z-0"></div>
+
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+            
+            {{-- Left: Image composition --}}
+            <div class="relative order-2 lg:order-1">
+                <div class="bg-white rounded-[3rem] p-4 sm:p-6 relative z-10 w-4/5 ml-auto shadow-[0_20px_50px_-10px_rgba(0,0,0,0.1)] border border-slate-100">
+                    <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hospital" class="rounded-[2rem] w-full h-auto object-cover">
+                </div>
+                <div class="absolute top-20 left-0 w-2/3 z-20 shadow-2xl rounded-[2.5rem] overflow-hidden border-8 border-white">
+                    <img src="https://images.unsplash.com/photo-1551076805-e1869033e561?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Mobile UI" class="w-full h-auto object-cover">
+                </div>
+                
+                {{-- Floating badge --}}
+                <div class="absolute bottom-10 -left-6 bg-white p-5 rounded-2xl shadow-[0_10px_30px_-10px_rgba(0,0,0,0.15)] z-30 flex items-center gap-4 border border-slate-50 animate-[float_4s_ease-in-out_infinite]">
+                    <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-black">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                    <div>
+                        <p class="text-lg font-black text-slate-900">ম্যাচিং সিস্টেম</p>
+                        <p class="text-sm font-bold text-slate-500">স্মার্ট ও দ্রুত</p>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Right: Content --}}
+            <div class="order-1 lg:order-2">
+                <p class="text-sm font-extrabold text-[#FF385C] uppercase tracking-widest mb-3">কীভাবে কাজ করে</p>
+                <h2 class="text-3xl lg:text-5xl font-black text-slate-900 mb-6 leading-tight">খুব সহজেই রক্ত<br>দিন বা নিন</h2>
+                <p class="text-lg font-medium text-slate-500 mb-10 leading-relaxed">রক্তদূত এমন একটি প্ল্যাটফর্ম যা রক্তদাতা এবং গ্রহীতার মধ্যে সরাসরি সংযোগ স্থাপন করে। কোনো মধ্যস্বত্বভোগী নেই, সম্পূর্ণ বিনামূল্যে এবং সুরক্ষিত।</p>
+                
+                <ul class="space-y-8 mb-12">
+                    <li class="flex items-start gap-5">
+                        <div class="mt-1 w-10 h-10 rounded-full bg-red-100 text-[#FF385C] flex items-center justify-center shrink-0">
+                            <span class="font-black">১</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-black text-slate-900 mb-2">প্রোফাইল তৈরি করুন</h4>
+                            <p class="text-slate-500 font-medium">আপনার রক্তের গ্রুপ, ঠিকানা এবং অন্যান্য তথ্য দিয়ে ফ্রি প্রোফাইল তৈরি করুন।</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-5">
+                        <div class="mt-1 w-10 h-10 rounded-full bg-red-100 text-[#FF385C] flex items-center justify-center shrink-0">
+                            <span class="font-black">২</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-black text-slate-900 mb-2">ডোনার খুঁজুন</h4>
+                            <p class="text-slate-500 font-medium">আমাদের স্মার্ট ফিল্টার দিয়ে আপনার নির্দিষ্ট এলাকায় উপযুক্ত ডোনার খুঁজে বের করুন।</p>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-5">
+                        <div class="mt-1 w-10 h-10 rounded-full bg-red-100 text-[#FF385C] flex items-center justify-center shrink-0">
+                            <span class="font-black">৩</span>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-black text-slate-900 mb-2">জীবন বাঁচান</h4>
+                            <p class="text-slate-500 font-medium">সরাসরি কল করুন বা প্ল্যাটফর্মের মাধ্যমে সাড়া দিন এবং জীবন বাঁচানোর এই মহৎ কাজে শরিক হোন।</p>
+                        </div>
+                    </li>
+                </ul>
+                
+                <a href="{{ route('register') }}" class="inline-flex items-center justify-center gap-2 bg-[#FF385C] hover:bg-[#E31C5F] text-white font-black text-sm px-8 py-4 rounded-full transition-transform hover:scale-105 shadow-lg shadow-red-500/30">
+                    আজই যুক্ত হোন <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </a>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════
+     SECTION 5 — TOP DONORS (Podium Style)
+═══════════════════════════════════════════════════════════════ --}}
+<section class="py-24 bg-[#FAFAFA]" aria-label="শীর্ষ রক্তদাতা">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <div class="inline-flex items-center justify-center gap-1.5 bg-red-50 text-[#FF385C] font-extrabold text-[11px] px-4 py-1.5 rounded-full mb-4 shadow-sm border border-red-100">
+                <span>🦸</span> রিয়েল লাইফ সুপারহিরো
+            </div>
+            <h2 class="text-3xl lg:text-4xl font-black text-slate-800 mb-4 tracking-tight">আমাদের সেরা রক্তদাতাগণ</h2>
+            <p class="text-slate-500 font-medium">প্ল্যাটফর্মে যারা সবচেয়ে বেশি মানুষের জীবন বাঁচিয়েছেন, তাদের প্রতি আমাদের কৃতজ্ঞতা।</p>
+        </div>
+
+        @if($topDonors->isNotEmpty())
+            @php
+                $orderedDonors = collect();
+                // 2nd Place (Left)
+                if($topDonors->has(1)) $orderedDonors->push(['donor' => $topDonors[1], 'rank' => 2, 'emoji' => '🥈', 'label' => '২য় স্থান']);
+                // 1st Place (Center)
+                if($topDonors->has(0)) $orderedDonors->push(['donor' => $topDonors[0], 'rank' => 1, 'emoji' => '🥇', 'label' => '১ম স্থান']);
+                // 3rd Place (Right)
+                if($topDonors->has(2)) $orderedDonors->push(['donor' => $topDonors[2], 'rank' => 3, 'emoji' => '🥉', 'label' => '৩য় স্থান']);
+            @endphp
+
+            <div class="flex flex-col lg:flex-row items-end justify-center gap-6 lg:gap-8 mt-12 px-4">
+                @foreach($orderedDonors as $item)
+                    @php
+                        $d = $item['donor'];
+                        $rank = $item['rank'];
+                        $initial = mb_strtoupper(mb_substr($d->name, 0, 1));
+                        
+                        $isFirst = $rank === 1;
+                        
+                        // Dynamic Classes based on rank
+                        $cardClasses = $isFirst 
+                            ? "border-[#FACC15] shadow-[0_15px_50px_-10px_rgba(251,191,36,0.3)] z-10 scale-100 lg:scale-110 pb-8 pt-12" 
+                            : "border-slate-100 shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] scale-100 pb-6 pt-10 mt-8 lg:mt-0";
+                            
+                        $avatarBorder = match($rank) {
+                            1 => "border-[#FACC15] text-[#FACC15]",
+                            2 => "border-slate-300 text-slate-400",
+                            3 => "border-orange-300 text-orange-400",
+                            default => "border-slate-200"
+                        };
+                    @endphp
+                    
+                    <div class="bg-white rounded-[2rem] px-6 w-full max-w-sm mx-auto lg:mx-0 flex flex-col items-center relative border-2 {{ $cardClasses }} transition-transform duration-300 hover:-translate-y-2">
+                        
+                        {{-- Floating Rank Badge --}}
+                        <div class="absolute -top-4 bg-slate-900 text-white text-xs font-black px-5 py-1.5 rounded-full flex items-center gap-1.5 shadow-md border-[3px] border-white">
+                            <span>{{ $item['emoji'] }}</span> {{ $item['label'] }}
+                        </div>
+                        
+                        {{-- Avatar Circle --}}
+                        <div class="w-24 h-24 rounded-full border-[3px] {{ $avatarBorder }} flex items-center justify-center text-4xl font-black mb-5 bg-white shadow-sm">
+                            {{ $initial }}
+                        </div>
+                        
+                        {{-- Name --}}
+                        <h3 class="text-xl font-black text-slate-900 text-center mb-3 truncate w-full">{{ $d->name }}</h3>
+                        
+                        {{-- Blood Group Pill --}}
+                        @if($d->blood_group)
+                        <div class="bg-red-50 text-[#FF385C] font-black text-[10px] px-3 py-1 rounded-md mb-6 uppercase tracking-widest border border-red-100">
+                            {{ $d->blood_group?->value ?? $d->blood_group }} ডোনার
+                        </div>
+                        @else
+                        <div class="h-6 mb-6"></div>
+                        @endif
+                        
+                        {{-- Stats Box --}}
+                        <div class="w-full bg-[#F8FAFC] border border-slate-100 rounded-2xl p-4 flex items-center divide-x divide-slate-200 mb-6">
+                            <div class="flex-1 text-center">
+                                <div class="text-xl font-black text-slate-800">{{ $d->total_verified_donations ?? 0 }}</div>
+                                <div class="text-[10px] font-bold text-slate-400 mt-1">রক্তদান</div>
+                            </div>
+                            <div class="flex-1 text-center">
+                                <div class="text-xl font-black text-slate-800">{{ number_format($d->points ?? 0) }}</div>
+                                <div class="text-[10px] font-bold text-slate-400 mt-1">পয়েন্ট</div>
+                            </div>
+                        </div>
+                        
+                        {{-- Medals/Badges (Tiny versions) --}}
+                        <div class="flex gap-2 justify-center h-6">
+                            @if($d->badges->isNotEmpty())
+                                @foreach($d->badges->take(3) as $badge)
+                                    @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
+                                    <span class="text-lg drop-shadow-sm hover:scale-110 transition-transform cursor-help" title="{{ $bd['bn'] }}">{{ $bd['emoji'] }}</span>
+                                @endforeach
+                            @else
+                                <span class="text-lg opacity-30 grayscale">🎖️</span>
+                                <span class="text-lg opacity-30 grayscale">🎖️</span>
+                                <span class="text-lg opacity-30 grayscale">🎖️</span>
+                            @endif
+                        </div>
+                        
+                    </div>
+                @endforeach
+            </div>
+            
+            <div class="mt-16 text-center">
+                <a href="{{ route('leaderboard') }}" class="inline-flex items-center justify-center gap-2 bg-white border-2 border-slate-100 hover:border-slate-300 text-slate-700 font-bold text-sm px-8 py-4 rounded-full transition-all shadow-sm hover:shadow-md group">
+                    সম্পূর্ণ লিডারবোর্ড দেখুন 
+                    <svg class="w-4 h-4 text-slate-400 group-hover:text-slate-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+        @endif
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════
+     SECTION 6 — BLOG (Listygo Latest Blog style)
+═══════════════════════════════════════════════════════════════ --}}
+<section class="py-24 bg-slate-50 border-t border-slate-200/50">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <p class="text-sm font-extrabold text-[#FF385C] uppercase tracking-widest mb-3">সংবাদ ও নিবন্ধ</p>
+            <h2 class="text-3xl lg:text-4xl font-black text-slate-900 mb-4">সর্বশেষ ব্লগ পোস্ট</h2>
+        </div>
+
+        @if($recentPosts->isNotEmpty())
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @foreach($recentPosts as $post)
+                    <div class="group bg-white rounded-[2rem] p-4 border border-slate-100 shadow-sm hover:shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)] transition-all duration-300">
+                        <div class="rounded-[1.5rem] overflow-hidden mb-6 relative h-56 bg-slate-100">
+                            {{-- Placeholder image --}}
+                            <div class="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300 group-hover:scale-105 transition-transform duration-500"></div>
+                            
+                            @if($post->category?->name)
+                                <div class="absolute top-4 left-4 bg-[#FF385C] text-white text-xs font-black tracking-wider px-4 py-2 rounded-full shadow-md z-10">
+                                    {{ $post->category->name }}
+                                </div>
+                            @endif
+                        </div>
+                        
+                        <div class="px-2">
+                            <div class="flex items-center gap-4 text-xs font-bold text-slate-400 mb-3">
+                                <span class="flex items-center gap-1.5">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                    {{ optional($post->published_at ?? $post->created_at)->format('d M, Y') }}
+                                </span>
+                            </div>
+                            
+                            <h3 class="text-xl font-black text-slate-900 mb-4 group-hover:text-[#FF385C] transition-colors line-clamp-2 leading-snug">
+                                <a href="{{ route('blog.show', $post->slug) }}" class="focus:outline-none focus:underline">
+                                    {{ $post->title }}
+                                </a>
+                            </h3>
+                            
+                            <a href="{{ route('blog.show', $post->slug) }}" class="inline-flex items-center gap-2 text-sm font-black text-slate-700 group-hover:text-[#FF385C] transition-colors">
+                                আরও পড়ুন <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+            
+            <div class="mt-12 text-center">
+                <a href="{{ route('blog.index') }}" class="inline-block border-2 border-slate-200 hover:border-slate-900 text-slate-700 hover:text-white hover:bg-slate-900 font-black text-sm px-8 py-4 rounded-full transition-all">
+                    সব পোস্ট দেখুন
+                </a>
+            </div>
+        @else
+            <div class="text-center py-10">
+                <p class="text-slate-500 font-medium">এখনো কোনো নিবন্ধ প্রকাশিত হয়নি।</p>
+            </div>
+        @endif
+        
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════
+     SECTION 7 — BOTTOM BANNER (Listygo App Banner style)
+═══════════════════════════════════════════════════════════════ --}}
+<section class="bg-[#FF385C] relative overflow-hidden">
+    {{-- Background pattern --}}
+    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 32px 32px;"></div>
+    <div class="absolute -top-64 -right-64 w-[500px] h-[500px] bg-white opacity-5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-64 -left-64 w-[500px] h-[500px] bg-black opacity-10 rounded-full blur-3xl pointer-events-none"></div>
+    
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative z-10">
+        <div class="grid md:grid-cols-2 items-center gap-12">
+            <div class="text-white text-center md:text-left">
+                <p class="text-sm font-extrabold text-red-200 uppercase tracking-widest mb-3">সবসময় সাথে থাকুন</p>
+                <h2 class="text-4xl lg:text-5xl font-black mb-6 leading-tight">জরুরি মুহূর্তে<br>আপনার পাশে</h2>
+                <p class="text-red-100 font-medium mb-10 text-lg max-w-md mx-auto md:mx-0">আমাদের প্ল্যাটফর্ম মোবাইল থেকেও সমানভাবে ব্যবহারযোগ্য। যেকোনো সময়, যেকোনো স্থানে ডোনার খুঁজুন।</p>
+                
+                <div class="flex flex-wrap justify-center md:justify-start gap-4">
+                    <a href="{{ route('search') }}" class="bg-white text-[#FF385C] font-black px-8 py-4 rounded-full shadow-xl hover:shadow-2xl hover:bg-slate-50 transition-all flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        ডোনার খুঁজুন
+                    </a>
+                    <a href="{{ route('register') }}" class="bg-slate-900 text-white font-black px-8 py-4 rounded-full shadow-xl hover:shadow-2xl hover:bg-black transition-all">
+                        অ্যাকাউন্ট খুলুন
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hidden md:flex justify-center relative">
+                {{-- Mockup image placeholder --}}
+                <div class="w-72 h-[500px] bg-white rounded-[2.5rem] border-8 border-slate-900 shadow-2xl mx-auto -mb-40 relative overflow-hidden transform rotate-6 hover:rotate-0 transition-transform duration-500">
+                    <div class="absolute top-0 inset-x-0 h-7 bg-slate-900 rounded-b-2xl w-1/2 mx-auto z-20"></div>
+                    
+                    {{-- App UI Mockup --}}
+                    <div class="p-5 pt-10 bg-slate-50 h-full relative z-10">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-500">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                            </div>
+                            <div class="w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center">
+                                <div class="w-4 h-4 bg-slate-200 rounded-full"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="w-3/4 h-8 bg-slate-200 rounded-lg mb-2"></div>
+                        <div class="w-1/2 h-4 bg-slate-200 rounded-lg mb-6"></div>
+                        
+                        <div class="space-y-4">
+                            <div class="w-full h-28 bg-white rounded-2xl shadow-sm border border-slate-100 flex p-3 gap-3">
+                                <div class="w-1/3 h-full bg-slate-100 rounded-xl"></div>
+                                <div class="w-2/3 space-y-2 py-1">
+                                    <div class="w-full h-3 bg-slate-200 rounded"></div>
+                                    <div class="w-2/3 h-3 bg-slate-200 rounded"></div>
+                                    <div class="w-1/2 h-4 bg-red-100 rounded mt-auto"></div>
+                                </div>
+                            </div>
+                            <div class="w-full h-28 bg-white rounded-2xl shadow-sm border border-slate-100 flex p-3 gap-3">
+                                <div class="w-1/3 h-full bg-slate-100 rounded-xl"></div>
+                                <div class="w-2/3 space-y-2 py-1">
+                                    <div class="w-full h-3 bg-slate-200 rounded"></div>
+                                    <div class="w-2/3 h-3 bg-slate-200 rounded"></div>
+                                    <div class="w-1/2 h-4 bg-red-100 rounded mt-auto"></div>
+                                </div>
+                            </div>
+                            <div class="w-full h-28 bg-white rounded-2xl shadow-sm border border-slate-100 flex p-3 gap-3">
+                                <div class="w-1/3 h-full bg-slate-100 rounded-xl"></div>
+                                <div class="w-2/3 space-y-2 py-1">
+                                    <div class="w-full h-3 bg-slate-200 rounded"></div>
+                                    <div class="w-2/3 h-3 bg-slate-200 rounded"></div>
+                                    <div class="w-1/2 h-4 bg-red-100 rounded mt-auto"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@endsection
+
+@push('scripts')
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const divisionSelect = document.getElementById('division_select');
-        const districtSelect = document.getElementById('district_select');
-        const upazilaSelect  = document.getElementById('upazila_select');
-
-        divisionSelect.addEventListener('change', function() {
-            const divId = this.value;
-            districtSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
-            districtSelect.disabled  = true;
-            upazilaSelect.innerHTML  = '<option value="">উপজেলা/এরিয়া</option>';
-            upazilaSelect.disabled   = true;
-
-            if (divId) {
-                fetch(`/ajax/districts/${divId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        districtSelect.innerHTML = '<option value="">জেলা নির্বাচন</option>';
-                        districtSelect.disabled  = false;
-                        data.forEach(dist => {
-                            districtSelect.innerHTML += `<option value="${dist.id}">${dist.name}</option>`;
-                        });
-                    })
-                    .catch(err => console.error("Error fetching districts:", err));
-            } else {
-                districtSelect.innerHTML = '<option value="">জেলা নির্বাচন</option>';
-            }
-        });
-
-        districtSelect.addEventListener('change', function() {
-            const distId = this.value;
-            upazilaSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
-            upazilaSelect.disabled  = true;
-
-            if (distId) {
-                fetch(`/ajax/upazilas/${distId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        upazilaSelect.innerHTML = '<option value="">উপজেলা/এরিয়া</option>';
-                        upazilaSelect.disabled  = false;
-                        data.forEach(upz => {
-                            upazilaSelect.innerHTML += `<option value="${upz.id}">${upz.name}</option>`;
-                        });
-                    })
-                    .catch(err => console.error("Error fetching upazilas:", err));
-            } else {
-                upazilaSelect.innerHTML = '<option value="">উপজেলা/এরিয়া</option>';
-            }
-        });
+    // Counter animation for Trust Band
+    document.addEventListener('DOMContentLoaded', () => {
+        const counters = document.querySelectorAll('.counter[data-target]');
+        if (!counters.length) return;
+        
+        const run = (el) => {
+            const target = parseInt(el.dataset.target, 10) || 0;
+            const duration = 2500;
+            const start = performance.now();
+            
+            const step = (now) => {
+                const progress = Math.min((now - start) / duration, 1);
+                // Ease out Expo
+                const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+                el.textContent = Math.floor(ease * target).toLocaleString('bn-BD');
+                
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                } else {
+                    el.textContent = target.toLocaleString('bn-BD');
+                }
+            };
+            requestAnimationFrame(step);
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    run(entry.target);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+        
+        counters.forEach(c => observer.observe(c));
     });
 </script>
 
-</body>
-</html>
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-20px); }
+    }
+</style>
+@endpush

@@ -73,9 +73,13 @@ Route::get('/', function () {
             $q->where('nid_status', 'approved')->orWhere('verified_badge', 1);
         })->count();
     $totalDonations = \App\Models\User::sum('total_verified_donations');
-    $livesSaved     = ($totalDonations * 3) + 120;
+    $totalDonors    = \App\Models\User::where('role', 'donor')->count();
+    $recentPosts    = \App\Models\Post::where('status', 'approved')
+        ->orderByDesc('published_at')
+        ->limit(2)
+        ->get();
 
-    return view('home', compact('divisions', 'topDonors', 'verifiedDonors', 'livesSaved', 'homeRequests'));
+    return view('home', compact('divisions', 'topDonors', 'verifiedDonors', 'totalDonations', 'totalDonors', 'homeRequests', 'recentPosts'));
 })->name('home');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
