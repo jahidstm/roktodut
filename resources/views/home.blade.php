@@ -167,17 +167,17 @@
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center divide-y sm:divide-y-0 sm:divide-x divide-white/10">
             
             <div class="pt-4 sm:pt-0">
-                <div class="text-4xl lg:text-5xl font-black text-white mb-2"><span class="counter" data-target="{{ $totalDonors }}">0</span><span class="text-[#FF385C]">+</span></div>
+                <div class="text-4xl lg:text-5xl font-black text-white mb-2"><span class="counter" data-target="{{ $totalDonors }}">0</span><span class="text-[#D32F2F]">+</span></div>
                 <div class="text-sm font-bold text-slate-400">নিবন্ধিত ডোনার</div>
             </div>
 
             <div class="pt-8 sm:pt-0">
-                <div class="text-4xl lg:text-5xl font-black text-white mb-2"><span class="counter" data-target="{{ $verifiedDonors }}">0</span><span class="text-[#FF385C]">+</span></div>
+                <div class="text-4xl lg:text-5xl font-black text-white mb-2"><span class="counter" data-target="{{ $verifiedDonors }}">0</span><span class="text-[#D32F2F]">+</span></div>
                 <div class="text-sm font-bold text-slate-400">ভেরিফাইড ডোনার</div>
             </div>
 
             <div class="pt-8 sm:pt-0">
-                <div class="text-4xl lg:text-5xl font-black text-white mb-2"><span class="counter" data-target="{{ $totalDonations }}">0</span><span class="text-[#FF385C]">+</span></div>
+                <div class="text-4xl lg:text-5xl font-black text-white mb-2"><span class="counter" data-target="{{ $totalDonations }}">0</span><span class="text-[#D32F2F]">+</span></div>
                 <div class="text-sm font-bold text-slate-400">সফল রক্তদান</div>
             </div>
 
@@ -205,7 +205,7 @@
                         $urgencyVal   = $req->urgency?->value ?? 'normal';
                         $urgencyLabel = match($urgencyVal) { 'emergency' => 'অতি জরুরি', 'urgent' => 'জরুরি', default => 'সাধারণ' };
                         $urgencyBg = match($urgencyVal) {
-                            'emergency' => 'bg-[#FF385C] text-white',
+                            'emergency' => 'bg-[#D32F2F] text-white',
                             'urgent'    => 'bg-amber-500 text-white',
                             default     => 'bg-slate-800 text-white',
                         };
@@ -217,7 +217,7 @@
                         $requestStatus = strtolower((string) ($req->status ?? 'pending'));
 
                         [$statusLabel, $statusCls] = match (true) {
-                            $requestStatus === 'expired' => ['বাতিল', 'bg-rose-50 text-rose-700 border-rose-200'],
+                            $requestStatus === 'expired' => ['বাতিল', 'bg-red-50 text-red-700 border-red-200'],
                             $verifiedCount > 0 || $requestStatus === 'fulfilled' => ['সফল (যাচাইকৃত)', 'bg-emerald-50 text-emerald-700 border-emerald-200'],
                             $claimedCount > 0 => ['ক্লেইম রিভিউতে', 'bg-amber-50 text-amber-700 border-amber-200'],
                             $acceptedCount > 0 => ['ডোনার পাওয়া গেছে', 'bg-indigo-50 text-indigo-700 border-indigo-200'],
@@ -245,14 +245,14 @@
                                 </span>
                             </div>
                             
-                            <div class="absolute top-5 right-5 bg-white text-[#FF385C] font-black text-sm px-4 py-1.5 rounded-full shadow-sm border border-slate-100 z-10">
+                            <div class="absolute top-5 right-5 bg-white text-[#D32F2F] font-black text-sm px-4 py-1.5 rounded-full shadow-sm border border-slate-100 z-10">
                                 {{ $bgGroup }}
                             </div>
                         </div>
 
                         {{-- Content --}}
                         <div class="p-8 flex-1 flex flex-col">
-                            <h3 class="text-xl font-black text-slate-900 mb-4 truncate group-hover:text-[#FF385C] transition-colors" title="{{ $req->patient_name }}">
+                            <h3 class="text-xl font-black text-slate-900 mb-4 truncate group-hover:text-[#D32F2F] transition-colors" title="{{ $req->patient_name }}">
                                 {{ $req->patient_name ?? 'রোগী' }}
                             </h3>
                             
@@ -299,7 +299,7 @@
                                     </div>
                                 </div>
                                 
-                                <a href="{{ route('requests.show', $req) }}" class="text-sm font-black text-[#FF385C] hover:text-white border-2 border-[#FF385C] hover:bg-[#FF385C] px-5 py-2 rounded-full transition-colors flex items-center gap-1.5">
+                                <a href="{{ route('requests.show', $req) }}" class="text-sm font-black text-[#D32F2F] hover:text-white border-2 border-[#D32F2F] hover:bg-[#D32F2F] px-5 py-2 rounded-full transition-colors flex items-center gap-1.5">
                                     বিস্তারিত <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                                 </a>
                             </div>
@@ -327,7 +327,7 @@
 <section class="py-24 bg-slate-50 overflow-hidden relative">
     
     {{-- Background decorations --}}
-    <div class="absolute right-0 top-0 w-1/3 h-full bg-[#FF385C]/5 rounded-l-[100px] z-0"></div>
+    <div class="absolute right-0 top-0 w-1/3 h-full bg-[#D32F2F]/5 rounded-l-[100px] z-0"></div>
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
@@ -355,13 +355,13 @@
 
             {{-- Right: Content --}}
             <div class="order-1 lg:order-2">
-                <p class="text-sm font-extrabold text-[#FF385C] uppercase tracking-widest mb-3">কীভাবে কাজ করে</p>
+                <p class="text-sm font-extrabold text-[#D32F2F] uppercase tracking-widest mb-3">কীভাবে কাজ করে</p>
                 <h2 class="text-3xl lg:text-5xl font-black text-slate-900 mb-6 leading-tight">খুব সহজেই রক্ত<br>দিন বা নিন</h2>
                 <p class="text-lg font-medium text-slate-500 mb-10 leading-relaxed">রক্তদূত এমন একটি প্ল্যাটফর্ম যা রক্তদাতা এবং গ্রহীতার মধ্যে সরাসরি সংযোগ স্থাপন করে। কোনো মধ্যস্বত্বভোগী নেই, সম্পূর্ণ বিনামূল্যে এবং সুরক্ষিত।</p>
                 
                 <ul class="space-y-8 mb-12">
                     <li class="flex items-start gap-5">
-                        <div class="mt-1 w-10 h-10 rounded-full bg-red-100 text-[#FF385C] flex items-center justify-center shrink-0">
+                        <div class="mt-1 w-10 h-10 rounded-full bg-red-100 text-[#D32F2F] flex items-center justify-center shrink-0">
                             <span class="font-black">১</span>
                         </div>
                         <div>
@@ -370,7 +370,7 @@
                         </div>
                     </li>
                     <li class="flex items-start gap-5">
-                        <div class="mt-1 w-10 h-10 rounded-full bg-red-100 text-[#FF385C] flex items-center justify-center shrink-0">
+                        <div class="mt-1 w-10 h-10 rounded-full bg-red-100 text-[#D32F2F] flex items-center justify-center shrink-0">
                             <span class="font-black">২</span>
                         </div>
                         <div>
@@ -379,7 +379,7 @@
                         </div>
                     </li>
                     <li class="flex items-start gap-5">
-                        <div class="mt-1 w-10 h-10 rounded-full bg-red-100 text-[#FF385C] flex items-center justify-center shrink-0">
+                        <div class="mt-1 w-10 h-10 rounded-full bg-red-100 text-[#D32F2F] flex items-center justify-center shrink-0">
                             <span class="font-black">৩</span>
                         </div>
                         <div>
@@ -405,7 +405,7 @@
     <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         
         <div class="text-center max-w-2xl mx-auto mb-16">
-            <div class="inline-flex items-center justify-center gap-1.5 bg-red-50 text-[#FF385C] font-extrabold text-[11px] px-4 py-1.5 rounded-full mb-4 shadow-sm border border-red-100">
+            <div class="inline-flex items-center justify-center gap-1.5 bg-red-50 text-[#D32F2F] font-extrabold text-[11px] px-4 py-1.5 rounded-full mb-4 shadow-sm border border-red-100">
                 <span>🦸</span> রিয়েল লাইফ সুপারহিরো
             </div>
             <h2 class="text-3xl lg:text-4xl font-black text-slate-800 mb-4 tracking-tight">আমাদের সেরা রক্তদাতাগণ</h2>
@@ -462,7 +462,7 @@
                         
                         {{-- Blood Group Pill --}}
                         @if($d->blood_group)
-                        <div class="bg-red-50 text-[#FF385C] font-black text-[10px] px-3 py-1 rounded-md mb-6 uppercase tracking-widest border border-red-100">
+                        <div class="bg-red-50 text-[#D32F2F] font-black text-[10px] px-3 py-1 rounded-md mb-6 uppercase tracking-widest border border-red-100">
                             {{ $d->blood_group?->value ?? $d->blood_group }} ডোনার
                         </div>
                         @else
@@ -530,7 +530,7 @@
                             <div class="absolute inset-0 bg-gradient-to-br from-slate-200 to-slate-300 group-hover:scale-105 transition-transform duration-500"></div>
                             
                             @if($post->category?->name)
-                                <div class="absolute top-4 left-4 bg-[#FF385C] text-white text-xs font-black tracking-wider px-4 py-2 rounded-full shadow-md z-10">
+                                <div class="absolute top-4 left-4 bg-[#D32F2F] text-white text-xs font-black tracking-wider px-4 py-2 rounded-full shadow-md z-10">
                                     {{ $post->category->name }}
                                 </div>
                             @endif
@@ -544,13 +544,13 @@
                                 </span>
                             </div>
                             
-                            <h3 class="text-xl font-black text-slate-900 mb-4 group-hover:text-[#FF385C] transition-colors line-clamp-2 leading-snug">
+                            <h3 class="text-xl font-black text-slate-900 mb-4 group-hover:text-[#D32F2F] transition-colors line-clamp-2 leading-snug">
                                 <a href="{{ route('blog.show', $post->slug) }}" class="focus:outline-none focus:underline">
                                     {{ $post->title }}
                                 </a>
                             </h3>
                             
-                            <a href="{{ route('blog.show', $post->slug) }}" class="inline-flex items-center gap-2 text-sm font-black text-slate-700 group-hover:text-[#FF385C] transition-colors">
+                            <a href="{{ route('blog.show', $post->slug) }}" class="inline-flex items-center gap-2 text-sm font-black text-slate-700 group-hover:text-[#D32F2F] transition-colors">
                                 আরও পড়ুন <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                             </a>
                         </div>

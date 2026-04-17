@@ -1,7 +1,7 @@
 @props(['title', 'subtitle' => null, 'variant' => 'app', 'label' => null])
 
 @if($variant === 'marketing')
-<section class="relative bg-gradient-to-br from-red-700 via-red-600 to-rose-500 overflow-hidden text-center pt-20 pb-20 lg:pt-28 lg:pb-24">
+<section class="relative bg-gradient-to-br from-red-700 via-red-600 to-[#D32F2F] overflow-hidden text-center pt-20 pb-20 lg:pt-28 lg:pb-24">
     <div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px); background-size: 28px 28px;"></div>
     <div class="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -bottom-10 -left-10 w-60 h-60 bg-red-900/30 rounded-full blur-2xl pointer-events-none"></div>
