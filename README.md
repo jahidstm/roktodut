@@ -1,71 +1,96 @@
 # 🩸 RoktoDut (রক্তদূত)
-> **বিশ্বাসযোগ্য রক্তদাতা খোঁজার একটি স্মার্ট, প্রাইভেসি-ফোকাসড ও অটোমেটেড প্ল্যাটফর্ম।**
+> **A smart, privacy-first, and automation-driven platform for finding trustworthy blood donors—fast.**
 
 [![Laravel](https://img.shields.io/badge/Laravel-11.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white)](https://laravel.com)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://mysql.com)
 
-## 📝 প্রজেক্ট ওভারভিউ
-**RoktoDut** প্রচলিত কোনো সাধারণ ব্লাড ব্যাংক ওয়েবসাইট নয়; এটি একটি ডাটা-ড্রিভেন স্মার্ট ইকোসিস্টেম। আমাদের মূল লক্ষ্য হলো ইমার্জেন্সি মুহূর্তে লগিন বা রেজিস্ট্রেশনের ঝামেলা ছাড়াই রোগীর সাথে ডোনারের যোগাযোগ করিয়ে দেওয়া, ডেটা স্ক্র্যাপিং থেকে ডোনারদের প্রাইভেসি রক্ষা করা এবং পুরো ডোনেশন প্রক্রিয়াটিকে অটোমেশনের মাধ্যমে নির্ভুল রাখা।
+---
+
+## 📝 Project Overview
+
+**RoktoDut** is not a conventional blood bank website. It is a data-driven ecosystem designed to reduce response time during emergencies while protecting donor privacy and maintaining trust throughout the donation lifecycle.
+
+Our core goals are:
+- Enable **donor discovery without login/registration** during emergencies.
+- Protect donors from **data scraping and harassment** with privacy-by-design features.
+- Ensure the end-to-end donation flow remains **accurate, verifiable, and automated**.
 
 ---
 
-## 🌟 বিস্তারিত ফিচার লিস্ট (Key Features)
+## 🌟 Key Features
 
-### ১. ইউজার রোল ও এক্সেস কন্ট্রোল (User Ecosystem)
-সিস্টেমটি ৪ ধরনের ব্যবহারকারী দ্বারা পরিচালিত হবে:
-- **Donor (রক্তদাতা):** প্রোফাইল ম্যানেজ করবেন, রক্ত দিয়ে পয়েন্ট ও ব্যাজ অর্জন করবেন এবং রিয়েল-টাইম রিকোয়েস্ট পাবেন।
-- **Recipient (গ্রহীতা):** লগিন ছাড়াই রক্ত খুঁজবেন এবং রিকোয়েস্ট ক্রিয়েট করে ডোনারের সাথে যোগাযোগ করবেন।
-- **Org Admin (অর্গানাইজেশন):** ব্লাড ক্লাব বা হাসপাতাল তাদের মেম্বারদের ভেরিফাই ও ম্যানেজ করবেন।
-- **System Admin (কর্তৃপক্ষ):** এনআইডি ভেরিফিকেশন, রিপোর্ট মনিটরিং এবং সিস্টেম মেইনটেন্যান্স করবেন।
+### 1) User Roles & Access Control (User Ecosystem)
+The system supports four primary user roles:
 
-### ২. স্মার্ট সার্চ ইঞ্জিন ও ইমার্জেন্সি রেসপন্স 🚑
-- **ওপেন এক্সেস (No Login Required):** ইমার্জেন্সি মুহূর্তে সময় বাঁচাতে লগিন ছাড়াই জেলা ও রক্তের গ্রুপ দিয়ে ডোনার খোঁজা যাবে।
-- **স্মার্ট সর্টিং অ্যালগরিদম (Priority Logic):** সার্চ রেজাল্ট এলোমেলো আসবে না। লিস্টটি নির্ভরতার ভিত্তিতে সাজানো হবে:
-    1. **Ready Now:** যারা রক্ত দিতে সম্পূর্ণ প্রস্তুত এবং অ্যাভেইলেবল।
-    2. **Org Verified:** ভেরিফাইড ব্লাড ক্লাব বা হাসপাতালের লিস্টেড মেম্বার।
-    3. **NID Verified:** এনআইডি ভেরিফিকেশন সম্পন্ন করা ট্রাস্টেড ডোনার।
-    4. **Regular:** সাধারণ ডোনার।
-
-### ৩. প্রাইভেসি শিল্ড ও সিকিউর কলিং 🛡️
-- **Data Privacy:** ডোনারের মোবাইল নম্বর পাবলিকলি সরাসরি দেখা যাবে না (যেমন: `017******89`)।
-- **Math Challenge:** নম্বর দেখার জন্য ব্যবহারকারীকে একটি ম্যাথ চ্যালেঞ্জ সমাধান করতে হবে। এটি স্প্যামিং এবং ডেটা স্ক্র্যাপার বট প্রতিরোধ করবে।
-- **Rate Limiting:** সুরক্ষার জন্য ১৫ মিনিটে সর্বোচ্চ ৫ বার ফোন নম্বর রিভিল করার লিমিটেশন সেট করা আছে।
-
-### ৪. ডাটা অটোমেশন ও ফ্রেশনেস লজিক (The Brain) 🧠
-- **Welcome Back Check:** ডোনার ৩০ দিনের বেশি সময় পর লগিন করলে একটি পপ-আপ প্রম্পট আসবে, যার মাধ্যমে তার সর্বশেষ স্ট্যাটাস আপডেট করা হবে।
-- **Auto Cooldown:** রক্তদানের পর ডোনারের স্ট্যাটাস অটোমেটিক **৪ মাসের জন্য Unavailable** হয়ে যাবে।
-- **Silent Approval:** ডোনেশন ক্লেইম করার ২৪ ঘণ্টার মধ্যে গ্রহীতা কোনো ডিসপুট (Dispute) না করলে, সিস্টেম সেটিকে সফল ডোনেশন হিসেবে অটো-অ্যাপ্রুভ করে নেবে।
-
-### ৫. অর্গানাইজেশন ম্যানেজমেন্ট প্যানেল 🏥
-- **Member Approval:** অর্গানাইজেশন অ্যাডমিন তাদের ক্লাবের মেম্বারদের প্রোফাইল রিভিউ এবং ভেরিফাই করতে পারবেন।
-- **Verified Tag:** সার্চ লিস্টে মেম্বারদের নামের পাশে ক্লাবের ট্রাস্ট ট্যাগ প্রদর্শিত হবে।
-
-### ৬. গেমফিকেশন: লিডারবোর্ড ও ব্যাজ 🏆
-- **ডায়নামিক লিডারবোর্ড:** কে কতবার রক্ত দিয়েছেন, তার ওপর ভিত্তি করে জাতীয় এবং জেলাভিত্তিক (National & District) লিডারবোর্ড।
-- **পয়েন্ট ও ব্যাজ সিস্টেম:** সফল ডোনেশন এবং সিস্টেম এনগেজমেন্টের ওপর ভিত্তি করে ডোনারদের পয়েন্ট ও বিভিন্ন মাইলস্টোন ব্যাজ প্রদান।
-
-### ৭. ট্রাস্ট ও স্মার্ট ভেরিফিকেশন ✅
-- **NID Verification:** এনআইডি কার্ড আপলোড ও অ্যাডমিন ভেরিফিকেশনের মাধ্যমে প্রোফাইল ব্লু-ব্যাজ ভেরিফিকেশন।
-- **QR Code Smart Card:** ডোনারদের জন্য ডিজিটাল আইডেন্টিটি কার্ড এবং কিউআর কোড ইস্যু করা।
-
-### ৮. কমিউনিটি ও সাকসেস স্টোরি ❤️
-- **Success Stories:** রোগী এবং ডোনার রক্তদানের মুহূর্তের ছবি ও অভিজ্ঞতার গল্প শেয়ার করতে পারবেন।
-- **Health Blog:** রক্তদানের উপকারিতা ও স্বাস্থ্য সচেতনতা নিয়ে ডেডিকেটেড ব্লগ সেকশন।
+- **Donor:** Manages profile, receives real-time requests, and earns points/badges for verified donations.
+- **Recipient:** Searches for donors without login and can create requests to reach donors quickly.
+- **Org Admin:** Represents a blood club/hospital and verifies/manages organization members.
+- **System Admin:** Oversees NID verification, reports, and overall system governance.
 
 ---
 
-## 🛠️ টেকনোলজি স্ট্যাক (Tech Stack)
-- **Backend Framework:** Laravel 11 (PHP 8.x)
+### 2) Smart Search Engine & Emergency Response 🚑
+- **Open Access (No Login Required):** Users can search donors by location and blood group without signing in.
+- **Priority-Based Smart Sorting:** Search results are ranked by trust and readiness (not random):
+  1. **Ready Now:** Donors who are currently available and ready to donate.
+  2. **Org Verified:** Members verified by a registered blood club/hospital.
+  3. **NID Verified:** Donors with completed NID verification.
+  4. **Regular:** Standard donors without additional verification tiers.
+
+---
+
+### 3) Privacy Shield & Secure Contact Reveal 🛡️
+- **Phone Privacy:** Donor phone numbers are masked by default (e.g., `017******89`).
+- **Math Challenge:** Users must solve a simple math challenge to reveal contact information—reducing spam and bot scraping.
+- **Rate Limiting:** Contact reveal requests are limited (e.g., max 5 reveals per 15 minutes) to prevent abuse.
+
+---
+
+### 4) Automation & Freshness Logic (The Brain) 🧠
+- **Welcome Back Check:** If a donor logs in after 30+ days, the system prompts them to confirm their current availability.
+- **Auto Cooldown:** After a successful donation, donors are automatically marked **Unavailable for 4 months**.
+- **Silent Approval:** If a donation claim is not disputed by the recipient within 24 hours, it is automatically approved as a successful donation.
+
+---
+
+### 5) Organization Management Panel 🏥
+- **Member Approval:** Organization admins can review and verify members.
+- **Verified Tag:** Verified organization members receive a visible trust tag in search results.
+
+---
+
+### 6) Gamification: Leaderboard & Badges 🏆
+- **Dynamic Leaderboards:** National and district-based leaderboards ranked by verified donations and/or points.
+- **Points & Badges:** Donors earn points and milestone badges for verified donations and platform engagement.
+
+---
+
+### 7) Trust & Smart Verification ✅
+- **NID Verification:** Donors can upload NID; admins verify and grant a verified badge.
+- **QR Smart Card:** Donors receive a digital identity card with a QR code.
+
+---
+
+### 8) Community & Success Stories ❤️
+- **Success Stories:** Donors and recipients can share donation experiences and photos.
+- **Health Blog:** A dedicated blog for awareness and health education related to blood donation.
+
+---
+
+## 🛠️ Tech Stack
+
+- **Backend Framework:** Laravel 12 (PHP 8.x)
 - **Frontend:** Blade Templates, Tailwind CSS 3, Alpine.js 3
 - **Bundler:** Vite 5
 - **Database:** MySQL 8.0
 
 ---
 
-## 👥 ডেভেলপমেন্ট টিম (Team Members)
-| Name | Role / Contribution | GitHub Profile |
-| :--- | :--- | :--- |
+## 👥 Team Members
+
+| Name | Role / Contribution | GitHub |
+|---|---|---|
 | **Jahid Hasan** | Lead Backend, Database Architecture, Security | [@jahidstm](https://github.com/jahidstm) |
 | **Md. Alif Khan** | Frontend Refactoring, API Integration, UI Components | [@3alif](https://github.com/3alif) |
 | **Nohzat Tabassum** | UI/UX, OAuth Integration, System Documentation | [@NohzatTabassum](https://github.com/NohzatTabassum) |
