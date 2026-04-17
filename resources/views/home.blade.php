@@ -7,158 +7,163 @@
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 1 — HERO (Listygo Inspired)
 ═══════════════════════════════════════════════════════════════ --}}
-<section class="relative overflow-hidden bg-gradient-to-br from-[#fff5f5] via-white to-[#fff0f0] pt-16 pb-20 lg:pt-24 lg:pb-28" aria-label="হিরো সেকশন">
+{{-- ═══════════════════════════════════════════════════════════════
+     SECTION 1 — HERO (Light Theme Centered)
+═══════════════════════════════════════════════════════════════ --}}
+<section class="relative bg-gradient-to-b from-[#FFF5F5] to-white pt-20 pb-32 lg:pt-28 lg:pb-40 text-center" aria-label="হিরো সেকশন">
     
-    {{-- Decorative Background Elements --}}
-    <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        {{-- City/Building outline placeholder at bottom like Listygo --}}
-        <div class="absolute bottom-0 right-0 w-full md:w-1/2 opacity-[0.03]">
-            <svg viewBox="0 0 100 20" preserveAspectRatio="none" class="w-full h-32 fill-current text-slate-900">
-                <path d="M0,20 L0,10 L5,10 L5,5 L10,5 L10,15 L15,15 L15,8 L20,8 L20,20 Z M25,20 L25,12 L30,12 L30,20 Z M35,20 L35,5 L45,5 L45,20 Z M50,20 L50,15 L60,15 L60,20 Z M65,20 L65,10 L75,10 L75,20 Z M80,20 L80,5 L90,5 L90,20 Z M95,20 L95,10 L100,10 L100,20 Z"></path>
-            </svg>
+    {{-- Decorative Background Elements (optional subtle pattern) --}}
+    <div class="absolute inset-0 opacity-40 pointer-events-none" style="background-image: radial-gradient(circle at 2px 2px, rgba(211,47,47,0.1) 1px, transparent 0); background-size: 40px 40px;"></div>
+
+    <div class="relative z-10 mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+        
+        {{-- Top Pill --}}
+        <div class="inline-flex items-center gap-2 bg-white border border-red-100 text-[#D32F2F] text-xs font-black px-5 py-2 rounded-full mb-8 shadow-sm">
+            ইমার্জেন্সি ব্লাড ডোনেশন নেটওয়ার্ক
         </div>
-    </div>
-
-    <div class="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-            
-            {{-- Left Content --}}
-            <div class="max-w-2xl">
-                <p class="text-sm font-bold text-[#FF385C] uppercase tracking-wider mb-4 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-[#FF385C]"></span>
-                    বাংলাদেশের ভেরিফায়েড ব্লাড নেটওয়ার্ক
-                </p>
-                <h1 class="text-4xl sm:text-5xl lg:text-[3.5rem] font-black text-slate-900 leading-[1.1] mb-6">
-                    সঠিক ডোনার খুঁজুন,<br>
-                    <span class="text-[#FF385C] relative">
-                        জীবন বাঁচান
-                        <svg class="absolute w-full h-3 -bottom-1 left-0 text-red-200" viewBox="0 0 100 10" preserveAspectRatio="none"><path d="M0,5 Q50,10 100,5" stroke="currentColor" stroke-width="4" fill="none"/></svg>
-                    </span>
-                </h1>
-                <p class="text-lg text-slate-500 mb-8 font-medium max-w-lg">
-                    জরুরি মুহূর্তে আপনার নির্দিষ্ট এলাকায় রক্তের সন্ধানে। মাত্র কয়েক ক্লিকে খুঁজে নিন ভেরিফাইড রক্তদাতা।
-                </p>
-                
-                {{-- Horizontal Search Form (Listygo style) --}}
-                <div x-data="{
-                        districts: [],
-                        upazilas: [],
-                        loadingDistricts: false,
-                        fetchDistricts(divisionId) {
-                            this.districts = [];
-                            this.upazilas = [];
-                            if (!divisionId) return;
-                            this.loadingDistricts = true;
-                            fetch('/ajax/districts/' + divisionId)
-                                .then(r => r.json())
-                                .then(data => { this.districts = data; this.loadingDistricts = false; })
-                                .catch(() => { this.loadingDistricts = false; });
-                        }
-                    }" 
-                    class="bg-white p-2 rounded-3xl sm:rounded-full shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] mt-6 border border-slate-100 flex flex-col sm:flex-row items-center relative z-20">
-                    
-                    <form action="{{ route('search') }}" method="GET" class="flex flex-col sm:flex-row w-full items-center divide-y sm:divide-y-0 sm:divide-x divide-slate-100">
-                        
-                        {{-- Blood Group --}}
-                        <div class="flex-1 w-full px-5 py-3 sm:py-2">
-                            <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">রক্তের গ্রুপ</label>
-                            <select name="blood_group" class="w-full bg-transparent border-none p-0 text-sm font-black text-slate-800 focus:ring-0 cursor-pointer">
-                                <option value="">সব গ্রুপ</option>
-                                @foreach(\App\Enums\BloodGroup::cases() as $bg)
-                                    <option value="{{ $bg->value }}">{{ $bg->value }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        {{-- Division --}}
-                        <div class="flex-1 w-full px-5 py-3 sm:py-2">
-                            <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">বিভাগ</label>
-                            <select name="division_id" @change="fetchDistricts($event.target.value)" class="w-full bg-transparent border-none p-0 text-sm font-black text-slate-800 focus:ring-0 cursor-pointer">
-                                <option value="">সব বিভাগ</option>
-                                @foreach($divisions as $div)
-                                    <option value="{{ $div->id }}">{{ $div->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        {{-- District --}}
-                        <div class="flex-1 w-full px-5 py-3 sm:py-2">
-                            <label class="block text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-1">জেলা</label>
-                            <select name="district_id" :disabled="districts.length === 0" class="w-full bg-transparent border-none p-0 text-sm font-black text-slate-800 focus:ring-0 cursor-pointer disabled:opacity-50">
-                                <option value="" x-text="loadingDistricts ? 'লোড হচ্ছে...' : (districts.length === 0 ? 'বিভাগ বাছুন' : 'সব জেলা')"></option>
-                                <template x-for="d in districts" :key="d.id">
-                                    <option :value="d.id" x-text="d.name"></option>
-                                </template>
-                            </select>
-                        </div>
-
-                        {{-- Button --}}
-                        <div class="w-full sm:w-auto p-2 sm:p-0 sm:pl-2 shrink-0">
-                            <button type="submit" class="w-full sm:w-auto bg-[#FF385C] hover:bg-[#E31C5F] text-white rounded-2xl sm:rounded-full px-8 py-4 text-sm font-black transition-transform hover:scale-105 whitespace-nowrap shadow-lg shadow-red-500/30 flex items-center justify-center gap-2">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                                সার্চ করুন
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                
-                {{-- Quick links --}}
-                <div class="mt-8 flex flex-wrap items-center gap-3 text-sm">
-                    <span class="text-slate-400 font-bold text-xs uppercase tracking-widest">জনপ্রিয়:</span>
-                    <a href="{{ route('search', ['blood_group' => 'O+']) }}" class="bg-white border border-slate-200 px-4 py-1.5 rounded-full text-slate-700 font-black hover:border-[#FF385C] hover:text-[#FF385C] transition-colors shadow-sm">O+ পজিটিভ</a>
-                    <a href="{{ route('search', ['blood_group' => 'A+']) }}" class="bg-white border border-slate-200 px-4 py-1.5 rounded-full text-slate-700 font-black hover:border-[#FF385C] hover:text-[#FF385C] transition-colors shadow-sm">A+ পজিটিভ</a>
-                    <a href="{{ route('search', ['blood_group' => 'B+']) }}" class="bg-white border border-slate-200 px-4 py-1.5 rounded-full text-slate-700 font-black hover:border-[#FF385C] hover:text-[#FF385C] transition-colors shadow-sm">B+ পজিটিভ</a>
-                </div>
-
-            </div>
-
-            {{-- Right Image Collage (Listygo style) --}}
-            <div class="hidden lg:block relative h-[550px] w-full">
-                {{-- Decorative blobs --}}
-                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-red-100/50 rounded-full blur-3xl z-0"></div>
-                
-                {{-- Main Left Tall Image --}}
-                <div class="absolute right-[50%] top-10 w-[240px] h-[340px] rounded-[100px] border-8 border-white shadow-2xl overflow-hidden z-10 animate-[float_6s_ease-in-out_infinite]">
-                    <img src="https://images.unsplash.com/photo-1538108149393-cebb47cdf141?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Blood Donation" class="w-full h-full object-cover">
-                </div>
-                
-                {{-- Top Right Circle --}}
-                <div class="absolute right-[5%] top-0 w-[200px] h-[200px] rounded-full border-8 border-white shadow-2xl overflow-hidden z-20 animate-[float_7s_ease-in-out_infinite_reverse]">
-                    <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Medical Lab" class="w-full h-full object-cover">
-                </div>
-                
-                {{-- Bottom Right Circle --}}
-                <div class="absolute right-[10%] bottom-16 w-[220px] h-[220px] rounded-full border-8 border-white shadow-2xl overflow-hidden z-30 animate-[float_5s_ease-in-out_infinite]">
-                    <img src="https://images.unsplash.com/photo-1615461066841-6116e61058f4?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" alt="Doctor" class="w-full h-full object-cover object-top">
-                </div>
-                
-                {{-- Accent Icon --}}
-                <div class="absolute top-20 right-[55%] text-[#FF385C] animate-pulse">
-                    <svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                </div>
-
-                {{-- Floating Stat Box --}}
-                <div class="absolute bottom-32 left-[5%] bg-white px-5 py-4 rounded-2xl shadow-xl flex items-center gap-4 z-40 border border-slate-50">
-                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center text-green-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                    </div>
-                    <div>
-                        <div class="text-xs text-slate-400 font-extrabold uppercase tracking-wider">ভেরিফাইড ডোনার</div>
-                        <div class="text-2xl font-black text-slate-900">{{ number_format($verifiedDonors) }}+</div>
-                    </div>
-                </div>
-            </div>
-
+        
+        {{-- Headline --}}
+        <h1 class="text-4xl sm:text-5xl lg:text-[4rem] font-black text-[#1e293b] leading-[1.15] mb-6 tracking-tight">
+            জরুরি মুহূর্তে রক্তের সন্ধানে—<br>
+            <span class="text-[#D32F2F]">আমরা আছি আপনার পাশে</span>
+        </h1>
+        
+        {{-- Subtitle --}}
+        <p class="text-lg text-slate-600 mb-10 font-bold max-w-2xl mx-auto leading-relaxed">
+            বাংলাদেশের সবচেয়ে নির্ভরযোগ্য NID-ভেরিফাইড ডোনার নেটওয়ার্ক — জরুরি মুহূর্তে সঠিক রক্ত, সঠিক সময়ে।
+        </p>
+        
+        {{-- Buttons --}}
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 w-full sm:w-auto">
+            <button onclick="document.getElementById('search-section').scrollIntoView({behavior: 'smooth'})" class="w-full sm:w-auto bg-[#D32F2F] text-white font-black px-8 py-4 rounded-xl shadow-lg shadow-red-500/30 hover:bg-[#B71C1C] transition-transform hover:scale-105 flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> এখনই ডোনার খুঁজুন
+            </button>
+            <a href="{{ route('requests.create') }}" class="w-full sm:w-auto bg-white border-2 border-[#D32F2F] text-[#D32F2F] hover:bg-red-50 font-black px-8 py-3.5 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm h-[56px]">
+                জরুরি রক্তের অনুরোধ
+            </a>
         </div>
+        
+        {{-- Mini Stats --}}
+        <div class="flex flex-wrap justify-center items-center gap-4 sm:gap-6 text-xs sm:text-sm font-bold text-slate-600">
+            <div class="flex items-center gap-2">
+                <span class="bg-red-50 p-1.5 rounded-full text-[10px] sm:text-xs">🔒</span> ফোন নম্বর সর্বদা গোপন
+            </div>
+            <div class="hidden sm:block w-[1px] h-4 bg-slate-300"></div>
+            <div class="flex items-center gap-2">
+                <span class="bg-red-50 p-1.5 rounded-full text-[10px] sm:text-xs">💳</span> NID ভেরিফাইড ডোনার
+            </div>
+            <div class="hidden sm:block w-[1px] h-4 bg-slate-300"></div>
+            <div class="flex items-center gap-2">
+                <span class="bg-red-50 p-1.5 rounded-full text-[10px] sm:text-xs">📍</span> ৬৪ জেলায় সক্রিয়
+            </div>
+        </div>
+        
     </div>
 </section>
+
+{{-- Floating Search Bar (Overlapping Hero & Next Section) --}}
+<div id="search-section" class="relative z-30 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 -mt-16 lg:-mt-24" x-data="{
+        districts: [],
+        upazilas: [],
+        loadingDistricts: false,
+        fetchDistricts(divisionId) {
+            this.districts = [];
+            this.upazilas = [];
+            if (!divisionId) return;
+            this.loadingDistricts = true;
+            fetch('/ajax/districts/' + divisionId)
+                .then(r => r.json())
+                .then(data => { this.districts = data; this.loadingDistricts = false; })
+                .catch(() => { this.loadingDistricts = false; });
+        }
+    }">
+    
+    <div class="bg-white rounded-[2rem] shadow-[0_20px_50px_-12px_rgba(0,0,0,0.15)] border border-slate-100 p-6 sm:p-8">
+        
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-[#D32F2F]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-slate-900">দ্রুত ডোনার খুঁজুন</h3>
+                <p class="text-xs font-bold text-slate-400 mt-0.5">রক্তের গ্রুপ ও এলাকা দিয়ে দ্রুত ডোনার খুঁজুন</p>
+            </div>
+        </div>
+
+        <form action="{{ route('search') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
+            
+            {{-- Division --}}
+            <div class="lg:col-span-1">
+                <div class="relative">
+                    <select name="division_id" @change="fetchDistricts($event.target.value)" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] transition-all appearance-none cursor-pointer">
+                        <option value="">বিভাগ নির্বাচন</option>
+                        @foreach($divisions as $div)
+                            <option value="{{ $div->id }}">{{ $div->name }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            {{-- District --}}
+            <div class="lg:col-span-1">
+                <div class="relative">
+                    <select name="district_id" :disabled="districts.length === 0" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] transition-all appearance-none cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
+                        <option value="" x-text="loadingDistricts ? 'লোড হচ্ছে...' : (districts.length === 0 ? 'জেলা নির্বাচন' : 'সব জেলা')"></option>
+                        <template x-for="d in districts" :key="d.id">
+                            <option :value="d.id" x-text="d.name"></option>
+                        </template>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Upazila Placeholder --}}
+            <div class="lg:col-span-1">
+                <div class="relative">
+                    <select name="upazila_id" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] transition-all appearance-none cursor-pointer disabled:opacity-50 disabled:bg-slate-50" disabled>
+                        <option value="">উপজেলা / এরিয়া</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Blood Group --}}
+            <div class="lg:col-span-1">
+                <div class="relative">
+                    <select name="blood_group" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] transition-all appearance-none cursor-pointer">
+                        <option value="">রক্তের গ্রুপ</option>
+                        @foreach(\App\Enums\BloodGroup::cases() as $bg)
+                            <option value="{{ $bg->value }}">{{ $bg->value }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Button --}}
+            <div class="lg:col-span-1">
+                <button type="submit" class="w-full bg-[#D32F2F] hover:bg-[#B71C1C] text-white rounded-xl px-4 py-3.5 text-sm font-black transition-colors flex items-center justify-center gap-2 h-[50px]">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    সার্চ করুন
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 2 — TRUST BAND (Dark background style)
 ═══════════════════════════════════════════════════════════════ --}}
-<section class="bg-[#1e1e24] py-14 relative z-20">
+<section class="bg-[#1e1e24] pt-24 lg:pt-32 pb-14 relative z-20 -mt-12 lg:-mt-20">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center divide-y sm:divide-y-0 sm:divide-x divide-white/10">
             
