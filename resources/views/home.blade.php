@@ -10,7 +10,7 @@
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 1 — HERO (Light Theme Centered)
 ═══════════════════════════════════════════════════════════════ --}}
-<section class="relative bg-gradient-to-b from-[#FFF5F5] to-white pt-20 pb-32 lg:pt-28 lg:pb-40 text-center" aria-label="হিরো সেকশন">
+<section class="relative bg-gradient-to-b from-[#FFF5F5] to-white pt-20 pb-20 lg:pt-28 lg:pb-24 text-center" aria-label="হিরো সেকশন">
     
     {{-- Decorative Background Elements (optional subtle pattern) --}}
     <div class="absolute inset-0 opacity-40 pointer-events-none" style="background-image: radial-gradient(circle at 2px 2px, rgba(211,47,47,0.1) 1px, transparent 0); background-size: 40px 40px;"></div>
@@ -24,12 +24,12 @@
         
         {{-- Headline --}}
         <h1 class="text-4xl sm:text-5xl lg:text-[4rem] font-black text-[#1e293b] leading-[1.15] mb-6 tracking-tight">
-            জরুরি মুহূর্তে রক্তের সন্ধানে—<br>
-            <span class="text-[#D32F2F]">আমরা আছি আপনার পাশে</span>
+            জরুরি মুহূর্তে রক্তের সন্ধানে—
+            <span class="block mt-2 text-[#D32F2F]">আমরা আছি আপনার পাশে</span>
         </h1>
         
         {{-- Subtitle --}}
-        <p class="text-lg text-slate-600 mb-10 font-bold max-w-2xl mx-auto leading-relaxed">
+        <p class="text-lg text-slate-600 mb-10 font-normal max-w-2xl mx-auto leading-relaxed">
             বাংলাদেশের সবচেয়ে নির্ভরযোগ্য NID-ভেরিফাইড ডোনার নেটওয়ার্ক — জরুরি মুহূর্তে সঠিক রক্ত, সঠিক সময়ে।
         </p>
         
@@ -59,13 +59,12 @@
         </div>
         
     </div>
-</section>
-
-{{-- Floating Search Bar (Overlapping Hero & Next Section) --}}
-<div id="search-section" class="relative z-30 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 -mt-16 lg:-mt-24" x-data="{
+{{-- Search Bar (Inside Hero Section) --}}
+<div id="search-section" class="relative z-20 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 mt-10 lg:mt-14" x-data="{
         districts: [],
         upazilas: [],
         loadingDistricts: false,
+        loadingUpazilas: false,
         fetchDistricts(divisionId) {
             this.districts = [];
             this.upazilas = [];
@@ -75,6 +74,15 @@
                 .then(r => r.json())
                 .then(data => { this.districts = data; this.loadingDistricts = false; })
                 .catch(() => { this.loadingDistricts = false; });
+        },
+        fetchUpazilas(districtId) {
+            this.upazilas = [];
+            if (!districtId) return;
+            this.loadingUpazilas = true;
+            fetch('/ajax/upazilas/' + districtId)
+                .then(r => r.json())
+                .then(data => { this.upazilas = data; this.loadingUpazilas = false; })
+                .catch(() => { this.loadingUpazilas = false; });
         }
     }">
     
@@ -101,36 +109,30 @@
                             <option value="{{ $div->id }}">{{ $div->name }}</option>
                         @endforeach
                     </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </div>
                 </div>
             </div>
 
             {{-- District --}}
             <div class="lg:col-span-1">
                 <div class="relative">
-                    <select name="district_id" :disabled="districts.length === 0" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] transition-all appearance-none cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
+                    <select name="district_id" @change="fetchUpazilas($event.target.value)" :disabled="districts.length === 0" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] transition-all appearance-none cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
                         <option value="" x-text="loadingDistricts ? 'লোড হচ্ছে...' : (districts.length === 0 ? 'জেলা নির্বাচন' : 'সব জেলা')"></option>
                         <template x-for="d in districts" :key="d.id">
                             <option :value="d.id" x-text="d.name"></option>
                         </template>
                     </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </div>
                 </div>
             </div>
 
             {{-- Upazila Placeholder --}}
             <div class="lg:col-span-1">
                 <div class="relative">
-                    <select name="upazila_id" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] transition-all appearance-none cursor-pointer disabled:opacity-50 disabled:bg-slate-50" disabled>
-                        <option value="">উপজেলা / এরিয়া</option>
+                    <select name="upazila_id" :disabled="upazilas.length === 0" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] transition-all appearance-none cursor-pointer disabled:opacity-50 disabled:bg-slate-50">
+                        <option value="" x-text="loadingUpazilas ? 'লোড হচ্ছে...' : (upazilas.length === 0 ? 'উপজেলা / এরিয়া' : 'সব উপজেলা / এরিয়া')"></option>
+                        <template x-for="u in upazilas" :key="u.id">
+                            <option :value="u.id" x-text="u.name"></option>
+                        </template>
                     </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </div>
                 </div>
             </div>
 
@@ -143,9 +145,6 @@
                             <option value="{{ $bg->value }}">{{ $bg->value }}</option>
                         @endforeach
                     </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-                    </div>
                 </div>
             </div>
 
@@ -159,11 +158,12 @@
         </form>
     </div>
 </div>
+</section>
 
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 2 — TRUST BAND (Dark background style)
 ═══════════════════════════════════════════════════════════════ --}}
-<section class="bg-[#1e1e24] pt-24 lg:pt-32 pb-14 relative z-20 -mt-12 lg:-mt-20">
+<section class="bg-[#1e1e24] pt-16 lg:pt-20 pb-14 relative z-20">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-8 text-center divide-y sm:divide-y-0 sm:divide-x divide-white/10">
             
@@ -211,6 +211,19 @@
                             default     => 'bg-slate-800 text-white',
                         };
                         $bgGroup  = $req->blood_group?->value ?? '?';
+                        $bagsNeeded = max((int) ($req->bags_needed ?? 1), 1);
+                        $acceptedCount = (int) ($req->accepted_responses_count ?? 0);
+                        $claimedCount = (int) ($req->claimed_verifications_count ?? 0);
+                        $verifiedCount = (int) ($req->verified_verifications_count ?? 0);
+                        $requestStatus = strtolower((string) ($req->status ?? 'pending'));
+
+                        [$statusLabel, $statusCls] = match (true) {
+                            $requestStatus === 'expired' => ['বাতিল', 'bg-rose-50 text-rose-700 border-rose-200'],
+                            $verifiedCount > 0 || $requestStatus === 'fulfilled' => ['সফল (যাচাইকৃত)', 'bg-emerald-50 text-emerald-700 border-emerald-200'],
+                            $claimedCount > 0 => ['ক্লেইম রিভিউতে', 'bg-amber-50 text-amber-700 border-amber-200'],
+                            $acceptedCount > 0 => ['ডোনার পাওয়া গেছে', 'bg-indigo-50 text-indigo-700 border-indigo-200'],
+                            default => ['চলমান', 'bg-sky-50 text-sky-700 border-sky-200'],
+                        };
                     @endphp
                     <div class="bg-white rounded-[2rem] overflow-hidden shadow-[0_4px_20px_-10px_rgba(0,0,0,0.08)] hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.12)] transition-all duration-300 group border border-slate-100 flex flex-col">
                         
@@ -227,6 +240,9 @@
                                 <span class="{{ $urgencyBg }} text-xs font-bold px-3.5 py-1.5 rounded-full flex items-center gap-1.5 shadow-sm">
                                     @if($urgencyVal === 'emergency') <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span> @endif
                                     {{ $urgencyLabel }}
+                                </span>
+                                <span class="bg-white/95 text-slate-700 text-xs font-bold px-3.5 py-1.5 rounded-full border border-slate-200 shadow-sm">
+                                    {{ \App\Support\BanglaDate::digits((string) $bagsNeeded) }} ব্যাগ
                                 </span>
                             </div>
                             
@@ -258,7 +274,13 @@
                                     <span class="w-6 h-6 rounded-full bg-orange-50 flex items-center justify-center shrink-0 text-orange-500">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                     </span>
-                                    <span class="mt-0.5">{{ $req->needed_at ? $req->needed_at->format('d M, Y (h:i A)') : 'যত দ্রুত সম্ভব' }}</span>
+                                    <span class="mt-0.5">{{ \App\Support\BanglaDate::absolute($req->needed_at) }}</span>
+                                </p>
+                                <p class="text-xs font-semibold text-slate-500 flex items-center gap-3">
+                                    <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-500">
+                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"/></svg>
+                                    </span>
+                                    <span class="mt-0.5">পোস্ট {{ \App\Support\BanglaDate::relative($req->created_at) }}</span>
                                 </p>
                             </div>
 
@@ -266,11 +288,16 @@
                             
                             {{-- Footer actions --}}
                             <div class="flex items-center justify-between">
-                                <div class="text-xs font-bold text-slate-500 flex items-center gap-2">
-                                    <span class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center">
-                                        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex h-7 items-center rounded-full border px-3 text-xs font-bold {{ $statusCls }}">
+                                        {{ $statusLabel }}
                                     </span>
-                                    {{ $req->accepted_responses_count ?? 0 }} সাড়া
+                                    <div class="text-xs font-bold text-slate-500 flex items-center gap-1.5">
+                                        <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center">
+                                            <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        </span>
+                                        {{ \App\Support\BanglaDate::digits((string) $acceptedCount) }} সাড়া
+                                    </div>
                                 </div>
                                 
                                 <a href="{{ route('requests.show', $req) }}" class="text-sm font-black text-[#FF385C] hover:text-white border-2 border-[#FF385C] hover:bg-[#FF385C] px-5 py-2 rounded-full transition-colors flex items-center gap-1.5">
@@ -546,81 +573,46 @@
 </section>
 
 {{-- ═══════════════════════════════════════════════════════════════
-     SECTION 7 — BOTTOM BANNER (Listygo App Banner style)
+     SECTION 7 — CTA BANNER (Centered Design)
 ═══════════════════════════════════════════════════════════════ --}}
-<section class="bg-[#FF385C] relative overflow-hidden">
-    {{-- Background pattern --}}
-    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 2px 2px, white 1px, transparent 0); background-size: 32px 32px;"></div>
-    <div class="absolute -top-64 -right-64 w-[500px] h-[500px] bg-white opacity-5 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-64 -left-64 w-[500px] h-[500px] bg-black opacity-10 rounded-full blur-3xl pointer-events-none"></div>
-    
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 lg:py-24 relative z-10">
-        <div class="grid md:grid-cols-2 items-center gap-12">
-            <div class="text-white text-center md:text-left">
-                <p class="text-sm font-extrabold text-red-200 uppercase tracking-widest mb-3">সবসময় সাথে থাকুন</p>
-                <h2 class="text-4xl lg:text-5xl font-black mb-6 leading-tight">জরুরি মুহূর্তে<br>আপনার পাশে</h2>
-                <p class="text-red-100 font-medium mb-10 text-lg max-w-md mx-auto md:mx-0">আমাদের প্ল্যাটফর্ম মোবাইল থেকেও সমানভাবে ব্যবহারযোগ্য। যেকোনো সময়, যেকোনো স্থানে ডোনার খুঁজুন।</p>
-                
-                <div class="flex flex-wrap justify-center md:justify-start gap-4">
-                    <a href="{{ route('search') }}" class="bg-white text-[#FF385C] font-black px-8 py-4 rounded-full shadow-xl hover:shadow-2xl hover:bg-slate-50 transition-all flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        ডোনার খুঁজুন
-                    </a>
-                    <a href="{{ route('register') }}" class="bg-slate-900 text-white font-black px-8 py-4 rounded-full shadow-xl hover:shadow-2xl hover:bg-black transition-all">
-                        অ্যাকাউন্ট খুলুন
-                    </a>
-                </div>
+<section class="bg-[#BE1B21] relative py-12 lg:py-14 overflow-hidden text-center">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col items-center">
+        
+        {{-- Heart Icon --}}
+        <div class="w-16 h-16 rounded-full border border-white/30 flex items-center justify-center mb-6 bg-white/10">
+            <svg class="w-8 h-8 text-white fill-current" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        </div>
+
+        {{-- Headline --}}
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-5 tracking-tight">আজই একটি জীবন বাঁচান</h2>
+        
+        {{-- Subtitle --}}
+        <p class="text-white/90 font-medium text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+            আপনার একটি রক্তদান তিনটি প্রাণ বাঁচাতে পারে। বাংলাদেশের সবচেয়ে নির্ভরযোগ্য ভেরিফায়েড ডোনার<br class="hidden md:block"> নেটওয়ার্কে এখনই যোগ দিন।
+        </p>
+        
+        {{-- Buttons --}}
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 w-full sm:w-auto">
+            <a href="{{ route('requests.create') }}" class="w-full sm:w-auto bg-white text-[#BE1B21] hover:bg-slate-50 font-black px-8 py-3.5 rounded-xl transition-all shadow-lg flex items-center justify-center gap-2 text-[15px]">
+                রক্তের রিকোয়েস্ট করুন
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+            <a href="{{ route('search') }}" class="w-full sm:w-auto bg-white/10 hover:bg-white/20 border border-white/30 text-white font-black px-8 py-3.5 rounded-xl transition-all flex items-center justify-center text-[15px]">
+                ডোনার সার্চ করুন
+            </a>
+        </div>
+        
+        {{-- Security Info --}}
+        <div class="text-center">
+            <div class="flex items-center justify-center gap-2 text-white text-sm font-bold mb-2.5">
+                <svg class="w-4 h-4 text-[#FACC15]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7z"/></svg>
+                মোবাইল নম্বর কখনো পাবলিক করা হয় না।
             </div>
-            
-            <div class="hidden md:flex justify-center relative">
-                {{-- Mockup image placeholder --}}
-                <div class="w-72 h-[500px] bg-white rounded-[2.5rem] border-8 border-slate-900 shadow-2xl mx-auto -mb-40 relative overflow-hidden transform rotate-6 hover:rotate-0 transition-transform duration-500">
-                    <div class="absolute top-0 inset-x-0 h-7 bg-slate-900 rounded-b-2xl w-1/2 mx-auto z-20"></div>
-                    
-                    {{-- App UI Mockup --}}
-                    <div class="p-5 pt-10 bg-slate-50 h-full relative z-10">
-                        <div class="flex items-center justify-between mb-6">
-                            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-500">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                            </div>
-                            <div class="w-10 h-10 bg-white rounded-full shadow-sm flex items-center justify-center">
-                                <div class="w-4 h-4 bg-slate-200 rounded-full"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="w-3/4 h-8 bg-slate-200 rounded-lg mb-2"></div>
-                        <div class="w-1/2 h-4 bg-slate-200 rounded-lg mb-6"></div>
-                        
-                        <div class="space-y-4">
-                            <div class="w-full h-28 bg-white rounded-2xl shadow-sm border border-slate-100 flex p-3 gap-3">
-                                <div class="w-1/3 h-full bg-slate-100 rounded-xl"></div>
-                                <div class="w-2/3 space-y-2 py-1">
-                                    <div class="w-full h-3 bg-slate-200 rounded"></div>
-                                    <div class="w-2/3 h-3 bg-slate-200 rounded"></div>
-                                    <div class="w-1/2 h-4 bg-red-100 rounded mt-auto"></div>
-                                </div>
-                            </div>
-                            <div class="w-full h-28 bg-white rounded-2xl shadow-sm border border-slate-100 flex p-3 gap-3">
-                                <div class="w-1/3 h-full bg-slate-100 rounded-xl"></div>
-                                <div class="w-2/3 space-y-2 py-1">
-                                    <div class="w-full h-3 bg-slate-200 rounded"></div>
-                                    <div class="w-2/3 h-3 bg-slate-200 rounded"></div>
-                                    <div class="w-1/2 h-4 bg-red-100 rounded mt-auto"></div>
-                                </div>
-                            </div>
-                            <div class="w-full h-28 bg-white rounded-2xl shadow-sm border border-slate-100 flex p-3 gap-3">
-                                <div class="w-1/3 h-full bg-slate-100 rounded-xl"></div>
-                                <div class="w-2/3 space-y-2 py-1">
-                                    <div class="w-full h-3 bg-slate-200 rounded"></div>
-                                    <div class="w-2/3 h-3 bg-slate-200 rounded"></div>
-                                    <div class="w-1/2 h-4 bg-red-100 rounded mt-auto"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="text-white/70 text-xs font-semibold">
+                বিনামূল্যে &middot; NID ভেরিফায়েড নেটওয়ার্ক &middot; ৬৪ জেলায় সক্রিয়
             </div>
         </div>
+
     </div>
 </section>
 

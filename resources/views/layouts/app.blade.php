@@ -29,8 +29,16 @@
 </head>
 
 <body class="bg-slate-50 text-slate-900 antialiased">
-<header class="bg-white border-b border-slate-100 relative z-50">
-    <div class="mx-auto max-w-6xl px-4 py-4 sm:py-5 flex items-center justify-between">
+<header
+    x-data="{ scrolled: false }"
+    x-init="scrolled = window.scrollY > 8; window.addEventListener('scroll', () => scrolled = window.scrollY > 8)"
+    :class="scrolled ? 'bg-white/80 backdrop-blur-md border-slate-200 shadow-sm' : 'bg-white border-slate-100'"
+    class="sticky top-0 z-50 border-b transition-all duration-300">
+    <div class="mx-auto max-w-6xl px-4 py-4 sm:py-5 relative flex items-center justify-between">
+        @php
+            $requestsRoute = \Illuminate\Support\Facades\Route::has('requests') ? route('requests') : route('requests.index');
+            $isCompactHeader = request()->routeIs('requests.*') || request()->routeIs('search') || request()->routeIs('search.*');
+        @endphp
         
         {{-- 🩸 Logo & Brand --}}
         <a href="{{ route('home') }}" class="flex items-center gap-3 group">
@@ -44,22 +52,42 @@
         </a>
 
         {{-- 🧭 Navigation & Actions --}}
-        <nav class="flex items-center gap-3 sm:gap-5">
-            {{-- ১. রিকোয়েস্ট ফিড --}}
-            <a href="{{ route('requests.index') }}" class="text-sm font-bold text-slate-600 hover:text-red-600 transition-colors hidden sm:block">রিকোয়েস্ট ফিড</a>
+        <nav class="ml-auto flex items-center gap-3 sm:gap-5">
+            @unless($isCompactHeader)
+                {{-- Center Menu (Exact 5 items) --}}
+                <div class="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 text-[15px] font-semibold text-slate-600">
+                    <a href="{{ route('home') }}"
+                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('home') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                        হোম
+                    </a>
+                    <a href="{{ $requestsRoute }}"
+                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('requests') || request()->routeIs('requests.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                        রক্ত দিন
+                    </a>
+                    <a href="{{ route('search') }}"
+                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('search') || request()->routeIs('search.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                        স্মার্ট ডোনার সার্চ
+                    </a>
+                    <a href="{{ route('leaderboard') }}"
+                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('leaderboard') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                        লিডারবোর্ড
+                    </a>
+                    <a href="{{ route('blog.index') }}"
+                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('blog.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                        ব্লগ
+                    </a>
+                </div>
+            @endunless
 
-            {{-- ২. লিডারবোর্ড --}}
-            @if(request()->routeIs('home'))
-            <a href="{{ route('leaderboard') }}" class="text-sm font-bold text-slate-600 hover:text-red-600 transition-colors hidden sm:flex items-center gap-1.5">
-                🏆 <span>লিডারবোর্ড</span>
-            </a>
+            @if($isCompactHeader && auth()->check())
+                <a href="{{ $requestsRoute }}" class="hidden md:block text-sm font-bold text-slate-700 hover:text-red-600 transition-colors">
+                    রিকোয়েস্ট ফিড
+                </a>
+                <a href="{{ route('requests.create') }}" class="hidden md:inline-flex items-center bg-[#0f172a] hover:bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-sm shadow-sm transition-colors">
+                    রিকোয়েস্ট করুন
+                </a>
             @endif
-            
-            {{-- ২. রিকোয়েস্ট করুন বাটন (সঠিক অর্ডারে আনা হলো) --}}
-            <a href="{{ route('requests.create') }}" class="text-sm font-extrabold bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 sm:px-4 sm:py-2 rounded-lg shadow-sm transition-colors hidden sm:block">
-                রিকোয়েস্ট করুন
-            </a>
-            
+
             @auth
                 {{-- ৩. Notification Bell (Real-time via Reverb) --}}
                 <div class="relative"
