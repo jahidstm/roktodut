@@ -87,6 +87,11 @@ Route::get('/', function () {
     $totalDonations = $impactMetrics['total_donations'];
     $totalDonors    = $impactMetrics['total_donors'];
     $recentPosts    = \App\Models\Post::where('status', 'published')
+        ->with([
+            'author:id,name,profile_image',
+            'storyMeta:id,post_id,anonymize_level,is_verified_story',
+            'categories:id,name',
+        ])
         ->orderByDesc('published_at')
         ->limit(3)
         ->get();
