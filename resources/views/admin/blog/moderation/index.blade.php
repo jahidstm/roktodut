@@ -3,49 +3,37 @@
 @section('title', 'ব্লগ মডারেশন কিউ | রক্তদূত অ্যাডমিন')
 
 @section('content')
-
-{{-- ── Admin Header ──────────────────────────────────────────────────────── --}}
-<section class="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
-    <div class="absolute inset-0 opacity-[0.04]"
-         style="background-image: linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),
-                                  linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px);
-                background-size: 28px 28px;"></div>
-
-    <div class="relative mx-auto max-w-6xl px-4 sm:px-6 py-10 md:py-14">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <span class="inline-flex items-center gap-2 bg-amber-500/15 border border-amber-500/30 text-amber-400 text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full mb-3">
-                    🛡️ অ্যাডমিন প্যানেল
-                </span>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-white">ব্লগ মডারেশন কিউ</h1>
-                <p class="mt-1.5 text-slate-400 text-sm font-medium">পর্যালোচনার অপেক্ষায় থাকা পোস্টগুলো অনুমোদন বা বাতিল করুন।</p>
-            </div>
-            <a href="{{ route('admin.dashboard') }}"
-               class="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm font-semibold transition-colors duration-150 shrink-0">
-                ← অ্যাডমিন ড্যাশবোর্ড
-            </a>
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                <span class="w-9 h-9 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-lg">📝</span>
+                ব্লগ মডারেশন কিউ
+            </h1>
+            <p class="text-slate-500 text-sm font-semibold mt-1">পর্যালোচনার অপেক্ষায় থাকা পোস্টগুলো অনুমোদন বা বাতিল করুন।</p>
         </div>
-
-        {{-- Stats Row --}}
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-8">
-            @foreach([
-                ['label' => 'মোট পেন্ডিং', 'value' => $stats['total_pending'],  'color' => 'amber',   'icon' => '⏳'],
-                ['label' => 'সাফল্যের গল্প', 'value' => $stats['total_stories'], 'color' => 'rose',    'icon' => '💪'],
-                ['label' => 'স্বাস্থ্য ব্লগ', 'value' => $stats['total_health'],  'color' => 'sky',     'icon' => '🏥'],
-                ['label' => 'মোট বাতিল',    'value' => $stats['total_rejected'],'color' => 'red',     'icon' => '❌'],
-            ] as $stat)
-            <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-                <div class="text-xl mb-1">{{ $stat['icon'] }}</div>
-                <div class="text-2xl font-extrabold text-white">{{ $stat['value'] }}</div>
-                <div class="text-xs text-slate-400 font-semibold mt-0.5">{{ $stat['label'] }}</div>
-            </div>
-            @endforeach
-        </div>
+        <a href="{{ route('admin.dashboard') }}"
+           class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition">
+            ← অ্যাডমিন ড্যাশবোর্ড
+        </a>
     </div>
-</section>
 
-{{-- ── Flash Messages ─────────────────────────────────────────────────────── --}}
-<div class="mx-auto max-w-6xl px-4 sm:px-6 pt-6">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        @foreach([
+            ['label' => 'মোট পেন্ডিং', 'value' => $stats['total_pending'], 'icon' => '⏳'],
+            ['label' => 'সাফল্যের গল্প', 'value' => $stats['total_stories'], 'icon' => '💪'],
+            ['label' => 'স্বাস্থ্য ব্লগ', 'value' => $stats['total_health'], 'icon' => '🏥'],
+            ['label' => 'মোট বাতিল', 'value' => $stats['total_rejected'], 'icon' => '❌'],
+        ] as $stat)
+            <div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+                <div class="text-xl mb-1">{{ $stat['icon'] }}</div>
+                <div class="text-2xl font-extrabold text-slate-900">{{ $stat['value'] }}</div>
+                <div class="text-xs text-slate-500 font-semibold mt-0.5">{{ $stat['label'] }}</div>
+            </div>
+        @endforeach
+    </div>
+
+    {{-- ── Flash Messages ─────────────────────────────────────────────────────── --}}
     @if(session('success'))
         <div class="mb-4 bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-emerald-700 font-semibold text-sm flex items-center gap-2">
             <svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
@@ -58,10 +46,9 @@
             {{ session('error') }}
         </div>
     @endif
-</div>
 
-{{-- ── Main Content ────────────────────────────────────────────────────────── --}}
-<div class="mx-auto max-w-6xl px-4 sm:px-6 py-6 pb-16">
+    {{-- ── Main Content ────────────────────────────────────────────────────────── --}}
+    <div class="py-6 pb-16">
 
     @if($pendingPosts->isEmpty())
         {{-- Empty State --}}
@@ -283,6 +270,7 @@
             </div>
         @endif
     @endif
+    </div>
 </div>
 
 

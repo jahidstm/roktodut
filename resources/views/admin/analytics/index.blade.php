@@ -19,13 +19,16 @@
      x-data="analyticsDashboard(@js($bloodGroupData), @js($monthlyTrend))"
      x-init="initCharts()">
 
-    <div class="mb-8 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-extrabold text-slate-900">অ্যানালিটিক্স ড্যাশবোর্ড</h1>
-            <p class="mt-2 text-slate-500 font-medium">রক্তদূতের রিয়েল ডেটা ট্রেন্ড, ডোনার প্রোফাইল এবং রিকোয়েস্ট পারফরম্যান্স দেখুন।</p>
+            <h1 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                <span class="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-lg">📊</span>
+                অ্যানালিটিক্স ড্যাশবোর্ড
+            </h1>
+            <p class="mt-1 text-slate-500 text-sm font-semibold">রক্তদূতের রিয়েল ডেটা ট্রেন্ড, ডোনার প্রোফাইল এবং রিকোয়েস্ট পারফরম্যান্স দেখুন।</p>
         </div>
         <a href="{{ route('admin.analytics.export') }}"
-           class="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-extrabold px-5 py-3 rounded-xl shadow-sm shadow-red-200 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2">
+           class="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-5 py-3 rounded-xl shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400 focus-visible:ring-offset-2">
             <span>⬇</span>
             রিপোর্ট ডাউনলোড করুন (CSV)
         </a>

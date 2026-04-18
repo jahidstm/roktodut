@@ -3,13 +3,21 @@
 @section('title', $user->name . ' — Gamification Governance')
 
 @section('content')
-<div class="max-w-5xl mx-auto px-4 py-8 space-y-8">
+<div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
 
-    {{-- ── ব্র্যাডক্রাম + ব্যাক ── --}}
-    <div class="flex items-center gap-2 text-sm text-slate-500 font-medium">
-        <a href="{{ route('admin.gamification.index') }}" class="hover:text-slate-800 transition">Governance</a>
-        <span>/</span>
-        <span class="text-slate-800 font-bold">{{ $user->name }}</span>
+    <div class="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                <span class="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-lg">🎯</span>
+                Donor Governance: {{ $user->name }}
+            </h1>
+            <p class="text-slate-500 text-sm font-semibold mt-1">পয়েন্ট, ব্যাজ, শ্যাডোব্যান এবং অডিট লগ ম্যানেজ করুন</p>
+        </div>
+        <div class="flex items-center gap-2 text-sm text-slate-500 font-medium">
+            <a href="{{ route('admin.gamification.index') }}" class="hover:text-slate-800 transition">Governance</a>
+            <span>/</span>
+            <span class="text-slate-800 font-bold">{{ $user->name }}</span>
+        </div>
     </div>
 
     {{-- ── Flash ── --}}

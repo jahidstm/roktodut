@@ -8,13 +8,13 @@
     {{-- ── হেডার ── --}}
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-extrabold text-slate-900 flex items-center gap-3">
-                <span class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-red-100 text-red-600">
+            <h1 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                <span class="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-lg">
                     🎮
                 </span>
                 Gamification Governance
             </h1>
-            <p class="text-slate-500 font-medium mt-1">ডোনারদের পয়েন্ট, ব্যাজ ও লিডারবোর্ড স্ট্যাটাস কন্ট্রোল করুন।</p>
+            <p class="text-slate-500 text-sm font-semibold mt-1">ডোনারদের পয়েন্ট, ব্যাজ ও লিডারবোর্ড স্ট্যাটাস কন্ট্রোল করুন।</p>
         </div>
         <a href="{{ route('admin.dashboard') }}"
            class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition">

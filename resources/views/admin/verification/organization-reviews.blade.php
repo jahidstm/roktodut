@@ -3,48 +3,43 @@
 @section('title', 'অর্গানাইজেশন/হাসপাতাল যাচাই কিউ | রক্তদূত অ্যাডমিন')
 
 @section('content')
-<section class="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
-    <div class="absolute inset-0 opacity-[0.04]"
-         style="background-image: linear-gradient(rgba(255,255,255,1) 1px,transparent 1px),
-                                  linear-gradient(90deg,rgba(255,255,255,1) 1px,transparent 1px);
-                background-size: 28px 28px;"></div>
-
-    <div class="relative mx-auto max-w-7xl px-4 sm:px-6 py-10 md:py-14">
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <span class="inline-flex items-center gap-2 bg-indigo-500/15 border border-indigo-500/30 text-indigo-300 text-xs font-extrabold uppercase tracking-widest px-3 py-1 rounded-full mb-3">
-                    🏥 অ্যাডমিন প্যানেল
-                </span>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-white">অর্গানাইজেশন/হাসপাতাল যাচাই</h1>
-                <p class="mt-1.5 text-slate-400 text-sm font-medium">অফিশিয়াল ডকুমেন্ট দেখে প্রতিষ্ঠান verify করুন।</p>
-            </div>
-            <a href="{{ route('admin.dashboard') }}"
-               class="inline-flex items-center gap-2 text-slate-400 hover:text-white text-sm font-semibold transition-colors duration-150 shrink-0">
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+                <span class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-lg">🏥</span>
+                অর্গানাইজেশন/হাসপাতাল যাচাই
+            </h1>
+            <p class="text-slate-500 text-sm font-semibold mt-1">অফিশিয়াল ডকুমেন্ট দেখে organization approve/reject করুন</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="inline-flex items-center gap-1.5 bg-indigo-600 text-white text-sm font-black px-4 py-2 rounded-full shadow-sm">
+                {{ $orgStats['total_pending'] }} টি পেন্ডিং
+            </span>
+            <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition">
                 ← অ্যাডমিন ড্যাশবোর্ড
             </a>
         </div>
+    </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
-            <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-                <div class="text-xl mb-1">⏳</div>
-                <div class="text-2xl font-extrabold text-white">{{ $orgStats['total_pending'] }}</div>
-                <div class="text-xs text-slate-400 font-semibold mt-0.5">মোট পেন্ডিং</div>
-            </div>
-            <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-                <div class="text-xl mb-1">✅</div>
-                <div class="text-2xl font-extrabold text-white">{{ $orgStats['approved'] }}</div>
-                <div class="text-xs text-slate-400 font-semibold mt-0.5">মোট অ্যাপ্রুভড</div>
-            </div>
-            <div class="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
-                <div class="text-xl mb-1">❌</div>
-                <div class="text-2xl font-extrabold text-white">{{ $orgStats['rejected'] }}</div>
-                <div class="text-xs text-slate-400 font-semibold mt-0.5">মোট বাতিল</div>
-            </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+            <div class="text-xl mb-1">⏳</div>
+            <div class="text-2xl font-extrabold text-slate-900">{{ $orgStats['total_pending'] }}</div>
+            <div class="text-xs text-slate-500 font-semibold mt-0.5">মোট পেন্ডিং</div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+            <div class="text-xl mb-1">✅</div>
+            <div class="text-2xl font-extrabold text-slate-900">{{ $orgStats['approved'] }}</div>
+            <div class="text-xs text-slate-500 font-semibold mt-0.5">মোট অ্যাপ্রুভড</div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+            <div class="text-xl mb-1">❌</div>
+            <div class="text-2xl font-extrabold text-slate-900">{{ $orgStats['rejected'] }}</div>
+            <div class="text-xs text-slate-500 font-semibold mt-0.5">মোট বাতিল</div>
         </div>
     </div>
-</section>
 
-<div class="mx-auto max-w-7xl px-4 sm:px-6 pt-6">
     @if(session('success'))
         <div class="mb-4 bg-emerald-50 border border-emerald-200 rounded-xl p-4 text-emerald-700 font-semibold text-sm flex items-center gap-2">
             ✅ {{ session('success') }}
@@ -55,9 +50,8 @@
             ⚠️ {{ session('error') }}
         </div>
     @endif
-</div>
 
-<div class="mx-auto max-w-7xl px-4 sm:px-6 py-6 pb-16" x-data="{ rejectModalOpen: false, currentOrgId: null, currentOrgName: '' }">
+    <div class="py-6 pb-16" x-data="{ rejectModalOpen: false, currentOrgId: null, currentOrgName: '' }">
     @if($pendingOrgs->isEmpty())
         <div class="bg-white rounded-3xl border border-slate-200 p-12 text-center flex flex-col items-center">
             <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-300 mb-4 text-3xl">🎉</div>
@@ -204,6 +198,7 @@
                 </form>
             </div>
         </div>
+    </div>
     </div>
 </div>
 @endsection
