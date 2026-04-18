@@ -40,12 +40,14 @@ class RewardDonorPoints implements ShouldQueue
                 donor:            $event->donor,
                 bloodRequest:     $event->bloodRequest,
                 isFirstResponder: $event->isFirstResponder,
+                isMidnightSavior: $event->isMidnightSavior,
             );
 
             Log::info('✅ Gamification reward processed', [
                 'donor_id'         => $event->donor->id,
                 'blood_request_id' => $event->bloodRequest->id,
                 'first_responder'  => $event->isFirstResponder,
+                'midnight_savior'  => $event->isMidnightSavior,
             ]);
 
         } catch (\Throwable $e) {

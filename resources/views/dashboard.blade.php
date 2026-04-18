@@ -762,9 +762,9 @@
                     <div class="w-10 h-10 rounded-xl bg-emerald-100 flex items-center justify-center text-lg shrink-0">👥</div>
                     <div class="flex-1 min-w-0">
                         <p class="text-sm font-extrabold text-slate-800">রেফারেল বোনাস</p>
-                        <p class="text-xs text-slate-500 font-medium truncate">বন্ধু সাইন-আপ + প্রথম ডোনেশনে</p>
+                        <p class="text-xs text-slate-500 font-medium truncate">বন্ধু সাইন-আপে +১০, প্রথম ডোনেশনে +৩০</p>
                     </div>
-                    <span class="text-sm font-black text-emerald-600 shrink-0">+৪০</span>
+                    <span class="text-sm font-black text-emerald-600 shrink-0">+১০/+৩০</span>
                 </div>
 
                 {{-- প্রোফাইল কমপ্লিট --}}

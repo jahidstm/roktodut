@@ -127,6 +127,8 @@ class BloodRequestController extends Controller
             $isEmergency = ($bloodRequest->urgency === 'emergency');
             $responseTimeHours = $bloodRequest->created_at->diffInHours($response->created_at);
             $isFirstResponder  = $isEmergency && $responseTimeHours <= 3;
+            $responseHour = $response->created_at->hour;
+            $isMidnightSavior = $isEmergency && $responseHour >= 0 && $responseHour <= 5;
 
             // 🚀 ইভেন্ট ফায়ার — RewardDonorPoints Listener ব্যাকগ্রাউন্ডে চলবে
             event(new DonationCompleted(
@@ -134,6 +136,7 @@ class BloodRequestController extends Controller
                 bloodRequest:     $bloodRequest,
                 isEmergency:      $isEmergency,
                 isFirstResponder: $isFirstResponder,
+                isMidnightSavior: $isMidnightSavior,
             ));
         }
 

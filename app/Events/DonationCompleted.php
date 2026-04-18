@@ -20,5 +20,6 @@ class DonationCompleted
         public readonly BloodRequest $bloodRequest,
         public readonly bool $isEmergency = false,
         public readonly bool $isFirstResponder = false,
+        public readonly bool $isMidnightSavior = false,
     ) {}
 }
