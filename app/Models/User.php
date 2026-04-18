@@ -118,6 +118,11 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         return $this->belongsTo(Upazila::class, 'upazila_id');
     }
 
+    public function receivesBroadcastNotificationsOn(): string
+    {
+        return 'user.'.$this->id;
+    }
+
     // ==================== Other Relationships ====================
 
     public function donations(): HasMany

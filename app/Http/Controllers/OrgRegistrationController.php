@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Organization;
+use App\Notifications\AdminTaskNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class OrgRegistrationController extends Controller
 {
@@ -88,6 +90,16 @@ class OrgRegistrationController extends Controller
             $adminUser->update(['organization_id' => $organization->id]);
 
             DB::commit();
+
+            $admins = User::where('role', 'admin')->get();
+            if ($admins->isNotEmpty()) {
+                Notification::send($admins, new AdminTaskNotification(
+                    message: "নতুন {$organization->name} যাচাইয়ের জন্য পেন্ডিং আছে।",
+                    url: route('admin.org.reviews'),
+                    title: '🏥 পেন্ডিং অর্গানাইজেশন/হাসপাতাল যাচাই',
+                    taskType: 'organization_review',
+                ));
+            }
 
             return redirect()->route('login')->with('success', 'আপনার রেজিস্ট্রেশন সফল হয়েছে। আমাদের টিম আপনার তথ্যগুলো যাচাই করে শীঘ্রই অ্যাকাউন্টটি অ্যাক্টিভ করবে।');
         } catch (\Exception $e) {

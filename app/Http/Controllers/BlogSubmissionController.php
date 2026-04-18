@@ -6,9 +6,12 @@ use App\Models\BloodRequest;
 use App\Models\Donation;
 use App\Models\Post;
 use App\Models\SuccessStoryMeta;
+use App\Models\User;
+use App\Notifications\AdminTaskNotification;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -89,6 +92,16 @@ class BlogSubmissionController extends Controller
             'status'         => 'pending_review',
             'published_at'   => null,
         ]);
+
+        $admins = User::where('role', 'admin')->get();
+        if ($admins->isNotEmpty()) {
+            Notification::send($admins, new AdminTaskNotification(
+                message: "নতুন ব্লগ পোস্ট রিভিউর জন্য এসেছে: {$post->title}",
+                url: route('admin.blog.moderation.index'),
+                title: '📝 পেন্ডিং ব্লগ মডারেশন',
+                taskType: 'blog_moderation',
+            ));
+        }
 
         // ── Story Meta ─────────────────────────────────────────────────────
         if ($post->type === 'story') {

@@ -19,15 +19,16 @@
         </div>
     </div>
 
+    <div id="org-command-shell">
     {{-- 🧭 Top Navigation Tabs --}}
     <div class="mb-8 flex overflow-x-auto bg-white border border-slate-200 rounded-2xl p-2 shadow-sm gap-2 whitespace-nowrap">
-        <a href="{{ route('org.dashboard') }}" class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900">
+        <a href="{{ route('org.dashboard') }}" data-org-tab class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900">
             👥 মেম্বার ম্যানেজমেন্ট
         </a>
-        <a href="{{ route('org.requests.index') }}" class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all text-slate-600 hover:bg-slate-50 hover:text-red-600">
+        <a href="{{ route('org.requests.index') }}" data-org-tab class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all text-slate-600 hover:bg-slate-50 hover:text-red-600">
             🩸 রক্তের অনুরোধ (অর্গ জোন)
         </a>
-        <a href="{{ route('org.camps.index') }}" class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all bg-teal-600 text-white shadow-sm">
+        <a href="{{ route('org.camps.index') }}" data-org-tab class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all bg-teal-600 text-white shadow-sm">
             🏕️ রক্তদান ক্যাম্প
         </a>
     </div>
@@ -93,6 +94,7 @@
         <div class="px-6 py-4 border-t border-slate-100 bg-slate-50">
             {{ $camps->links() }}
         </div>
+    </div>
     </div>
 </div>
 @endsection

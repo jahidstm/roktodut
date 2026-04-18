@@ -49,108 +49,21 @@
         </x-card>
     </div>
 
-    {{-- 🪪 ২. NID ভেরিফিকেশন রিভিউ (Primary Queue) --}}
-    <div x-data="{ openNidReview: false }" class="mb-12">
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
-             :class="{'border-blue-200 ring-2 ring-blue-50': openNidReview}">
-            <button @click="openNidReview = !openNidReview"
-                    @keydown.enter="openNidReview = !openNidReview"
-                    @keydown.space.prevent="openNidReview = !openNidReview"
-                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-blue-50/30 transition-colors focus:outline-none">
-                <div class="flex items-center gap-4 text-left">
-                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl shrink-0 transition-transform"
-                         :class="{'scale-110': openNidReview}">🪪</div>
-                    <div>
-                        <h3 class="text-lg font-extrabold text-slate-900">NID ভেরিফিকেশন রিভিউ (অর্গানাইজেশন-বিহীন ইউজার)</h3>
-                        <p class="text-sm text-slate-500 font-medium">অ্যাডমিন কিউ থেকে NID approve/reject করুন</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="hidden sm:flex flex-wrap gap-2">
-                        <span class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2.5 py-1 rounded-md border border-blue-100">🪪 NID রিভিউ</span>
-                    </div>
-                    <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">
-                        {{ $pendingNids }} টি পেন্ডিং
-                    </span>
-                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300"
-                         :class="{'rotate-180 bg-blue-100 text-blue-600': openNidReview}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
-                    </div>
-                </div>
-            </button>
-            <div x-show="openNidReview"
-                 x-collapse
-                 style="display: none;">
-                <div class="p-6 border-t border-slate-100 bg-slate-50/50">
-                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">
-                        এখানে শুধুমাত্র অর্গানাইজেশন-বিহীন ইউজারদের NID রিভিউ হয়। অর্গানাইজেশন সদস্যদের NID তাদের org-admin যাচাই করবেন।
-                    </p>
-                    <a href="{{ route('admin.nid.reviews') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
-                        প্যানেলে প্রবেশ করুন
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                    </a>
-                </div>
-            </div>
+    {{-- 🧭 ২. Admin Operations Control Center (Priority Panels) --}}
+    <div x-data="{ activeAccordion: null }" class="space-y-4 mb-8">
+        <div class="flex items-center gap-2 mb-4 mt-8">
+            <h2 class="text-xl font-extrabold text-slate-900">🧭 অ্যাডমিন অপারেশনস কন্ট্রোল সেন্টার</h2>
         </div>
-    </div>
 
-    {{-- 🏢 ৩. অর্গানাইজেশন/হাসপাতাল যাচাই --}}
-    <div x-data="{ openOrgReview: false }" class="mb-12">
+        {{-- 1) Proof Review --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
-             :class="{'border-indigo-200 ring-2 ring-indigo-50': openOrgReview}">
-            <button @click="openOrgReview = !openOrgReview"
-                    @keydown.enter="openOrgReview = !openOrgReview"
-                    @keydown.space.prevent="openOrgReview = !openOrgReview"
-                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-indigo-50/30 transition-colors focus:outline-none">
-                <div class="flex items-center gap-4 text-left">
-                    <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl shrink-0 transition-transform"
-                         :class="{'scale-110': openOrgReview}">🏥</div>
-                    <div>
-                        <h3 class="text-lg font-extrabold text-slate-900">অর্গানাইজেশন/হাসপাতাল যাচাই</h3>
-                        <p class="text-sm text-slate-500 font-medium">অফিশিয়াল ডকুমেন্ট যাচাই করে organization approve/reject করুন</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="hidden sm:flex flex-wrap gap-2">
-                        <span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2.5 py-1 rounded-md border border-indigo-100">🏢 অর্গ ভেরিফাই</span>
-                        <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-md border border-emerald-100">✅ অ্যাপ্রুভ/রিজেক্ট</span>
-                    </div>
-                    <span class="bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">
-                        {{ $pendingOrgs }} টি পেন্ডিং
-                    </span>
-                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300"
-                         :class="{'rotate-180 bg-indigo-100 text-indigo-600': openOrgReview}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
-                    </div>
-                </div>
-            </button>
-            <div x-show="openOrgReview"
-                 x-collapse
-                 style="display: none;">
-                <div class="p-6 border-t border-slate-100 bg-slate-50/50">
-                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">
-                        হাসপাতাল/অর্গানাইজেশনের আবেদন ও অফিসিয়াল ডকুমেন্ট যাচাইয়ের জন্য dedicated review panel ব্যবহার করুন।
-                    </p>
-                    <a href="{{ route('admin.org.reviews') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
-                        প্যানেলে প্রবেশ করুন
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- 🛡️ ৪. পেন্ডিং ভেরিফিকেশন (প্রুফ রিভিউ - Secondary Queue) --}}
-    <div x-data="{ openProofReview: false }" class="mb-12">
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
-             :class="{'border-red-200 ring-2 ring-red-50': openProofReview}">
-            <button @click="openProofReview = !openProofReview"
-                    @keydown.enter="openProofReview = !openProofReview"
-                    @keydown.space.prevent="openProofReview = !openProofReview"
+             :class="{'border-red-200 ring-2 ring-red-50': activeAccordion === 1}">
+            <button @click="activeAccordion = activeAccordion === 1 ? null : 1" 
+                    @keydown.enter="activeAccordion = activeAccordion === 1 ? null : 1"
+                    @keydown.space.prevent="activeAccordion = activeAccordion === 1 ? null : 1"
                     class="w-full flex items-center justify-between p-5 bg-white hover:bg-red-50/30 transition-colors focus:outline-none">
                 <div class="flex items-center gap-4 text-left">
-                    <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-2xl shrink-0 transition-transform"
-                         :class="{'scale-110': openProofReview}">🛡️</div>
+                    <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 1}">🛡️</div>
                     <div>
                         <h3 class="text-lg font-extrabold text-slate-900">পেন্ডিং ভেরিফিকেশন (প্রুফ রিভিউ)</h3>
                         <p class="text-sm text-slate-500 font-medium">ডোনেশন প্রুফ queue review করে approve/reject করুন</p>
@@ -161,57 +74,7 @@
                         <span class="bg-amber-50 text-amber-700 text-[10px] font-bold px-2.5 py-1 rounded-md border border-amber-100">🟡 ক্লেইমড</span>
                         <span class="bg-red-50 text-red-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-red-100">🔴 ডিসপিউটেড</span>
                     </div>
-                    <span class="bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-full">
-                        {{ $pendingClaims }} টি পেন্ডিং
-                    </span>
-                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300"
-                         :class="{'rotate-180 bg-red-100 text-red-600': openProofReview}">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
-                    </div>
-                </div>
-            </button>
-
-            <div x-show="openProofReview"
-                 x-collapse
-                 style="display: none;">
-                <div class="p-6 border-t border-slate-100 bg-slate-50/50">
-                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">
-                        বড় স্কেলে (যেমন ১০০+ কেস) ড্যাশবোর্ড পরিষ্কার রাখতে full proof review queue আলাদা প্যানেলে রাখা হয়েছে।
-                    </p>
-                    <a href="{{ route('admin.donations.proof_reviews') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
-                        প্যানেলে প্রবেশ করুন
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- ⚙️ ৫. Governance & Moderation Tools (Expandable Accordion) --}}
-    <div x-data="{ activeAccordion: null }" class="space-y-4 mb-8">
-        <div class="flex items-center gap-2 mb-4 mt-8">
-            <h2 class="text-xl font-extrabold text-slate-900">⚙️ গভার্নেন্স ও মডারেশন প্যানেল</h2>
-        </div>
-
-        {{-- Gamification Governance --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
-             :class="{'border-red-200 ring-2 ring-red-50': activeAccordion === 1}">
-            <button @click="activeAccordion = activeAccordion === 1 ? null : 1" 
-                    @keydown.enter="activeAccordion = activeAccordion === 1 ? null : 1"
-                    @keydown.space.prevent="activeAccordion = activeAccordion === 1 ? null : 1"
-                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-red-50/30 transition-colors focus:outline-none">
-                <div class="flex items-center gap-4 text-left">
-                    <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 1}">🎮</div>
-                    <div>
-                        <h3 class="text-lg font-extrabold text-slate-900">Gamification Governance Panel</h3>
-                        <p class="text-sm text-slate-500 font-medium">ডোনার পয়েন্ট অ্যাডজাস্ট, শ্যাডোব্যান এবং অ্যাক্টিভিটি অডিট</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="hidden sm:flex flex-wrap gap-2">
-                        <span class="bg-red-50 text-red-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-red-100">🚫 Shadowban</span>
-                        <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-blue-100">🔧 Point Adjust</span>
-                    </div>
+                    <span class="bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-full">{{ $pendingClaims }} টি পেন্ডিং</span>
                     <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-red-100 text-red-600': activeAccordion === 1}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </div>
@@ -222,9 +85,9 @@
                  style="display: none;">
                 <div class="p-6 border-t border-slate-100 bg-slate-50/50">
                     <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">
-                        ডোনারদের অর্জিত পয়েন্ট ম্যানুয়ালি রিভিউ ও মডিফাই করার জন্য এই প্যানেল ব্যবহার করুন। কোনো অস্বাভাবিক পয়েন্ট গেইন দেখা গেলে অ্যাকাউন্ট শ্যাডোব্যান বা রিস্টোর করতে পারবেন।
+                        বড় স্কেলে ড্যাশবোর্ড পরিষ্কার রাখতে full proof review queue আলাদা প্যানেলে রাখা হয়েছে।
                     </p>
-                    <a href="{{ route('admin.gamification.index') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
+                    <a href="{{ route('admin.donations.proof_reviews') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
                         প্যানেলে প্রবেশ করুন
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </a>
@@ -232,37 +95,26 @@
             </div>
         </div>
 
-        {{-- Blog Governance --}}
+        {{-- 2) NID Review --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
-             :class="{'border-violet-200 ring-2 ring-violet-50': activeAccordion === 2}">
+             :class="{'border-blue-200 ring-2 ring-blue-50': activeAccordion === 2}">
             <button @click="activeAccordion = activeAccordion === 2 ? null : 2" 
                     @keydown.enter="activeAccordion = activeAccordion === 2 ? null : 2"
                     @keydown.space.prevent="activeAccordion = activeAccordion === 2 ? null : 2"
-                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-violet-50/30 transition-colors focus:outline-none">
+                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-blue-50/30 transition-colors focus:outline-none">
                 <div class="flex items-center gap-4 text-left">
-                    <div class="w-12 h-12 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 2}">📝</div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 2}">🪪</div>
                     <div>
-                        <div class="flex items-center gap-2 flex-wrap mb-0.5">
-                            <h3 class="text-lg font-extrabold text-slate-900">ব্লগ ও কন্টেন্ট মডারেশন</h3>
-                            @if(isset($pendingBlogCount) && $pendingBlogCount > 0)
-                                <span class="bg-red-100 text-red-600 text-[10px] font-black px-2 py-0.5 rounded-full border border-red-200 animate-pulse">
-                                    🔴 {{ $pendingBlogCount }} পেন্ডিং
-                                </span>
-                            @else
-                                <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-100">
-                                    ✅ সব ক্লিয়ার
-                                </span>
-                            @endif
-                        </div>
-                        <p class="text-sm text-slate-500 font-medium">ইউজারদের সাবমিট করা ব্লগ পোস্ট রিভিউ করুন</p>
+                        <h3 class="text-lg font-extrabold text-slate-900">NID ভেরিফিকেশন রিভিউ</h3>
+                        <p class="text-sm text-slate-500 font-medium">অর্গানাইজেশন-বিহীন ইউজারদের NID approve/reject করুন</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="hidden sm:flex flex-wrap gap-2">
-                        <span class="bg-violet-50 text-violet-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-violet-100">✍️ রিভিউ</span>
-                        <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-emerald-100">✅ অ্যাপ্রুভ</span>
+                        <span class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2.5 py-1 rounded-md border border-blue-100">🪪 NID রিভিউ</span>
                     </div>
-                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-violet-100 text-violet-600': activeAccordion === 2}">
+                    <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">{{ $pendingNids }} টি পেন্ডিং</span>
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-blue-100 text-blue-600': activeAccordion === 2}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </div>
                 </div>
@@ -272,17 +124,53 @@
                  style="display: none;">
                 <div class="p-6 border-t border-slate-100 bg-slate-50/50">
                     <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">
-                        পুরো সিস্টেমের কন্টেন্ট কোয়ালিটি কন্ট্রোল করুন। অপ্রাসঙ্গিক বা ভুয়া খবর ফিল্টার আউট করে শুধু মানসম্মত ব্লগ অ্যাপ্রুভ করুন।
+                        এখানে শুধুমাত্র অর্গানাইজেশন-বিহীন ইউজারদের NID রিভিউ হয়।
                     </p>
-                    <a href="{{ route('admin.blog.moderation.index') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
-                        মডারেশন শুরু করুন
+                    <a href="{{ route('admin.nid.reviews') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
+                        প্যানেলে প্রবেশ করুন
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                     </a>
                 </div>
             </div>
         </div>
 
-        {{-- Support Inbox Governance --}}
+        {{-- 3) Organization Review --}}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+             :class="{'border-indigo-200 ring-2 ring-indigo-50': activeAccordion === 3}">
+            <button @click="activeAccordion = activeAccordion === 3 ? null : 3"
+                    @keydown.enter="activeAccordion = activeAccordion === 3 ? null : 3"
+                    @keydown.space.prevent="activeAccordion = activeAccordion === 3 ? null : 3"
+                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-indigo-50/30 transition-colors focus:outline-none">
+                <div class="flex items-center gap-4 text-left">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 3}">🏥</div>
+                    <div>
+                        <h3 class="text-lg font-extrabold text-slate-900">অর্গানাইজেশন/হাসপাতাল যাচাই</h3>
+                        <p class="text-sm text-slate-500 font-medium">অফিশিয়াল ডকুমেন্ট দেখে organization approve/reject করুন</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex flex-wrap gap-2">
+                        <span class="bg-indigo-50 text-indigo-700 text-[10px] font-bold px-2.5 py-1 rounded-md border border-indigo-100">🏢 অর্গ ভেরিফাই</span>
+                        <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-md border border-emerald-100">✅ অ্যাপ্রুভ/রিজেক্ট</span>
+                    </div>
+                    <span class="bg-indigo-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">{{ $pendingOrgs }} টি পেন্ডিং</span>
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-indigo-100 text-indigo-600': activeAccordion === 3}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </button>
+            <div x-show="activeAccordion === 3" x-collapse style="display: none;">
+                <div class="p-6 border-t border-slate-100 bg-slate-50/50">
+                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">হাসপাতাল/অর্গানাইজেশনের আবেদন ও অফিসিয়াল ডকুমেন্ট যাচাই করুন।</p>
+                    <a href="{{ route('admin.org.reviews') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
+                        প্যানেলে প্রবেশ করুন
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {{-- 4) Support Inbox Governance --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
              :class="{'border-blue-200 ring-2 ring-blue-50': activeAccordion === 4}">
             <button @click="activeAccordion = activeAccordion === 4 ? null : 4" 
@@ -331,15 +219,92 @@
             </div>
         </div>
 
-        {{-- Analytics Dashboard --}}
+        {{-- 5) Blog Governance --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
-             :class="{'border-red-200 ring-2 ring-red-50': activeAccordion === 3}">
-            <button @click="activeAccordion = activeAccordion === 3 ? null : 3"
-                    @keydown.enter="activeAccordion = activeAccordion === 3 ? null : 3"
-                    @keydown.space.prevent="activeAccordion = activeAccordion === 3 ? null : 3"
+             :class="{'border-violet-200 ring-2 ring-violet-50': activeAccordion === 5}">
+            <button @click="activeAccordion = activeAccordion === 5 ? null : 5"
+                    @keydown.enter="activeAccordion = activeAccordion === 5 ? null : 5"
+                    @keydown.space.prevent="activeAccordion = activeAccordion === 5 ? null : 5"
+                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-violet-50/30 transition-colors focus:outline-none">
+                <div class="flex items-center gap-4 text-left">
+                    <div class="w-12 h-12 rounded-xl bg-violet-100 text-violet-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 5}">📝</div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                            <h3 class="text-lg font-extrabold text-slate-900">ব্লগ ও কন্টেন্ট মডারেশন</h3>
+                            @if(isset($pendingBlogCount) && $pendingBlogCount > 0)
+                                <span class="bg-red-100 text-red-600 text-[10px] font-black px-2 py-0.5 rounded-full border border-red-200 animate-pulse">🔴 {{ $pendingBlogCount }} পেন্ডিং</span>
+                            @else
+                                <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-100">✅ সব ক্লিয়ার</span>
+                            @endif
+                        </div>
+                        <p class="text-sm text-slate-500 font-medium">ইউজারদের সাবমিট করা ব্লগ পোস্ট রিভিউ করুন</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex flex-wrap gap-2">
+                        <span class="bg-violet-50 text-violet-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-violet-100">✍️ রিভিউ</span>
+                        <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-emerald-100">✅ অ্যাপ্রুভ</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-violet-100 text-violet-600': activeAccordion === 5}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </button>
+            <div x-show="activeAccordion === 5" x-collapse style="display: none;">
+                <div class="p-6 border-t border-slate-100 bg-slate-50/50">
+                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">পোস্ট কন্টেন্ট কোয়ালিটি কন্ট্রোল করুন এবং মানসম্মত ব্লগ অ্যাপ্রুভ করুন।</p>
+                    <a href="{{ route('admin.blog.moderation.index') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
+                        মডারেশন শুরু করুন
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {{-- 6) Gamification Governance --}}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+             :class="{'border-red-200 ring-2 ring-red-50': activeAccordion === 6}">
+            <button @click="activeAccordion = activeAccordion === 6 ? null : 6"
+                    @keydown.enter="activeAccordion = activeAccordion === 6 ? null : 6"
+                    @keydown.space.prevent="activeAccordion = activeAccordion === 6 ? null : 6"
                     class="w-full flex items-center justify-between p-5 bg-white hover:bg-red-50/30 transition-colors focus:outline-none">
                 <div class="flex items-center gap-4 text-left">
-                    <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 3}">📊</div>
+                    <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 6}">🎮</div>
+                    <div>
+                        <h3 class="text-lg font-extrabold text-slate-900">Gamification Governance Panel</h3>
+                        <p class="text-sm text-slate-500 font-medium">ডোনার পয়েন্ট অ্যাডজাস্ট, শ্যাডোব্যান এবং অ্যাক্টিভিটি অডিট</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex flex-wrap gap-2">
+                        <span class="bg-red-50 text-red-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-red-100">🚫 Shadowban</span>
+                        <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-blue-100">🔧 Point Adjust</span>
+                    </div>
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-red-100 text-red-600': activeAccordion === 6}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </button>
+            <div x-show="activeAccordion === 6" x-collapse style="display: none;">
+                <div class="p-6 border-t border-slate-100 bg-slate-50/50">
+                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">অস্বাভাবিক পয়েন্ট গেইন বা ব্যাজ আচরণ ম্যানেজ করতে এই প্যানেল ব্যবহার করুন।</p>
+                    <a href="{{ route('admin.gamification.index') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
+                        প্যানেলে প্রবেশ করুন
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {{-- 7) Analytics Dashboard --}}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+             :class="{'border-red-200 ring-2 ring-red-50': activeAccordion === 7}">
+            <button @click="activeAccordion = activeAccordion === 7 ? null : 7"
+                    @keydown.enter="activeAccordion = activeAccordion === 7 ? null : 7"
+                    @keydown.space.prevent="activeAccordion = activeAccordion === 7 ? null : 7"
+                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-red-50/30 transition-colors focus:outline-none">
+                <div class="flex items-center gap-4 text-left">
+                    <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 7}">📊</div>
                     <div>
                         <h3 class="text-lg font-extrabold text-slate-900">Analytics Dashboard & CSV Export</h3>
                         <p class="text-sm text-slate-500 font-medium">রিয়েল-টাইম চার্ট, ট্রেন্ড অ্যানালাইসিস এবং প্রাইভেসি-সেইফ রিপোর্ট ডাউনলোড</p>
@@ -350,12 +315,12 @@
                         <span class="bg-red-50 text-red-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-red-100">📈 Chart</span>
                         <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-emerald-100">⬇ CSV</span>
                     </div>
-                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-red-100 text-red-600': activeAccordion === 3}">
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-red-100 text-red-600': activeAccordion === 7}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </div>
                 </div>
             </button>
-            <div x-show="activeAccordion === 3"
+            <div x-show="activeAccordion === 7"
                  x-collapse
                  style="display: none;">
                 <div class="p-6 border-t border-slate-100 bg-slate-50/50">

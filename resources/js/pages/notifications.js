@@ -7,7 +7,7 @@
 
 // ─── Toast ────────────────────────────────────────────────────────────────────
 
-function showToast(message) {
+function showToast(message, title = '🔔 নতুন নোটিফিকেশন') {
     const container = document.getElementById('notif-toast-container');
     if (!container) return;
 
@@ -26,7 +26,7 @@ function showToast(message) {
             </svg>
         </div>
         <div class="flex-1 min-w-0">
-            <p class="text-sm font-black text-slate-900">🩸 নতুন রক্তের অনুরোধ</p>
+            <p class="text-sm font-black text-slate-900">${title}</p>
             <p class="text-xs text-slate-500 mt-0.5 leading-snug line-clamp-2">${message}</p>
         </div>
         <button onclick="this.parentElement.remove()"
@@ -67,20 +67,33 @@ export function initNotifications(userId) {
     window.Echo
         .private(`user.${userId}`)
         .listen('BloodRequestMatched', (event) => {
-            // 1. Notify the Alpine notificationBell component
             window.dispatchEvent(new CustomEvent('notif:new', {
                 detail: {
-                    id:          `${event.request_id}_${Date.now()}`,
-                    message:     event.message    ?? 'নতুন রক্তের অনুরোধ',
+                    id: `${event.request_id}_${Date.now()}`,
+                    message: event.message ?? 'নতুন রক্তের অনুরোধ',
                     blood_group: event.blood_group ?? null,
-                    urgency:     event.urgency     ?? 'normal',
-                    url:         event.url         ?? '#',
-                    read_at:     null,
-                    time_ago:    'এইমাত্র',
+                    urgency: event.urgency ?? 'normal',
+                    url: event.url ?? '#',
+                    read_at: null,
+                    time_ago: 'এইমাত্র',
                 },
             }));
 
-            // 2. Show Bangla toast
-            showToast(event.message ?? 'নতুন রক্তের অনুরোধ এসেছে!');
+            showToast(event.message ?? 'নতুন রক্তের অনুরোধ এসেছে!', '🩸 নতুন রক্তের অনুরোধ');
+        })
+        .notification((event) => {
+            window.dispatchEvent(new CustomEvent('notif:new', {
+                detail: {
+                    id: event.id ?? `notif_${Date.now()}`,
+                    message: event.message ?? 'নতুন নোটিফিকেশন',
+                    blood_group: event.blood_group ?? null,
+                    urgency: event.urgency ?? 'normal',
+                    url: event.url ?? '#',
+                    read_at: null,
+                    time_ago: 'এইমাত্র',
+                },
+            }));
+
+            showToast(event.message ?? 'নতুন নোটিফিকেশন এসেছে!', event.title ?? '🔔 নতুন নোটিফিকেশন');
         });
 }

@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\BloodRequestResponse;
+use App\Models\User;
+use App\Notifications\AdminTaskNotification;
 use App\Services\GamificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 class DonationClaimController extends Controller
@@ -38,6 +41,8 @@ class DonationClaimController extends Controller
                     'donor_claimed_at'    => now(),
                 ]);
 
+                $this->notifyAdminsForProofReview($response, 'claim');
+
                 return back()->with('success', '🎉 পিন মিলেছে! আপনার দাবিটি (Claim) রেকর্ড করা হয়েছে। গ্রহীতা বা অ্যাডমিন রিভিউয়ের পর আপনার পয়েন্ট ও ব্যাজ যুক্ত হবে।');
             }
             return back()->with('error', 'দুঃখিত, পিনটি সঠিক নয়।');
@@ -50,6 +55,8 @@ class DonationClaimController extends Controller
                 'verification_status' => 'claimed',
                 'donor_claimed_at'    => now(),
             ]);
+
+            $this->notifyAdminsForProofReview($response, 'claim');
 
             return back()->with('success', '📸 আপনার প্রমাণটি জমা হয়েছে। যাচাইয়ের পর পয়েন্ট ও ব্যাজ যুক্ত হবে।');
         }
@@ -107,6 +114,7 @@ class DonationClaimController extends Controller
 
         if ($request->decision === 'dispute') {
             $response->update(['verification_status' => 'disputed']);
+            $this->notifyAdminsForProofReview($response, 'dispute');
             return back()->with('error', 'অভিযোগটি গ্রহণ করা হয়েছে।');
         }
     }
@@ -190,5 +198,34 @@ class DonationClaimController extends Controller
         }
 
         return Storage::disk('private')->response($response->proof_image_path);
+    }
+
+    private function notifyAdminsForProofReview(BloodRequestResponse $response, string $type = 'claim'): void
+    {
+        $admins = User::where('role', 'admin')->get();
+        if ($admins->isEmpty()) {
+            return;
+        }
+
+        $response->loadMissing(['user:id,name', 'bloodRequest:id,patient_name,blood_group']);
+        $donorName = $response->user?->name ?? 'একজন ডোনার';
+        $patientName = $response->bloodRequest?->patient_name;
+        $bloodGroup = $response->bloodRequest?->blood_group;
+        $context = $patientName ? "রোগী: {$patientName}" : ($bloodGroup ? "গ্রুপ: {$bloodGroup}" : null);
+        $message = match ($type) {
+            'dispute' => $context
+                ? "{$donorName} ডোনেশন ভেরিফিকেশন নিয়ে ডিসপিউট দিয়েছে ({$context})।"
+                : "{$donorName} ডোনেশন ভেরিফিকেশন নিয়ে ডিসপিউট দিয়েছে।",
+            default => $context
+                ? "{$donorName} ডোনেশন ক্লেইম সাবমিট করেছে ({$context})।"
+                : "{$donorName} ডোনেশন ক্লেইম সাবমিট করেছে।",
+        };
+
+        Notification::send($admins, new AdminTaskNotification(
+            message: $message,
+            url: route('admin.donations.proof_reviews'),
+            title: '📎 পেন্ডিং প্রুফ রিভিউ',
+            taskType: 'proof_review',
+        ));
     }
 }

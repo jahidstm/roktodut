@@ -3,6 +3,7 @@ import './bootstrap';
 import Alpine from 'alpinejs';
 import { initSearchPage } from './pages/search';
 import { initNotifications } from './pages/notifications';
+import { initOrgDashboardTabs } from './pages/org-dashboard-tabs';
 
 window.Alpine = Alpine;
 
@@ -101,4 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (window.__userId) {
         initNotifications(window.__userId);
     }
+
+    initOrgDashboardTabs();
 });

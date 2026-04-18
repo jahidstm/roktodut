@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\User;
+use App\Notifications\AdminTaskNotification;
 use App\Services\GamificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
@@ -195,6 +198,18 @@ class ProfileController extends Controller
         if ($changed) {
             $user->save();
             $user->refresh();
+
+            if ($user->nid_status === 'pending') {
+                $admins = User::where('role', 'admin')->get();
+                if ($admins->isNotEmpty()) {
+                    Notification::send($admins, new AdminTaskNotification(
+                        message: "{$user->name} নতুন NID তথ্য জমা দিয়েছে। যাচাই প্রয়োজন।",
+                        url: route('admin.nid.reviews'),
+                        title: '🪪 পেন্ডিং NID ভেরিফিকেশন',
+                        taskType: 'nid_review',
+                    ));
+                }
+            }
 
             // NID আপলোড করলে প্রোফাইল ১০০% হয় কিনা চেক করা
             $completion = $this->calcCompletion($user);
