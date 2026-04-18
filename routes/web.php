@@ -197,6 +197,9 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 // 🛡️ সিস্টেম অ্যাডমিন রাউটস (ইন্টিগ্রেটেড গ্রুপ)
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/donations/proof-reviews', [AdminDashboardController::class, 'proofReviews'])->name('admin.donations.proof_reviews');
+    Route::get('/admin/verification/nid-reviews', [AdminDashboardController::class, 'nidReviews'])->name('admin.nid.reviews');
+    Route::get('/admin/verification/organization-reviews', [AdminDashboardController::class, 'organizationReviews'])->name('admin.org.reviews');
     Route::get('/admin/analytics', [AnalyticsController::class, 'index'])->name('admin.analytics.index');
     Route::get('/admin/analytics/export', [AnalyticsController::class, 'export'])->name('admin.analytics.export');
     Route::post('/admin/donations/{response}/verify', [DonationClaimController::class, 'adminVerify'])->name('admin.donations.verify');

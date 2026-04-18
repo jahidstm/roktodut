@@ -51,22 +51,16 @@ class AdminDashboardController extends Controller
         }
 
         // 🎯 ৫. যেসব ক্লেইম ভেরিফাই করার জন্য পেন্ডিং আছে বা ডিসপুট করা হয়েছে
-        $pendingClaims = BloodRequestResponse::with(['user', 'bloodRequest']) // 'user' হলো ডোনার
-            ->whereIn('verification_status', ['claimed', 'disputed'])
-            ->orderBy('donor_claimed_at', 'desc')
-            ->get();
+        $pendingClaims = BloodRequestResponse::whereIn('verification_status', ['claimed', 'disputed'])->count();
 
         // 🏅 ৫. পেন্ডিং NID ভেরিফিকেশন (System Admin Review - Only org-less users)
         $pendingNids = User::where('nid_status', 'pending')
             ->whereNotNull('nid_path')
             ->whereNull('organization_id')
-            ->orderBy('updated_at', 'asc')
-            ->get();
+            ->count();
 
         // 🏢 ৭. Pending Organization Applications
-        $pendingOrgs = \App\Models\Organization::where('status', 'pending')
-            ->orderBy('created_at', 'asc')
-            ->get();
+        $pendingOrgs = \App\Models\Organization::where('status', 'pending')->count();
 
         // 📑 ৮. Recent Audit Logs
         $recentAuditLogs = \App\Models\AdminAuditLog::with('admin')
@@ -104,6 +98,75 @@ class AdminDashboardController extends Controller
             'recentSecurityLogs',
             'pendingSupportMessages'
         ));
+    }
+
+    /**
+     * 🛡️ Dedicated donation proof review queue
+     */
+    public function proofReviews()
+    {
+        $pendingClaims = BloodRequestResponse::with([
+                'user',
+                'bloodRequest.requester',
+            ])
+            ->whereIn('verification_status', ['claimed', 'disputed'])
+            ->orderByDesc('donor_claimed_at')
+            ->paginate(12)
+            ->withQueryString();
+
+        $reviewStats = [
+            'total_pending' => BloodRequestResponse::whereIn('verification_status', ['claimed', 'disputed'])->count(),
+            'claimed' => BloodRequestResponse::where('verification_status', 'claimed')->count(),
+            'disputed' => BloodRequestResponse::where('verification_status', 'disputed')->count(),
+        ];
+
+        return view('admin.donations.proof-reviews', compact('pendingClaims', 'reviewStats'));
+    }
+
+    /**
+     * 🪪 Dedicated NID verification queue
+     */
+    public function nidReviews()
+    {
+        $pendingNids = User::with('district')
+            ->where('nid_status', 'pending')
+            ->whereNotNull('nid_path')
+            ->whereNull('organization_id')
+            ->orderBy('updated_at', 'asc')
+            ->paginate(15)
+            ->withQueryString();
+
+        $nidStats = [
+            'total_pending' => User::where('nid_status', 'pending')
+                ->whereNotNull('nid_path')
+                ->whereNull('organization_id')
+                ->count(),
+            'approved' => User::where(function ($q) {
+                $q->where('nid_status', 'approved')->orWhere('verified_badge', 1);
+            })->count(),
+        ];
+
+        return view('admin.verification.nid-reviews', compact('pendingNids', 'nidStats'));
+    }
+
+    /**
+     * 🏥 Dedicated organization/hospital verification queue
+     */
+    public function organizationReviews()
+    {
+        $pendingOrgs = \App\Models\Organization::with(['locationDistrict', 'locationUpazila'])
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'asc')
+            ->paginate(12)
+            ->withQueryString();
+
+        $orgStats = [
+            'total_pending' => \App\Models\Organization::where('status', 'pending')->count(),
+            'approved' => \App\Models\Organization::where('status', 'approved')->count(),
+            'rejected' => \App\Models\Organization::where('status', 'rejected')->count(),
+        ];
+
+        return view('admin.verification.organization-reviews', compact('pendingOrgs', 'orgStats'));
     }
 
     /**
