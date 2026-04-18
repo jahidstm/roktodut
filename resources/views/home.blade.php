@@ -335,10 +335,10 @@
             {{-- Left: Image composition --}}
             <div class="relative order-2 lg:order-1">
                 <div class="bg-white rounded-[3rem] p-4 sm:p-6 relative z-10 w-4/5 ml-auto shadow-[0_20px_50px_-10px_rgba(0,0,0,0.1)] border border-slate-100">
-                    <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hospital" class="rounded-[2rem] w-full h-auto object-cover">
+                    <img src="https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Hospital" class="rounded-[2rem] w-full h-auto object-cover" loading="lazy" decoding="async">
                 </div>
                 <div class="absolute top-20 left-0 w-2/3 z-20 shadow-2xl rounded-[2.5rem] overflow-hidden border-8 border-white">
-                    <img src="https://images.unsplash.com/photo-1551076805-e1869033e561?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Mobile UI" class="w-full h-auto object-cover">
+                    <img src="https://images.unsplash.com/photo-1551076805-e1869033e561?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" alt="Mobile UI" class="w-full h-auto object-cover" loading="lazy" decoding="async">
                 </div>
                 
                 {{-- Floating badge --}}
@@ -575,29 +575,24 @@
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 7 — CTA BANNER (Centered Design)
 ═══════════════════════════════════════════════════════════════ --}}
-<section class="bg-[#BE1B21] relative py-12 lg:py-14 overflow-hidden text-center">
-    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col items-center">
-        
-        {{-- Heart Icon --}}
-        <div class="w-16 h-16 rounded-full border border-white/30 flex items-center justify-center mb-6 bg-white/10">
-            <svg class="w-8 h-8 text-white fill-current" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        </div>
+<section class="bg-[#BE1B21] relative py-10 lg:py-11 overflow-hidden text-center">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col items-center pt-3 lg:pt-4">
 
         {{-- Headline --}}
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-5 tracking-tight">আজই একটি জীবন বাঁচান</h2>
+        <h2 class="text-3xl sm:text-4xl lg:text-[44px] font-black text-white mb-4 tracking-tight">আজই একটি জীবন বাঁচান</h2>
         
         {{-- Subtitle --}}
-        <p class="text-white/90 font-medium text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed">
+        <p class="text-white/90 font-medium text-base md:text-[17px] max-w-2xl mx-auto mb-7 leading-relaxed">
             আপনার একটি রক্তদান তিনটি প্রাণ বাঁচাতে পারে। বাংলাদেশের সবচেয়ে নির্ভরযোগ্য ভেরিফায়েড ডোনার<br class="hidden md:block"> নেটওয়ার্কে এখনই যোগ দিন।
         </p>
         
         {{-- Buttons --}}
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10 w-full sm:w-auto">
-            <x-secondary-button href="{{ route('requests.create') }}" class="w-full sm:w-auto px-8 py-4 border-white text-[#BE1B21] hover:bg-slate-50 hover:text-[#BE1B21]">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3 mb-7 w-full sm:w-auto">
+            <x-secondary-button href="{{ route('requests.create') }}" class="w-full sm:w-auto px-7 py-3.5 border-white text-[#BE1B21] hover:bg-slate-50 hover:text-[#BE1B21]">
                 রক্তের রিকোয়েস্ট করুন
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
             </x-secondary-button>
-            <x-secondary-button href="{{ route('search') }}" class="w-full sm:w-auto px-8 py-4 bg-white/10 hover:bg-white/20 border-white/30 text-white hover:text-white hover:border-white/40 shadow-none">
+            <x-secondary-button href="{{ route('search') }}" class="w-full sm:w-auto px-7 py-3.5 bg-white/10 hover:bg-white/20 border-white/30 text-white hover:text-white hover:border-white/40 shadow-none">
                 ডোনার সার্চ করুন
             </x-secondary-button>
         </div>

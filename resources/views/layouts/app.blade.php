@@ -44,7 +44,7 @@
         {{-- 🩸 Logo & Brand --}}
         <a href="{{ route('home') }}" class="flex items-center gap-3 group">
             <div class="h-9 w-9 sm:h-10 sm:w-10 rounded-xl border border-slate-100 flex items-center justify-center overflow-hidden bg-white shadow-sm group-hover:shadow-md transition-shadow">
-                <img src="{{ asset('images/image_14.png') }}" alt="RoktoDut Logo" class="w-full h-full object-contain p-1">
+                <img src="{{ asset('images/image_14.png') }}" alt="RoktoDut Logo" class="w-full h-full object-contain p-1" loading="lazy" decoding="async">
             </div>
             <div class="leading-tight hidden sm:block">
                 <div class="font-extrabold tracking-tight text-slate-900 group-hover:text-red-600 transition-colors">রক্তদূত</div>
@@ -212,7 +212,7 @@
                         {{-- Avatar Thumbnail --}}
                         <div class="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
                             @if(auth()->user()->profile_image)
-                                <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="Profile" class="w-full h-full object-cover">
+                                <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="Profile" class="w-full h-full object-cover" loading="lazy" decoding="async">
                             @else
                                 <span class="text-slate-600 font-black text-xs sm:text-sm">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
                             @endif
@@ -323,6 +323,29 @@
 
     {{-- Per-page scripts pushed by child views (modals, WYSIWYG init, etc.) --}}
     @stack('scripts')
+
+    {{-- Lenis smooth scrolling --}}
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
+    <script>
+        (() => {
+            const lenis = new Lenis({
+                smoothWheel: true,
+                normalizeWheel: true,
+                syncTouch: true,
+            });
+
+            lenis.on('scroll', () => {
+                window.dispatchEvent(new Event('scroll'));
+            });
+
+            function raf(time) {
+                lenis.raf(time);
+                requestAnimationFrame(raf);
+            }
+
+            requestAnimationFrame(raf);
+        })();
+    </script>
 
     {{-- Crisp Chat Integration --}}
     <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="d3209b87-c7a3-40a6-9eaf-1e15fc3129a4";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>

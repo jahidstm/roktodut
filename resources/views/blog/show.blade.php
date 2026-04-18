@@ -83,6 +83,8 @@
         <div class="absolute inset-0">
             <img src="{{ asset('storage/' . $post->cover_image) }}"
                  alt="{{ $post->title }}"
+                 loading="lazy"
+                 decoding="async"
                  class="w-full h-full object-cover opacity-25">
             <div class="absolute inset-0 bg-gradient-to-t
                 {{ $isStory ? 'from-red-700 via-red-600/80' : 'from-sky-800 via-sky-700/80' }}
@@ -146,7 +148,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                         </svg>
                     @elseif($post->author?->profile_image)
-                        <img src="{{ asset('storage/' . $post->author->profile_image) }}" alt="Author" class="w-full h-full object-cover">
+                        <img src="{{ asset('storage/' . $post->author->profile_image) }}" alt="Author" class="w-full h-full object-cover" loading="lazy" decoding="async">
                     @else
                         {{ mb_substr($authorName, 0, 1) }}
                     @endif
