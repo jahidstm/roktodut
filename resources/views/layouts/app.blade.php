@@ -347,7 +347,5 @@
         })();
     </script>
 
-    {{-- Crisp Chat Integration --}}
-    <script type="text/javascript">window.$crisp=[];window.CRISP_WEBSITE_ID="d3209b87-c7a3-40a6-9eaf-1e15fc3129a4";(function(){d=document;s=d.createElement("script");s.src="https://client.crisp.chat/l.js";s.async=1;d.getElementsByTagName("head")[0].appendChild(s);})();</script>
 </body>
 </html>
