@@ -230,10 +230,10 @@
     <div class="grid grid-cols-2 sm:grid-cols-4 gap-5">
         @php
         $team = [
-            ['initials' => 'MA', 'name' => 'মোহাম্মদ আলিফ',   'role' => 'ফুলস্ট্যাক লিড',      'color' => 'bg-red-600'],
-            ['initials' => 'SR', 'name' => 'সামিরা রহমান',    'role' => 'UI/UX ডিজাইনার',     'color' => 'bg-rose-500'],
-            ['initials' => 'TH', 'name' => 'তানভীর হাসান',    'role' => 'ব্যাকএন্ড ইঞ্জিনিয়ার', 'color' => 'bg-pink-600'],
-            ['initials' => 'NK', 'name' => 'নাওমি খানম',      'role' => 'কিউএ ও ডকুমেন্টেশন', 'color' => 'bg-red-700'],
+            ['initials' => 'JH', 'name' => 'Jahid Hasan', 'role' => 'Lead Backend, Database Architecture, Security', 'github' => '@jahidstm', 'github_url' => 'https://github.com/jahidstm', 'color' => 'bg-red-600'],
+            ['initials' => 'AK', 'name' => 'Md. Alif Khan', 'role' => 'Frontend Refactoring, API Integration, UI Components', 'github' => '@3alif', 'github_url' => 'https://github.com/3alif', 'color' => 'bg-rose-500'],
+            ['initials' => 'NT', 'name' => 'Nohzat Tabassum', 'role' => 'UI/UX, OAuth Integration, System Documentation', 'github' => '@NohzatTabassum', 'github_url' => 'https://github.com/NohzatTabassum', 'color' => 'bg-pink-600'],
+            ['initials' => 'MM', 'name' => 'Mst. Moumita Rahman Meem', 'role' => 'Database Seeders, Localization, Demo Data', 'github' => '@Meem-1137', 'github_url' => 'https://github.com/Meem-1137', 'color' => 'bg-red-700'],
         ];
         @endphp
         @foreach($team as $member)
@@ -243,6 +243,9 @@
             </div>
             <p class="text-sm font-bold text-slate-800">{{ $member['name'] }}</p>
             <p class="text-xs text-slate-500 mt-0.5">{{ $member['role'] }}</p>
+            <a href="{{ $member['github_url'] }}" target="_blank" rel="noopener noreferrer" class="inline-block mt-1 text-xs font-semibold text-blue-600 hover:text-blue-700 hover:underline">
+                {{ $member['github'] }}
+            </a>
         </div>
         @endforeach
     </div>

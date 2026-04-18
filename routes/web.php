@@ -88,7 +88,7 @@ Route::get('/', function () {
     $totalDonors    = $impactMetrics['total_donors'];
     $recentPosts    = \App\Models\Post::where('status', 'published')
         ->orderByDesc('published_at')
-        ->limit(2)
+        ->limit(3)
         ->get();
 
     return view('home', compact('divisions', 'topDonors', 'verifiedDonors', 'totalDonations', 'totalDonors', 'homeRequests', 'recentPosts'));
