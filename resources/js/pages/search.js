@@ -172,22 +172,11 @@ async function wireLocationsDropdowns() {
 
     if (!divisionEl || !districtEl || !upazilaEl) return;
 
-    const selectedDivision = document.getElementById('selectedDivision')?.value || '';
+    const selectedDivision = document.getElementById('selectedDivision')?.value || divisionEl.value || '';
     const selectedDistrict = document.getElementById('selectedDistrict')?.value || '';
     const selectedUpazila = document.getElementById('selectedUpazila')?.value || '';
 
-    let data = {};
-    try {
-        const res = await fetch('/data/bd_locations.json', { cache: 'no-store' });
-        if (res.ok) data = await res.json();
-    } catch (e) {
-        console.error('Failed to load locations JSON', e);
-    }
-
-    const divisionsMap = (data && data.divisions && typeof data.divisions === 'object') ? data.divisions : {};
-    const hasJsonDivisions = Object.keys(divisionsMap).length > 0;
-
-    function setOptions(el, placeholder, values, selectedValue = '') {
+    function setOptions(el, placeholder, values, selectedValue = '', valueKey = null, textKey = null) {
         el.innerHTML = '';
         const ph = document.createElement('option');
         ph.value = '';
@@ -196,60 +185,112 @@ async function wireLocationsDropdowns() {
 
         values.forEach(v => {
             const opt = document.createElement('option');
-            opt.value = v;
-            opt.textContent = v;
-            if (v === selectedValue) opt.selected = true;
+            const optionValue = valueKey ? String(v[valueKey]) : String(v);
+            const optionText = textKey ? String(v[textKey]) : String(v);
+            opt.value = optionValue;
+            opt.textContent = optionText;
+            if (optionValue === String(selectedValue)) opt.selected = true;
             el.appendChild(opt);
         });
     }
 
-    function populateDivisions() {
-        if (!hasJsonDivisions) {
+    async function fetchJson(url) {
+        const res = await fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+            },
+        });
+        if (!res.ok) {
+            throw new Error(`Request failed (${res.status})`);
+        }
+        return res.json();
+    }
+
+    function resetDistricts(placeholder = 'প্রথমে বিভাগ নির্বাচন করুন') {
+        setOptions(districtEl, placeholder, []);
+        districtEl.disabled = true;
+    }
+
+    function resetUpazilas(placeholder = 'প্রথমে জেলা নির্বাচন করুন') {
+        setOptions(upazilaEl, placeholder, []);
+        upazilaEl.disabled = true;
+    }
+
+    async function loadDistricts(divisionId, preselectedDistrict = '') {
+        if (!divisionId) {
+            resetDistricts();
+            resetUpazilas();
             return;
         }
-        setOptions(divisionEl, 'সিলেক্ট করুন', Object.keys(divisionsMap), selectedDivision);
+
+        setOptions(districtEl, 'লোড হচ্ছে...', []);
+        districtEl.disabled = true;
+        resetUpazilas();
+
+        const districts = await fetchJson(`/ajax/districts/${encodeURIComponent(divisionId)}`);
+        setOptions(districtEl, 'জেলা নির্বাচন', districts, preselectedDistrict, 'id', 'name');
+        districtEl.disabled = false;
     }
 
-    function populateDistricts() {
-        if (!hasJsonDivisions) {
-            districtEl.disabled = !divisionEl.value;
-            upazilaEl.disabled = true;
+    async function loadUpazilas(districtId, preselectedUpazila = '') {
+        if (!districtId) {
+            resetUpazilas();
             return;
         }
-        const districtsMap = divisionsMap?.[divisionEl.value] ?? {};
-        const districtPlaceholder = divisionEl.value ? 'জেলা নির্বাচন' : 'প্রথমে বিভাগ নির্বাচন করুন';
-        setOptions(districtEl, districtPlaceholder, Object.keys(districtsMap), selectedDistrict);
-        districtEl.disabled = !divisionEl.value;
-        setOptions(upazilaEl, 'প্রথমে জেলা নির্বাচন করুন', [], selectedUpazila);
-        upazilaEl.disabled = !divisionEl.value;
+
+        setOptions(upazilaEl, 'লোড হচ্ছে...', []);
+        upazilaEl.disabled = true;
+
+        const upazilas = await fetchJson(`/ajax/upazilas/${encodeURIComponent(districtId)}`);
+        setOptions(upazilaEl, 'উপজেলা/থানা নির্বাচন', upazilas, preselectedUpazila, 'id', 'name');
+        upazilaEl.disabled = false;
     }
 
-    function populateUpazilas() {
-        if (!hasJsonDivisions) return;
-        const districtsMap = divisionsMap?.[divisionEl.value] ?? {};
-        const upazilas = Array.isArray(districtsMap?.[districtEl.value]) ? districtsMap[districtEl.value] : [];
-        setOptions(upazilaEl, 'উপজেলা/থানা নির্বাচন', upazilas, selectedUpazila);
-        upazilaEl.disabled = !(divisionEl.value && districtEl.value);
-    }
-
-    divisionEl.addEventListener('change', () => {
+    divisionEl.addEventListener('change', async () => {
         const sd = document.getElementById('selectedDistrict');
         const su = document.getElementById('selectedUpazila');
         if (sd) sd.value = '';
         if (su) su.value = '';
-        populateDistricts();
-        upazilaEl.disabled = true;
+
+        try {
+            await loadDistricts(divisionEl.value);
+        } catch (e) {
+            console.error('Error loading districts:', e);
+            resetDistricts('জেলা লোড করা যায়নি');
+            resetUpazilas();
+        }
     });
 
-    districtEl.addEventListener('change', () => {
+    districtEl.addEventListener('change', async () => {
         const su = document.getElementById('selectedUpazila');
         if (su) su.value = '';
-        populateUpazilas();
+
+        try {
+            await loadUpazilas(districtEl.value);
+        } catch (e) {
+            console.error('Error loading upazilas:', e);
+            resetUpazilas('উপজেলা লোড করা যায়নি');
+        }
     });
 
-    populateDivisions();
-    populateDistricts();
-    populateUpazilas();
+    try {
+        if (selectedDivision) {
+            divisionEl.value = String(selectedDivision);
+            await loadDistricts(divisionEl.value, selectedDistrict);
+            if (selectedDistrict) {
+                districtEl.value = String(selectedDistrict);
+                await loadUpazilas(districtEl.value, selectedUpazila);
+            }
+        } else {
+            resetDistricts();
+            resetUpazilas();
+        }
+    } catch (e) {
+        console.error('Error initializing location dropdowns:', e);
+        resetDistricts('জেলা লোড করা যায়নি');
+        resetUpazilas('উপজেলা লোড করা যায়নি');
+    }
 }
 
 function wireSearchFormLoading() {

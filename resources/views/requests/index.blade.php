@@ -57,18 +57,22 @@
                 </select>
             </div>
 
-            <div class="md:col-span-4 flex justify-end gap-2 mt-2">
-                @if(request()->hasAny(['blood_group', 'division_id', 'district_id', 'upazila_id']))
-                    <a href="{{ route('requests.index') }}" class="shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg font-extrabold transition-colors flex items-center justify-center">
-                        ক্লিয়ার
+             <div class="md:col-span-4 flex justify-end gap-2 mt-2">
+                 @if(request()->hasAny(['blood_group', 'division_id', 'district_id', 'upazila_id']))
+                     <a href="{{ route('requests.index') }}" class="shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg font-extrabold transition-colors flex items-center justify-center">
+                         ক্লিয়ার
                     </a>
                 @endif
-                <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-8 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
-                    খুঁজুন
-                </button>
-            </div>
-        </form>
-    </div>
+                 <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-8 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
+                     খুঁজুন
+                 </button>
+             </div>
+
+            <input type="hidden" id="selectedDivision" value="{{ request('division_id', '') }}">
+            <input type="hidden" id="selectedDistrict" value="{{ request('district_id', '') }}">
+            <input type="hidden" id="selectedUpazila" value="{{ request('upazila_id', '') }}">
+         </form>
+     </div>
 
     @if ($requests->isEmpty())
         <div class="rounded-2xl border border-slate-200 bg-white p-10 text-center">
@@ -86,85 +90,6 @@
             {{ $requests->links() }}
         </div>
     @endif
-
-    {{-- ⚙️ Isolated AJAX Script for Cascading Filter Location --}}
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const divSelect = document.getElementById('filter_division');
-            const distSelect = document.getElementById('filter_district');
-            const upzSelect = document.getElementById('filter_upazila');
-
-            const oldDiv = "{{ request('division_id') }}";
-            const oldDist = "{{ request('district_id') }}";
-            const oldUpz = "{{ request('upazila_id') }}";
-
-            function loadDistricts(divId, preSelectedDist = null) {
-                distSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
-                distSelect.disabled = true;
-                upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
-                upzSelect.disabled = true;
-
-                fetch(`/ajax/districts/${divId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        distSelect.innerHTML = '<option value="">জেলা নির্বাচন</option>';
-                        distSelect.disabled = false;
-                        data.forEach(dist => {
-                            const selected = (dist.id == preSelectedDist) ? 'selected' : '';
-                            distSelect.innerHTML += `<option value="${dist.id}" ${selected}>${dist.name}</option>`;
-                        });
-
-                        if(preSelectedDist) {
-                            loadUpazilas(preSelectedDist, oldUpz);
-                        }
-                    })
-                    .catch(err => console.error("Error loading districts:", err));
-            }
-
-            function loadUpazilas(distId, preSelectedUpz = null) {
-                upzSelect.innerHTML = '<option value="">লোড হচ্ছে...</option>';
-                upzSelect.disabled = true;
-
-                fetch(`/ajax/upazilas/${distId}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        upzSelect.innerHTML = '<option value="">উপজেলা/থানা নির্বাচন</option>';
-                        upzSelect.disabled = false;
-                        data.forEach(upz => {
-                            const selected = (upz.id == preSelectedUpz) ? 'selected' : '';
-                            upzSelect.innerHTML += `<option value="${upz.id}" ${selected}>${upz.name}</option>`;
-                        });
-                    })
-                    .catch(err => console.error("Error loading upazilas:", err));
-            }
-
-            // Event Listeners
-            divSelect.addEventListener('change', function() {
-                if (!this.value) {
-                    distSelect.innerHTML = '<option value="">প্রথমে বিভাগ নির্বাচন করুন</option>';
-                    distSelect.disabled = true;
-                    upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
-                    upzSelect.disabled = true;
-                    return;
-                }
-                loadDistricts(this.value);
-            });
-
-            distSelect.addEventListener('change', function() {
-                if (!this.value) {
-                    upzSelect.innerHTML = '<option value="">প্রথমে জেলা নির্বাচন করুন</option>';
-                    upzSelect.disabled = true;
-                    return;
-                }
-                loadUpazilas(this.value);
-            });
-
-            // Auto-hydrate on load if old data exists
-            if(oldDiv) {
-                loadDistricts(oldDiv, oldDist);
-            }
-        });
-    </script>
 
 {{-- 🎯 THE FIX: এই ডিভটি কন্টেইনার ক্লোজ করছে --}}
 </div>
