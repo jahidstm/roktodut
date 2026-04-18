@@ -149,7 +149,7 @@
             @endphp
 
             @foreach($milestones as $m)
-            <div class="relative overflow-hidden rounded-2xl border {{ $m['border'] }} bg-gradient-to-br {{ $m['bg'] }} p-5 {{ isset($m['highlight']) ? 'sm:col-span-2' : '' }}">
+            <div class="relative overflow-hidden rounded-2xl border {{ $m['border'] }} bg-gradient-to-br {{ $m['bg'] }} p-5 h-full">
                 @if(isset($m['highlight']))
                     <div class="absolute top-3 right-4 text-6xl opacity-[0.07]">🏆</div>
                 @endif
