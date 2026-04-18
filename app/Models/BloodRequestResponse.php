@@ -18,6 +18,13 @@ class BloodRequestResponse extends Model
         'proof_image_path',   // 🚀 নতুন কলাম
         'verification_status', // 🚀 নতুন কলাম
         'donor_claimed_at',    // 🚀 নতুন কলাম
+        'fulfilled_at',
+        'fulfilled_by',
+    ];
+
+    protected $casts = [
+        'donor_claimed_at' => 'datetime',
+        'fulfilled_at' => 'datetime',
     ];
 
     /**

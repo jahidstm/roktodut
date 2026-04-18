@@ -19,20 +19,30 @@ class DashboardController extends Controller
         }
 
         $user = Auth::user()->load('badges');
+        $userRole = $user->role?->value ?? $user->role;
+        $isDonor = $userRole === 'donor';
 
         // ২. স্ট্যাটিস্টিকস ক্যালকুলেশন
-        // "মোট রিকোয়েস্ট": Count of requests CREATED by this user.
-        $totalRequestsMade = BloodRequest::where('requested_by', $user->id)->count();
+        // "মোট রিকোয়েস্ট": Donor হলে responded requests, Recipient হলে created requests
+        $totalRequestsMade = $isDonor
+            ? BloodRequestResponse::where('user_id', $user->id)
+                ->distinct('blood_request_id')
+                ->count('blood_request_id')
+            : BloodRequest::where('requested_by', $user->id)->count();
 
-        // "আপনার অবদান": Count of successful donations (where fulfilled_at is NOT NULL).
+        // "আপনার অবদান": verified/fulfilled responses
         $totalContributions = BloodRequestResponse::where('user_id', $user->id)
-            ->whereNotNull('fulfilled_at')
+            ->where(function ($q) {
+                $q->where('verification_status', 'verified')
+                    ->orWhereNotNull('fulfilled_at');
+            })
             ->count();
 
-        // "সফল রিকোয়েস্ট": Count of requests user responded to that were fulfilled.
+        // "সফল রিকোয়েস্ট": donor এর verified/fulfilled responses
         $fulfilledRequests = BloodRequestResponse::where('user_id', $user->id)
-            ->whereHas('bloodRequest', function ($q) {
-                $q->where('status', 'fulfilled');
+            ->where(function ($q) {
+                $q->where('verification_status', 'verified')
+                    ->orWhereNotNull('fulfilled_at');
             })
             ->count();
 
@@ -43,14 +53,26 @@ class DashboardController extends Controller
             : 'N/A';
 
         // ৩. সাম্প্রতিক ৫টি রিকোয়েস্টের হিস্ট্রি (Eager Loading সহ)
-        $recentRequests = BloodRequest::where('requested_by', $user->id)
+        $recentRequestsQuery = BloodRequest::query()
             ->withCount([
                 'responses as total_responses',
-                'responses as accepted_responses' => fn($q) => $q->where('status', 'accepted')
-            ])
-            ->orderByDesc('created_at')
-            ->limit(5)
-            ->get();
+                'responses as accepted_responses' => fn($q) => $q->where('status', 'accepted'),
+            ]);
+
+        if ($isDonor) {
+            $recentRequestsQuery
+                ->whereHas('responses', fn($q) => $q->where('user_id', $user->id)->where('status', 'accepted'))
+                ->withMax([
+                    'responses as my_latest_response_at' => fn($q) => $q->where('user_id', $user->id)->where('status', 'accepted'),
+                ], 'created_at')
+                ->orderByDesc('my_latest_response_at');
+        } else {
+            $recentRequestsQuery
+                ->where('requested_by', $user->id)
+                ->orderByDesc('created_at');
+        }
+
+        $recentRequests = $recentRequestsQuery->limit(5)->get();
 
         // 🎯 ৪. ডোনার হিসেবে আপনার চলমান কমিটমেন্ট (Top 3)
         $ongoingCommitments = BloodRequestResponse::where('user_id', $user->id)
@@ -62,13 +84,20 @@ class DashboardController extends Controller
 
         // 🎯 ৫. ডোনেশন হিস্ট্রি (History Table)
         $donationHistory = BloodRequestResponse::where('user_id', $user->id)
-            ->whereNotNull('fulfilled_at')
+            ->where(function ($q) {
+                $q->where('verification_status', 'verified')
+                    ->orWhereNotNull('fulfilled_at');
+            })
             ->with(['bloodRequest.district', 'bloodRequest.upazila'])
             ->orderByDesc('fulfilled_at')
+            ->orderByDesc('updated_at')
             ->get();
 
         $successfulDonationsCount = BloodRequestResponse::where('user_id', $user->id)
-            ->whereNotNull('fulfilled_at')
+            ->where(function ($q) {
+                $q->where('verification_status', 'verified')
+                    ->orWhereNotNull('fulfilled_at');
+            })
             ->count();
 
         $livesSaved = $totalContributions * 3;
@@ -188,7 +217,8 @@ class DashboardController extends Controller
             'totalDonations',
             'gamificationStats',
             'radarRequests',
-            'showInactivePopup'
+            'showInactivePopup',
+            'isDonor'
         ));
     }
 }

@@ -542,7 +542,9 @@
         <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
             <div>
                 <h2 class="text-lg font-extrabold text-slate-900">আপনার সাম্প্রতিক রিকোয়েস্টসমূহ</h2>
-                <p class="text-sm text-slate-500 font-medium mt-1">সর্বশেষ ৫টি রিকোয়েস্টের আপডেট</p>
+                <p class="text-sm text-slate-500 font-medium mt-1">
+                    {{ ($isDonor ?? false) ? 'আপনি যেসব রিকোয়েস্টে সাড়া দিয়েছেন (Accepted)' : 'সর্বশেষ ৫টি রিকোয়েস্টের আপডেট' }}
+                </p>
             </div>
         </div>
 
@@ -550,7 +552,7 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold">
-                        <th class="px-6 py-4 border-b border-slate-100">রোগীর নাম ও গ্রুপ</th>
+                        <th class="px-6 py-4 border-b border-slate-100">{{ ($isDonor ?? false) ? 'রিকোয়েস্ট ও গ্রুপ' : 'রোগীর নাম ও গ্রুপ' }}</th>
                         <th class="px-6 py-4 border-b border-slate-100">দরকার</th>
                         <th class="px-6 py-4 border-b border-slate-100">সাড়া (Accepted)</th>
                         <th class="px-6 py-4 border-b border-slate-100">স্ট্যাটাস</th>
@@ -594,7 +596,9 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-6 py-10 text-center text-slate-500 font-medium">আপনি এখনো কোনো রক্তের রিকোয়েস্ট করেননি।</td>
+                            <td colspan="5" class="px-6 py-10 text-center text-slate-500 font-medium">
+                                {{ ($isDonor ?? false) ? 'আপনি এখনো কোনো রিকোয়েস্টে Accepted সাড়া দেননি।' : 'আপনি এখনো কোনো রক্তের রিকোয়েস্ট করেননি।' }}
+                            </td>
                         </tr>
                     @endforelse
                 </tbody>
