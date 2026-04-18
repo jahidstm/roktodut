@@ -246,6 +246,10 @@ Route::middleware(['auth', 'role:org_admin'])->group(function () {
     Route::get('/org/camps', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'index'])->name('org.camps.index');
     Route::get('/org/camps/create', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'create'])->name('org.camps.create');
     Route::post('/org/camps', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'store'])->name('org.camps.store');
+    Route::get('/org/camps/{camp}/edit', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'edit'])->name('org.camps.edit');
+    Route::put('/org/camps/{camp}', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'update'])->name('org.camps.update');
+    Route::post('/org/camps/{camp}/publish', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'publish'])->name('org.camps.publish');
+    Route::post('/org/camps/{camp}/cancel', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'cancel'])->name('org.camps.cancel');
     Route::get('/org/camps/{camp}', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'show'])->name('org.camps.show');
     Route::post('/org/camps/{camp}/attendance', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'logAttendance'])->name('org.camps.attendance');
 });

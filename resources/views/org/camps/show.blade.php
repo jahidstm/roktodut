@@ -12,7 +12,13 @@
             </a>
             <div>
                 <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ $camp->name }}</h1>
-                <p class="text-slate-500 font-medium">তারিখ: {{ $camp->camp_date->format('d M, Y') }} | স্থান: {{ $camp->location }}</p>
+                <p class="text-slate-500 font-medium">
+                    সময়: {{ optional($camp->start_at)->format('d M, Y h:i A') }} - {{ optional($camp->end_at)->format('d M, Y h:i A') }}
+                    | স্থান: {{ $camp->address_line ?? $camp->location }}
+                </p>
+                <p class="text-xs text-slate-400 font-semibold mt-1">
+                    রেজিস্টার্ড: {{ $camp->registered_count ?? 0 }} • চেক-ইন: {{ $camp->checked_in_count ?? 0 }}
+                </p>
             </div>
         </div>
     </div>
