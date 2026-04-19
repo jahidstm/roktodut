@@ -1,9 +1,9 @@
 import './bootstrap';
 
 import Alpine from 'alpinejs';
-import { initSearchPage } from './pages/search';
 import { initNotifications } from './pages/notifications';
 import { initOrgDashboardTabs } from './pages/org-dashboard-tabs';
+import { initSearchPage } from './pages/search';
 
 window.Alpine = Alpine;
 
@@ -22,6 +22,15 @@ Alpine.data('notificationBell', () => ({
             this.notifications.unshift(e.detail);
             if (this.notifications.length > 10) {
                 this.notifications.pop();
+            }
+        });
+
+        this.syncUnreadCount();
+        window.setInterval(() => this.syncUnreadCount(), 20000);
+        window.addEventListener('focus', () => this.syncUnreadCount());
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                this.syncUnreadCount();
             }
         });
     },
@@ -44,6 +53,18 @@ Alpine.data('notificationBell', () => ({
             console.error('[Notification] Failed to fetch recent:', err);
         } finally {
             this.loading = false;
+        }
+    },
+
+    async syncUnreadCount() {
+        try {
+            const res = await window.axios.get('/notifications/recent');
+            this.unreadCount = Number(res.data.unread_count) || 0;
+            if (this.open || this.notifications.length === 0) {
+                this.notifications = Array.isArray(res.data.notifications) ? res.data.notifications : [];
+            }
+        } catch (err) {
+            console.error('[Notification] Failed to sync unread count:', err);
         }
     },
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\OrgAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\DonorVerificationStatusNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -36,11 +37,11 @@ class DashboardController extends Controller
         $verifiedMembers = User::where('organization_id', $admin->organization_id)->where('role', 'donor')->where('nid_status', 'verified')->get();
         $verifiedCount = $verifiedMembers->count();
         $readyCount = $verifiedMembers->where('is_available', true)->count();
-        
+
         // Online vs Camp donations
         $orgUsersIds = User::where('organization_id', $admin->organization_id)->pluck('id');
         $onlineDonations = \App\Models\Donation::whereIn('donor_id', $orgUsersIds)->count();
-        $campDonations = \App\Models\CampAttendance::whereHas('bloodCamp', function($q) use ($admin) {
+        $campDonations = \App\Models\CampAttendance::whereHas('bloodCamp', function ($q) use ($admin) {
             $q->where('organization_id', $admin->organization_id);
         })->count();
 
@@ -59,7 +60,7 @@ class DashboardController extends Controller
             ->where('nid_status', 'verified')
             ->with('district')
             ->get()
-            ->groupBy(function($user) {
+            ->groupBy(function ($user) {
                 return $user->district ? $user->district->bn_name : 'অজানা জেলা';
             })
             ->map->count();
@@ -100,6 +101,7 @@ class DashboardController extends Controller
         $donor->reviewed_at = now();
 
         $donor->save();
+        $donor->notify(new DonorVerificationStatusNotification($request->status));
 
         $message = $request->status === 'verified'
             ? 'ডোনারকে সফলভাবে ভেরিফাই করা হয়েছে এবং ব্লু ব্যাজ প্রদান করা হয়েছে।'

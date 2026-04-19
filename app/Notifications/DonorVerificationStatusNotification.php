@@ -3,46 +3,63 @@
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 
 class DonorVerificationStatusNotification extends Notification
 {
     use Queueable;
 
-    public $status;
-
-    /**
-     * Create a new notification instance.
-     */
-    public function __construct($status)
-    {
-        $this->status = $status;
-    }
+    public function __construct(private readonly string $status) {}
 
     /**
      * Get the notification's delivery channels.
      */
     public function via(object $notifiable): array
     {
-        return ['database']; // আমরা ডেটাবেস নোটিফিকেশন ব্যবহার করছি
+        $channels = ['database'];
+
+        $broadcastDriver = (string) config('broadcasting.default', 'null');
+        if (!in_array($broadcastDriver, ['null', 'log'], true)) {
+            $channels[] = 'broadcast';
+        }
+
+        return $channels;
     }
 
-    /**
-     * Get the array representation of the notification.
-     */
+    public function toDatabase(object $notifiable): array
+    {
+        return $this->buildPayload();
+    }
+
+    public function toBroadcast(object $notifiable): BroadcastMessage
+    {
+        return new BroadcastMessage($this->buildPayload());
+    }
+
     public function toArray(object $notifiable): array
     {
-        // স্ট্যাটাস অনুযায়ী ডাইনামিক মেসেজ
-        $message = $this->status === 'approved' 
-            ? 'অভিনন্দন! আপনার এনআইডি ভেরিফিকেশন সফল হয়েছে। আপনি এখন একজন ব্লু-ব্যাজ ভেরিফাইড ডোনার।' 
+        return $this->buildPayload();
+    }
+
+    private function buildPayload(): array
+    {
+        $normalizedStatus = in_array($this->status, ['approved', 'verified'], true)
+            ? 'verified'
+            : 'rejected';
+
+        $message = $normalizedStatus === 'verified'
+            ? 'অভিনন্দন! আপনার এনআইডি ভেরিফিকেশন সফল হয়েছে। আপনি এখন একজন ব্লু-ব্যাজ ভেরিফাইড ডোনার।'
             : 'দুঃখিত, আপনার এনআইডি ভেরিফিকেশন রিকোয়েস্ট বাতিল করা হয়েছে। সঠিক ছবি দিয়ে আবার চেষ্টা করুন।';
 
         return [
             'type' => 'verification_status',
-            'status' => $this->status,
+            'status' => $normalizedStatus,
             'message' => $message,
-            'url' => '/dashboard', // ক্লিক করলে ইউজারের ড্যাশবোর্ডে যাবে
+            'url' => route('dashboard'),
+            'urgency' => null,
+            'blood_group' => null,
+            'created_at' => now()->toISOString(),
         ];
     }
 }

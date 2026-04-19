@@ -4,6 +4,7 @@ namespace App\Http\Controllers\OrgAdmin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Notifications\DonorVerificationStatusNotification;
 use App\Services\GamificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,6 +41,7 @@ class VerificationController extends Controller
 
         // 🏅 Verified Donor ব্যাজ অ্যার্জন করান
         $this->gamification->awardVerifiedBadge($donor);
+        $donor->notify(new DonorVerificationStatusNotification('verified'));
 
         return redirect()->route('org.dashboard')->with('success', "{$donor->name}-কে সফলভাবে ভেরিফাই করা হয়েছে।");
     }
@@ -66,6 +68,7 @@ class VerificationController extends Controller
 
         // ব্যাজ রিমুভ করি
         $this->gamification->revokeVerifiedBadge($donor);
+        $donor->notify(new DonorVerificationStatusNotification('rejected'));
 
         return redirect()->route('org.dashboard')->with('error', "{$donor->name}-এর ভেরিফিকেশন বাতিল করা হয়েছে।");
     }
