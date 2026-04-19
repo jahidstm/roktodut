@@ -21,6 +21,7 @@ use App\Http\Controllers\OrgRegistrationController;
 use App\Http\Controllers\DonationClaimController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\PublicVerificationController;
+use App\Http\Controllers\ChatbotController;
 
 use App\Http\Controllers\PublicBloodRequestController;
 use App\Http\Controllers\BlogController;
@@ -98,6 +99,10 @@ Route::get('/', function () {
 
     return view('home', compact('divisions', 'topDonors', 'verifiedDonors', 'totalDonations', 'totalDonors', 'homeRequests', 'recentPosts'));
 })->name('home');
+
+Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])
+    ->middleware('throttle:30,1')
+    ->name('chatbot.ask');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::post('/donors/{donor}/reveal/start', [DonorRevealController::class, 'start'])->name('donors.reveal.start');

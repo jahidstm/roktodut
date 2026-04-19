@@ -347,5 +347,7 @@
         })();
     </script>
 
+    @include('layouts.chatbot-widget')
+
 </body>
 </html>
