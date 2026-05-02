@@ -9,8 +9,12 @@ use App\Models\BloodRequest;
 use App\Models\BloodRequestResponse;
 use App\Models\District;
 use App\Services\DonorMatchingService;
+use App\Services\MathCaptchaService;
+use App\Support\PhoneNormalizer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 class BloodRequestController extends Controller
@@ -65,19 +69,141 @@ class BloodRequestController extends Controller
     /**
      * রিকোয়েস্ট তৈরির ফর্ম দেখায়
      */
-    public function create()
+    public function create(Request $request, MathCaptchaService $mathCaptchaService)
     {
-        return view('requests.create');
+        $captchaQuestion = $mathCaptchaService->generate();
+
+        if ($request->user()) {
+            return view('requests.create', compact('captchaQuestion'));
+        }
+
+        $token = $request->cookie('rd_guest_token');
+        $isValidLength = is_string($token) && strlen($token) >= 32 && strlen($token) <= 64;
+
+        if (!$isValidLength) {
+            $token = Str::random(64);
+        }
+
+        return response()
+            ->view('requests.create', compact('captchaQuestion'))
+            ->cookie(
+                name: 'rd_guest_token',
+                value: $token,
+                minutes: 60 * 24 * 30,
+                path: '/',
+                domain: null,
+                secure: $request->isSecure(),
+                httpOnly: true,
+                raw: false,
+                sameSite: 'lax'
+            );
     }
 
     /**
      * নতুন রিকোয়েস্ট সেভ করা এবং ডোনারদের নোটিফাই করা
      */
-    public function store(StoreBloodRequestRequest $request)
+    public function store(StoreBloodRequestRequest $request, MathCaptchaService $mathCaptchaService)
     {
+        $ipHash = hash('sha256', ((string) $request->ip()) . '|' . ((string) config('app.key')));
+        $dailyLimitMessage = 'অনেক বেশি অনুরোধ করা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।';
+        $dailyKey = 'requests-store:daily:' . $ipHash;
+        $dailyCount = (int) Cache::get($dailyKey, 0);
+
+        if ($dailyCount >= 30) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $dailyLimitMessage], 429);
+            }
+
+            return back()->withInput()->with('error', $dailyLimitMessage);
+        }
+
+        if ($dailyCount === 0) {
+            Cache::put($dailyKey, 1, now()->endOfDay());
+        } else {
+            Cache::increment($dailyKey);
+        }
+
+        $normalizedPhone = '';
+
+        $request->validate([
+            'contact_number' => [
+                'required',
+                'string',
+                function (string $attribute, mixed $value, \Closure $fail) use (&$normalizedPhone): void {
+                    $normalizedPhone = PhoneNormalizer::normalizeBdPhone((string) $value);
+
+                    if (preg_match('/^01\d{9}$/', $normalizedPhone) !== 1) {
+                        $fail('সঠিক মোবাইল নম্বর দিন (যেমন: 01XXXXXXXXX)।');
+                    }
+                },
+            ],
+            'captcha_answer' => [
+                'required',
+                function (string $attribute, mixed $value, \Closure $fail) use ($mathCaptchaService): void {
+                    if (!$mathCaptchaService->verify($value)) {
+                        $fail('ক্যাপচা সঠিক নয় বা মেয়াদ শেষ হয়েছে। আবার চেষ্টা করুন।');
+                    }
+                },
+            ],
+        ], [
+            'contact_number.required' => 'মোবাইল নম্বর দেওয়া বাধ্যতামূলক।',
+            'captcha_answer.required' => 'ক্যাপচা উত্তর দেওয়া বাধ্যতামূলক।',
+        ]);
+
         $data = $request->validated();
 
-        $data['requested_by'] = $request->user()->id;
+        $data['contact_number_normalized'] = $normalizedPhone;
+        $data['created_ip_hash'] = $ipHash;
+
+        if ($request->user()) {
+            $data['requested_by'] = $request->user()->id;
+            $data['guest_token'] = null;
+        } else {
+            $guestToken = $request->cookie('rd_guest_token');
+            $data['requested_by'] = null;
+            $data['guest_token'] = is_string($guestToken) && strlen($guestToken) >= 32 && strlen($guestToken) <= 64
+                ? $guestToken
+                : null;
+        }
+
+        $duplicateMessage = 'আপনার এই নম্বর দিয়ে একই রক্তের গ্রুপ ও জেলার জন্য একটি অনুরোধ ইতিমধ্যে আছে। অনুগ্রহ করে আগের অনুরোধটি দেখুন বা আপডেট করুন।';
+        $tooManyMessage = 'অনেক বেশি অনুরোধ করা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।';
+
+        $existingRequest = BloodRequest::query()
+            ->where('contact_number_normalized', $data['contact_number_normalized'])
+            ->where('blood_group', $data['blood_group'])
+            ->where('district_id', $data['district_id'])
+            ->whereIn('status', ['pending', 'in_progress'])
+            ->where('created_at', '>=', now()->subHours(6))
+            ->latest('created_at')
+            ->first();
+
+        if ($existingRequest) {
+            return back()
+                ->withInput()
+                ->with('error', $duplicateMessage)
+                ->with('existing_request_url', route('requests.show', $existingRequest));
+        }
+
+        $latestByPhone = BloodRequest::query()
+            ->where('contact_number_normalized', $data['contact_number_normalized'])
+            ->latest('created_at')
+            ->first();
+
+        if ($latestByPhone && $latestByPhone->created_at?->gte(now()->subMinutes(2))) {
+            return back()->withInput()->with('error', $tooManyMessage);
+        }
+
+        $requestsLast24Hours = BloodRequest::query()
+            ->where('contact_number_normalized', $data['contact_number_normalized'])
+            ->whereNotIn('status', ['expired', 'fulfilled'])
+            ->where('created_at', '>=', now()->subDay())
+            ->count();
+
+        if ($requestsLast24Hours >= 3) {
+            return back()->withInput()->with('error', $tooManyMessage);
+        }
+
         $data['status'] = 'pending';
 
         // ১. রিকোয়েস্ট সেভ করা
@@ -98,7 +224,7 @@ class BloodRequestController extends Controller
             );
         }
 
-        return redirect()->route('requests.index')
+        return redirect()->route('requests.show', $bloodRequest)
             ->with('success', 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে এবং ' . $donors->count() . ' জন ডোনারকে অ্যালার্ট পাঠানো হয়েছে।');
     }
 
@@ -132,9 +258,9 @@ class BloodRequestController extends Controller
 
             // 🚀 ইভেন্ট ফায়ার — RewardDonorPoints Listener ব্যাকগ্রাউন্ডে চলবে
             event(new DonationCompleted(
-                donor:            $donor,
-                bloodRequest:     $bloodRequest,
-                isEmergency:      $isEmergency,
+                donor: $donor,
+                bloodRequest: $bloodRequest,
+                isEmergency: $isEmergency,
                 isFirstResponder: $isFirstResponder,
                 isMidnightSavior: $isMidnightSavior,
             ));
@@ -148,8 +274,6 @@ class BloodRequestController extends Controller
      */
     public function show(Request $request, BloodRequest $bloodRequest)
     {
-        Gate::authorize('view', $bloodRequest);
-
         // 🚀 রিলেশনাল ডেটা লোড করা (JSON এরর ফিক্স করার জন্য)
         $bloodRequest->load([
             'requester:id,name',
@@ -161,7 +285,7 @@ class BloodRequestController extends Controller
         $accepted = $bloodRequest->responses->where('status', 'accepted')->values();
         $declined = $bloodRequest->responses->where('status', 'declined')->values();
 
-        $canViewAcceptedDonors = $request->user()->can('viewAcceptedDonors', $bloodRequest);
+        $canViewAcceptedDonors = $request->user()?->can('viewAcceptedDonors', $bloodRequest) ?? false;
 
         return view('requests.show', [
             'bloodRequest' => $bloodRequest,

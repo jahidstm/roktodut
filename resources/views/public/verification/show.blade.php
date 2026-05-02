@@ -352,6 +352,41 @@
             line-height: 1.6;
         }
 
+        .report-btn {
+            margin-top: 1rem;
+            border: 1px solid rgba(248, 113, 113, 0.45);
+            background: rgba(127, 29, 29, 0.22);
+            color: #fecaca;
+            border-radius: .8rem;
+            font-weight: 700;
+            padding: .55rem .95rem;
+            font-size: .75rem;
+            cursor: pointer;
+        }
+
+        .report-modal {
+            border: 0;
+            border-radius: 1rem;
+            width: min(92vw, 30rem);
+            padding: 0;
+            background: #0f172a;
+            color: #f8fafc;
+        }
+
+        .report-modal::backdrop {
+            background: rgba(2, 6, 23, .72);
+        }
+
+        .report-field {
+            width: 100%;
+            border-radius: .65rem;
+            border: 1px solid rgba(148, 163, 184, .35);
+            background: #111827;
+            color: #f8fafc;
+            padding: .55rem .7rem;
+            font-size: .82rem;
+        }
+
         /* ── Responsive tweak ── */
         @media (max-width: 360px) {
             .blood-left .blood-value { font-size: 2.5rem; }
@@ -471,10 +506,51 @@
 
 </div>{{-- /.card --}}
 
+@if(session('success'))
+    <p style="margin-top:.85rem; color:#86efac; font-size:.75rem; font-weight:700;">{{ session('success') }}</p>
+@endif
+@if(session('error'))
+    <p style="margin-top:.85rem; color:#fecaca; font-size:.75rem; font-weight:700;">{{ session('error') }}</p>
+@endif
+
+<button id="open-report-modal" type="button" class="report-btn">Report this donor</button>
+
 {{-- Privacy note below card --}}
 <p class="privacy-note">
     🔒 {{ __('verification.privacy_protected') }}
 </p>
+
+<dialog id="report-modal" class="report-modal">
+    <form method="POST" action="{{ route('reports.store') }}" style="padding: 1rem 1rem 1.1rem;">
+        @csrf
+        <input type="hidden" name="reportable_type" value="user">
+        <input type="hidden" name="reportable_id" value="{{ $user_id }}">
+        <h3 style="font-size: .95rem; font-weight: 800; margin-bottom: .65rem;">ডোনার রিপোর্ট করুন</h3>
+        <label style="display:block; font-size: .74rem; font-weight: 700; margin-bottom: .4rem;">কারণ</label>
+        <select name="category" class="report-field" required>
+            <option value="">কারণ নির্বাচন করুন</option>
+            <option value="fake_info">Fake info</option>
+            <option value="harassment">Harassment</option>
+            <option value="spam">Spam</option>
+            <option value="inappropriate">Inappropriate</option>
+            <option value="other">Other</option>
+        </select>
+
+        <label style="display:block; font-size: .74rem; font-weight: 700; margin: .7rem 0 .4rem;">বিস্তারিত (ঐচ্ছিক)</label>
+        <textarea name="message" rows="4" class="report-field"></textarea>
+
+        <div style="display:flex; justify-content:flex-end; gap:.45rem; margin-top:.8rem;">
+            <button type="button" id="close-report-modal" class="report-field" style="width:auto; cursor:pointer; font-weight:700;">Cancel</button>
+            <button type="submit" class="report-field" style="width:auto; cursor:pointer; font-weight:800; background:#dc2626; border-color:#dc2626;">Submit</button>
+        </div>
+    </form>
+</dialog>
+
+<script>
+    const reportModal = document.getElementById('report-modal');
+    document.getElementById('open-report-modal')?.addEventListener('click', () => reportModal?.showModal());
+    document.getElementById('close-report-modal')?.addEventListener('click', () => reportModal?.close());
+</script>
 
 </body>
 </html>

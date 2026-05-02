@@ -63,27 +63,29 @@
                     </a>
                     <a href="{{ $requestsRoute }}"
                        class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('requests') || request()->routeIs('requests.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                        রক্ত দিন
+                        রক্তদান
                     </a>
                     <a href="{{ route('search') }}"
                        class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('search') || request()->routeIs('search.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                        স্মার্ট ডোনার সার্চ
+                        রক্তদাতা খুঁজুন
                     </a>
                     <a href="{{ route('leaderboard') }}"
                        class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('leaderboard') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                        লিডারবোর্ড
+                        সেরা রক্তদাতা
                     </a>
                     <a href="{{ route('blog.index') }}"
                        class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('blog.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                        ব্লগ
+                        স্বাস্থ্যবার্তা
                     </a>
                 </div>
             @endunless
 
-            @if($isCompactHeader && auth()->check())
-                <a href="{{ $requestsRoute }}" class="hidden md:block text-sm font-bold text-slate-700 hover:text-red-600 transition-colors">
-                    রিকোয়েস্ট ফিড
-                </a>
+            @if($isCompactHeader)
+                @auth
+                    <a href="{{ $requestsRoute }}" class="hidden md:block text-sm font-bold text-slate-700 hover:text-red-600 transition-colors">
+                        রিকোয়েস্ট ফিড
+                    </a>
+                @endauth
                 <a href="{{ route('requests.create') }}" class="hidden md:inline-flex items-center bg-[#0f172a] hover:bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-sm shadow-sm transition-colors">
                     রিকোয়েস্ট করুন
                 </a>

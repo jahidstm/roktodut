@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
@@ -120,7 +121,7 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
 
     public function receivesBroadcastNotificationsOn(): string
     {
-        return 'user.'.$this->id;
+        return 'user.' . $this->id;
     }
 
     // ==================== Other Relationships ====================
@@ -167,6 +168,11 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
     public function posts(): HasMany
     {
         return $this->hasMany(Post::class, 'author_user_id');
+    }
+
+    public function reports(): MorphMany
+    {
+        return $this->morphMany(Report::class, 'reportable');
     }
 
     public function organization(): BelongsTo

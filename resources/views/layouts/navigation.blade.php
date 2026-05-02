@@ -20,26 +20,26 @@
                     @auth
                         <a href="{{ route('requests.index') }}"
                            class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('requests.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                            রক্ত দিন
+                            রক্তদান
                         </a>
                     @endauth
                     @guest
                         <a href="{{ route('public.requests.index') }}"
                            class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('public.requests.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                            রক্ত দিন
+                            রক্তদান
                         </a>
                     @endguest
                     <a href="{{ route('search') }}"
                        class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('search') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                        স্মার্ট ডোনার সার্চ
+                        রক্তদাতা খুঁজুন
                     </a>
                     <a href="{{ route('leaderboard') }}"
                        class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('leaderboard') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                        লিডারবোর্ড
+                        সেরা রক্তদাতা
                     </a>
                     <a href="{{ route('blog.index') }}"
                        class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('blog.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                        ব্লগ
+                        স্বাস্থ্যবার্তা
                     </a>
                 </div>
             </div>
@@ -136,22 +136,22 @@
             </x-responsive-nav-link>
             @auth
                 <x-responsive-nav-link :href="route('requests.index')" :active="request()->routeIs('requests.*')" class="font-bold">
-                    রক্ত দিন
+                    রক্তদান
                 </x-responsive-nav-link>
             @endauth
             @guest
                 <x-responsive-nav-link :href="route('public.requests.index')" class="font-bold">
-                    রক্ত দিন
+                    রক্তদান
                 </x-responsive-nav-link>
             @endguest
             <x-responsive-nav-link :href="route('search')" :active="request()->routeIs('search')" class="font-bold">
-                স্মার্ট ডোনার সার্চ
+                রক্তদাতা খুঁজুন
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')" class="font-bold">
-                লিডারবোর্ড
+                সেরা রক্তদাতা
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('blog.index')" :active="request()->routeIs('blog.*')" class="font-bold">
-                ব্লগ
+                স্বাস্থ্যবার্তা
             </x-responsive-nav-link>
         </div>
         <div class="pt-4 pb-1 border-t border-slate-100">

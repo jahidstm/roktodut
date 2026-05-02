@@ -11,54 +11,83 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 /**
- * BlogSeeder — v2 (with taxonomy support)
+ * BlogSeeder — Bangla demo content
  *
  * Seeds:
  *   - 4 default categories (upserted, idempotent)
  *   - 10 published Health Blog posts  + health_blog_meta + category attach
  *   - 10 published Success Story posts + success_story_meta + category attach
  *
+ * Also removes the previous English demo posts (seeded slugs only).
+ *
  * Prerequisites: LocationSeeder + DemoDonorsSeeder must have already run.
- * The seeder is fully idempotent: every post is guarded by its slug.
  */
 class BlogSeeder extends Seeder
 {
     // ══════════════════════════════════════════════════════════════════
-    // 4 Default categories (PRD-defined)
+    // Default categories (slugs kept stable; names/descriptions in Bangla)
     // ══════════════════════════════════════════════════════════════════
     private const DEFAULT_CATEGORIES = [
         [
-            'name'        => 'Blood Donation Tips',
+            'name'        => 'রক্তদানের টিপস',
             'slug'        => 'blood-donation-tips',
-            'description' => 'Practical guides and tips for first-time and regular blood donors.',
+            'description' => 'প্রথমবার ও নিয়মিত রক্তদাতাদের জন্য সহজ গাইড, প্রস্তুতি ও পরামর্শ।',
             'type'        => 'health',
             'sort_order'  => 1,
         ],
         [
-            'name'        => 'Health & Science',
+            'name'        => 'স্বাস্থ্য ও বিজ্ঞান',
             'slug'        => 'health-and-science',
-            'description' => 'Medically reviewed articles on haematology, nutrition, and donor wellness.',
+            'description' => 'রক্ত, পুষ্টি, হিমোগ্লোবিন ও নিরাপদ রক্তদান নিয়ে তথ্যভিত্তিক লেখা।',
             'type'        => 'health',
             'sort_order'  => 2,
         ],
         [
-            'name'        => 'Donor Success Stories',
+            'name'        => 'সাফল্যের গল্প',
             'slug'        => 'donor-success-stories',
-            'description' => 'Real stories of lives saved through voluntary blood donation.',
+            'description' => 'রক্তদানের মাধ্যমে জীবন বাঁচার বাস্তব অভিজ্ঞতা ও অনুপ্রেরণামূলক গল্প।',
             'type'        => 'story',
             'sort_order'  => 3,
         ],
         [
-            'name'        => 'Community Spotlight',
+            'name'        => 'কমিউনিটি স্পটলাইট',
             'slug'        => 'community-spotlight',
-            'description' => 'Highlights from the Roktodut donor community across Bangladesh.',
+            'description' => 'রক্তদূত কমিউনিটির উদ্যোগ, ক্যাম্পেইন, স্বেচ্ছাসেবী ও স্থানীয় গল্প।',
             'type'        => 'general',
             'sort_order'  => 4,
         ],
     ];
 
+    /** Previous English demo titles (used only to compute and delete seeded slugs). */
+    private const OLD_HEALTH_TITLES_EN = [
+        "Why O+ Donors Are Bangladesh's Silent Heroes",
+        '7 Science-Backed Benefits of Regular Blood Donation',
+        'Understanding Blood Types and Compatibility',
+        'How Blood Donation Naturally Lowers Your Iron Levels',
+        'What Happens to Your Blood After You Donate?',
+        'Nutrition Guide: What to Eat Before and After Donating',
+        'Busting 5 Common Myths About Blood Donation',
+        'The Role of Platelets in Emergency Medicine',
+        'How Voluntary Donation Saves Lives in Rural Bangladesh',
+        'Blood Donation and Cardiovascular Health: The Evidence',
+    ];
+
+    private const OLD_STORY_TITLES_EN = [
+        "How a Stranger's Gift Saved My Daughter in Dhaka",
+        "Against All Odds: A Thalassemia Survivor's Journey",
+        'The Call at 2 AM That Changed My Life in Chittagong',
+        'From Recipient to Donor: My Three-Year Journey',
+        "A Mother's Prayer Answered by an Unknown Hero in Sylhet",
+        'Road Accident, Rare Blood, and a City That Responded',
+        'Paying It Forward: Why I Donate Every Four Months',
+        'The Night Roktodut Connected Me with My Blood Match',
+        'Surgery in Rajshahi: How 5 Donors Showed Up in 2 Hours',
+        'My First Donation and the Letter That Made Me Cry',
+    ];
+
     public function run(): void
     {
+        // Faker used only for randomness (not for content language).
         $faker = \Faker\Factory::create('en_US');
 
         // ── Resolve author pool ────────────────────────────────────────
@@ -71,8 +100,25 @@ class BlogSeeder extends Seeder
         }
 
         // ══════════════════════════════════════════════════════════════
-        // STEP 1 — Seed / upsert the 4 default categories
+        // STEP 0 — Remove previous English demo posts (seeded slugs only)
         // ══════════════════════════════════════════════════════════════
+        $this->command->info('🧹 Removing previous English demo blog posts...');
+
+        $oldSlugs = [];
+        foreach (self::OLD_HEALTH_TITLES_EN as $i => $t) {
+            $oldSlugs[] = Str::slug($t) . '-' . ($i + 1);
+        }
+        foreach (self::OLD_STORY_TITLES_EN as $i => $t) {
+            $oldSlugs[] = Str::slug($t) . '-story-' . ($i + 1);
+        }
+
+        $deleted = Post::whereIn('slug', $oldSlugs)->delete(); // cascades to meta + pivots
+        $this->command->line("   Removed {$deleted} old demo post(s).");
+
+        // ══════════════════════════════════════════════════════════════
+        // STEP 1 — Seed / upsert the default categories
+        // ══════════════════════════════════════════════════════════════
+        $this->command->info('');
         $this->command->info('🏷️  Seeding default categories...');
 
         $categories = [];
@@ -97,56 +143,50 @@ class BlogSeeder extends Seeder
         $catStories   = $categories['donor-success-stories'];
         $catCommunity = $categories['community-spotlight'];
 
-        // ══════════════════════════════════════════════════════════════
-        // STEP 2 — Cover images + districts
-        // ══════════════════════════════════════════════════════════════
-        $coverImages = [
-            'https://picsum.photos/seed/blood1/1200/630',
-            'https://picsum.photos/seed/health2/1200/630',
-            'https://picsum.photos/seed/donor3/1200/630',
-            'https://picsum.photos/seed/story4/1200/630',
-            'https://picsum.photos/seed/life5/1200/630',
-            'https://picsum.photos/seed/care6/1200/630',
-            'https://picsum.photos/seed/hope7/1200/630',
-            'https://picsum.photos/seed/save8/1200/630',
-        ];
-
-        $districts = [
-            'Dhaka', 'Chittagong', 'Sylhet', 'Rajshahi',
-            'Khulna', 'Barisal', 'Rangpur', 'Mymensingh',
-            'Comilla', 'Gazipur', 'Narayanganj', 'Bogura',
+        $districtsBn = [
+            'ঢাকা',
+            'চট্টগ্রাম',
+            'সিলেট',
+            'রাজশাহী',
+            'খুলনা',
+            'বরিশাল',
+            'রংপুর',
+            'ময়মনসিংহ',
+            'কুমিল্লা',
+            'গাজীপুর',
+            'নারায়ণগঞ্জ',
+            'বগুড়া',
         ];
 
         // ══════════════════════════════════════════════════════════════
-        // STEP 3 — Health Blog posts
+        // STEP 2 — Health Blog posts (Bangla)
         // ══════════════════════════════════════════════════════════════
         $this->command->info('');
-        $this->command->info('🩺  Seeding 10 Health Blog posts...');
+        $this->command->info('🩺  Seeding 10 Bangla Health Blog posts...');
 
-        $healthTitles = [
-            'Why O+ Donors Are Bangladesh\'s Silent Heroes',
-            '7 Science-Backed Benefits of Regular Blood Donation',
-            'Understanding Blood Types and Compatibility',
-            'How Blood Donation Naturally Lowers Your Iron Levels',
-            'What Happens to Your Blood After You Donate?',
-            'Nutrition Guide: What to Eat Before and After Donating',
-            'Busting 5 Common Myths About Blood Donation',
-            'The Role of Platelets in Emergency Medicine',
-            'How Voluntary Donation Saves Lives in Rural Bangladesh',
-            'Blood Donation and Cardiovascular Health: The Evidence',
+        $healthTitlesBn = [
+            'রক্তদানের আগে যা জানা জরুরি: নতুন ডোনারের গাইড',
+            'রক্তের গ্রুপ ও মিল: কার সাথে কার রক্ত যায়?',
+            'রক্তদানের পর শরীরে কী পরিবর্তন হয়?',
+            'রক্তদানের আগে ও পরে খাবার: সহজ ডায়েট গাইড',
+            'রক্তদানের ৫টি ভ্রান্ত ধারণা: সত্যটা কী?',
+            'হিমোগ্লোবিন, আয়রন ও রক্তদান: নিরাপদ থাকার টিপস',
+            'প্লেটলেট দান: কখন দরকার এবং কীভাবে কাজ করে',
+            'রমজান/উপবাসে রক্তদান: নিরাপদভাবে কী করবেন?',
+            'গ্রামাঞ্চলে স্বেচ্ছা রক্তদানের গুরুত্ব: সচেতনতা কেন দরকার',
+            'নিয়মিত রক্তদান: স্বাস্থ্য, মনোবল ও সামাজিক প্রভাব',
         ];
 
-        $medicalReviewers = [
-            'Dr. Arif Hossain, MBBS, FCPS (Hematology)',
-            'Dr. Nasrin Sultana, MD',
-            'Dr. Kamal Uddin, MBBS, MPH',
-            null, // articles pending peer review
+        $medicalReviewersBn = [
+            'ডা. আরিফ হোসেন (এমবিবিএস, এফসিপিএস — হেমাটোলজি)',
+            'ডা. নাসরিন সুলতানা (এমডি)',
+            'ডা. কামাল উদ্দিন (এমবিবিএস, এমপিএইচ)',
+            null,
         ];
 
-        foreach ($healthTitles as $i => $title) {
-            $slug = Str::slug($title) . '-' . ($i + 1);
+        foreach ($healthTitlesBn as $i => $title) {
+            $slug = 'bn-health-' . ($i + 1);
 
-            // Idempotent guard
             $post = Post::where('slug', $slug)->first();
 
             if (! $post) {
@@ -154,10 +194,9 @@ class BlogSeeder extends Seeder
                     'author_user_id' => $faker->randomElement($authorIds),
                     'title'          => $title,
                     'slug'           => $slug,
-                    'excerpt'        => $this->healthExcerpt($faker),
-                    'body_raw'       => $this->rawMarkdown($faker),
-                    'body_sanitized' => $this->sanitizedHealthHtml($faker, $title),
-                    'cover_image'    => $faker->randomElement($coverImages),
+                    'excerpt'        => $this->healthExcerptBn($faker),
+                    'body_raw'       => $this->healthBodyRawBn($faker, $title),
+                    'cover_image'    => null, // show UI placeholder (storage paths only)
                     'type'           => 'health',
                     'status'         => 'published',
                     'published_at'   => now()->subDays(rand(1, 180)),
@@ -165,16 +204,16 @@ class BlogSeeder extends Seeder
 
                 HealthBlogMeta::create([
                     'post_id'               => $post->id,
-                    'medically_reviewed_by' => $faker->randomElement($medicalReviewers),
+                    'medically_reviewed_by' => $faker->randomElement($medicalReviewersBn),
                     'sources_json'          => json_encode([
                         [
-                            'title'       => 'WHO Blood Safety and Availability: Factsheet',
+                            'title'       => 'WHO: রক্তের নিরাপত্তা ও প্রাপ্যতা (ফ্যাক্টশিট)',
                             'url'         => 'https://www.who.int/news-room/fact-sheets/detail/blood-safety-and-availability',
                             'accessed_at' => now()->subDays(rand(10, 60))->toDateString(),
                         ],
                         [
-                            'title'       => $faker->sentence(5),
-                            'url'         => 'https://pubmed.ncbi.nlm.nih.gov/' . $faker->numberBetween(10000000, 39999999),
+                            'title'       => 'পাবমেড (PubMed): রক্তদান সম্পর্কিত গবেষণা সারাংশ',
+                            'url'         => 'https://pubmed.ncbi.nlm.nih.gov/',
                             'accessed_at' => now()->subDays(rand(5, 30))->toDateString(),
                         ],
                     ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT),
@@ -185,42 +224,39 @@ class BlogSeeder extends Seeder
                 $this->command->line("   Skipped (exists): {$slug}");
             }
 
-            // ── Attach categories (sync is idempotent) ────────────────
-            // Every health post gets at least one health-specific category
-            // plus the general "Community Spotlight" category.
             $categoryIds = ($i % 2 === 0)
-                ? [$catTips->id, $catCommunity->id]      // even index → Tips + Community
-                : [$catScience->id, $catCommunity->id];  // odd index  → Science + Community
+                ? [$catTips->id, $catCommunity->id]
+                : [$catScience->id, $catCommunity->id];
 
             $post->categories()->syncWithoutDetaching($categoryIds);
         }
 
         // ══════════════════════════════════════════════════════════════
-        // STEP 4 — Success Story posts
+        // STEP 3 — Success Story posts (Bangla)
         // ══════════════════════════════════════════════════════════════
         $this->command->info('');
-        $this->command->info('❤️   Seeding 10 Success Story posts...');
+        $this->command->info('❤️   Seeding 10 Bangla Success Story posts...');
 
-        $storyTitles = [
-            'How a Stranger\'s Gift Saved My Daughter in Dhaka',
-            'Against All Odds: A Thalassemia Survivor\'s Journey',
-            'The Call at 2 AM That Changed My Life in Chittagong',
-            'From Recipient to Donor: My Three-Year Journey',
-            'A Mother\'s Prayer Answered by an Unknown Hero in Sylhet',
-            'Road Accident, Rare Blood, and a City That Responded',
-            'Paying It Forward: Why I Donate Every Four Months',
-            'The Night Roktodut Connected Me with My Blood Match',
-            'Surgery in Rajshahi: How 5 Donors Showed Up in 2 Hours',
-            'My First Donation and the Letter That Made Me Cry',
+        $storyTitlesBn = [
+            'ঢাকায় এক রাতের ফোনকল—যেভাবে বাঁচল একটি জীবন',
+            'চট্টগ্রামে অপারেশনের আগে রক্ত খোঁজা—রক্তদূত যেভাবে পাশে দাঁড়াল',
+            'সিলেটে একজন অচেনা ডোনারের সাহায্যে মায়ের চোখের জল থামল',
+            'রক্তগ্রহণকারী থেকে রক্তদাতা—আমার বদলে যাওয়ার গল্প',
+            'দুর্ঘটনা, বিরল গ্রুপ, আর মানুষের ভালোবাসা',
+            'প্রথম রক্তদান: ভয় থেকে গর্ব',
+            'দুই ঘণ্টায় পাঁচ ডোনার—রাজশাহীর অবিশ্বাস্য সহযোগিতা',
+            'একটি মেসেজ, একটি ব্যাগ রক্ত, তিনটি জীবন',
+            'চার মাস পরপর কেন রক্ত দিই: অভ্যাস গড়ার গল্প',
+            'রক্তদূত পরিবারের সাথে পরিচয়—মানবতার নতুন ঠিকানা',
         ];
 
-        foreach ($storyTitles as $i => $title) {
-            $slug = Str::slug($title) . '-story-' . ($i + 1);
+        foreach ($storyTitlesBn as $i => $title) {
+            $slug = 'bn-story-' . ($i + 1);
 
             $post = Post::where('slug', $slug)->first();
 
             if (! $post) {
-                $district  = $faker->randomElement($districts);
+                $district  = $faker->randomElement($districtsBn);
                 $refTypes  = ['donation', 'blood_request', null];
                 $refType   = $faker->randomElement($refTypes);
                 $anonymize = $faker->randomElement(['public', 'initials', 'anonymous']);
@@ -229,10 +265,9 @@ class BlogSeeder extends Seeder
                     'author_user_id' => $faker->randomElement($authorIds),
                     'title'          => $title,
                     'slug'           => $slug,
-                    'excerpt'        => $this->storyExcerpt($faker),
-                    'body_raw'       => $this->rawMarkdown($faker),
-                    'body_sanitized' => $this->sanitizedStoryHtml($faker, $title, $district, $anonymize),
-                    'cover_image'    => $faker->randomElement($coverImages),
+                    'excerpt'        => $this->storyExcerptBn($faker),
+                    'body_raw'       => $this->storyBodyRawBn($faker, $title, $district, $anonymize),
+                    'cover_image'    => null,
                     'type'           => 'story',
                     'status'         => 'published',
                     'published_at'   => now()->subDays(rand(1, 180)),
@@ -252,73 +287,61 @@ class BlogSeeder extends Seeder
                 $this->command->line("   Skipped (exists): {$slug}");
             }
 
-            // ── Attach categories ────────────────────────────────────
-            // Every story post gets "Donor Success Stories" + "Community Spotlight".
             $categoryIds = ($i % 3 === 0)
-                ? [$catStories->id, $catCommunity->id, $catTips->id]  // extra Tips for every 3rd story
+                ? [$catStories->id, $catCommunity->id, $catTips->id]
                 : [$catStories->id, $catCommunity->id];
 
             $post->categories()->syncWithoutDetaching($categoryIds);
         }
 
-        // ══════════════════════════════════════════════════════════════
-        // Summary
-        // ══════════════════════════════════════════════════════════════
         $this->command->info('');
-        $this->command->info('✅ BlogSeeder complete:');
-        $this->command->info('   ↳ 4 default categories upserted');
-        $this->command->info('   ↳ 10 Health Blog posts + health_blog_meta + category links');
-        $this->command->info('   ↳ 10 Success Story posts + success_story_meta + category links');
+        $this->command->info('✅ BlogSeeder complete (Bangla demo content).');
     }
 
     // ══════════════════════════════════════════════════════════════════
-    // Private content generators
+    // Bangla content generators
     // ══════════════════════════════════════════════════════════════════
 
-    private function rawMarkdown(\Faker\Generator $faker): string
+    private function healthBodyRawBn(\Faker\Generator $faker, string $title): string
     {
-        $parts = [];
-        for ($i = 0; $i < 4; $i++) {
-            $parts[] = '## ' . $faker->sentence(4) . "\n\n" . $faker->paragraph(5);
-        }
-        return implode("\n\n", $parts);
-    }
+        $safeTitle = htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
-    private function sanitizedHealthHtml(\Faker\Generator $faker, string $title): string
-    {
-        $safeTitle   = htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $subheadings = [
-            'What the Science Says',
-            'Key Benefits for Regular Donors',
-            'Who Is Eligible to Donate?',
-            'Preparing for Your Donation Day',
-            'What to Expect at the Donation Centre',
-            'Long-Term Health Impact',
+        $sentences = [
+            'রক্তদান একটি নিরাপদ ও মানবিক কাজ—সঠিক প্রস্তুতি নিলে ঝুঁকি অনেকটাই কমে যায়।',
+            'রক্তদানের আগে পর্যাপ্ত ঘুম, পানি এবং হালকা খাবার গুরুত্বপূর্ণ।',
+            'রক্তদানের পর কয়েক মিনিট বিশ্রাম নিন এবং ভারী কাজ কিছুক্ষণ এড়িয়ে চলুন।',
+            'জ্বর, সংক্রমণ, বা চিকিৎসকের নিষেধ থাকলে রক্তদান থেকে বিরত থাকুন।',
+            'রক্তের গ্রুপ ও মিল (compatibility) জানা থাকলে জরুরি মুহূর্তে দ্রুত সাহায্য করা যায়।',
+            'হিমোগ্লোবিন ও আয়রন ভালো রাখতে সুষম খাবার এবং নিয়মিত স্বাস্থ্য পরীক্ষা সহায়ক।',
         ];
 
-        $sections = '';
-        for ($i = 0; $i < 4; $i++) {
-            $h     = htmlspecialchars($faker->randomElement($subheadings), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-            $para1 = htmlspecialchars($faker->paragraph(4), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-            $para2 = htmlspecialchars($faker->paragraph(3), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-            $li1   = htmlspecialchars($faker->sentence(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-            $li2   = htmlspecialchars($faker->sentence(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-            $li3   = htmlspecialchars($faker->sentence(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $tips = [
+            'রক্তদানের আগে ২-৩ গ্লাস পানি পান করুন',
+            'হালকা খাবার খান (ডিম/ডাল/ভাত/সবজি)',
+            'ধূমপান ও অতিরিক্ত ক্যাফেইন এড়িয়ে চলুন',
+            'রক্তদানের পরে ২৪ ঘণ্টা অতিরিক্ত পরিশ্রম করবেন না',
+            'ইনজেকশনের জায়গায় ব্যথা/ফোলা হলে ঠান্ডা সেঁক দিন',
+        ];
 
-            $sections .= "\n<h2>{$h}</h2>\n"
-                       . "<p>{$para1}</p>\n"
-                       . "<ul><li>{$li1}</li><li>{$li2}</li><li>{$li3}</li></ul>\n"
-                       . "<p>{$para2}</p>";
-        }
+        $para1 = htmlspecialchars($this->pickMany($faker, $sentences, 2, 3), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $para2 = htmlspecialchars($this->pickMany($faker, $sentences, 2, 3), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        $lis = $this->pickManyArray($faker, $tips, 3, 4);
+        $lisHtml = implode('', array_map(
+            fn($t) => '<li>' . htmlspecialchars($t, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</li>',
+            $lis
+        ));
 
         return "<article>\n"
-             . "<h1>{$safeTitle}</h1>"
-             . $sections
-             . "\n<p><strong>Always consult a certified medical professional before donating blood.</strong></p>"
-             . "\n</article>";
+            . "<h1>{$safeTitle}</h1>\n"
+            . "<h2>সংক্ষেপে কী বলছে বিষয়টি</h2>\n<p>{$para1}</p>\n"
+            . "<h2>কীভাবে প্রস্তুতি নেবেন</h2>\n<ul>{$lisHtml}</ul>\n"
+            . "<h2>রক্তদানের পরে যত্ন</h2>\n<p>{$para2}</p>\n"
+            . "<p><strong>নোট:</strong> কোনো অসুস্থতা/ওষুধ সেবনের ক্ষেত্রে রক্তদানের আগে চিকিৎসকের পরামর্শ নিন।</p>\n"
+            . "</article>";
     }
 
-    private function sanitizedStoryHtml(
+    private function storyBodyRawBn(
         \Faker\Generator $faker,
         string $title,
         string $district,
@@ -326,47 +349,83 @@ class BlogSeeder extends Seeder
     ): string {
         $safeTitle    = htmlspecialchars($title, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $safeDistrict = htmlspecialchars($district, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $narratorName = match ($anonymize) {
-            'initials'  => 'F. R.',
-            'anonymous' => 'An Anonymous Donor',
-            default     => htmlspecialchars($faker->name(), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
-        };
 
-        $para1 = htmlspecialchars($faker->paragraph(5), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $para2 = htmlspecialchars($faker->paragraph(4), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $para3 = htmlspecialchars($faker->paragraph(4), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        $para4 = htmlspecialchars($faker->paragraph(3), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $namesBn = ['রাফি', 'তানজিলা', 'সাব্বির', 'নুসরাত', 'তামিম', 'মেহজাবিন', 'আকাশ', 'ফারহানা'];
+        $narrator = match ($anonymize) {
+            'initials'  => 'র. দ.',
+            'anonymous' => 'একজন রক্তদাতা',
+            default     => $faker->randomElement($namesBn),
+        };
+        $safeNarrator = htmlspecialchars($narrator, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        $paraA = htmlspecialchars($this->pickMany($faker, [
+            'সেদিন সন্ধ্যায় হঠাৎ করে একটি জরুরি কল আসে—রক্ত দরকার, সময় খুব কম।',
+            'হাসপাতালের করিডোরে অপেক্ষা, দুশ্চিন্তা আর অনিশ্চয়তা—সব একসাথে চাপা পড়ে যায়।',
+            'রক্তের গ্রুপ মিলছিল না, পরিচিত কেউ পাশে ছিল না—ঠিক তখনই রক্তদূতের কথা মনে পড়ে।',
+        ], 2, 3), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        $paraB = htmlspecialchars($this->pickMany($faker, [
+            'একটি পোস্ট/রিকোয়েস্ট দেওয়ার কিছুক্ষণের মধ্যেই কয়েকজন ডোনার যোগাযোগ করেন।',
+            'যখন প্রথম ডোনারটি এসে বললেন “আমি আছি”—মনে হলো অন্ধকারে আলো জ্বলে উঠেছে।',
+            'সব প্রক্রিয়া শেষ হতে বেশি সময় লাগেনি—কিন্তু সেই মুহূর্তটা আজও মনে গেঁথে আছে।',
+        ], 2, 3), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+
+        $paraC = htmlspecialchars($this->pickMany($faker, [
+            'পরদিন সকালে বুঝলাম—একটি ব্যাগ রক্ত শুধু রক্ত নয়, এটা আশা।',
+            'সেই অভিজ্ঞতার পর আমি নিয়মিত রক্তদাতা হওয়ার সিদ্ধান্ত নিই।',
+            'আপনি হয়তো কাউকে চিনবেন না—তবু আপনার রক্ত কারো পুরো পৃথিবী বাঁচাতে পারে।',
+        ], 2, 3), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 
         return "<article>\n"
-             . "<h1>{$safeTitle}</h1>\n"
-             . "<p><em>Story shared from <strong>{$safeDistrict}</strong> by {$narratorName}.</em></p>\n"
-             . "<h2>The Beginning</h2>\n<p>{$para1}</p>\n"
-             . "<h2>A Desperate Search</h2>\n<p>{$para2}</p>\n"
-             . "<h2>When Help Arrived</h2>\n<p>{$para3}</p>\n"
-             . "<h2>Life After the Donation</h2>\n<p>{$para4}</p>\n"
-             . "<p><strong>Thank you to every blood donor who gives the gift of life.</strong></p>\n"
-             . "</article>";
+            . "<h1>{$safeTitle}</h1>\n"
+            . "<p><em>{$safeDistrict} থেকে শেয়ার করেছেন <strong>{$safeNarrator}</strong>।</em></p>\n"
+            . "<h2>শুরুটা ছিল অস্থির</h2>\n<p>{$paraA}</p>\n"
+            . "<h2>যখন সাহায্য এল</h2>\n<p>{$paraB}</p>\n"
+            . "<h2>শেষ কথা</h2>\n<p>{$paraC}</p>\n"
+            . "<p><strong>ধন্যবাদ</strong>—সব রক্তদাতাকে, যারা নিঃশব্দে জীবন বাঁচান।</p>\n"
+            . "</article>";
     }
 
-    private function healthExcerpt(\Faker\Generator $faker): string
+    private function healthExcerptBn(\Faker\Generator $faker): string
     {
         $openers = [
-            'Blood donation saves millions of lives every year.',
-            'Understanding your blood type can literally be lifesaving.',
-            'Regular donors experience measurable health benefits.',
-            'The human body replenishes donated blood within 24 to 48 hours.',
+            'রক্তদানের আগে-পরের ছোট কিছু নিয়ম মানলেই অভিজ্ঞতাটি অনেক বেশি স্বস্তিদায়ক হয়।',
+            'রক্তের গ্রুপ, হিমোগ্লোবিন আর পানিশূন্যতা—এই তিনটি বিষয় বুঝলেই প্রস্তুতি সহজ।',
+            'প্রথমবার রক্ত দিতে ভয় লাগা স্বাভাবিক; সঠিক তথ্য জানলে ভয় অনেকটাই কমে যায়।',
+            'রক্তদান নিরাপদ রাখতে এই টিপসগুলো আপনাকে সাহায্য করবে।',
         ];
-        return $faker->randomElement($openers) . ' ' . $faker->sentence(12);
+
+        return $faker->randomElement($openers);
     }
 
-    private function storyExcerpt(\Faker\Generator $faker): string
+    private function storyExcerptBn(\Faker\Generator $faker): string
     {
         $openers = [
-            'I never expected a stranger\'s generosity to save my family.',
-            'The night everything changed began with a single phone call.',
-            'Finding the right blood type felt impossible until Roktodut.',
-            'I used to be afraid to donate. Now I do it every four months.',
+            'অচেনা মানুষের সহানুভূতি কীভাবে এক মুহূর্তে সবকিছু বদলে দেয়—এটাই সেই গল্প।',
+            'একটি জরুরি কল, কয়েকজন ডোনার, আর নতুন করে বেঁচে ওঠার আশা।',
+            'রক্তদূতের মাধ্যমে পাওয়া সহযোগিতা—যা আজও কৃতজ্ঞতায় ভরিয়ে দেয়।',
+            'এই অভিজ্ঞতা আমাকে নিয়মিত রক্তদাতা হতে অনুপ্রাণিত করেছে।',
         ];
-        return $faker->randomElement($openers) . ' ' . $faker->sentence(10);
+
+        return $faker->randomElement($openers);
+    }
+
+    private function pickMany(\Faker\Generator $faker, array $items, int $min, int $max): string
+    {
+        $count = $faker->numberBetween($min, $max);
+        $picked = $this->pickManyArray($faker, $items, $count, $count);
+        return implode(' ', $picked);
+    }
+
+    private function pickManyArray(\Faker\Generator $faker, array $items, int $min, int $max): array
+    {
+        $count = $faker->numberBetween($min, $max);
+        $count = max(1, min($count, count($items)));
+
+        $keys = array_keys($items);
+        shuffle($keys);
+
+        $pickedKeys = array_slice($keys, 0, $count);
+        return array_map(fn($k) => $items[$k], $pickedKeys);
     }
 }

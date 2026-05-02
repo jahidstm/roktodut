@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'নতুন পোস্ট লিখুন | রক্তদূত ব্লগ')
+@section('title', 'নতুন পোস্ট লিখুন | রক্তদূত স্বাস্থ্যবার্তা')
 
 {{-- ═══════════════════════════════════════════════════════════════════════
      BLOG CREATE — Quill.js WYSIWYG Submission Form
@@ -30,7 +30,7 @@
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/>
             </svg>
-            ব্লগে ফিরুন
+            স্বাস্থ্যবার্তায় ফিরুন
         </a>
         <h1 class="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
             ✍️ নতুন পোস্ট লিখুন

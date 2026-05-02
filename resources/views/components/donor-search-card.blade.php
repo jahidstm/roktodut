@@ -1,7 +1,5 @@
 @props([
     'donor',
-    'challenge' => null,
-    'revealedPhone' => null,
     'isTarget' => false,
 ])
 
@@ -28,7 +26,6 @@
          data-reveal-verify-url="{{ route('donors.reveal.verify', $donor->id) }}"
          data-csrf-token="{{ csrf_token() }}"
          data-masked-phone="{{ $masked }}"
-         data-revealed-phone="{{ $revealedPhone ?: '' }}"
          data-can-request="{{ $canRequest ? '1' : '0' }}"
          data-request-url="{{ route('requests.create') }}">
     <div class="flex items-start justify-between gap-3">
@@ -92,49 +89,19 @@
     <div class="mt-4 rounded-xl border border-slate-200 bg-white p-3">
         <div class="mb-3 flex items-center justify-between gap-2">
             <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">মোবাইল নম্বর</p>
-            <p class="font-mono text-sm font-bold text-slate-800 js-phone-text">{{ $revealedPhone ?: $masked }}</p>
+            <p class="font-mono text-sm font-bold text-slate-800 js-phone-text">{{ $masked }}</p>
         </div>
 
         <div class="js-reveal-container">
-            @if(!$revealedPhone)
-                @if($isTarget && is_array($challenge))
-                    <form method="POST" action="{{ route('donors.reveal.verify', $donor->id) }}" class="space-y-2 js-reveal-verify-form" data-url="{{ route('donors.reveal.verify', $donor->id) }}">
-                        @csrf
-                        <label class="block rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700 js-question-label">
-                            OTP নিরাপত্তা প্রশ্ন: {{ $challenge['question'] }}
-                        </label>
-                        <div class="flex gap-2">
-                            <input type="number" name="answer" required class="min-w-0 flex-1 rounded-lg border-slate-300 text-sm focus:border-red-500 focus:ring-red-500 js-answer-input" placeholder="উত্তর লিখুন">
-                            <button type="submit" class="inline-flex h-10 items-center justify-center rounded-lg bg-slate-800 px-4 text-sm font-bold text-white transition hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-300 js-verify-btn">
-                                Verify
-                            </button>
-                        </div>
-                    </form>
-                @else
-                    <button type="button"
-                            data-reveal-start
-                            class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
-                        <svg class="hidden h-4 w-4 animate-spin reveal-spinner" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"></path>
-                        </svg>
-                        <span class="reveal-btn-text">নম্বর দেখুন</span>
-                    </button>
-                @endif
-            @else
-                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 js-success-actions">
-                    <a href="tel:{{ $revealedPhone }}" class="inline-flex h-10 items-center justify-center rounded-lg bg-emerald-600 px-4 text-sm font-black text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-300 js-call-btn">
-                        কল করুন
-                    </a>
-                    @auth
-                        @if(auth()->user()->role?->value === 'recipient' || auth()->user()->role === 'recipient')
-                            <a href="{{ route('requests.create') }}" class="inline-flex h-10 items-center justify-center rounded-lg border border-red-200 bg-red-50 px-4 text-sm font-bold text-red-700 transition hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-200">
-                                রিকোয়েস্ট করুন
-                            </a>
-                        @endif
-                    @endauth
-                </div>
-            @endif
+            <button type="button"
+                    data-reveal-start
+                    class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                <svg class="hidden h-4 w-4 animate-spin reveal-spinner" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"></path>
+                </svg>
+                <span class="reveal-btn-text">নম্বর দেখুন</span>
+            </button>
         </div>
 
         <p class="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 js-inline-error {{ $showInlineError ? '' : 'hidden' }}">

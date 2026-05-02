@@ -39,8 +39,11 @@ class DonorMatchingService
             // ✅ ব্লাড গ্রুপ ম্যাচ
             ->where('blood_group', $request->blood_group->value)
 
-            // ✅ রিকোয়েস্টকারী নিজে বাদ
-            ->where('id', '!=', $request->requested_by)
+            // ✅ রিকোয়েস্টকারী নিজে বাদ (guest হলে skip)
+            ->when(
+                $request->requested_by !== null,
+                fn($q) => $q->where('id', '!=', $request->requested_by)
+            )
 
             // ✅ শ্যাডোব্যান্ড ইউজার বাদ
             ->where('is_shadowbanned', false)
@@ -48,13 +51,13 @@ class DonorMatchingService
             // ✅ যারা availability explicitly বন্ধ করেননি তারা অন্তর্ভুক্ত
             ->where(function ($q) {
                 $q->whereNull('is_available')
-                  ->orWhere('is_available', true);
+                    ->orWhere('is_available', true);
             })
 
             // ✅ ১২০ দিনের কুলডাউন পার হয়েছে (last_donated_at কলাম)
             ->where(function ($q) use ($cooldownCutoff) {
                 $q->whereNull('last_donated_at')
-                  ->orWhere('last_donated_at', '<=', $cooldownCutoff);
+                    ->orWhere('last_donated_at', '<=', $cooldownCutoff);
             })
 
             // 🚀 Smart Sorting (Gamification Tier):

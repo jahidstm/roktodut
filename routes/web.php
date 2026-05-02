@@ -28,6 +28,9 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\BlogSubmissionController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\SupportMessageController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Models\Division;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -61,7 +64,7 @@ Route::get('/', function () {
         ->notShadowbanned()
         ->where(function ($q) {
             $q->where('total_verified_donations', '>', 0)
-              ->orWhere('points', '>', 0);
+                ->orWhere('points', '>', 0);
         })
         ->with(['badges', 'district'])
         ->orderByDesc('total_verified_donations')
@@ -130,6 +133,18 @@ Route::get('/terms', function () {
 
 Route::get('/urgent-requests', [PublicBloodRequestController::class, 'index'])->name('public.requests.index');
 
+Route::post('/reports', [ReportController::class, 'store'])
+    ->middleware('throttle:reports-submit')
+    ->name('reports.store');
+
+Route::get('/requests/create', [BloodRequestController::class, 'create'])
+    ->name('requests.create');
+Route::post('/requests', [BloodRequestController::class, 'store'])
+    ->middleware('throttle:requests-store')
+    ->name('requests.store');
+Route::get('/requests/{bloodRequest}', [BloodRequestController::class, 'show'])
+    ->name('requests.show');
+
 Route::get('/blog', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/blog/create', [BlogSubmissionController::class, 'create'])
     ->middleware('auth')
@@ -166,7 +181,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::resource('requests', BloodRequestController::class)
         ->parameters(['requests' => 'bloodRequest'])
-        ->only(['index', 'create', 'store', 'show']);
+        ->only(['index']);
 
     Route::post('/requests/{bloodRequest}/respond', [BloodRequestResponseController::class, 'store'])->name('requests.respond');
     Route::post('/responses/{response}/claim', [DonationClaimController::class, 'store'])->name('donations.claim');
@@ -207,6 +222,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/verification/organization-reviews', [AdminDashboardController::class, 'organizationReviews'])->name('admin.org.reviews');
     Route::get('/admin/analytics', [AnalyticsController::class, 'index'])->name('admin.analytics.index');
     Route::get('/admin/analytics/export', [AnalyticsController::class, 'export'])->name('admin.analytics.export');
+    Route::get('/admin/audit-logs', [AuditLogController::class, 'index'])->name('admin.audit-logs.index');
+    Route::get('/admin/nid/{user}/image', [ProfileController::class, 'viewNidForAdmin'])
+        ->middleware('signed')
+        ->name('admin.nid.image');
     Route::post('/admin/donations/{response}/verify', [DonationClaimController::class, 'adminVerify'])->name('admin.donations.verify');
     Route::post('/admin/users/{user}/verify-nid', [AdminDashboardController::class, 'verifyNid'])->name('admin.nid.verify');
     Route::post('/admin/orgs/{organization}/verify', [AdminDashboardController::class, 'verifyOrg'])->name('admin.org.verify');
@@ -233,6 +252,12 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/{message}', [SupportMessageController::class, 'show'])->name('show');
         Route::post('/{message}/status', [SupportMessageController::class, 'updateStatus'])->name('status');
     });
+
+    Route::prefix('admin/reports')->name('admin.reports.')->group(function () {
+        Route::get('/', [AdminReportController::class, 'index'])->name('index');
+        Route::get('/{report}', [AdminReportController::class, 'show'])->name('show');
+        Route::post('/{report}/status', [AdminReportController::class, 'updateStatus'])->name('status');
+    });
 });
 
 // --- ৬. অর্গানাইজেশন অ্যাডমিন রাউটস (ইন্টিগ্রেটেড গ্রুপ) ---
@@ -240,6 +265,9 @@ Route::middleware(['auth', 'role:org_admin'])->group(function () {
     Route::get('/org/dashboard', [OrgDashboardController::class, 'index'])->name('org.dashboard');
     Route::patch('/org/members/{donor}/verify', [OrgDashboardController::class, 'updateVerificationStatus'])->name('org.members.verify');
     Route::get('/org/donor/{id}/verify', [VerificationController::class, 'show'])->name('org.donor.verify');
+    Route::get('/org/nid/{user}/image', [ProfileController::class, 'viewNidForOrg'])
+        ->middleware('signed')
+        ->name('org.nid.image');
     Route::post('/org/donor/{id}/approve', [VerificationController::class, 'approve'])->name('org.donor.approve');
     Route::post('/org/donor/{id}/reject', [VerificationController::class, 'reject'])->name('org.donor.reject');
 

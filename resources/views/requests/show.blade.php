@@ -4,6 +4,17 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    @if(session('success'))
+        <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800 font-bold">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700 font-bold">
+            {{ session('error') }}
+        </div>
+    @endif
 
     {{-- Header Section --}}
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
@@ -28,8 +39,16 @@
                 </div>
             </div>
 
-            <div class="shrink-0 px-3 py-1 rounded-lg bg-red-50 text-red-700 border border-red-100 font-extrabold">
-                {{ $bloodRequest->blood_group?->value ?? (string) $bloodRequest->blood_group }}
+            <div class="shrink-0 flex flex-col items-end gap-2">
+                <div class="px-3 py-1 rounded-lg bg-red-50 text-red-700 border border-red-100 font-extrabold">
+                    {{ $bloodRequest->blood_group?->value ?? (string) $bloodRequest->blood_group }}
+                </div>
+                <button type="button"
+                        x-data
+                        @click="$dispatch('open-modal', 'report-blood-request')"
+                        class="inline-flex items-center rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-black text-red-700 hover:bg-red-50">
+                    Report
+                </button>
             </div>
         </div>
 
@@ -55,6 +74,51 @@
             </div>
         @endif
     </div>
+
+    <x-modal name="report-blood-request" maxWidth="lg">
+        <form method="POST" action="{{ route('reports.store') }}" class="p-6">
+            @csrf
+            <input type="hidden" name="reportable_type" value="blood_request">
+            <input type="hidden" name="reportable_id" value="{{ $bloodRequest->id }}">
+
+            <h3 class="text-lg font-extrabold text-slate-900">রিকোয়েস্ট রিপোর্ট করুন</h3>
+            <p class="mt-1 text-sm font-medium text-slate-500">ভুল তথ্য, স্প্যাম বা অপব্যবহার হলে রিপোর্ট পাঠান।</p>
+
+            <div class="mt-4">
+                <label for="report-category" class="block text-sm font-bold text-slate-700 mb-2">কারণ</label>
+                <select id="report-category" name="category" required class="w-full rounded-xl border-slate-300 text-sm font-semibold">
+                    <option value="">কারণ নির্বাচন করুন</option>
+                    <option value="fake_info">Fake info</option>
+                    <option value="harassment">Harassment</option>
+                    <option value="spam">Spam</option>
+                    <option value="inappropriate">Inappropriate</option>
+                    <option value="other">Other</option>
+                </select>
+                @error('category')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+            </div>
+
+            <div class="mt-4">
+                <label for="report-message" class="block text-sm font-bold text-slate-700 mb-2">বিস্তারিত (ঐচ্ছিক)</label>
+                <textarea id="report-message" name="message" rows="4" class="w-full rounded-xl border-slate-300 text-sm">{{ old('message') }}</textarea>
+                @error('message')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+            </div>
+
+            @error('reportable_type')<p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+            @error('reportable_id')<p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+
+            <div class="mt-6 flex items-center justify-end gap-2">
+                <button type="button"
+                        x-data
+                        @click="$dispatch('close-modal', 'report-blood-request')"
+                        class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50">
+                    Cancel
+                </button>
+                <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-black text-white hover:bg-red-700">
+                    Submit report
+                </button>
+            </div>
+        </form>
+    </x-modal>
 
     {{-- 🎯 Action Box: Accept, Decline, or Fulfill Buttons --}}
     @php

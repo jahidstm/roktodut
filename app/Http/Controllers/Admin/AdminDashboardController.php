@@ -7,9 +7,11 @@ use App\Models\BloodRequest;
 use App\Models\BloodRequestResponse;
 use App\Models\Post;
 use App\Models\User;
+use App\Services\AuditLogger;
 use App\Services\GamificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AdminDashboardController extends Controller
@@ -106,9 +108,9 @@ class AdminDashboardController extends Controller
     public function proofReviews()
     {
         $pendingClaims = BloodRequestResponse::with([
-                'user',
-                'bloodRequest.requester',
-            ])
+            'user',
+            'bloodRequest.requester',
+        ])
             ->whereIn('verification_status', ['claimed', 'disputed'])
             ->orderByDesc('donor_claimed_at')
             ->paginate(12)
@@ -174,8 +176,10 @@ class AdminDashboardController extends Controller
      */
     private function logAudit(string $actionType, $targetId, string $targetType, array $details = [])
     {
+        $adminId = (int) Auth::id();
+
         \App\Models\AdminAuditLog::create([
-            'admin_id' => auth()->id(),
+            'admin_id' => $adminId,
             'action_type' => $actionType,
             'target_id' => $targetId,
             'target_type' => $targetType,
@@ -193,17 +197,21 @@ class AdminDashboardController extends Controller
         if ($decision === 'approve') {
             $this->gamification->awardVerifiedBadge($user);
             $this->logAudit('nid_approve', $user->id, User::class);
+            AuditLogger::log('admin.nid.verify.approve', $user, [
+                'decision' => 'approve',
+                'nid_status' => $user->nid_status,
+            ]);
             return back()->with('success', "✅ {$user->name}-এর NID ভেরিফাই সম্পন্ন হয়েছে। 'Verified Donor' ব্যাজ যুক্ত হয়েছে।");
         }
 
         $this->gamification->revokeVerifiedBadge($user);
-        
+
         // Log to security radar if repeated rejections (e.g. > 2 times)
         $rejectionCount = \App\Models\AdminAuditLog::where('target_id', $user->id)
             ->where('target_type', User::class)
             ->where('action_type', 'nid_reject')
             ->count();
-            
+
         if ($rejectionCount >= 2) {
             \App\Models\SecurityRadarEvent::create([
                 'user_id' => $user->id,
@@ -214,6 +222,11 @@ class AdminDashboardController extends Controller
         }
 
         $this->logAudit('nid_reject', $user->id, User::class);
+        AuditLogger::log('admin.nid.verify.reject', $user, [
+            'decision' => 'reject',
+            'nid_status' => $user->nid_status,
+            'prior_rejection_count' => $rejectionCount,
+        ]);
         return back()->with('error', "❌ {$user->name}-এর NID ভেরিফিকেশন বাতিল হয়েছে।");
     }
 
@@ -228,9 +241,10 @@ class AdminDashboardController extends Controller
         ]);
 
         $status = $request->input('status');
-        
+        $reviewedBy = (int) Auth::id();
+
         $organization->status = $status;
-        $organization->reviewed_by = auth()->id();
+        $organization->reviewed_by = $reviewedBy;
         $organization->reviewed_at = now();
 
         if ($status === 'approved') {
@@ -249,7 +263,7 @@ class AdminDashboardController extends Controller
             $organization->is_verified = false;
             $organization->rejection_reason = $request->input('rejection_reason');
             $organization->save();
-            
+
             $this->logAudit('org_reject', $organization->id, \App\Models\Organization::class, [
                 'reason' => $request->input('rejection_reason')
             ]);

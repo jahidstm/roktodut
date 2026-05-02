@@ -29,9 +29,9 @@ class DemoDonorsSeeder extends Seeder
         // ─── লোকেশন রেফারেন্স ────────────────────────────────────────
         $dhakaDiv   = Division::where('name', 'ঢাকা')->first();
         $dhakaDist  = District::where('name', 'ঢাকা')
-                        ->where('division_id', optional($dhakaDiv)->id)->first();
+            ->where('division_id', optional($dhakaDiv)->id)->first();
         $dhanmondi  = Upazila::where('name', 'ধানমন্ডি')
-                        ->where('district_id', optional($dhakaDist)->id)->first();
+            ->where('district_id', optional($dhakaDist)->id)->first();
 
         $divId  = $dhakaDiv->id  ?? 1;
         $distId = $dhakaDist->id ?? 1;
@@ -162,6 +162,65 @@ class DemoDonorsSeeder extends Seeder
             }
         }
 
+        // ─── ৩b. টার্গেটেড ডেমো ডোনার (সাভার, ঢাকা + A+) ─────────────────
+        // Search page filters: blood_group + division_id + district_id + upazila_id
+        // Also requires: is_available=true and cooldown_until null/past.
+        $savarUpz = Upazila::where('name', 'like', '%সাভার%')
+            ->where('district_id', $distId)
+            ->first();
+
+        if ($savarUpz) {
+            for ($j = 1; $j <= 8; $j++) {
+                $donations = 1 + ($j % 3);
+                $points = ($donations * 50) + ($j % 2 === 0 ? 10 : 0);
+
+                $donor = User::updateOrCreate(
+                    ['email' => "savar.a{$j}@demo.test"],
+                    [
+                        'name'                     => "সাভার ডেমো ডোনার {$j}",
+                        'password'                 => Hash::make('password'),
+                        'phone'                    => '01731' . str_pad((string) $j, 6, '0', STR_PAD_LEFT),
+                        'role'                     => UserRole::DONOR->value,
+                        'blood_group'              => BloodGroup::A_POS->value,
+                        'division_id'              => $divId,
+                        'district_id'              => $distId,
+                        'upazila_id'               => $savarUpz->id,
+                        'organization_id'          => $org->id,
+                        'address'                  => 'সাভার, ঢাকা',
+                        'nid_status'               => 'verified',
+                        'nid_path'                 => 'seed/dummy_nid.jpg',
+                        'qr_token'                 => Str::random(32),
+                        'is_onboarded'             => true,
+                        'is_available'             => true,
+                        'is_ready_now'             => ($j % 3 === 0),
+                        'verified_badge'           => true,
+                        'total_verified_donations' => $donations,
+                        'total_donations'          => $donations,
+                        'points'                   => $points,
+                        'monthly_points'           => $donations * 50,
+                        'monthly_points_month'     => $currentMonth,
+                        'last_donated_at'          => now()->subDays(160 + $j)->toDateString(),
+                        'cooldown_until'           => null,
+                        'is_shadowbanned'          => false,
+                        'email_verified_at'        => now(),
+                        'gender'                   => ($j % 2 === 0) ? 'male' : 'female',
+                        'date_of_birth'            => now()->subYears(22 + ($j % 10))->toDateString(),
+                        'weight'                   => 55 + ($j % 20),
+                    ]
+                );
+
+                // badges (optional)
+                $donor->badges()->detach();
+                if ($badges->has('bronze_bloodline')) $this->attachBadge($donor, $badges['bronze_bloodline']);
+                if ($badges->has('verified_donor'))  $this->attachBadge($donor, $badges['verified_donor']);
+                if ($donor->is_ready_now && $badges->has('ready_now')) $this->attachBadge($donor, $badges['ready_now']);
+            }
+
+            $this->command->info('✅ Savar A+ demo donors added: savar.a1@demo.test … savar.a8@demo.test');
+        } else {
+            $this->command->warn('⚠️ "সাভার" উপজেলা খুঁজে পাওয়া যায়নি — targeted A+ demo donors স্কিপ করা হয়েছে।');
+        }
+
         // ─── ৪. স্পেসিফিক টেস্ট ইউজার ───────────────────────────────
 
         // Platinum Hero ডোনার (সর্বোচ্চ স্তর পরীক্ষার জন্য)
@@ -198,7 +257,7 @@ class DemoDonorsSeeder extends Seeder
             ]
         );
         $platinumDonor->badges()->detach();
-        foreach (['bronze_bloodline','silver_savior','golden_guardian','platinum_hero','verified_donor','rare_blood_hero','ready_now'] as $slug) {
+        foreach (['bronze_bloodline', 'silver_savior', 'golden_guardian', 'platinum_hero', 'verified_donor', 'rare_blood_hero', 'ready_now'] as $slug) {
             if ($badges->has($slug)) $this->attachBadge($platinumDonor, $badges[$slug]);
         }
 

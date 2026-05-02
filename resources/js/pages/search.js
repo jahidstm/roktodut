@@ -76,12 +76,12 @@ function renderChallenge(card, question) {
     container.innerHTML = `
         <form class="space-y-2 js-reveal-verify-form" data-url="${verifyUrl}">
             <label class="block rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700">
-                OTP নিরাপত্তা প্রশ্ন: ${question}
+                ক্যাপচা: ${question}
             </label>
             <div class="flex gap-2">
-                <input type="number" name="answer" required class="min-w-0 flex-1 rounded-lg border-slate-300 text-sm focus:border-red-500 focus:ring-red-500" placeholder="উত্তর লিখুন">
+                <input type="text" name="captcha_answer" required class="min-w-0 flex-1 rounded-lg border-slate-300 text-sm focus:border-red-500 focus:ring-red-500" placeholder="উত্তর লিখুন">
                 <button type="submit" class="inline-flex h-10 items-center justify-center rounded-lg bg-slate-800 px-4 text-sm font-bold text-white transition hover:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-300">
-                    Verify
+                    যাচাই করুন
                 </button>
             </div>
         </form>
@@ -132,7 +132,7 @@ function wireAjaxReveal() {
             if (!res.ok || !responsePayload?.ok) {
                 throw new Error(getErrorMessage(responsePayload, `Reveal start failed (${res.status})`));
             }
-            renderChallenge(card, responsePayload.question || '2 + 2 = ?');
+            renderChallenge(card, responsePayload.captchaQuestion || '২ + ২ = ?');
         } catch (err) {
             showError(card, err.message);
             toggleButtonLoading(btn, false);

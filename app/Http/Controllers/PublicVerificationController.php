@@ -45,8 +45,8 @@ class PublicVerificationController extends Controller
         // nid_status চেক intentionally DB-তে করা হচ্ছে যাতে
         // token সঠিক হলেও verify না হলে invalid দেখায়।
         $user = User::where('qr_token', $token)
-                    ->where('nid_status', 'verified')
-                    ->first();
+            ->where('nid_status', 'verified')
+            ->first();
 
         // ─── ২. Shadow-Ban / Not Found চেক ──────────────────────────────
         //
@@ -72,8 +72,8 @@ class PublicVerificationController extends Controller
         // Pivot table থেকে badge list নেওয়া। প্রতিটি badge-এর জন্য
         // GamificationService থেকে display data (label, emoji, color) নেওয়া।
         $badges = $user->badges()
-                       ->get()
-                       ->map(fn ($badge) => GamificationService::getBadgeDisplayData($badge->name));
+            ->get()
+            ->map(fn($badge) => GamificationService::getBadgeDisplayData($badge->name));
 
         // ─── ৫. Blood Group ──────────────────────────────────────────────
         // Enum থেকে string value বের করো (e.g., "A+", "O-")
@@ -86,6 +86,7 @@ class PublicVerificationController extends Controller
         //     কারণ: Blade-এ অসাবধানতাবশত {{ $user->phone }} টাইপ করলে
         //     data leak হবে। শুধুমাত্র whitelisted scalar/array পাস করা হচ্ছে।
         return view('public.verification.show', [
+            'user_id'      => $user->id,
             'name'         => $user->name,
             'blood_group'  => $bloodGroup,
             'badges'       => $badges,

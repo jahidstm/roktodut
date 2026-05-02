@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'ব্লগ — স্বাস্থ্য তথ্য ও সাফল্যের গল্প | রক্তদূত')
+@section('title', 'স্বাস্থ্যবার্তা — স্বাস্থ্য তথ্য ও সাফল্যের গল্প | রক্তদূত')
 
 @section('content')
 
@@ -10,7 +10,7 @@
      ═══════════════════════════════════════════════════════════════════════ --}}
 
 {{-- ── Hero Banner ─────────────────────────────────────────────────────── --}}
-<x-page-header variant="marketing" label="🩸 রক্তদূত ব্লগ" title="স্বাস্থ্য তথ্য ও <span class='text-yellow-300'>সাফল্যের গল্প</span>" subtitle="রক্তদানের অভিজ্ঞতা, চিকিৎসা পরামর্শ এবং আমাদের ডোনারদের অনুপ্রেরণামূলক গল্প পড়ুন।">
+<x-page-header variant="marketing" label="🩸 রক্তদূত স্বাস্থ্যবার্তা" title="স্বাস্থ্য তথ্য ও <span class='text-yellow-300'>সাফল্যের গল্প</span>" subtitle="রক্তদানের অভিজ্ঞতা, চিকিৎসা পরামর্শ এবং আমাদের ডোনারদের অনুপ্রেরণামূলক গল্প পড়ুন।">
     <x-slot name="actions">
         <div class="flex flex-col items-center w-full">
             @auth

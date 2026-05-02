@@ -75,6 +75,34 @@ class AppServiceProvider extends ServiceProvider
         });
         // ────────────────────────────────────────────────────────────────────
 
+        RateLimiter::for('requests-store', function (Request $request) {
+            $message = 'অনেক বেশি অনুরোধ করা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।';
+
+            return ($request->user() ? Limit::perMinute(10) : Limit::perMinute(5))
+                ->by('requests-store:' . $request->ip())
+                ->response(function (Request $request) use ($message) {
+                    if ($request->expectsJson()) {
+                        return response()->json(['message' => $message], 429);
+                    }
+
+                    return back()->withInput()->with('error', $message);
+                });
+        });
+
+        RateLimiter::for('reports-submit', function (Request $request) {
+            $message = 'অল্প সময়ের মধ্যে অনেক বেশি রিপোর্ট করা হয়েছে। অনুগ্রহ করে ১ মিনিট পরে আবার চেষ্টা করুন।';
+
+            return Limit::perMinute(3)
+                ->by('reports-submit:' . $request->ip())
+                ->response(function (Request $request) use ($message) {
+                    if ($request->expectsJson()) {
+                        return response()->json(['message' => $message], 429);
+                    }
+
+                    return back()->withInput()->with('error', $message);
+                });
+        });
+
         RateLimiter::for('phone-reveal', function (Request $request) {
             if ($request->user() && $request->user()->isAdmin()) {
                 return Limit::none();

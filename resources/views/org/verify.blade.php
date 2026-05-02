@@ -71,8 +71,16 @@
                     <h2 class="text-sm font-extrabold text-slate-800 uppercase tracking-widest">সাবমিট করা ডকুমেন্ট (NID/ID)</h2>
                 </div>
                 <div class="p-6 flex-1 flex items-center justify-center bg-slate-100/50">
-                    @if($donor->nid_image)
-                        <img src="{{ asset('storage/' . $donor->nid_image) }}" alt="NID Document" class="max-w-full h-auto max-h-[600px] rounded-xl shadow-md border border-slate-200">
+                    @if($donor->nid_path)
+                        @if(\Illuminate\Support\Str::endsWith($donor->nid_path, ['.pdf']))
+                            <iframe src="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('org.nid.image', now()->addMinutes(2), ['user' => $donor->id]) }}"
+                                    class="w-full h-[550px] rounded-xl border border-slate-200 shadow-inner"
+                                    style="border: none;"></iframe>
+                        @else
+                            <img src="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('org.nid.image', now()->addMinutes(2), ['user' => $donor->id]) }}"
+                                 alt="NID Document"
+                                 class="max-w-full h-auto max-h-[600px] rounded-xl shadow-md border border-slate-200">
+                        @endif
                     @else
                         <div class="text-center text-slate-400">
                             <svg class="w-16 h-16 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>

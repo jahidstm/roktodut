@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', $post->title . ' | রক্তদূত ব্লগ')
+@section('title', $post->title . ' | রক্তদূত স্বাস্থ্যবার্তা')
 
 @section('content')
 
@@ -56,7 +56,7 @@
         <nav class="flex items-center gap-2 text-sm font-semibold text-slate-400" aria-label="Breadcrumb">
             <a href="{{ route('home') }}" class="hover:text-red-600 transition-colors">হোম</a>
             <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-            <a href="{{ route('blog.index') }}" class="hover:text-red-600 transition-colors">ব্লগ</a>
+            <a href="{{ route('blog.index') }}" class="hover:text-red-600 transition-colors">স্বাস্থ্যবার্তা</a>
             <svg class="w-4 h-4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             <span class="text-slate-600 truncate max-w-xs">{{ Str::limit($post->title, 45) }}</span>
         </nav>

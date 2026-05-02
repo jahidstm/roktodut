@@ -3,6 +3,7 @@
 @section('title', 'রক্তদূত — রক্ত দিন, জীবন বাঁচান')
 
 @section('content')
+@include('partials.pilot-banner')
 
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 1 — HERO (Listygo Inspired)

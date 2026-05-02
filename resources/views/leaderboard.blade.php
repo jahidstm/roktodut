@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'লিডারবোর্ড – রক্তদূত')
+@section('title', 'সেরা রক্তদাতা – রক্তদূত')
 
 @section('content')
 <div id="leaderboard-root" class="max-w-5xl mx-auto px-4 py-8 sm:py-12">
@@ -19,7 +19,7 @@
                     <div class="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center text-2xl shadow-lg">🏆</div>
                     <div>
                         <h1 class="text-2xl sm:text-3xl font-black text-white leading-tight">
-                            {{ $time === 'month' ? 'এই মাসের' : 'সর্বকালের' }} লিডারবোর্ড
+                            {{ $time === 'month' ? 'এই মাসের' : 'সর্বকালের' }} সেরা রক্তদাতা
                         </h1>
                         <p class="text-red-200 text-sm font-semibold">সেরা রক্তদাতাদের সম্মানের তালিকা</p>
                     </div>

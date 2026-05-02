@@ -87,17 +87,17 @@
                         @if(Str::endsWith($donor->nid_path, ['.pdf']))
                             {{-- Embedded PDF Viewer --}}
                             <div class="w-full h-full flex flex-col items-center w-full gap-4">
-                                <iframe src="{{ route('donor.view_nid', $donor->id) }}" class="w-full h-[350px] rounded-xl border border-slate-200 shadow-inner" style="border: none;"></iframe>
+                                <iframe src="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('org.nid.image', now()->addMinutes(2), ['user' => $donor->id]) }}" class="w-full h-[350px] rounded-xl border border-slate-200 shadow-inner" style="border: none;"></iframe>
                                 
-                                <a href="{{ route('donor.view_nid', $donor->id) }}" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white text-sm font-bold rounded-xl hover:bg-slate-900 transition-colors shadow-sm">
+                                <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('org.nid.image', now()->addMinutes(2), ['user' => $donor->id]) }}" target="_blank" class="inline-flex items-center gap-2 px-5 py-2.5 bg-slate-800 text-white text-sm font-bold rounded-xl hover:bg-slate-900 transition-colors shadow-sm">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                                     নতুন ট্যাবে বড় করে দেখুন
                                 </a>
                             </div>
                         @else
                             {{-- Image Preview --}}
-                            <a href="{{ route('donor.view_nid', $donor->id) }}" target="_blank" class="w-full h-full flex items-center justify-center cursor-pointer">
-                                <img src="{{ route('donor.view_nid', $donor->id) }}" alt="NID Document" class="max-h-[400px] w-auto object-contain rounded-xl">
+                            <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('org.nid.image', now()->addMinutes(2), ['user' => $donor->id]) }}" target="_blank" class="w-full h-full flex items-center justify-center cursor-pointer">
+                                <img src="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('org.nid.image', now()->addMinutes(2), ['user' => $donor->id]) }}" alt="NID Document" class="max-h-[400px] w-auto object-contain rounded-xl">
                             </a>
                             <div class="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center pointer-events-none">
                                 <span class="bg-slate-900 text-white text-xs font-bold px-4 py-2 rounded-lg shadow-lg">ক্লিক করে বড় করুন</span>

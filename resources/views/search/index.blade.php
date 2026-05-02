@@ -1,11 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'স্মার্ট ডোনার সার্চ — রক্তদূত')
+@section('title', 'রক্তদাতা খুঁজুন — রক্তদূত')
 
 @section('content')
-<x-page-header variant="app" title="স্মার্ট ডোনার সার্চ" />
+<x-page-header variant="app" title="রক্তদাতা খুঁজুন" />
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    @include('partials.pilot-banner')
+
     @php
         $selectedDivision = $request['division_id'] ?? '';
         $selectedDistrict = $request['district_id'] ?? '';
@@ -117,12 +119,10 @@
             @foreach($donors as $donor)
                 @php
                     $donorId = $donor->id;
-                    $challenge = session("reveal_challenge.$donorId");
-                    $revealedPhone = session("revealed_phone.$donorId");
                     $isTarget = session('reveal_target') == $donorId;
                 @endphp
 
-                <x-donor-search-card :donor="$donor" :challenge="$challenge" :revealed-phone="$revealedPhone" :is-target="$isTarget" />
+                <x-donor-search-card :donor="$donor" :is-target="$isTarget" />
             @endforeach
         </div>
 

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'জরুরি রক্তের অনুরোধ | রক্তদূত')
+@section('title', 'রক্তদান | জরুরি রক্তের অনুরোধ | রক্তদূত')
 
 @section('content')
 <div class="min-h-screen bg-white">

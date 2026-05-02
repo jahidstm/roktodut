@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
@@ -260,14 +261,48 @@ class ProfileController extends Controller
             abort(403, 'এই ডকুমেন্টটি দেখার অনুমতি আপনার নেই।');
         }
 
+        return $this->servePrivateNid($user);
+    }
+
+    public function viewNidForAdmin(Request $request, User $user)
+    {
+        if (!$request->hasValidSignature()) {
+            abort(403, 'সাইনড লিংকটি আর বৈধ নেই।');
+        }
+
+        if (!$request->user()->isAdmin()) {
+            abort(403, 'এই ডকুমেন্টটি দেখার অনুমতি আপনার নেই।');
+        }
+
+        return $this->servePrivateNid($user);
+    }
+
+    public function viewNidForOrg(Request $request, User $user)
+    {
+        if (!$request->hasValidSignature()) {
+            abort(403, 'সাইনড লিংকটি আর বৈধ নেই।');
+        }
+
+        $viewer = $request->user();
+        $isOrgAdmin = $viewer->isOrgAdmin() && $viewer->organization_id === $user->organization_id;
+
+        if (!$isOrgAdmin) {
+            abort(403, 'এই ডকুমেন্টটি দেখার অনুমতি আপনার নেই।');
+        }
+
+        return $this->servePrivateNid($user);
+    }
+
+    private function servePrivateNid(User $user)
+    {
         if (!$user->nid_path) {
             abort(404, 'ডোনার এখনো এনআইডি ডকুমেন্ট আপলোড করেননি।');
         }
 
-        if (!\Illuminate\Support\Facades\Storage::disk('private')->exists($user->nid_path)) {
+        if (!Storage::disk('private')->exists($user->nid_path)) {
             abort(404, 'ফাইলটি সার্ভারে পাওয়া যায়নি।');
         }
 
-        return \Illuminate\Support\Facades\Storage::disk('private')->response($user->nid_path);
+        return Storage::disk('private')->response($user->nid_path);
     }
 }

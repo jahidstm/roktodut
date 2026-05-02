@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\UserRole;
+use App\Services\MathCaptchaService;
 use App\Models\User;
 use App\Models\BloodRequest;
 use App\Models\PhoneRevealLog;
@@ -13,16 +14,6 @@ use Illuminate\Support\Facades\Gate;
 
 class DonorRevealController extends Controller
 {
-    private function challengeKey(int $donorId): string
-    {
-        return "reveal_challenge.$donorId";
-    }
-
-    private function revealedKey(int $donorId): string
-    {
-        return "revealed_phone.$donorId";
-    }
-
     private function deny(Request $request, int $donorId, string $message, int $status = 403)
     {
         if ($request->expectsJson()) {
@@ -47,87 +38,91 @@ class DonorRevealController extends Controller
     // Public Donor Directory Reveal Methods (Legacy/General)
     // ==========================================
 
-    public function start(Request $request, User $donor)
+    public function start(Request $request, User $donor, MathCaptchaService $mathCaptchaService)
     {
         if ($this->getRoleValue($donor->role) !== 'donor' && $this->getRoleValue($donor->role) !== UserRole::DONOR->value) {
             return $this->deny($request, (int)$donor->id, 'এই ইউজার ডোনার না।', 404);
         }
 
-        $a = random_int(2, 9);
-        $b = random_int(2, 9);
-
-        $request->session()->put($this->challengeKey($donor->id), [
-            'question' => "$a + $b = ?",
-            'answer' => $a + $b,
-            'expires_at' => now()->addMinutes(5)->timestamp,
-        ]);
-
-        $request->session()->flash('reveal_target', $donor->id);
+        $captchaQuestion = $mathCaptchaService->generate();
 
         if ($request->expectsJson()) {
             return response()->json([
                 'ok' => true,
                 'donor_id' => $donor->id,
-                'challenge_set' => true,
-                'question' => "$a + $b = ?",
+                'captchaQuestion' => $captchaQuestion,
                 'expires_in_seconds' => 300,
             ]);
         }
 
-        return back()->with('reveal_target', $donor->id);
+        return back();
     }
 
-    public function verify(Request $request, User $donor)
+    public function verify(Request $request, User $donor, MathCaptchaService $mathCaptchaService)
     {
         if ($this->getRoleValue($donor->role) !== 'donor' && $this->getRoleValue($donor->role) !== UserRole::DONOR->value) {
             return $this->deny($request, (int)$donor->id, 'এই ইউজার ডোনার না।', 404);
         }
 
-        $payload = $request->session()->get($this->challengeKey($donor->id));
-        if (!$payload || now()->timestamp > (int)($payload['expires_at'] ?? 0)) {
-            return $this->deny($request, (int)$donor->id, 'চ্যালেঞ্জের সময় শেষ। আবার চেষ্টা করুন।', 422);
-        }
-
         $request->validate([
-            'answer' => ['required', 'integer', 'min:0', 'max:99'],
+            'captcha_answer' => ['required'],
+        ], [
+            'captcha_answer.required' => 'ক্যাপচা উত্তর দেওয়া বাধ্যতামূলক।',
         ]);
 
-        if ((int)$request->input('answer') !== (int)$payload['answer']) {
-            return $this->deny($request, (int)$donor->id, 'ভুল উত্তর। আবার চেষ্টা করুন।', 422);
+        $ipHash = hash('sha256', ((string) $request->ip()) . '|' . ((string) config('app.key')));
+
+        if (!$mathCaptchaService->verify($request->input('captcha_answer'))) {
+            DB::table('phone_reveal_attempts')->insert([
+                'donor_id' => $donor->id,
+                'ip_hash' => $ipHash,
+                'status' => 'failed_captcha',
+                'created_at' => now(),
+            ]);
+
+            return $this->deny($request, (int)$donor->id, 'ক্যাপচা সঠিক নয় বা মেয়াদ শেষ হয়েছে। আবার চেষ্টা করুন।', 422);
         }
 
-        $ip = $request->ip() ?? 'unknown';
-        $windowStart = Carbon::now()->subMinutes(15);
-
-        $recentSuccessCount = DB::table('phone_reveal_logs')
-            ->where('ip', $ip)
-            ->where('created_at', '>=', $windowStart)
+        $successThisHour = DB::table('phone_reveal_attempts')
+            ->where('ip_hash', $ipHash)
+            ->where('status', 'success')
+            ->where('created_at', '>=', Carbon::now()->subHour())
             ->count();
 
-        if ($recentSuccessCount >= 5) {
-            return $this->deny($request, (int)$donor->id, 'আপনি অনেকবার ফোন দেখার চেষ্টা করেছেন। ১৫ মিনিট পরে আবার চেষ্টা করুন।', 429);
+        $successForDonorToday = DB::table('phone_reveal_attempts')
+            ->where('ip_hash', $ipHash)
+            ->where('donor_id', $donor->id)
+            ->where('status', 'success')
+            ->where('created_at', '>=', Carbon::now()->startOfDay())
+            ->count();
+
+        if ($successThisHour >= 3 || $successForDonorToday >= 1) {
+            DB::table('phone_reveal_attempts')->insert([
+                'donor_id' => $donor->id,
+                'ip_hash' => $ipHash,
+                'status' => 'rate_limited',
+                'created_at' => now(),
+            ]);
+
+            return $this->deny($request, (int)$donor->id, 'অনেক বেশি অনুরোধ করা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।', 429);
         }
 
-        DB::table('phone_reveal_logs')->insert([
+        DB::table('phone_reveal_attempts')->insert([
             'donor_id' => $donor->id,
-            'ip' => $ip,
+            'ip_hash' => $ipHash,
+            'status' => 'success',
             'created_at' => now(),
-            'updated_at' => now(),
         ]);
-
-        $request->session()->put($this->revealedKey($donor->id), (string)$donor->phone);
-        $request->session()->forget($this->challengeKey($donor->id));
 
         if ($request->expectsJson()) {
             return response()->json([
                 'ok' => true,
                 'donor_id' => $donor->id,
-                'revealed' => true,
                 'phone' => (string) ($donor->phone ?? ''),
             ]);
         }
 
-        return back()->with('reveal_target', $donor->id);
+        return back();
     }
 
     // ==========================================
@@ -149,7 +144,7 @@ class DonorRevealController extends Controller
 
         // ৩. স্মার্ট রেট লিমিটিং: ১৫ মিনিটে সর্বোচ্চ ৫ জন ইউনিক ডোনারের নাম্বার দেখতে পারবে
         $viewerId = $request->user()->id;
-        
+
         $recentUniqueReveals = PhoneRevealLog::where('viewer_user_id', $viewerId)
             ->where('created_at', '>=', now()->subMinutes(15))
             ->distinct('donor_id')

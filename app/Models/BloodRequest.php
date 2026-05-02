@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class BloodRequest extends Model
 {
@@ -15,6 +16,8 @@ class BloodRequest extends Model
 
     protected $fillable = [
         'requested_by',
+        'guest_token',
+        'created_ip_hash',
         'patient_name',
         'blood_group',
         'bags_needed',
@@ -28,6 +31,7 @@ class BloodRequest extends Model
         'address',
         'contact_name',
         'contact_number',
+        'contact_number_normalized',
         'urgency',
         'needed_at',
         'status',
@@ -57,6 +61,11 @@ class BloodRequest extends Model
     public function responses(): HasMany
     {
         return $this->hasMany(BloodRequestResponse::class, 'blood_request_id');
+    }
+
+    public function reports(): MorphMany
+    {
+        return $this->morphMany(Report::class, 'reportable');
     }
 
     public function donations(): HasMany
@@ -97,7 +106,7 @@ class BloodRequest extends Model
         return $query->where('status', 'pending')
             ->where(function ($q) {
                 $q->whereNull('needed_at')
-                  ->orWhere('needed_at', '>=', now()->subHours(2));
+                    ->orWhere('needed_at', '>=', now()->subHours(2));
             });
     }
 

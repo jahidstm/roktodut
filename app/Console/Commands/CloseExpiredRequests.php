@@ -2,47 +2,53 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Models\BloodRequest;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Log;
+use App\Services\AuditLogger;
+use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
 
 class CloseExpiredRequests extends Command
 {
-    /**
-     * The name and signature of the console command.
-     * এটি টার্মিনালে কল করার জন্য ব্যবহার হবে।
-     */
-    protected $signature = 'requests:close-expired';
+    protected $signature = 'requests:expire';
 
-    /**
-     * The console command description.
-     */
-    protected $description = 'Automatically close blood requests that are 24 hours past their needed time.';
+    protected $description = 'Expire old pending/in_progress blood requests (needed_at older than 6 hours).';
 
-    /**
-     * Execute the console command.
-     */
-    public function handle()
+    public function handle(): int
     {
-        $this->info('Starting expired requests cleanup...');
+        $threshold = now()->subHours(6);
 
-        // বর্তমান সময় থেকে ২৪ ঘণ্টা আগের সময় বের করা
-        $thresholdTime = Carbon::now()->subHours(24);
+        $idsToExpire = BloodRequest::query()
+            ->whereIn('status', ['pending', 'in_progress'])
+            ->whereNotNull('needed_at')
+            ->where('needed_at', '<', $threshold)
+            ->pluck('id')
+            ->all();
 
-        // ডাটাবেস আপডেট কোয়েরি
-        $expiredCount = BloodRequest::whereNotIn('status', ['fulfilled', 'closed'])
-                                    ->where('needed_at', '<', $thresholdTime)
-                                    ->update(['status' => 'closed']);
-
-        // অ্যাডমিনদের ট্র্যাকিংয়ের জন্য লগ (Log) রাখা
-        if ($expiredCount > 0) {
-            Log::info("Auto-cleanup: {$expiredCount} expired blood requests have been closed.");
-            $this->info("Success: {$expiredCount} requests closed.");
-        } else {
-            $this->info('No expired requests found.');
+        if (empty($idsToExpire)) {
+            $this->info('No requests to expire.');
+            return self::SUCCESS;
         }
 
-        return Command::SUCCESS;
+        $expiredCount = 0;
+
+        DB::transaction(function () use (&$expiredCount, $idsToExpire, $threshold): void {
+            $expiredCount = BloodRequest::query()
+                ->whereIn('id', $idsToExpire)
+                ->update(['status' => 'expired']);
+
+            AuditLogger::log(
+                action: 'system.expire_request',
+                target: ['type' => BloodRequest::class],
+                metadata: [
+                    'expired_count' => $expiredCount,
+                    'request_ids' => $idsToExpire,
+                    'threshold' => $threshold->toDateTimeString(),
+                ],
+                actorUserId: null,
+            );
+        });
+
+        $this->info("Expired {$expiredCount} request(s).");
+        return self::SUCCESS;
     }
 }

@@ -50,22 +50,22 @@
                 <ul class="space-y-3.5">
                     <li>
                         <a href="{{ route('search') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
-                            স্মার্ট ডোনার সার্চ
+                            রক্তদাতা খুঁজুন
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('public.requests.index') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
-                            রক্ত দিন
+                            রক্তদান
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('leaderboard') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
-                            লিডারবোর্ড
+                            সেরা রক্তদাতা
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('blog.index') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
-                            ব্লগ
+                            স্বাস্থ্যবার্তা
                         </a>
                     </li>
                 </ul>

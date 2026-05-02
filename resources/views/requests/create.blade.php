@@ -5,8 +5,19 @@
 @section('content')
 {{-- 🎯 THE FIX: ফর্মটি মাঝখানে রাখতে এবং উপরে-নিচে পর্যাপ্ত শ্বাস নেওয়ার জায়গা (Breathing Space) দিতে px-4 sm:px-6 lg:px-8 py-10 যোগ করা হলো --}}
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    @include('partials.pilot-banner')
+
     <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">নতুন রক্তের রিকোয়েস্ট</h1>
     <p class="text-slate-500 font-medium mt-1">সঠিক তথ্য দিলে দ্রুত ডোনার রেসপন্স পাবে।</p>
+
+    @if(session('existing_request_url'))
+        <div class="mt-4">
+            <a href="{{ session('existing_request_url') }}"
+               class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-extrabold text-amber-700 hover:bg-amber-100 transition">
+                আগের অনুরোধ দেখুন
+            </a>
+        </div>
+    @endif
 
     <div class="mt-8 rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm relative overflow-hidden">
         <div class="absolute top-0 left-0 w-2 h-full bg-red-600"></div>
@@ -116,6 +127,8 @@
                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3">{{ old('notes') }}</textarea>
                 @error('notes') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
             </div>
+
+            <x-captcha-field :captcha-question="$captchaQuestion" />
 
             <div class="flex items-center gap-4 pt-4 border-t border-slate-100">
                 {{-- 🎯 ডাইনামিক সাবমিট বাটন --}}
