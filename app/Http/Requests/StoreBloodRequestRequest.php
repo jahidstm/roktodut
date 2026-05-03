@@ -21,10 +21,14 @@ class StoreBloodRequestRequest extends FormRequest
             'hospital'       => ['nullable', 'string', 'max:200'],
             'bags_needed'    => ['required', 'integer', 'min:1', 'max:10'],
 
-            // 📍 নতুন রিলেশনাল লোকেশন ভ্যালিডেশন
+            // 📍 রিলেশনাল লোকেশন ভ্যালিডেশন
             'division_id'    => ['required', 'integer', 'exists:divisions,id'],
             'district_id'    => ['required', 'integer', 'exists:districts,id'],
             'upazila_id'     => ['required', 'integer', 'exists:upazilas,id'],
+
+            // 📍 Geospatial coordinates (optional — picked via Leaflet map)
+            'latitude'       => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude'      => ['nullable', 'numeric', 'between:-180,180'],
 
             'address'        => ['nullable', 'string', 'max:255'],
             'contact_name'   => ['nullable', 'string', 'max:120'],

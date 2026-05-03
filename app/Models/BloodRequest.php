@@ -29,6 +29,8 @@ class BloodRequest extends Model
         'upazila_id',
 
         'address',
+        'latitude',
+        'longitude',
         'contact_name',
         'contact_number',
         'contact_number_normalized',
@@ -108,6 +110,31 @@ class BloodRequest extends Model
                 $q->whereNull('needed_at')
                     ->orWhere('needed_at', '>=', now()->subHours(2));
             });
+    }
+
+    /**
+     * 📍 Radius-based scope (Haversine Formula)
+     *
+     * নির্দিষ্ট lat/lng কেন্দ্র থেকে $radiusKm কিলোমিটারের মধ্যে
+     * থাকা সকল blood_requests ফেরত দেয়, দূরত্ব অনুযায়ী sort করে।
+     *
+     * Usage:  BloodRequest::closeTo($lat, $lng, 5)->active()->get();
+     */
+    public function scopeCloseTo($query, float $lat, float $lng, float $radiusKm = 5.0)
+    {
+        $haversine = "(6371 * acos(
+            cos(radians({$lat}))
+            * cos(radians(latitude))
+            * cos(radians(longitude) - radians({$lng}))
+            + sin(radians({$lat})) * sin(radians(latitude))
+        ))";
+
+        return $query
+            ->selectRaw("*, {$haversine} AS distance_km")
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->havingRaw("{$haversine} <= ?", [$radiusKm])
+            ->orderByRaw("{$haversine} ASC");
     }
 
     /**

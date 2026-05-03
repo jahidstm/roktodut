@@ -234,6 +234,25 @@
                         :selected-district="old('district_id', $user->district_id)"
                         :selected-upazila="old('upazila_id', $user->upazila_id)"
                     />
+                    
+                    {{-- 📍 Smart Geospatial Update --}}
+                    <div class="mt-6 p-4 rounded-xl border border-blue-100 bg-blue-50/50 flex flex-col sm:flex-row items-center justify-between gap-4" x-data="geoUpdater()">
+                        <div>
+                            <p class="text-sm font-bold text-blue-900 flex items-center gap-1.5">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path></svg>
+                                স্মার্ট ডোনার ম্যাচিং (GPS)
+                            </p>
+                            <p class="text-xs text-blue-700 font-medium mt-1 max-w-md">সঠিকভাবে নিকটবর্তী মুমূর্ষু রোগীর অ্যালার্ট পেতে আপনার বর্তমান লাইভ লোকেশন পিন করুন। <span x-show="saved" class="text-emerald-600 font-bold ml-1">✅ লোকেশন সেভ করা আছে।</span></p>
+                        </div>
+                        
+                        <button type="button" @click="updateLocation" :disabled="loading"
+                                :class="loading ? 'bg-slate-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'"
+                                class="w-full sm:w-auto shrink-0 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-sm shadow-blue-500/30 transition-all flex items-center justify-center gap-2">
+                            <svg x-show="!loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
+                            <svg x-show="loading" style="display: none;" class="animate-spin w-4 h-4 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                            <span x-text="loading ? 'লোকেশন নেওয়া হচ্ছে...' : 'আমার লোকেশন আপডেট করুন'"></span>
+                        </button>
+                    </div>
                 </div>
 
                 {{-- Additional Fields --}}
@@ -473,6 +492,48 @@
                 } finally {
                     this.isLoading = false;
                 }
+            }
+        }));
+
+        Alpine.data('geoUpdater', () => ({
+            loading: false,
+            saved: {{ $user->latitude ? 'true' : 'false' }},
+
+            updateLocation() {
+                if (!navigator.geolocation) {
+                    alert('আপনার ডিভাইস লোকেশন সাপোর্ট করে না।');
+                    return;
+                }
+
+                this.loading = true;
+
+                navigator.geolocation.getCurrentPosition(
+                    async (pos) => {
+                        try {
+                            const res = await axios.post('{{ route('profile.location.update') }}', {
+                                latitude: pos.coords.latitude,
+                                longitude: pos.coords.longitude
+                            });
+                            if (res.data.success) {
+                                this.saved = true;
+                                alert(res.data.message);
+                            }
+                        } catch (error) {
+                            alert('লোকেশন সেভ করতে সমস্যা হয়েছে।');
+                        } finally {
+                            this.loading = false;
+                        }
+                    },
+                    (error) => {
+                        this.loading = false;
+                        if (error.code === error.PERMISSION_DENIED) {
+                            alert('অনুগ্রহ করে ব্রাউজারে লোকেশন পারমিশন দিন।');
+                        } else {
+                            alert('লোকেশন নির্ণয় করা যায়নি।');
+                        }
+                    },
+                    { enableHighAccuracy: true, timeout: 15000 }
+                );
             }
         }));
     });

@@ -305,4 +305,26 @@ class ProfileController extends Controller
 
         return Storage::disk('private')->response($user->nid_path);
     }
+
+    /**
+     * 📍 ডোনারের GPS লোকেশন সেভ করা (Browser Geolocation API থেকে আসে)
+     * POST /profile/location
+     */
+    public function updateLocation(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $validated = $request->validate([
+            'latitude'  => ['required', 'numeric', 'between:-90,90'],
+            'longitude' => ['required', 'numeric', 'between:-180,180'],
+        ]);
+
+        $user = $request->user();
+        $user->latitude  = $validated['latitude'];
+        $user->longitude = $validated['longitude'];
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => '✅ আপনার লোকেশন সফলভাবে সেভ হয়েছে!',
+        ]);
+    }
 }

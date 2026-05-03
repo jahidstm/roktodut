@@ -280,6 +280,39 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
     }
 
     /**
+     * 📍 Radius-based Donor Scope (Haversine Formula)
+     *
+     * নির্দিষ্ট lat/lng কেন্দ্র থেকে $radiusKm কিলোমিটারের মধ্যে
+     * থাকা সকল ডোনার ফেরত দেয়, দূরত্ব অনুযায়ী sort করে।
+     *
+     * Usage: User::closeTo($lat, $lng, 5)->where('blood_group', ...)->get();
+     */
+    public function scopeCloseTo($query, float $lat, float $lng, float $radiusKm = 5.0)
+    {
+        $haversine = "(6371 * acos(
+            cos(radians({$lat}))
+            * cos(radians(latitude))
+            * cos(radians(longitude) - radians({$lng}))
+            + sin(radians({$lat})) * sin(radians(latitude))
+        ))";
+
+        return $query
+            ->selectRaw("*, {$haversine} AS distance_km")
+            ->whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->havingRaw("{$haversine} <= ?", [$radiusKm])
+            ->orderByRaw("{$haversine} ASC");
+    }
+
+    /**
+     * শুধুমাত্র যাদের lat/lng সেভ করা আছে তাদের scope।
+     */
+    public function scopeHasLocation($query)
+    {
+        return $query->whereNotNull('latitude')->whereNotNull('longitude');
+    }
+
+    /**
      * Get Profile Completion Percentage
      * 
      * @return int

@@ -2,6 +2,15 @@
 
 @section('title', 'নতুন রক্তের রিকোয়েস্ট — রক্তদূত')
 
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+    #hospital-map { height: 280px; border-radius: 1rem; border: 1px solid #e2e8f0; z-index: 0; }
+    .leaflet-container { font-family: inherit; }
+</style>
+@endpush
+
 @section('content')
 {{-- 🎯 THE FIX: ফর্মটি মাঝখানে রাখতে এবং উপরে-নিচে পর্যাপ্ত শ্বাস নেওয়ার জায়গা (Breathing Space) দিতে px-4 sm:px-6 lg:px-8 py-10 যোগ করা হলো --}}
 <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
@@ -85,6 +94,33 @@
                 @error('address') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
             </div>
 
+            {{-- 📍 Geospatial Map Picker --}}
+            <div class="rounded-2xl border border-blue-100 bg-blue-50/40 p-4">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <p class="text-sm font-extrabold text-blue-900">📍 হাসপাতালের অবস্থান পিন করুন <span class="text-blue-400 font-semibold text-xs">(ঐচ্ছিক কিন্তু অত্যন্ত জরুরি)</span></p>
+                        <p class="text-xs text-blue-600 font-medium mt-0.5">মানচিত্রে ক্লিক করুন বা নিচের বাটন দিয়ে সরাসরি আপনার অবস্থান নিন — ডোনার ম্যাচিং আরও নির্ভুল হবে।</p>
+                    </div>
+                    <button type="button" id="use-my-location"
+                            class="shrink-0 flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-3 py-2 rounded-lg transition-colors">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        আমার লোকেশন
+                    </button>
+                </div>
+
+                <div id="hospital-map"></div>
+
+                <div id="map-coords-display" class="mt-2 hidden">
+                    <p class="text-xs text-emerald-700 font-semibold bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-1.5">
+                        ✅ পিন সেট: <span id="map-lat-display"></span>, <span id="map-lng-display"></span>
+                    </p>
+                </div>
+
+                {{-- Hidden inputs — submitted with the form --}}
+                <input type="hidden" name="latitude" id="input-latitude" value="{{ old('latitude') }}">
+                <input type="hidden" name="longitude" id="input-longitude" value="{{ old('longitude') }}">
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="text-sm font-extrabold text-slate-800">কন্টাক্ট নাম</label>
@@ -137,13 +173,11 @@
                         :disabled="isSubmitting"
                         class="bg-red-600 hover:bg-red-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white px-8 py-3.5 rounded-xl text-sm font-black transition-all shadow-sm shadow-red-200 flex items-center justify-center min-w-[200px]">
                     
-                    {{-- নরমাল অবস্থা --}}
                     <span x-show="!isSubmitting" class="flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                         রিকোয়েস্ট সাবমিট করুন
                     </span>
 
-                    {{-- লোডিং অবস্থা --}}
                     <span x-show="isSubmitting" style="display: none;" class="flex items-center gap-2">
                         <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -160,48 +194,16 @@
         </form>
     </div>
 </div>
+
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLs=" crossorigin=""></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const urgencySelect = document.getElementById('urgency');
     const neededAtInput = document.getElementById('needed_at');
     const note = document.getElementById('urgency-threshold-note');
 
-    if (!urgencySelect || !neededAtInput || !note) {
-        return;
-    }
-
-    const emergencyOption = urgencySelect.querySelector('option[value="emergency"]');
-    const urgentOption = urgencySelect.querySelector('option[value="urgent"]');
-    const normalOption = urgencySelect.querySelector('option[value="normal"]');
-
-    const updateUrgencyAvailability = () => {
-        const raw = neededAtInput.value;
-
-        if (!raw) {
-            if (emergencyOption) emergencyOption.disabled = false;
-            if (urgentOption) urgentOption.disabled = false;
-            note.classList.add('hidden');
-            note.textContent = '';
-            return;
-        }
-
-        const selectedDate = new Date(raw);
-        if (Number.isNaN(selectedDate.getTime())) {
-            return;
-        }
-
-        const now = new Date();
-        const emergencyLimit = new Date(now.getTime() + (24 * 60 * 60 * 1000));
-        const urgentLimit = new Date(now.getTime() + (72 * 60 * 60 * 1000));
-
-        const disableEmergency = selectedDate > emergencyLimit;
-        const disableUrgent = selectedDate > urgentLimit;
-
-        if (emergencyOption) emergencyOption.disabled = disableEmergency;
-        if (urgentOption) urgentOption.disabled = disableUrgent;
-
-        if (urgencySelect.value === 'emergency' && disableEmergency) {
-            urgencySelect.value = normalOption ? 'normal' : '';
         }
 
         if (urgencySelect.value === 'urgent' && disableUrgent) {

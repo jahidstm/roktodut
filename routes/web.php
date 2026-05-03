@@ -211,6 +211,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/blog', [BlogSubmissionController::class, 'store'])->name('blog.store');
     Route::post('/donation-record', [DonationRecordController::class, 'update'])->name('donation.record.update');
     Route::get('/donations/{response}/proof', [DonationClaimController::class, 'viewProof'])->name('donations.proof');
+
+    // 📍 Geospatial: ডোনারের GPS লোকেশন সেভ করা
+    Route::post('/profile/location', [ProfileController::class, 'updateLocation'])->name('profile.location.update');
 });
 
 // --- ৫. ড্যাশবোর্ড রাউটস (রোল ভিত্তিক) ---

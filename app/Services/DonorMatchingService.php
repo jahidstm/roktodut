@@ -9,10 +9,15 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Carbon;
 
 /**
- * DonorMatchingService
+ * DonorMatchingService — Geospatial-First Matching
  *
- * রক্তের অনুরোধের সাথে যোগ্য ডোনারদের ম্যাচ করে।
- * Smart Sorting: Ready Now > Org Verified > NID Verified > Regular
+ * Priority order:
+ *   1. Radius-based (Haversine) — hospital lat/lng → ডোনারের lat/lng
+ *      Emergency: 10 km | Urgent: 15 km | Normal: 20 km
+ *   2. Fallback: same district (existing behaviour) — যখন request-এ lat/lng নেই
+ *      বা radius-এ পর্যাপ্ত ডোনার পাওয়া না গেলে।
+ *
+ * Smart Sorting: Ready Now > Org Verified > NID Verified > Closest Distance > Points
  * Cap: Emergency → 50, Otherwise → 20
  */
 class DonorMatchingService
@@ -21,20 +26,82 @@ class DonorMatchingService
     private const CAP_NORMAL    = 20;
     private const COOLDOWN_DAYS = 120;
 
+    // 📍 Radius per urgency (km)
+    private const RADIUS = [
+        'emergency' => 10.0,
+        'urgent'    => 15.0,
+        'normal'    => 20.0,
+    ];
+
     /**
      * নতুন ব্লাড রিকোয়েস্টের জন্য যোগ্য ডোনারদের তালিকা ফেরত দেয়।
+     * Radius-based matching → district fallback।
      */
     public function match(BloodRequest $request): Collection
     {
         $cap            = $this->getCap($request->urgency);
         $cooldownCutoff = Carbon::now()->subDays(self::COOLDOWN_DAYS);
 
-        return User::query()
-            // ✅ রোল ফিল্টার: ডোনার এবং অর্গ অ্যাডমিন
-            ->whereIn('role', ['donor', 'org_admin'])
+        // ── রিকোয়েস্টে lat/lng আছে কিনা চেক করা ──────────────────────────
+        $hasCoords = $request->latitude !== null && $request->longitude !== null;
 
-            // ✅ লোকেশন ম্যাচ: একই জেলা
+        if ($hasCoords) {
+            $urgencyValue = $request->urgency instanceof UrgencyLevel
+                ? $request->urgency->value
+                : (string) $request->urgency;
+
+            $radiusKm = self::RADIUS[$urgencyValue] ?? self::RADIUS['normal'];
+
+            $donors = $this->buildBaseQuery($request, $cooldownCutoff)
+                ->closeTo((float) $request->latitude, (float) $request->longitude, $radiusKm)
+                // Smart Sorting: দূরত্ব আগে (scopeCloseTo already sorts by distance)
+                // তারপর gamification tier
+                ->orderByDesc('is_ready_now')
+                ->orderByDesc('verified_badge')
+                ->orderByRaw("CASE WHEN nid_status = 'approved' THEN 1 ELSE 0 END DESC")
+                ->orderByDesc('points')
+                ->limit($cap)
+                ->get(['id', 'name', 'blood_group', 'district_id', 'latitude', 'longitude', 'is_ready_now', 'verified_badge', 'distance_km']);
+
+            // ── পর্যাপ্ত ডোনার পাওয়া গেছে? ────────────────────────────────
+            if ($donors->count() >= min(5, $cap)) {
+                return $donors;
+            }
+
+            // ── কম ডোনার পেলে radius দ্বিগুণ করে আবার চেষ্টা (expanded search) ─
+            $expandedDonors = $this->buildBaseQuery($request, $cooldownCutoff)
+                ->closeTo((float) $request->latitude, (float) $request->longitude, $radiusKm * 2)
+                ->orderByDesc('is_ready_now')
+                ->orderByDesc('verified_badge')
+                ->orderByRaw("CASE WHEN nid_status = 'approved' THEN 1 ELSE 0 END DESC")
+                ->orderByDesc('points')
+                ->limit($cap)
+                ->get(['id', 'name', 'blood_group', 'district_id', 'latitude', 'longitude', 'is_ready_now', 'verified_badge', 'distance_km']);
+
+            if ($expandedDonors->isNotEmpty()) {
+                return $expandedDonors;
+            }
+        }
+
+        // ── Fallback: জেলা-ভিত্তিক পুরনো পদ্ধতি ────────────────────────────
+        return $this->buildBaseQuery($request, $cooldownCutoff)
             ->where('district_id', $request->district_id)
+            ->orderByDesc('is_ready_now')
+            ->orderByDesc('verified_badge')
+            ->orderByRaw("CASE WHEN nid_status = 'approved' THEN 1 ELSE 0 END DESC")
+            ->orderByDesc('points')
+            ->limit($cap)
+            ->get(['id', 'name', 'blood_group', 'district_id', 'latitude', 'longitude', 'is_ready_now', 'verified_badge']);
+    }
+
+    /**
+     * Base query — সব রিকোয়েস্টে common ফিল্টারগুলো।
+     */
+    private function buildBaseQuery(BloodRequest $request, Carbon $cooldownCutoff)
+    {
+        return User::query()
+            // ✅ রোল ফিল্টার
+            ->whereIn('role', ['donor', 'org_admin'])
 
             // ✅ ব্লাড গ্রুপ ম্যাচ
             ->where('blood_group', $request->blood_group->value)
@@ -48,32 +115,17 @@ class DonorMatchingService
             // ✅ শ্যাডোব্যান্ড ইউজার বাদ
             ->where('is_shadowbanned', false)
 
-            // ✅ যারা availability explicitly বন্ধ করেননি তারা অন্তর্ভুক্ত
+            // ✅ যারা availability বন্ধ করেননি
             ->where(function ($q) {
                 $q->whereNull('is_available')
                     ->orWhere('is_available', true);
             })
 
-            // ✅ ১২০ দিনের কুলডাউন পার হয়েছে (last_donated_at কলাম)
+            // ✅ ১২০ দিনের কুলডাউন পার হয়েছে
             ->where(function ($q) use ($cooldownCutoff) {
                 $q->whereNull('last_donated_at')
                     ->orWhere('last_donated_at', '<=', $cooldownCutoff);
-            })
-
-            // 🚀 Smart Sorting (Gamification Tier):
-            // ১. is_ready_now = 1 সবার আগে
-            // ২. verified_badge = 1 (Org Verified)
-            // ৩. nid_status = 'approved' (NID Verified)
-            // ৪. points বেশি
-            ->orderByDesc('is_ready_now')
-            ->orderByDesc('verified_badge')
-            ->orderByRaw("CASE WHEN nid_status = 'approved' THEN 1 ELSE 0 END DESC")
-            ->orderByDesc('points')
-
-            // 🎯 Cap: অতিরিক্ত নোটিফিকেশন এড়ানো
-            ->limit($cap)
-
-            ->get(['id', 'name', 'blood_group', 'district_id', 'is_ready_now', 'verified_badge']);
+            });
     }
 
     /**
