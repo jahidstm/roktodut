@@ -29,6 +29,10 @@
                             রক্তদান
                         </a>
                     @endguest
+                    <a href="{{ route('requests.my-requests') }}"
+                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('requests.my-requests') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                        আমার রিকোয়েস্ট
+                    </a>
                     <a href="{{ route('search') }}"
                        class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('search') ? 'text-red-600 font-bold bg-red-50' : '' }}">
                         রক্তদাতা খুঁজুন
@@ -144,6 +148,9 @@
                     রক্তদান
                 </x-responsive-nav-link>
             @endguest
+            <x-responsive-nav-link :href="route('requests.my-requests')" :active="request()->routeIs('requests.my-requests')" class="font-bold">
+                আমার রিকোয়েস্ট
+            </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('search')" :active="request()->routeIs('search')" class="font-bold">
                 রক্তদাতা খুঁজুন
             </x-responsive-nav-link>

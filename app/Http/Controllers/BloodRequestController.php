@@ -39,7 +39,9 @@ class BloodRequestController extends Controller
                 'responses as claimed_verifications_count' => fn($q) => $q->where('verification_status', 'claimed'),
                 'responses as verified_verifications_count' => fn($q) => $q->where('verification_status', 'verified'),
             ])
-            ->where('status', 'pending');
+            ->whereIn('status', ['pending', 'in_progress'])
+            // হার্ড শিল্ড: বর্তমান সময়ের চেয়ে ৬ ঘণ্টা আগের কোনো রিকোয়েস্ট ফিডে আসবে না
+            ->where('needed_at', '>=', now()->subHours(6));
 
         // 🎯 স্মার্ট ফিল্টারিং লজিক (Relational IDs)
         if ($request->filled('blood_group')) {
@@ -58,13 +60,53 @@ class BloodRequestController extends Controller
             $query->where('upazila_id', $request->upazila_id);
         }
 
-        $requests = $query->orderByRaw('needed_at is null asc')
-            ->orderBy('needed_at')
+        $requests = $query
+            // প্রায়োরিটি ১: ইমার্জেন্সি লেভেল
+            ->orderByRaw("FIELD(LOWER(urgency), 'emergency', 'urgent', 'normal')")
+            // প্রায়োরিটি ২: যার ডেডলাইন সবচেয়ে কাছে (Ascending)
+            ->orderBy('needed_at', 'asc')
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('requests.index', compact('requests'));
+    }
+
+    /**
+     * লগইনড ইউজার বা গেস্ট টোকেনভিত্তিক "আমার রিকোয়েস্ট" তালিকা।
+     */
+    public function myRequests(Request $request)
+    {
+        $userId = $request->user()?->id;
+        $guestToken = $request->cookie('rd_guest_token');
+        $hasValidGuestToken = is_string($guestToken) && strlen($guestToken) >= 32 && strlen($guestToken) <= 64;
+
+        $query = BloodRequest::query()
+            ->with(['district:id,name', 'upazila:id,name']);
+
+        if ($userId || $hasValidGuestToken) {
+            $query->where(function ($q) use ($userId, $guestToken, $hasValidGuestToken) {
+                if ($userId) {
+                    $q->where('requested_by', $userId);
+                }
+
+                if ($hasValidGuestToken) {
+                    if ($userId) {
+                        $q->orWhere('guest_token', $guestToken);
+                    } else {
+                        $q->where('guest_token', $guestToken);
+                    }
+                }
+            });
+        } else {
+            $query->whereRaw('1 = 0');
+        }
+
+        $requests = $query
             ->orderByDesc('created_at')
             ->paginate(12)
             ->withQueryString();
 
-        return view('requests.index', compact('requests'));
+        return view('requests.my-requests', compact('requests'));
     }
 
     /**
@@ -296,7 +338,16 @@ class BloodRequestController extends Controller
 
     public function renew(Request $request, BloodRequest $bloodRequest)
     {
-        if ((int) $request->user()->id !== (int) $bloodRequest->requested_by) {
+        $userId = $request->user()?->id;
+        $guestToken = $request->cookie('rd_guest_token');
+        $hasValidGuestToken = is_string($guestToken) && strlen($guestToken) >= 32 && strlen($guestToken) <= 64;
+
+        $ownsAsUser = $userId && ((int) $userId === (int) $bloodRequest->requested_by);
+        $ownsAsGuest = $hasValidGuestToken
+            && !empty($bloodRequest->guest_token)
+            && hash_equals((string) $bloodRequest->guest_token, (string) $guestToken);
+
+        if (! $ownsAsUser && ! $ownsAsGuest) {
             abort(403, 'এই রিকোয়েস্ট রিনিউ করার অনুমতি আপনার নেই।');
         }
 

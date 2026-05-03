@@ -563,9 +563,11 @@
                     @forelse($recentRequests as $req)
                         @php
                             $isOwner = ((int) ($req->requested_by ?? 0) === (int) auth()->id());
-                            $isExpiredStatus = strtolower((string) $req->status) === 'expired';
-                            $isPastNeededAt = $req->needed_at && $req->needed_at->lt(now());
-                            $canRenew = $isOwner && ($isExpiredStatus || $isPastNeededAt);
+                            $currentStatus = strtolower((string) $req->status);
+                            $isExpiredStatus = $currentStatus === 'expired';
+                            $isPendingLikeStatus = in_array($currentStatus, ['pending', 'in_progress'], true);
+                            $isPastNeededAt = $req->needed_at && \Carbon\Carbon::parse($req->needed_at)->isPast();
+                            $canRenew = $isOwner && ($isExpiredStatus || ($isPastNeededAt && $isPendingLikeStatus));
                         @endphp
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-6 py-4">

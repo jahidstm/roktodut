@@ -124,15 +124,28 @@
     @php
         $myResponse = auth()->check() ? $bloodRequest->responses->where('user_id', auth()->id())->first() : null;
         $isOwner = auth()->check() && ((int) $bloodRequest->requested_by === (int) auth()->id());
+        $currentStatus = strtolower((string) $bloodRequest->status);
+        $isExpiredStatus = $currentStatus === 'expired';
+        $isPendingLikeStatus = in_array($currentStatus, ['pending', 'in_progress'], true);
+        $isPastNeededAt = $bloodRequest->needed_at && \Carbon\Carbon::parse($bloodRequest->needed_at)->isPast();
+        $canRenew = $isOwner && ($isExpiredStatus || ($isPastNeededAt && $isPendingLikeStatus));
     @endphp
 
-    <div class="mt-6 mb-6 p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+    <div x-data="{ renewOpen: {{ ($errors->has('needed_at') || $errors->has('urgency')) ? 'true' : 'false' }} }" class="mt-6 mb-6 p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
         <div>
             <h3 class="text-base font-black text-slate-800">আপনার সিদ্ধান্ত (Action)</h3>
             <p class="text-sm text-slate-500 font-medium">এই রিকোয়েস্টের জন্য আপনার সাড়া দিন</p>
         </div>
         
         <div class="flex flex-wrap gap-3">
+            @if($canRenew)
+                <button type="button"
+                        @click="renewOpen = true"
+                        class="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black shadow-sm transition">
+                    রিনিউ করুন
+                </button>
+            @endif
+
             @if (Route::has('requests.fulfill') && $isOwner && strtolower($bloodRequest->status) !== 'fulfilled')
                 <form method="POST" action="{{ route('requests.fulfill', $bloodRequest) }}">
                     @csrf
@@ -209,6 +222,55 @@
                 </div>
             @endif
         </div>
+
+        @if($canRenew)
+            <div x-show="renewOpen"
+                 style="display:none;"
+                 class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/55 backdrop-blur-sm p-4"
+                 x-transition.opacity>
+                <div @click.away="renewOpen = false" class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 text-left">
+                    <div class="mb-4">
+                        <h3 class="text-lg font-black text-slate-900">রিকোয়েস্ট রিনিউ করুন</h3>
+                        <p class="mt-1 text-xs font-semibold text-slate-500">নতুন সময় ও জরুরিতা সেট করলে রিকোয়েস্ট আবার ফিডে যাবে।</p>
+                    </div>
+
+                    <form method="POST" action="{{ route('requests.renew', $bloodRequest->id) }}" class="space-y-4" data-renew-modal>
+                        @csrf
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1.5">কবে রক্ত লাগবে</label>
+                            <input type="datetime-local"
+                                   name="needed_at"
+                                   value="{{ old('needed_at', optional($bloodRequest->needed_at)->format('Y-m-d\TH:i')) }}"
+                                   class="renew-needed-at w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
+                            @error('needed_at')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-600 mb-1.5">জরুরিতা</label>
+                            <select name="urgency" class="renew-urgency w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
+                                @foreach (\App\Enums\UrgencyLevel::cases() as $case)
+                                    <option value="{{ $case->value }}" @selected(old('urgency', $bloodRequest->urgency?->value ?? (string) $bloodRequest->urgency) === $case->value)>
+                                        {{ $case->label() }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('urgency')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+                            <p class="renew-threshold-note mt-1 text-xs font-semibold text-amber-700 hidden"></p>
+                        </div>
+
+                        <div class="pt-1 flex items-center justify-end gap-2">
+                            <button type="button" @click="renewOpen = false" class="px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-sm font-bold hover:bg-slate-50">
+                                Cancel
+                            </button>
+                            <button type="submit" class="px-5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-black">
+                                রিনিউ সাবমিট
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        @endif
     </div>
 
     {{-- 🎯 ডোনারের জন্য Donation Claim Action Box --}}
@@ -354,6 +416,76 @@
 {{-- Reveal Phone Number Script --}}
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    const modals = document.querySelectorAll('[data-renew-modal]');
+
+    modals.forEach((form) => {
+        const neededAtInput = form.querySelector('.renew-needed-at');
+        const urgencySelect = form.querySelector('.renew-urgency');
+        const note = form.querySelector('.renew-threshold-note');
+
+        if (!neededAtInput || !urgencySelect || !note) {
+            return;
+        }
+
+        const emergencyOption = urgencySelect.querySelector('option[value="emergency"]');
+        const urgentOption = urgencySelect.querySelector('option[value="urgent"]');
+        const normalOption = urgencySelect.querySelector('option[value="normal"]');
+
+        const updateUrgencyAvailability = () => {
+            const raw = neededAtInput.value;
+
+            if (!raw) {
+                if (emergencyOption) emergencyOption.disabled = false;
+                if (urgentOption) urgentOption.disabled = false;
+                note.classList.add('hidden');
+                note.textContent = '';
+                return;
+            }
+
+            const selectedDate = new Date(raw);
+            if (Number.isNaN(selectedDate.getTime())) {
+                return;
+            }
+
+            const now = new Date();
+            const emergencyLimit = new Date(now.getTime() + (24 * 60 * 60 * 1000));
+            const urgentLimit = new Date(now.getTime() + (72 * 60 * 60 * 1000));
+
+            const disableEmergency = selectedDate > emergencyLimit;
+            const disableUrgent = selectedDate > urgentLimit;
+
+            if (emergencyOption) emergencyOption.disabled = disableEmergency;
+            if (urgentOption) urgentOption.disabled = disableUrgent;
+
+            if (urgencySelect.value === 'emergency' && disableEmergency) {
+                urgencySelect.value = normalOption ? 'normal' : '';
+            }
+
+            if (urgencySelect.value === 'urgent' && disableUrgent) {
+                urgencySelect.value = normalOption ? 'normal' : '';
+            }
+
+            if (disableUrgent) {
+                note.textContent = 'নির্বাচিত সময় ৭২ ঘণ্টার বেশি — Emergency ও Urgent অপশন নিষ্ক্রিয়।';
+                note.classList.remove('hidden');
+                return;
+            }
+
+            if (disableEmergency) {
+                note.textContent = 'নির্বাচিত সময় ২৪ ঘণ্টার বেশি — Emergency অপশন নিষ্ক্রিয়।';
+                note.classList.remove('hidden');
+                return;
+            }
+
+            note.classList.add('hidden');
+            note.textContent = '';
+        };
+
+        neededAtInput.addEventListener('input', updateUrgencyAvailability);
+        urgencySelect.addEventListener('change', updateUrgencyAvailability);
+        updateUrgencyAvailability();
+    });
+
     document.addEventListener('click', async (e) => {
         const btn = e.target.closest('.reveal-btn');
         if (!btn) return;

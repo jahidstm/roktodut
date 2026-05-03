@@ -142,6 +142,10 @@ Route::get('/requests/create', [BloodRequestController::class, 'create'])
 Route::post('/requests', [BloodRequestController::class, 'store'])
     ->middleware('throttle:requests-store')
     ->name('requests.store');
+Route::get('/my-requests', [BloodRequestController::class, 'myRequests'])
+    ->name('requests.my-requests');
+Route::post('/requests/{bloodRequest}/renew', [BloodRequestController::class, 'renew'])
+    ->name('requests.renew');
 Route::get('/requests/{bloodRequest}', [BloodRequestController::class, 'show'])
     ->name('requests.show');
 
@@ -184,7 +188,6 @@ Route::middleware(['auth'])->group(function () {
         ->only(['index']);
 
     Route::post('/requests/{bloodRequest}/respond', [BloodRequestResponseController::class, 'store'])->name('requests.respond');
-    Route::post('/requests/{bloodRequest}/renew', [BloodRequestController::class, 'renew'])->name('requests.renew');
     Route::post('/responses/{response}/claim', [DonationClaimController::class, 'store'])->name('donations.claim');
     Route::post('/responses/{response}/recipient-verify', [DonationClaimController::class, 'verifyByRecipient'])->name('donations.recipient_verify');
     Route::post('/requests/{bloodRequest}/fulfill', [BloodRequestController::class, 'fulfill'])->name('requests.fulfill');
