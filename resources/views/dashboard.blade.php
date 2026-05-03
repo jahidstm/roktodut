@@ -561,6 +561,12 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-sm">
                     @forelse($recentRequests as $req)
+                        @php
+                            $isOwner = ((int) ($req->requested_by ?? 0) === (int) auth()->id());
+                            $isExpiredStatus = strtolower((string) $req->status) === 'expired';
+                            $isPastNeededAt = $req->needed_at && $req->needed_at->lt(now());
+                            $canRenew = $isOwner && ($isExpiredStatus || $isPastNeededAt);
+                        @endphp
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-6 py-4">
                                 <div class="font-extrabold text-slate-900">{{ $req->patient_name ?? 'রোগী' }}</div>
@@ -589,9 +595,70 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 text-right">
-                                <a href="{{ route('requests.show', $req->id) }}" class="inline-flex items-center justify-center px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-extrabold text-slate-700 hover:bg-slate-100 hover:text-red-600 transition">
-                                    ডিটেইলস
-                                </a>
+                                <div x-data="{ renewOpen: false }" class="inline-flex items-center gap-2">
+                                    @if($canRenew)
+                                        <button type="button"
+                                                @click="renewOpen = true"
+                                                class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-extrabold bg-red-600 text-white hover:bg-red-700 transition">
+                                            রিনিউ করুন
+                                        </button>
+                                    @endif
+
+                                    <a href="{{ route('requests.show', $req->id) }}" class="inline-flex items-center justify-center px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-extrabold text-slate-700 hover:bg-slate-100 hover:text-red-600 transition">
+                                        ডিটেইলস
+                                    </a>
+
+                                    @if($canRenew)
+                                        <div x-show="renewOpen"
+                                             style="display:none;"
+                                             class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/55 backdrop-blur-sm p-4"
+                                             x-transition.opacity>
+                                            <div @click.away="renewOpen = false" class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 text-left">
+                                                <div class="mb-4">
+                                                    <h3 class="text-lg font-black text-slate-900">রিকোয়েস্ট রিনিউ করুন</h3>
+                                                    <p class="mt-1 text-xs font-semibold text-slate-500">নতুন সময় ও জরুরিতা সেট করলে রিকোয়েস্ট আবার ফিডে যাবে।</p>
+                                                </div>
+
+                                                <form method="POST" action="{{ route('requests.renew', $req->id) }}" class="space-y-4" data-renew-modal>
+                                                    @csrf
+
+                                                    <div>
+                                                        <label class="block text-xs font-bold text-slate-600 mb-1.5">কবে রক্ত লাগবে</label>
+                                                        <input type="datetime-local"
+                                                               name="needed_at"
+                                                               value="{{ old('needed_at') }}"
+                                                               class="renew-needed-at w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
+                                                        @error('needed_at')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+                                                    </div>
+
+                                                    <div>
+                                                        <label class="block text-xs font-bold text-slate-600 mb-1.5">জরুরিতা</label>
+                                                        <select name="urgency" class="renew-urgency w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
+                                                            @foreach (\App\Enums\UrgencyLevel::cases() as $case)
+                                                                <option value="{{ $case->value }}" @selected(old('urgency', $req->urgency?->value ?? (string) $req->urgency) === $case->value)>
+                                                                    {{ $case->label() }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                        @error('urgency')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+                                                        <p class="renew-threshold-note mt-1 text-xs font-semibold text-amber-700 hidden"></p>
+                                                    </div>
+
+                                                    <div class="pt-2 flex items-center justify-end gap-2">
+                                                        <button type="button"
+                                                                @click="renewOpen = false"
+                                                                class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50">
+                                                            বাতিল
+                                                        </button>
+                                                        <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-xs font-black text-white hover:bg-red-700">
+                                                            রিনিউ সাবমিট
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty
@@ -905,5 +972,77 @@ function copySmartCardLink() {
         }, 2500);
     });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const modals = document.querySelectorAll('[data-renew-modal]');
+
+    modals.forEach((form) => {
+        const neededAtInput = form.querySelector('.renew-needed-at');
+        const urgencySelect = form.querySelector('.renew-urgency');
+        const note = form.querySelector('.renew-threshold-note');
+
+        if (!neededAtInput || !urgencySelect || !note) {
+            return;
+        }
+
+        const emergencyOption = urgencySelect.querySelector('option[value="emergency"]');
+        const urgentOption = urgencySelect.querySelector('option[value="urgent"]');
+        const normalOption = urgencySelect.querySelector('option[value="normal"]');
+
+        const updateUrgencyAvailability = () => {
+            const raw = neededAtInput.value;
+
+            if (!raw) {
+                if (emergencyOption) emergencyOption.disabled = false;
+                if (urgentOption) urgentOption.disabled = false;
+                note.classList.add('hidden');
+                note.textContent = '';
+                return;
+            }
+
+            const selectedDate = new Date(raw);
+            if (Number.isNaN(selectedDate.getTime())) {
+                return;
+            }
+
+            const now = new Date();
+            const emergencyLimit = new Date(now.getTime() + (24 * 60 * 60 * 1000));
+            const urgentLimit = new Date(now.getTime() + (72 * 60 * 60 * 1000));
+
+            const disableEmergency = selectedDate > emergencyLimit;
+            const disableUrgent = selectedDate > urgentLimit;
+
+            if (emergencyOption) emergencyOption.disabled = disableEmergency;
+            if (urgentOption) urgentOption.disabled = disableUrgent;
+
+            if (urgencySelect.value === 'emergency' && disableEmergency) {
+                urgencySelect.value = normalOption ? 'normal' : '';
+            }
+
+            if (urgencySelect.value === 'urgent' && disableUrgent) {
+                urgencySelect.value = normalOption ? 'normal' : '';
+            }
+
+            if (disableUrgent) {
+                note.textContent = 'নির্বাচিত সময় ৭২ ঘণ্টার বেশি — Emergency ও Urgent অপশন নিষ্ক্রিয়।';
+                note.classList.remove('hidden');
+                return;
+            }
+
+            if (disableEmergency) {
+                note.textContent = 'নির্বাচিত সময় ২৪ ঘণ্টার বেশি — Emergency অপশন নিষ্ক্রিয়।';
+                note.classList.remove('hidden');
+                return;
+            }
+
+            note.classList.add('hidden');
+            note.textContent = '';
+        };
+
+        neededAtInput.addEventListener('change', updateUrgencyAvailability);
+        neededAtInput.addEventListener('input', updateUrgencyAvailability);
+        updateUrgencyAvailability();
+    });
+});
 </script>
 @endsection

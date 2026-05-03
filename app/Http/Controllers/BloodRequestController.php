@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UrgencyLevel;
 use App\Events\DonationCompleted;
 use App\Http\Requests\StoreBloodRequestRequest;
 use App\Jobs\SendEmergencyBloodRequestNotificationJob;
@@ -87,15 +88,15 @@ class BloodRequestController extends Controller
         return response()
             ->view('requests.create', compact('captchaQuestion'))
             ->cookie(
-                name: 'rd_guest_token',
-                value: $token,
-                minutes: 60 * 24 * 30,
-                path: '/',
-                domain: null,
-                secure: $request->isSecure(),
-                httpOnly: true,
-                raw: false,
-                sameSite: 'lax'
+                'rd_guest_token',
+                $token,
+                60 * 24 * 30,
+                '/',
+                null,
+                $request->isSecure(),
+                true,
+                false,
+                'lax'
             );
     }
 
@@ -142,6 +143,30 @@ class BloodRequestController extends Controller
                 function (string $attribute, mixed $value, \Closure $fail) use ($mathCaptchaService): void {
                     if (!$mathCaptchaService->verify($value)) {
                         $fail('ক্যাপচা সঠিক নয় বা মেয়াদ শেষ হয়েছে। আবার চেষ্টা করুন।');
+                    }
+                },
+            ],
+            'urgency' => [
+                'required',
+                function (string $attribute, mixed $value, \Closure $fail) use ($request): void {
+                    $neededAtInput = (string) $request->input('needed_at');
+
+                    if ($neededAtInput === '') {
+                        return;
+                    }
+
+                    try {
+                        $neededAt = Carbon::parse($neededAtInput);
+                    } catch (\Throwable $e) {
+                        return;
+                    }
+
+                    if ($value === UrgencyLevel::EMERGENCY->value && $neededAt->gt(now()->addHours(24))) {
+                        $fail('জরুরি (Emergency) রিকোয়েস্টের জন্য রক্তের প্রয়োজন অবশ্যই পরবর্তী ২৪ ঘণ্টার মধ্যে হতে হবে।');
+                    }
+
+                    if ($value === UrgencyLevel::URGENT->value && $neededAt->gt(now()->addHours(72))) {
+                        $fail('আর্জেন্ট (Urgent) রিকোয়েস্টের জন্য সময় অবশ্যই পরবর্তী ৭২ ঘণ্টার মধ্যে হতে হবে।');
                     }
                 },
             ],
@@ -267,6 +292,58 @@ class BloodRequestController extends Controller
         }
 
         return back()->with('success', '🎉 অভিনন্দন! রিকোয়েস্টটি সম্পন্ন মার্ক করা হয়েছে এবং ডোনাররা পয়েন্ট পাবেন।');
+    }
+
+    public function renew(Request $request, BloodRequest $bloodRequest)
+    {
+        if ((int) $request->user()->id !== (int) $bloodRequest->requested_by) {
+            abort(403, 'এই রিকোয়েস্ট রিনিউ করার অনুমতি আপনার নেই।');
+        }
+
+        $isRenewable = $bloodRequest->status === 'expired'
+            || ($bloodRequest->needed_at && $bloodRequest->needed_at->lt(now()));
+
+        if (! $isRenewable) {
+            return back()->with('error', 'শুধুমাত্র এক্সপায়ারড বা সময় পেরিয়ে যাওয়া রিকোয়েস্ট রিনিউ করা যাবে।');
+        }
+
+        $validated = $request->validate([
+            'needed_at' => ['required', 'date', 'after:now'],
+            'urgency' => [
+                'required',
+                'string',
+                'in:emergency,urgent,normal',
+                function (string $attribute, mixed $value, \Closure $fail) use ($request): void {
+                    $neededAtInput = (string) $request->input('needed_at');
+
+                    if ($neededAtInput === '') {
+                        return;
+                    }
+
+                    try {
+                        $neededAt = Carbon::parse($neededAtInput);
+                    } catch (\Throwable $e) {
+                        return;
+                    }
+
+                    if ($value === UrgencyLevel::EMERGENCY->value && $neededAt->gt(now()->addHours(24))) {
+                        $fail('জরুরি (Emergency) রিকোয়েস্টের জন্য রক্তের প্রয়োজন অবশ্যই পরবর্তী ২৪ ঘণ্টার মধ্যে হতে হবে।');
+                    }
+
+                    if ($value === UrgencyLevel::URGENT->value && $neededAt->gt(now()->addHours(72))) {
+                        $fail('আর্জেন্ট (Urgent) রিকোয়েস্টের জন্য সময় অবশ্যই পরবর্তী ৭২ ঘণ্টার মধ্যে হতে হবে।');
+                    }
+                },
+            ],
+        ]);
+
+        $bloodRequest->update([
+            'status' => 'pending',
+            'needed_at' => Carbon::parse((string) $validated['needed_at']),
+            'urgency' => $validated['urgency'],
+        ]);
+
+        return back()->with('success', 'আপনার রিকোয়েস্টটি সফলভাবে রিনিউ করা হয়েছে এবং ফিডে যুক্ত হয়েছে।');
     }
 
     /**

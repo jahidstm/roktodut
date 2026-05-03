@@ -104,18 +104,19 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="text-sm font-extrabold text-slate-800">জরুরিতা <span class="text-red-500">*</span></label>
-                    <select name="urgency" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-bold px-4 py-3">
+                    <select id="urgency" name="urgency" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-bold px-4 py-3">
                         <option value="">সিলেক্ট করুন</option>
                         @foreach (\App\Enums\UrgencyLevel::cases() as $case)
                             <option value="{{ $case->value }}" @selected(old('urgency') === $case->value)>{{ $case->label() }}</option>
                         @endforeach
                     </select>
                     @error('urgency') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
+                    <div id="urgency-threshold-note" class="mt-1 text-xs font-semibold text-amber-700 hidden"></div>
                 </div>
 
                 <div>
                     <label class="text-sm font-extrabold text-slate-800">কবে রক্ত লাগবে <span class="text-red-500">*</span></label>
-                    <input type="datetime-local" name="needed_at" value="{{ old('needed_at') }}"
+                    <input id="needed_at" type="datetime-local" name="needed_at" value="{{ old('needed_at') }}"
                            class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-500 font-bold px-4 py-3" />
                     @error('needed_at') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
                 </div>
@@ -159,4 +160,73 @@
         </form>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const urgencySelect = document.getElementById('urgency');
+    const neededAtInput = document.getElementById('needed_at');
+    const note = document.getElementById('urgency-threshold-note');
+
+    if (!urgencySelect || !neededAtInput || !note) {
+        return;
+    }
+
+    const emergencyOption = urgencySelect.querySelector('option[value="emergency"]');
+    const urgentOption = urgencySelect.querySelector('option[value="urgent"]');
+    const normalOption = urgencySelect.querySelector('option[value="normal"]');
+
+    const updateUrgencyAvailability = () => {
+        const raw = neededAtInput.value;
+
+        if (!raw) {
+            if (emergencyOption) emergencyOption.disabled = false;
+            if (urgentOption) urgentOption.disabled = false;
+            note.classList.add('hidden');
+            note.textContent = '';
+            return;
+        }
+
+        const selectedDate = new Date(raw);
+        if (Number.isNaN(selectedDate.getTime())) {
+            return;
+        }
+
+        const now = new Date();
+        const emergencyLimit = new Date(now.getTime() + (24 * 60 * 60 * 1000));
+        const urgentLimit = new Date(now.getTime() + (72 * 60 * 60 * 1000));
+
+        const disableEmergency = selectedDate > emergencyLimit;
+        const disableUrgent = selectedDate > urgentLimit;
+
+        if (emergencyOption) emergencyOption.disabled = disableEmergency;
+        if (urgentOption) urgentOption.disabled = disableUrgent;
+
+        if (urgencySelect.value === 'emergency' && disableEmergency) {
+            urgencySelect.value = normalOption ? 'normal' : '';
+        }
+
+        if (urgencySelect.value === 'urgent' && disableUrgent) {
+            urgencySelect.value = normalOption ? 'normal' : '';
+        }
+
+        if (disableUrgent) {
+            note.textContent = 'নির্বাচিত সময় ৭২ ঘণ্টার বেশি — Emergency ও Urgent অপশন নিষ্ক্রিয়।';
+            note.classList.remove('hidden');
+            return;
+        }
+
+        if (disableEmergency) {
+            note.textContent = 'নির্বাচিত সময় ২৪ ঘণ্টার বেশি — Emergency অপশন নিষ্ক্রিয়।';
+            note.classList.remove('hidden');
+            return;
+        }
+
+        note.classList.add('hidden');
+        note.textContent = '';
+    };
+
+    neededAtInput.addEventListener('change', updateUrgencyAvailability);
+    neededAtInput.addEventListener('input', updateUrgencyAvailability);
+    updateUrgencyAvailability();
+});
+</script>
 @endsection
