@@ -199,23 +199,51 @@
                 <label class="block text-xs font-bold text-slate-500 mb-1">শেষ রক্তদানের তারিখ আপডেট করুন</label>
                 <input type="date" name="last_donated_at" value="{{ $user->last_donated_at?->format('Y-m-d') }}" max="{{ date('Y-m-d') }}" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
             </div>
-            <button type="submit" class="bg-slate-800 hover:bg-slate-900 text-white px-4 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
                 সেভ
             </button>
         </form>
     </div>
-
-
-    {{-- 2. Core Action (CTA Row) --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <a href="{{ route('requests.create') }}" class="group p-8 rounded-3xl bg-red-600 hover:bg-red-700 transition shadow-lg shadow-red-200">
-            <div class="text-white font-black text-xl mb-2">জরুরি রক্তের দরকার?</div>
-            <p class="text-red-100 text-sm font-medium">সহজেই নতুন রিকোয়েস্ট তৈরি করুন এবং ডোনারদের সাথে যোগাযোগ করুন।</p>
+    {{-- 2. Core Actions (CTA Row) --}}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {{-- Action 1: Create Request --}}
+        <a href="{{ route('requests.create') }}" class="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 transition-all shadow-lg shadow-red-100 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px]">
+            <div class="absolute -right-4 -top-4 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+            <div class="w-11 h-11 bg-white/20 rounded-2xl flex items-center justify-center text-white border border-white/30 shrink-0">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+            </div>
+            <div>
+                <h3 class="text-white font-black text-lg leading-tight">জরুরি রক্তের দরকার?</h3>
+                <p class="text-red-100 text-sm font-medium mt-1 leading-snug">নতুন রিকোয়েস্ট তৈরি করুন এবং ডোনারদের সাথে যোগাযোগ করুন।</p>
+            </div>
         </a>
 
-        <a href="{{ route('requests.index') }}" class="group p-8 rounded-3xl bg-white border-2 border-slate-200 hover:border-red-500 transition shadow-sm">
-            <div class="text-slate-900 font-black text-xl mb-2">রক্ত দিতে চান?</div>
-            <p class="text-slate-500 text-sm font-medium">আপনার এরিয়ার সাম্প্রতিক রিকোয়েস্টগুলো দেখুন এবং সাড়া দিন।</p>
+        {{-- Action 2: Donate Blood --}}
+        <a href="{{ route('requests.index') }}" class="group relative overflow-hidden p-6 rounded-3xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-emerald-300 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px]">
+            <div class="absolute -right-4 -bottom-4 w-28 h-28 bg-emerald-50 rounded-full blur-xl pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col gap-3">
+                <div class="w-11 h-11 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 border border-emerald-100 shrink-0 group-hover:scale-110 transition-transform">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-slate-900 font-black text-lg leading-tight">রক্ত দিতে চান?</h3>
+                    <p class="text-slate-500 text-sm font-medium mt-1 leading-snug">আপনার এলাকার সাম্প্রতিক রিকোয়েস্টগুলো দেখুন এবং সাড়া দিন।</p>
+                </div>
+            </div>
+        </a>
+
+        {{-- Action 3: My Requests --}}
+        <a href="{{ route('requests.my-requests') }}" class="group relative overflow-hidden p-6 rounded-3xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-blue-300 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px]">
+            <div class="absolute -left-4 -bottom-4 w-28 h-28 bg-blue-50 rounded-full blur-xl pointer-events-none"></div>
+            <div class="relative z-10 flex flex-col gap-3">
+                <div class="w-11 h-11 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 border border-blue-100 shrink-0 group-hover:scale-110 transition-transform">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-slate-900 font-black text-lg leading-tight">আমার রিকোয়েস্ট</h3>
+                    <p class="text-slate-500 text-sm font-medium mt-1 leading-snug">আপনার তৈরি করা রক্তের রিকোয়েস্টগুলো দেখুন ও ম্যানেজ করুন।</p>
+                </div>
+            </div>
         </a>
     </div>
 
@@ -270,22 +298,24 @@
                     $isUrgent    = ($urgencyVal === 'urgent');
                     $neededAt    = $req->needed_at;
                     $diffHours   = $neededAt ? (int) now()->diffInHours($neededAt, false) : null;
+                    // Light card styles
+                    $cardBorder  = $isEmergency ? 'border-red-200 shadow-red-50' : ($isUrgent ? 'border-amber-200 shadow-amber-50' : 'border-slate-200');
+                    $groupBg     = $isEmergency ? 'bg-red-100 text-red-700 ring-1 ring-red-200' : ($isUrgent ? 'bg-amber-100 text-amber-700 ring-1 ring-amber-200' : 'bg-slate-100 text-slate-600 ring-1 ring-slate-200');
                 @endphp
 
-                <div class="relative overflow-hidden rounded-2xl border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl
-                    {{ $isEmergency ? 'border-red-800/60 shadow-lg shadow-red-900/20' : ($isUrgent ? 'border-amber-700/40 shadow-sm' : 'border-slate-700/30') }}"
-                     style="background: {{ $isEmergency ? 'linear-gradient(135deg,#1c0808 0%,#2d1010 60%,#1e1a1a 100%)' : ($isUrgent ? 'linear-gradient(135deg,#1c1400 0%,#2d2010 60%,#1a1a1e 100%)' : 'linear-gradient(135deg,#0f172a 0%,#1e293b 100%)') }};">
+                <div class="relative overflow-hidden rounded-2xl bg-white border {{ $cardBorder }} shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
 
                     {{-- Pulse bar at top for emergency --}}
                     @if($isEmergency)
-                        <div class="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-red-500 to-transparent animate-pulse"></div>
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-400 via-red-600 to-red-400 animate-pulse rounded-t-2xl"></div>
+                    @elseif($isUrgent)
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-300 via-amber-500 to-amber-300 rounded-t-2xl"></div>
                     @endif
 
                     {{-- My blood group match indicator --}}
                     @if($isMyGroup)
                         <div class="absolute top-3 right-3 z-10">
-                            <span class="inline-flex items-center gap-1 text-[10px] font-black text-emerald-300 px-2 py-0.5 rounded-full"
-                                  style="background:rgba(16,185,129,.15); border:1px solid rgba(16,185,129,.3);">
+                            <span class="inline-flex items-center gap-1 text-[10px] font-black text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                                 ✓ আপনার গ্রুপ
                             </span>
                         </div>
@@ -295,8 +325,7 @@
                         {{-- Top row: Blood group + urgency --}}
                         <div class="flex items-start gap-3 mb-4">
                             {{-- Blood Group Badge --}}
-                            <div class="shrink-0 w-14 h-14 rounded-xl flex items-center justify-center font-black text-xl shadow-lg
-                                {{ $isEmergency ? 'bg-red-600/30 text-red-200 ring-1 ring-red-500/40' : ($isUrgent ? 'bg-amber-600/25 text-amber-200 ring-1 ring-amber-500/30' : 'bg-slate-600/30 text-slate-200 ring-1 ring-slate-500/20') }}">
+                            <div class="shrink-0 w-14 h-14 rounded-xl flex items-center justify-center font-black text-xl {{ $groupBg }}">
                                 {{ $reqGroup }}
                             </div>
 
@@ -304,52 +333,48 @@
                                 {{-- Urgency badge --}}
                                 <div class="mb-1.5">
                                     @if($isEmergency)
-                                        <span class="inline-flex items-center gap-1 text-[10px] font-black text-red-300 px-2 py-0.5 rounded-full uppercase tracking-wider"
-                                              style="background:rgba(220,38,38,.25); border:1px solid rgba(220,38,38,.4);">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse inline-block"></span>
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-black text-red-700 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse inline-block"></span>
                                             অতি জরুরি
                                         </span>
                                     @elseif($isUrgent)
-                                        <span class="inline-flex items-center gap-1 text-[10px] font-black text-amber-300 px-2 py-0.5 rounded-full uppercase tracking-wider"
-                                              style="background:rgba(217,119,6,.2); border:1px solid rgba(217,119,6,.35);">
-                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block"></span>
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-black text-amber-700 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block"></span>
                                             জরুরি
                                         </span>
                                     @else
-                                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-400 px-2 py-0.5 rounded-full"
-                                              style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);">
+                                        <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-slate-500 bg-slate-50 border border-slate-200 px-2 py-0.5 rounded-full">
                                             সাধারণ
                                         </span>
                                     @endif
                                 </div>
 
                                 {{-- Patient name --}}
-                                <p class="text-sm font-black text-white leading-tight truncate">
+                                <p class="text-sm font-black text-slate-900 leading-tight truncate">
                                     {{ $req->patient_name ?? 'অজ্ঞাত রোগী' }}
                                 </p>
-                                <p class="text-xs text-slate-400 font-medium truncate mt-0.5">
+                                <p class="text-xs text-slate-500 font-medium truncate mt-0.5">
                                     🏥 {{ $req->hospital ?? 'হাসপাতাল উল্লেখ নেই' }}
                                 </p>
                             </div>
                         </div>
 
                         {{-- Time countdown --}}
-                        <div class="mb-4 flex items-center gap-2 px-3 py-2 rounded-xl"
-                             style="background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.07);">
-                            <svg class="w-3.5 h-3.5 shrink-0 {{ $isEmergency ? 'text-red-400' : 'text-slate-500' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <div class="mb-4 flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-100">
+                            <svg class="w-3.5 h-3.5 shrink-0 {{ $isEmergency ? 'text-red-500' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                             @if($neededAt && $diffHours !== null)
                                 @if($diffHours < 0)
-                                    <span class="text-xs font-bold text-red-400">{{ abs($diffHours) }} ঘণ্টা আগে ছিল</span>
+                                    <span class="text-xs font-bold text-red-600">{{ abs($diffHours) }} ঘণ্টা আগে ছিল</span>
                                 @elseif($diffHours < 1)
-                                    <span class="text-xs font-black text-red-300 animate-pulse">এখনই প্রয়োজন!</span>
+                                    <span class="text-xs font-black text-red-600 animate-pulse">এখনই প্রয়োজন!</span>
                                 @elseif($diffHours < 24)
-                                    <span class="text-xs font-bold {{ $isEmergency ? 'text-red-300' : 'text-amber-300' }}">
+                                    <span class="text-xs font-bold {{ $isEmergency ? 'text-red-600' : 'text-amber-600' }}">
                                         {{ $diffHours }} ঘণ্টার মধ্যে প্রয়োজন
                                     </span>
                                 @else
-                                    <span class="text-xs font-semibold text-slate-400">
+                                    <span class="text-xs font-semibold text-slate-500">
                                         {{ $neededAt->format('d M, Y') }}-এর মধ্যে
                                     </span>
                                 @endif
@@ -359,7 +384,7 @@
 
                             {{-- Bags needed chip --}}
                             @if($req->bags_needed > 1)
-                                <span class="ml-auto text-[10px] font-bold text-slate-400 shrink-0">
+                                <span class="ml-auto text-[10px] font-bold text-slate-500 shrink-0">
                                     {{ $req->bags_needed }} ব্যাগ
                                 </span>
                             @endif
@@ -369,11 +394,10 @@
                         <a href="{{ route('requests.show', $req->id) }}"
                            class="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-sm font-extrabold transition-all duration-200
                            {{ $isEmergency
-                                ? 'bg-red-600 hover:bg-red-500 text-white shadow-md shadow-red-900/50'
+                                ? 'bg-red-600 hover:bg-red-700 text-white shadow-sm shadow-red-100'
                                 : ($isUrgent
-                                    ? 'bg-amber-600 hover:bg-amber-500 text-white shadow-md shadow-amber-900/30'
-                                    : 'text-slate-200 hover:text-white hover:bg-white/10') }}"
-                           style="{{ (!$isEmergency && !$isUrgent) ? 'border:1px solid rgba(255,255,255,.12);' : '' }}">
+                                    ? 'bg-amber-500 hover:bg-amber-600 text-white shadow-sm shadow-amber-100'
+                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700') }}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                                       d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
@@ -400,15 +424,17 @@
     {{-- E) My Commitments (Ongoing) --}}
     @if(isset($ongoingCommitments) && $ongoingCommitments->count() > 0)
     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-blue-50/50">
-            <div>
-                <h2 class="text-lg font-extrabold text-blue-900 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                    আমার চলমান কমিটমেন্ট
-                </h2>
-                <p class="text-sm text-blue-700/70 font-medium mt-1">যে রিকোয়েস্টগুলোতে আপনি রক্ত দেওয়ার প্রতিশ্রুতি দিয়েছেন</p>
+        <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
+                <div>
+                    <h2 class="text-base font-extrabold text-slate-900">আমার চলমান কমিটমেন্ট</h2>
+                    <p class="text-xs text-slate-500 font-medium mt-0.5">যে রিকোয়েস্টগুলোতে আপনি রক্ত দেওয়ার প্রতিশ্রুতি দিয়েছেন</p>
+                </div>
             </div>
-            <a href="{{ route('requests.index') }}" class="text-xs font-bold text-blue-600 hover:underline">সব দেখুন</a>
+            <a href="{{ route('requests.index') }}" class="text-xs font-bold text-red-600 hover:text-red-700 flex items-center gap-1 hover:underline underline-offset-2">সব দেখুন →</a>
         </div>
 
         <div class="overflow-x-auto">
@@ -445,49 +471,59 @@
     @endif
 
     {{-- 4. User Impact (Stats Grid) --}}
-    {{-- ══════════════════════════════════════════
-         📊 Stats Grid
-    ══════════════════════════════════════════ --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <x-card>
-            <div class="text-slate-500 text-sm font-bold uppercase tracking-wider">মোট রিকোয়েস্ট</div>
-            <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-4xl font-black text-slate-900">{{ $totalRequestsMade ?? 0 }}</span>
-                <span class="text-slate-400 font-bold text-sm">টি</span>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
             </div>
-        </x-card>
+            <div>
+                <div class="text-2xl font-black text-slate-900">{{ $totalRequestsMade ?? 0 }}</div>
+                <div class="text-xs font-bold text-slate-500 mt-0.5">মোট রিকোয়েস্ট</div>
+            </div>
+        </div>
 
-        <x-card>
-            <div class="text-emerald-600 text-sm font-bold uppercase tracking-wider">আপনার অবদান</div>
-            <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-4xl font-black text-emerald-600">{{ $totalContributions ?? 0 }}</span>
-                <span class="text-emerald-400 font-bold text-sm">বার</span>
+        <div class="bg-white rounded-2xl border border-emerald-100 p-5 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
             </div>
-        </x-card>
+            <div>
+                <div class="text-2xl font-black text-emerald-600">{{ $totalContributions ?? 0 }}</div>
+                <div class="text-xs font-bold text-emerald-500 mt-0.5">আপনার অবদান</div>
+            </div>
+        </div>
 
-        <x-card>
-            <div class="text-red-600 text-sm font-bold uppercase tracking-wider">সফল রিকোয়েস্ট</div>
-            <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-4xl font-black text-red-600">{{ $fulfilledRequests ?? 0 }}</span>
-                <span class="text-red-400 font-bold text-sm">টি</span>
+        <div class="bg-white rounded-2xl border border-red-100 p-5 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
-        </x-card>
+            <div>
+                <div class="text-2xl font-black text-red-600">{{ $fulfilledRequests ?? 0 }}</div>
+                <div class="text-xs font-bold text-red-500 mt-0.5">সফল রিকোয়েস্ট</div>
+            </div>
+        </div>
 
-        <x-card>
-            <div class="text-blue-600 text-sm font-bold uppercase tracking-wider">সফলতার হার</div>
-            <div class="mt-2 flex items-baseline gap-2">
-                <span class="text-4xl font-black text-blue-600">{{ $successRate ?? 0 }}</span>
-                @if($successRate !== 'N/A')<span class="text-blue-400 font-bold text-sm">%</span>@endif
+        <div class="bg-white rounded-2xl border border-blue-100 p-5 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
             </div>
-        </x-card>
+            <div>
+                <div class="text-2xl font-black text-blue-600">{{ $successRate ?? 0 }}{{ ($successRate !== 'N/A') ? '%' : '' }}</div>
+                <div class="text-xs font-bold text-blue-500 mt-0.5">সফলতার হার</div>
+            </div>
+        </div>
     </div>
 
     {{-- 7. Verified Donation History --}}
     <div>
         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-            <div class="px-6 py-5 border-b border-slate-100">
-                <h3 class="text-lg font-extrabold text-slate-900">ভেরিফাইড রক্তদান হিস্ট্রি</h3>
-                <p class="text-sm text-slate-500 font-medium mt-1">আপনার অতীতের সফল রক্তদানের লগ</p>
+            <div class="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                    <h3 class="text-base font-extrabold text-slate-900">ভেরিফাইড রক্তদান হিস্ট্রি</h3>
+                    <p class="text-xs text-slate-500 font-medium mt-0.5">আপনার অতীতের সফল রক্তদানের লগ</p>
+                </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -539,12 +575,13 @@
 
     @if(isset($recentRequests))
     <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center">
+        <div class="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+            </div>
             <div>
-                <h2 class="text-lg font-extrabold text-slate-900">আপনার সাম্প্রতিক রিকোয়েস্টসমূহ</h2>
-                <p class="text-sm text-slate-500 font-medium mt-1">
-                    {{ ($isDonor ?? false) ? 'আপনি যেসব রিকোয়েস্টে সাড়া দিয়েছেন (Accepted)' : 'সর্বশেষ ৫টি রিকোয়েস্টের আপডেট' }}
-                </p>
+                <h2 class="text-base font-extrabold text-slate-900">আপনার সাম্প্রতিক রিকোয়েস্টসমূহ</h2>
+                <p class="text-xs text-slate-500 font-medium mt-0.5">{{ ($isDonor ?? false) ? 'আপনি যেসব রিকোয়েস্টে সাড়া দিয়েছেন (Accepted)' : 'সর্বশেষ ৫টি রিকোয়েস্টের আপডেট' }}</p>
             </div>
         </div>
 
