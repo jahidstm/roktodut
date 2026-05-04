@@ -58,7 +58,7 @@ class BloodRequest extends Model
     /**
      * Reports on this request
      */
-    public function reports()
+    public function spamReports()
     {
         return $this->hasMany(BloodRequestReport::class, 'blood_request_id');
     }
@@ -125,6 +125,10 @@ class BloodRequest extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'pending')
+            ->where('is_hidden', false)
+            ->whereHas('requester', function ($q) {
+                $q->where('is_shadowbanned', false);
+            })
             ->where(function ($q) {
                 $q->whereNull('needed_at')
                     ->orWhere('needed_at', '>=', now()->subHours(2));

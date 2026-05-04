@@ -148,7 +148,7 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         return $this->hasMany(BloodRequestResponse::class, 'donor_user_id');
     }
 
-    public function reports(): HasMany
+    public function bloodRequestReports(): HasMany
     {
         return $this->hasMany(BloodRequestReport::class, 'user_id');
     }

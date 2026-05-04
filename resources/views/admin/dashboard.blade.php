@@ -307,6 +307,38 @@
             </div>
         </div>
 
+        {{-- Spam Radar --}}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+             :class="{'border-red-200 ring-2 ring-red-50': activeAccordion === 'spam_radar'}">
+            <button @click="activeAccordion = activeAccordion === 'spam_radar' ? null : 'spam_radar'"
+                    @keydown.enter="activeAccordion = activeAccordion === 'spam_radar' ? null : 'spam_radar'"
+                    @keydown.space.prevent="activeAccordion = activeAccordion === 'spam_radar' ? null : 'spam_radar'"
+                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-red-50/30 transition-colors focus:outline-none">
+                <div class="flex items-center gap-4 text-left">
+                    <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 'spam_radar'}">🛑</div>
+                    <div>
+                        <h3 class="text-lg font-extrabold text-slate-900">Spam Radar</h3>
+                        <p class="text-sm text-slate-500 font-medium">ফেক রিকোয়েস্ট রিপোর্ট রিভিউ এবং স্প্যামার শ্যাডোব্যান</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-full">Security Module</span>
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-red-100 text-red-600': activeAccordion === 'spam_radar'}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </button>
+            <div x-show="activeAccordion === 'spam_radar'" x-collapse style="display: none;">
+                <div class="p-6 border-t border-slate-100 bg-slate-50/50">
+                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">ডোনারদের রিপোর্ট করা ফেক এবং স্প্যাম রিকোয়েস্টগুলো রিভিউ করে স্ট্রাইক অ্যাপ্রুভ করুন।</p>
+                    <a href="{{ route('admin.spam-radar.index') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
+                        Go to Spam Radar
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
         {{-- 7) Analytics Dashboard --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
              :class="{'border-red-200 ring-2 ring-red-50': activeAccordion === 7}">

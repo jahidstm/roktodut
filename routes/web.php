@@ -31,6 +31,7 @@ use App\Http\Controllers\Admin\SupportMessageController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\Admin\SpamRadarController;
 use App\Http\Controllers\TelegramController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\HospitalController;
@@ -257,6 +258,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/users/{user}/verify-nid', [AdminDashboardController::class, 'verifyNid'])->name('admin.nid.verify');
     Route::post('/admin/orgs/{organization}/verify', [AdminDashboardController::class, 'verifyOrg'])->name('admin.org.verify');
     Route::get('/admin/orgs/{organization}/document', [AdminDashboardController::class, 'viewOrgDocument'])->name('admin.org.document');
+
+    // 🛑 Spam Radar Routes
+    Route::get('/admin/spam-radar', [SpamRadarController::class, 'index'])->name('admin.spam-radar.index');
+    Route::post('/admin/spam-radar/{bloodRequest}/approve', [SpamRadarController::class, 'approveStrike'])->name('admin.spam-radar.approve');
+    Route::post('/admin/spam-radar/{bloodRequest}/reject', [SpamRadarController::class, 'rejectReports'])->name('admin.spam-radar.reject');
 
     Route::prefix('admin/gamification')->name('admin.gamification.')->group(function () {
         Route::get('/',                          [GamificationGovernanceController::class, 'index'])->name('index');

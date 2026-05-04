@@ -404,8 +404,19 @@
         const dismissBtn = document.getElementById('pwa-dismiss-btn');
         const closeBtn  = document.getElementById('pwa-close-btn');
 
-        // ইতিমধ্যে install হয়েছে বা dismiss করা হয়েছে → দেখাবো না
-        const dismissed = sessionStorage.getItem('pwa_dismissed');
+        // ইতিমধ্যে dismiss করা হয়েছে কিনা চেক করবো (localStorage এ ১৪ দিন সেভ থাকবে)
+        const dismissedStr = localStorage.getItem('pwa_dismissed_at');
+        let shouldShow = true;
+        
+        if (dismissedStr) {
+            const dismissedAt = parseInt(dismissedStr, 10);
+            const fourteenDays = 14 * 24 * 60 * 60 * 1000;
+            // যদি ১৪ দিন পার না হয়ে থাকে, তাহলে দেখাবো না
+            if (Date.now() - dismissedAt < fourteenDays) {
+                shouldShow = false;
+            }
+        }
+
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches
                           || window.navigator.standalone === true;
 
@@ -413,9 +424,9 @@
             e.preventDefault();
             deferredPrompt = e;
 
-            if (!dismissed && !isStandalone) {
+            if (shouldShow && !isStandalone) {
                 setTimeout(() => {
-                    banner.style.display = 'block';
+                    if (banner) banner.style.display = 'block';
                 }, 3000); // 3 সেকেন্ড পর দেখাবে
             }
         });
@@ -426,7 +437,9 @@
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 if (outcome === 'accepted') {
-                    banner.style.display = 'none';
+                    if (banner) banner.style.display = 'none';
+                    // ইনস্টল হলে আর কখনোই দেখাবো না, তাই ফিউচার ডেট দিয়ে রাখলাম
+                    localStorage.setItem('pwa_dismissed_at', (Date.now() + 3650*24*60*60*1000).toString());
                 }
                 deferredPrompt = null;
             });
@@ -434,7 +447,8 @@
 
         const hideBanner = () => {
             if (banner) banner.style.display = 'none';
-            sessionStorage.setItem('pwa_dismissed', '1');
+            // ডিসমিস করলে বর্তমান সময় সেভ করে রাখবো, যেন ১৪ দিন পর আবার দেখাতে পারে
+            localStorage.setItem('pwa_dismissed_at', Date.now().toString());
         };
 
         if (dismissBtn) dismissBtn.addEventListener('click', hideBanner);
