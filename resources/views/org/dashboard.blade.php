@@ -19,6 +19,21 @@
         </div>
     </div>
 
+    @if($organization && $organization->status === 'pending')
+    <div class="mb-8 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-center gap-6 relative overflow-hidden">
+        <div class="absolute right-0 top-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl -z-0"></div>
+        <div class="w-14 h-14 bg-white text-amber-600 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-amber-100 z-10">
+            <svg class="w-7 h-7 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        </div>
+        <div class="z-10">
+            <h3 class="text-xl font-black text-amber-900">ভেরিফিকেশন পেন্ডিং রয়েছে ⏳</h3>
+            <p class="text-amber-800 text-sm font-bold mt-1.5 leading-relaxed">
+                আপনার অর্গানাইজেশনের দেওয়া ডকুমেন্টস সিস্টেম অ্যাডমিন যাচাই করছেন। ভেরিফিকেশন সম্পন্ন হলে আপনার প্রোফাইলে নোটিফিকেশন আসবে এবং আপনার অর্গানাইজেশন ফুল্লি ফাংশনাল হবে। অনুগ্রহ করে অপেক্ষা করুন।
+            </p>
+        </div>
+    </div>
+    @endif
+
     <div id="org-command-shell">
     {{-- 🧭 Top Navigation Tabs --}}
     <div class="mb-8 flex overflow-x-auto bg-white border border-slate-200 rounded-2xl p-2 shadow-sm gap-2 whitespace-nowrap">

@@ -65,7 +65,9 @@ class DashboardController extends Controller
             })
             ->map->count();
 
-        return view('org.dashboard', compact('members', 'stats', 'request', 'districtWiseMembers'));
+        $organization = \App\Models\Organization::find($admin->organization_id);
+
+        return view('org.dashboard', compact('members', 'stats', 'request', 'districtWiseMembers', 'organization'));
     }
 
     /**

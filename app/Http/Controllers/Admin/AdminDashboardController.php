@@ -262,12 +262,22 @@ class AdminDashboardController extends Controller
                 $organization->admin_id => ['status' => 'approved']
             ]);
 
+            // Notify Org Admin
+            if ($organization->admin) {
+                $organization->admin->notify(new \App\Notifications\OrganizationVerificationStatusNotification('approved'));
+            }
+
             $this->logAudit('org_approve', $organization->id, \App\Models\Organization::class);
             return back()->with('success', "✅ {$organization->name} সফলভাবে অ্যাপ্রুভ করা হয়েছে।");
         } else {
             $organization->is_verified = false;
             $organization->rejection_reason = $request->input('rejection_reason');
             $organization->save();
+
+            // Notify Org Admin
+            if ($organization->admin) {
+                $organization->admin->notify(new \App\Notifications\OrganizationVerificationStatusNotification('rejected', $request->input('rejection_reason')));
+            }
 
             $this->logAudit('org_reject', $organization->id, \App\Models\Organization::class, [
                 'reason' => $request->input('rejection_reason')
