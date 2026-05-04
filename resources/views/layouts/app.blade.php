@@ -248,8 +248,12 @@
                             <p class="text-xs font-semibold text-slate-500 mt-0.5 flex items-center gap-1.5">
                                 @if(auth()->user()->role?->value === 'org_admin' || auth()->user()->role === 'org_admin')
                                     <span class="w-2 h-2 rounded-full bg-blue-500"></span> অর্গানাইজেশন অ্যাডমিন
-                                @else
+                                @elseif(auth()->user()->role?->value === 'admin' || auth()->user()->role === 'admin')
+                                    <span class="w-2 h-2 rounded-full bg-purple-500"></span> সিস্টেম অ্যাডমিন
+                                @elseif(auth()->user()->is_donor)
                                     <span class="w-2 h-2 rounded-full bg-red-500"></span> ডোনার • <span class="text-red-600 font-bold">{{ auth()->user()->blood_group?->value ?? auth()->user()->blood_group ?? 'N/A' }}</span>
+                                @else
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span> সাধারণ সদস্য
                                 @endif
                             </p>
                         </div>
