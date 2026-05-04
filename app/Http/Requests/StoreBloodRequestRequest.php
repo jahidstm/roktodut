@@ -18,7 +18,7 @@ class StoreBloodRequestRequest extends FormRequest
         return [
             'patient_name'   => ['nullable', 'string', 'max:120'],
             'blood_group'    => ['required', 'string', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
-            'hospital'       => ['nullable', 'string', 'max:200'],
+            'hospital_id'    => ['nullable', 'integer', 'exists:hospitals,id'],
             'bags_needed'    => ['required', 'integer', 'min:1', 'max:10'],
 
             // 📍 রিলেশনাল লোকেশন ভ্যালিডেশন

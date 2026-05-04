@@ -354,7 +354,7 @@
                                     {{ $req->patient_name ?? 'অজ্ঞাত রোগী' }}
                                 </p>
                                 <p class="text-xs text-slate-500 font-medium truncate mt-0.5">
-                                    🏥 {{ $req->hospital ?? 'হাসপাতাল উল্লেখ নেই' }}
+                                    🏥 {{ $req->hospital?->display_name ?? 'হাসপাতাল উল্লেখ নেই' }}
                                 </p>
                             </div>
                         </div>
@@ -447,7 +447,7 @@
                                 <div class="text-xs font-bold text-slate-500 mt-0.5">গ্রুপ: <span class="text-blue-600">{{ $commitment->bloodRequest->blood_group?->value ?? $commitment->bloodRequest->blood_group }}</span></div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="font-semibold text-slate-700">{{ $commitment->bloodRequest->hospital ?? 'N/A' }}</div>
+                                <div class="font-semibold text-slate-700">{{ $commitment->bloodRequest->hospital?->display_name ?? 'N/A' }}</div>
                                 <div class="text-xs font-bold text-slate-500 mt-0.5">{{ $commitment->bloodRequest->district?->name ?? 'অজানা জেলা' }}</div>
                             </td>
                             <td class="px-6 py-4">
@@ -543,7 +543,7 @@
                                         <div class="font-extrabold text-slate-900">{{ $history->fulfilled_at ? $history->fulfilled_at->format('d M, Y') : 'N/A' }}</div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="font-semibold text-slate-700">{{ $history->bloodRequest->hospital ?? 'N/A' }}</div>
+                                        <div class="font-semibold text-slate-700">{{ $history->bloodRequest->hospital?->display_name ?? 'N/A' }}</div>
                                         <div class="text-xs text-slate-500 font-medium">{{ $history->bloodRequest->district?->name ?? 'N/A' }}, {{ $history->bloodRequest->upazila?->name ?? '' }}</div>
                                     </td>
                                     <td class="px-6 py-4">

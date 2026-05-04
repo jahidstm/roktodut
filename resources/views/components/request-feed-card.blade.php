@@ -65,7 +65,7 @@
 
     <div class="mt-3 space-y-1.5">
         <p class="truncate text-sm font-semibold text-slate-800">
-            {{ $request->hospital ?: 'হাসপাতাল উল্লেখ নেই' }}
+            {{ $request->hospital?->display_name ?: 'হাসপাতাল উল্লেখ নেই' }}
         </p>
         <p class="flex items-center gap-1.5 text-sm text-slate-600">
             <svg class="h-4 w-4 shrink-0 text-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

@@ -21,7 +21,7 @@ class BloodRequest extends Model
         'patient_name',
         'blood_group',
         'bags_needed',
-        'hospital',
+        'hospital_id',
 
         // 📍 নতুন রিলেশনাল লোকেশন আইডি (Mass Assignment Security Unlocked)
         'division_id',
@@ -95,6 +95,11 @@ class BloodRequest extends Model
     public function upazila(): BelongsTo
     {
         return $this->belongsTo(Upazila::class);
+    }
+
+    public function hospital(): BelongsTo
+    {
+        return $this->belongsTo(Hospital::class);
     }
 
     // ── ৭. Query Scopes ────────────────────────────────────────

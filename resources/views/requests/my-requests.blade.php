@@ -58,7 +58,7 @@
                             <h3 class="text-lg font-black tracking-tight text-slate-900 truncate">
                                 {{ $req->blood_group?->value ?? (string) $req->blood_group }} রক্ত প্রয়োজন
                             </h3>
-                            <p class="mt-1 text-sm font-semibold text-slate-800 truncate">{{ $req->hospital ?: 'হাসপাতাল উল্লেখ নেই' }}</p>
+                            <p class="mt-1 text-sm font-semibold text-slate-800 truncate">{{ $req->hospital?->display_name ?: 'হাসপাতাল উল্লেখ নেই' }}</p>
                             <p class="text-sm text-slate-600 truncate">{{ $req->district?->name ?? '-' }}{{ $req->upazila?->name ? ' · ' . $req->upazila->name : '' }}</p>
                         </div>
                         <span class="inline-flex items-center rounded-full border px-3 py-1 text-xs font-black {{ $statusInfo['cls'] }}">

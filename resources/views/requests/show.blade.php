@@ -33,7 +33,7 @@
         <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
                 <div class="text-lg font-extrabold truncate">{{ $bloodRequest->patient_name ?? 'রোগী' }}</div>
-                <div class="text-sm text-slate-500 font-medium truncate mt-1">{{ $bloodRequest->hospital ?? 'হাসপাতাল উল্লেখ নেই' }}</div>
+                <div class="text-sm text-slate-500 font-medium truncate mt-1">{{ $bloodRequest->hospital?->display_name ?? 'হাসপাতাল উল্লেখ নেই' }}</div>
                 <div class="text-sm text-slate-500 font-semibold mt-2">
                     লোকেশন: <span class="text-slate-800 font-extrabold">{{ $bloodRequest->upazila?->name ?? '-' }}, {{ $bloodRequest->district?->name ?? '-' }}</span>
                 </div>

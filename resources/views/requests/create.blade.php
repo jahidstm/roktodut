@@ -56,12 +56,78 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label class="text-sm font-extrabold text-slate-800">হাসপাতাল</label>
-                    <input name="hospital" value="{{ old('hospital') }}"
-                           class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3" />
-                    @error('hospital') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
+                {{-- 🏥 Hospital Autocomplete (Alpine.js) --}}
+                <div
+                    x-data="hospitalAutocomplete({{ old('hospital_id') ?? 'null' }}, '{{ old('hospital_display', '') }}')"
+                    class="relative"
+                >
+                    <label class="text-sm font-extrabold text-slate-800">
+                        হাসপাতাল
+                        <span x-show="selectedId && isVerified" class="ml-1 text-[10px] font-black text-emerald-600 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-full">✓ ভেরিফাইড</span>
+                        <span x-show="selectedId && !isVerified" class="ml-1 text-[10px] font-black text-amber-600 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full">নতুন — রিভিউ পেন্ডিং</span>
+                    </label>
+
+                    {{-- Hidden FK input (form submit হলে এটিই যাবে) --}}
+                    <input type="hidden" name="hospital_id" x-model="selectedId">
+
+                    {{-- Visible Search Input --}}
+                    <input
+                        type="text"
+                        id="hospital-search"
+                        autocomplete="off"
+                        placeholder="হাসপাতালের নাম লিখুন..."
+                        x-model="query"
+                        @input.debounce.300ms="search()"
+                        @focus="if(query.length >= 2) open = true"
+                        @keydown.arrow-down.prevent="focusNext()"
+                        @keydown.arrow-up.prevent="focusPrev()"
+                        @keydown.enter.prevent="selectFocused()"
+                        @keydown.escape="open = false"
+                        @blur="handleBlur()"
+                        class="mt-2 w-full rounded-xl border-slate-200 focus:border-red-500 focus:ring-red-500 font-medium px-4 py-3"
+                    />
+
+                    {{-- Dropdown --}}
+                    <div
+                        x-show="open && (results.length > 0 || canCreateNew)"
+                        x-transition:enter="transition ease-out duration-150"
+                        x-transition:enter-start="opacity-0 translate-y-1"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        class="absolute z-50 mt-1 w-full bg-white rounded-xl shadow-xl border border-slate-200 overflow-hidden"
+                        style="display:none;"
+                    >
+                        {{-- Search results --}}
+                        <template x-for="(item, idx) in results" :key="item.id">
+                            <button
+                                type="button"
+                                @mousedown.prevent="select(item)"
+                                :class="focusedIndex === idx ? 'bg-red-50 text-red-700' : 'text-slate-700 hover:bg-slate-50'"
+                                class="w-full text-left px-4 py-3 text-sm font-semibold flex items-center justify-between border-b border-slate-50 last:border-0 transition-colors"
+                            >
+                                <span x-text="item.display || item.name"></span>
+                                <span x-show="item.is_verified" class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full shrink-0">✓</span>
+                            </button>
+                        </template>
+
+                        {{-- "Add new" option --}}
+                        <button
+                            x-show="canCreateNew"
+                            type="button"
+                            @mousedown.prevent="createNew()"
+                            class="w-full text-left px-4 py-3 text-sm font-bold text-blue-600 hover:bg-blue-50 flex items-center gap-2 transition-colors"
+                        >
+                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            "<span x-text="query"></span>" — নতুন হিসেবে যোগ করুন
+                        </button>
+                    </div>
+
+                    {{-- Loading spinner --}}
+                    <div x-show="loading" class="absolute right-4 top-[3.1rem]">
+                        <svg class="w-4 h-4 animate-spin text-slate-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                    </div>
                 </div>
+                @error('hospital_id') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
+
 
                 <div>
                     <label class="text-sm font-extrabold text-slate-800">ব্যাগ প্রয়োজন <span class="text-red-500">*</span></label>
@@ -231,4 +297,115 @@ document.addEventListener('DOMContentLoaded', function () {
     updateUrgencyAvailability();
 });
 </script>
+
+{{-- 🏥 Hospital Autocomplete Alpine Component --}}
+<script>
+function hospitalAutocomplete(initialId = null, initialDisplay = '') {
+    return {
+        query:        initialDisplay || '',
+        selectedId:   initialId,
+        isVerified:   false,
+        results:      [],
+        open:         false,
+        loading:      false,
+        focusedIndex: -1,
+
+        get canCreateNew() {
+            return this.query.trim().length >= 2
+                && !this.results.some(r => r.display?.toLowerCase() === this.query.toLowerCase() || r.name?.toLowerCase() === this.query.toLowerCase())
+                && !this.loading;
+        },
+
+        async search() {
+            const q = this.query.trim();
+            if (q.length < 2) {
+                this.results = [];
+                this.open = false;
+                this.selectedId = null;
+                this.isVerified = false;
+                return;
+            }
+
+            this.loading = true;
+            this.open = true;
+            this.focusedIndex = -1;
+
+            try {
+                const districtEl = document.querySelector('[name="district_id"]');
+                const districtId = districtEl ? districtEl.value : '';
+                const url = `/api/hospitals/search?q=${encodeURIComponent(q)}${districtId ? '&district_id=' + districtId : ''}`;
+                const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+                this.results = await res.json();
+            } catch (e) {
+                this.results = [];
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        select(item) {
+            this.query      = item.display || item.name;
+            this.selectedId = item.id;
+            this.isVerified = item.is_verified;
+            this.open       = false;
+            this.results    = [];
+        },
+
+        // নতুন হসপিটাল: API-এ POST করে ID নিয়ে নেওয়া
+        async createNew() {
+            const name = this.query.trim();
+            if (!name) return;
+
+            this.loading = true;
+
+            try {
+                const res = await fetch('/api/hospitals', {
+                    method:  'POST',
+                    headers: {
+                        'Content-Type':  'application/json',
+                        'Accept':        'application/json',
+                        'X-CSRF-TOKEN':  document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({ name }),
+                });
+
+                const data = await res.json();
+
+                if (data.id) {
+                    this.selectedId = data.id;
+                    this.isVerified = false;
+                    this.open = false;
+                    this.results = [];
+                }
+            } catch (e) {
+                console.error('[HospitalAutocomplete] createNew failed:', e);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        handleBlur() {
+            // 200ms পর বন্ধ করা (mousedown event আগে যেন fire হতে পারে)
+            setTimeout(() => { this.open = false; }, 200);
+        },
+
+        focusNext() {
+            if (this.focusedIndex < this.results.length - 1) this.focusedIndex++;
+        },
+
+        focusPrev() {
+            if (this.focusedIndex > 0) this.focusedIndex--;
+        },
+
+        selectFocused() {
+            if (this.focusedIndex >= 0 && this.results[this.focusedIndex]) {
+                this.select(this.results[this.focusedIndex]);
+            } else if (this.canCreateNew) {
+                this.createNew();
+            }
+        },
+    };
+}
+</script>
 @endsection
+

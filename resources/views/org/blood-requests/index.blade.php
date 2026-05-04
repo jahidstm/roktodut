@@ -65,14 +65,14 @@
                         <h3 class="text-lg font-black text-slate-900 mb-1">{{ $request->patient_name }}</h3>
                         <p class="text-sm text-slate-600 font-medium mb-4 flex items-start gap-1.5">
                             <svg class="w-4 h-4 mt-0.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
-                            <span>{{ $request->hospital ?? 'হাসপাতাল উল্লেখ নেই' }} <br><span class="text-xs text-slate-400">{{ $request->upazila?->bn_name ?? $request->district?->bn_name ?? '' }}</span></span>
+                            <span>{{ $request->hospital?->display_name ?? 'হাসপাতাল উল্লেখ নেই' }} <br><span class="text-xs text-slate-400">{{ $request->upazila?->bn_name ?? $request->district?->bn_name ?? '' }}</span></span>
                         </p>
                     </div>
 
                     <div class="mt-4 pt-4 border-t border-slate-100 flex items-center gap-2">
                         @php
                             $isBroadcasted = \App\Models\BroadcastLog::where('organization_id', $org->id)->where('blood_request_id', $request->id)->exists();
-                            $shareText = "জরুরি রক্তের প্রয়োজন\nরোগী: {$request->patient_name}\nরক্তের গ্রুপ: " . ($request->blood_group?->value ?? (string) $request->blood_group) . "\nহাসপাতাল: {$request->hospital}\n\nবিস্তারিত দেখতে ক্লিক করুন: " . route('requests.show', $request->id);
+                            $shareText = "জরুরি রক্তের প্রয়োজন\nরোগী: {$request->patient_name}\nরক্তের গ্রুপ: " . ($request->blood_group?->value ?? (string) $request->blood_group) . "\nহাসপাতাল: " . ($request->hospital?->display_name ?? 'N/A') . "\n\nবিস্তারিত দেখতে ক্লিক করুন: " . route('requests.show', $request->id);
                         @endphp
 
                         @if($isBroadcasted)

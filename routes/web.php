@@ -33,6 +33,7 @@ use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\TelegramController;
 use App\Http\Controllers\PwaController;
+use App\Http\Controllers\HospitalController;
 use App\Models\Division;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -315,6 +316,21 @@ Route::middleware(['auth', 'role:org_admin'])->group(function () {
 Route::get('/ajax/divisions', [LocationController::class, 'getDivisions']);
 Route::get('/ajax/districts/{division_id}', [LocationController::class, 'getDistricts']);
 Route::get('/ajax/upazilas/{district_id}', [LocationController::class, 'getUpazilas']);
+
+// --- ৮. হসপিটাল অটোকমপ্লিট API ---
+Route::get('/api/hospitals/search', [HospitalController::class, 'search'])
+    ->name('hospitals.search')
+    ->middleware('throttle:60,1');
+Route::post('/api/hospitals', [HospitalController::class, 'store'])
+    ->name('hospitals.store')
+    ->middleware('throttle:3,1');
+
+// --- অ্যাডমিন হসপিটাল ম্যানেজমেন্ট ---
+Route::middleware(['auth', 'role:admin'])->prefix('admin/hospitals')->name('admin.hospitals.')->group(function () {
+    Route::get('/unverified', [HospitalController::class, 'unverified'])->name('unverified');
+    Route::patch('/{hospital}/verify', [HospitalController::class, 'verify'])->name('verify');
+    Route::delete('/{hospital}', [HospitalController::class, 'destroy'])->name('destroy');
+});
 
 require __DIR__ . '/auth.php';
 

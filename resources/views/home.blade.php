@@ -260,7 +260,7 @@
                                     <span class="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center shrink-0 text-red-500">
                                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                                     </span>
-                                    <span class="truncate mt-0.5">{{ $req->hospital ?? 'হাসপাতাল উল্লেখ নেই' }}</span>
+                                    <span class="truncate mt-0.5">{{ $req->hospital?->display_name ?? 'হাসপাতাল উল্লেখ নেই' }}</span>
                                 </p>
                                 <p class="text-sm font-semibold text-slate-600 flex items-start gap-3">
                                     <span class="w-6 h-6 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-500">
