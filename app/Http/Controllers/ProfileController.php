@@ -353,4 +353,57 @@ class ProfileController extends Controller
             'message' => '✅ আপনার লোকেশন সফলভাবে সেভ হয়েছে!',
         ]);
     }
+
+    public function upgradeToDonor(Request $request)
+    {
+        $user = $request->user();
+
+        $rules = [
+            'blood_group' => 'required|string|in:A+,A-,B+,B-,AB+,AB-,O+,O-',
+            'division_id' => 'required|exists:divisions,id',
+            'district_id' => 'required|exists:districts,id',
+            'upazila_id'  => 'required|exists:upazilas,id',
+            'gender'      => 'required|in:male,female',
+            'weight'      => 'nullable|numeric|min:30',
+            'last_donation_date' => 'nullable|date|before_or_equal:today',
+        ];
+
+        // If phone is missing from user, make it required
+        if (empty($user->phone)) {
+            $rules['phone'] = 'required|string|max:20|unique:users,phone';
+        }
+
+        $request->validate($rules, [
+            'phone.required' => 'ফোন নম্বর প্রদান করা বাধ্যতামূলক।',
+            'phone.unique' => 'এই ফোন নম্বরটি ইতিমধ্যে ব্যবহৃত হয়েছে।',
+            'blood_group.required' => 'রক্তের গ্রুপ নির্বাচন করা বাধ্যতামূলক।',
+            'division_id.required' => 'বিভাগ নির্বাচন করা বাধ্যতামূলক।',
+            'district_id.required' => 'জেলা নির্বাচন করা বাধ্যতামূলক।',
+            'upazila_id.required'  => 'উপজেলা নির্বাচন করা বাধ্যতামূলক।',
+            'gender.required'      => 'লিঙ্গ নির্বাচন করা বাধ্যতামূলক।',
+        ]);
+
+        if (empty($user->phone) && $request->filled('phone')) {
+            $user->phone = $request->phone;
+        }
+
+        $user->blood_group = $request->blood_group;
+        $user->division_id = $request->division_id;
+        $user->district_id = $request->district_id;
+        $user->upazila_id = $request->upazila_id;
+        $user->gender = $request->gender;
+        if ($request->filled('weight')) {
+            $user->weight = $request->weight;
+        }
+        if ($request->filled('last_donation_date')) {
+            $user->last_donated_at = $request->last_donation_date;
+        }
+
+        $user->is_donor = true;
+        $user->save();
+
+        return redirect()->route('dashboard')
+            ->with('status', 'donor-upgraded')
+            ->with('success_msg', 'অভিনন্দন! আপনি এখন সফলভাবে রক্তদাতা হিসেবে যুক্ত হয়েছেন।');
+    }
 }

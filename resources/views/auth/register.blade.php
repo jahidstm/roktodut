@@ -23,51 +23,62 @@
             <x-input-error :messages="$errors->get('email')" class="mt-1 text-sm text-red-600" />
         </div>
 
-        <!-- Role Selection -->
+        <!-- Intent Selection (replaces 'role' — now registration_intent) -->
         <div>
             <label class="block text-sm font-medium text-slate-700 mb-2">আমি হিসেবে যুক্ত হতে চাই:</label>
             <div class="flex items-center gap-6 bg-white p-3 rounded-xl border border-slate-200 shadow-sm">
                 <label class="flex items-center cursor-pointer group flex-1">
                     <div class="relative flex items-center justify-center">
-                        <input type="radio" name="role" value="recipient" class="peer sr-only" {{ old('role', 'recipient') === 'recipient' ? 'checked' : '' }} onchange="toggleDonorFields()">
+                        <input type="radio" name="registration_intent" value="recipient" id="intent_recipient"
+                               class="peer sr-only"
+                               {{ old('registration_intent', 'recipient') === 'recipient' ? 'checked' : '' }}
+                               onchange="toggleDonorFields()">
                         <div class="w-5 h-5 border-2 border-slate-300 rounded-full peer-checked:border-red-600 peer-checked:border-[6px] transition-all bg-white"></div>
                     </div>
                     <span class="ml-2 text-sm text-slate-700 group-hover:text-slate-900 font-medium">রক্তগ্রহীতা</span>
                 </label>
                 <label class="flex items-center cursor-pointer group flex-1 border-l border-slate-100 pl-4">
                     <div class="relative flex items-center justify-center">
-                        <input type="radio" name="role" value="donor" class="peer sr-only" {{ old('role') === 'donor' ? 'checked' : '' }} onchange="toggleDonorFields()">
+                        <input type="radio" name="registration_intent" value="donor" id="intent_donor"
+                               class="peer sr-only"
+                               {{ old('registration_intent') === 'donor' ? 'checked' : '' }}
+                               onchange="toggleDonorFields()">
                         <div class="w-5 h-5 border-2 border-slate-300 rounded-full peer-checked:border-red-600 peer-checked:border-[6px] transition-all bg-white"></div>
                     </div>
                     <span class="ml-2 text-sm text-slate-700 group-hover:text-slate-900 font-medium">রক্তদাতা</span>
                 </label>
             </div>
-            <x-input-error :messages="$errors->get('role')" class="mt-1 text-sm text-red-600" />
+            <x-input-error :messages="$errors->get('registration_intent')" class="mt-1 text-sm text-red-600" />
         </div>
 
-        <!-- Donor Specific Fields -->
-        <div id="donor_fields" class="hidden space-y-4 p-4 border border-red-100 rounded-2xl bg-red-50/50">
-            <div>
-                <label for="phone" class="block text-sm font-medium text-slate-700 mb-1">ফোন নম্বর <span class="text-red-500">*</span></label>
-                <input id="phone" type="text" name="phone" value="{{ old('phone') }}" placeholder="01XXXXXXXXX" class="input-modern bg-white" />
-                <x-input-error :messages="$errors->get('phone')" class="mt-1 text-sm text-red-600" />
-            </div>
+        <!-- Phone: required for donor, hidden for recipient -->
+        <div id="field_phone" class="hidden">
+            <label for="phone" class="block text-sm font-medium text-slate-700 mb-1">
+                ফোন নম্বর <span class="text-red-500">*</span>
+            </label>
+            <input id="phone" type="text" name="phone" value="{{ old('phone') }}" placeholder="01XXXXXXXXX" class="input-modern" />
+            <x-input-error :messages="$errors->get('phone')" class="mt-1 text-sm text-red-600" />
+        </div>
 
-            <div>
-                <label for="blood_group" class="block text-sm font-medium text-slate-700 mb-1">রক্তের গ্রুপ <span class="text-red-500">*</span></label>
-                <div class="relative">
-                    <select id="blood_group" name="blood_group" class="input-modern appearance-none bg-white cursor-pointer pr-10">
-                        <option value="">রক্তের গ্রুপ নির্বাচন করুন</option>
-                        @foreach(['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'] as $bg)
-                            <option value="{{ $bg }}" {{ old('blood_group') == $bg ? 'selected' : '' }}>{{ $bg }}</option>
-                        @endforeach
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
-                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                    </div>
+        <!-- Blood Group: required for donor, optional for recipient (analytics goldmine) -->
+        <div id="field_blood_group">
+            <label for="blood_group" class="block text-sm font-medium text-slate-700 mb-1">
+                রক্তের গ্রুপ
+                <span id="blood_group_required" class="text-red-500 hidden">*</span>
+                <span id="blood_group_optional" class="text-xs text-slate-400 font-normal ml-1">- ঐচ্ছিক</span>
+            </label>
+            <div class="relative">
+                <select id="blood_group" name="blood_group" class="input-modern appearance-none bg-white cursor-pointer pr-10">
+                    <option value="">রক্তের গ্রুপ নির্বাচন করুন</option>
+                    @foreach(['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'] as $bg)
+                        <option value="{{ $bg }}" {{ old('blood_group') == $bg ? 'selected' : '' }}>{{ $bg }}</option>
+                    @endforeach
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </div>
-                <x-input-error :messages="$errors->get('blood_group')" class="mt-1 text-sm text-red-600" />
             </div>
+            <x-input-error :messages="$errors->get('blood_group')" class="mt-1 text-sm text-red-600" />
         </div>
 
         <!-- Referral Code -->
@@ -77,22 +88,19 @@
             @if(request()->has('ref'))
                 <p class="text-xs text-emerald-600 font-bold mt-1 inline-flex items-center gap-1">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                    রেফারেল কোড অটো-অ্যাপ্লাই হয়েছে
+                    রেফারেল কোড অটো-অ্যাপ্লাই হয়েছে
                 </p>
             @endif
             <x-input-error :messages="$errors->get('referred_by_code')" class="mt-1 text-sm text-red-600" />
         </div>
 
-        <!-- Passwords Row to save vertical space -->
+        <!-- Passwords Row -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Password -->
             <div>
                 <label for="password" class="block text-sm font-medium text-slate-700 mb-1">পাসওয়ার্ড</label>
                 <input id="password" type="password" name="password" required autocomplete="new-password" placeholder="সর্বনিম্ন ৮ অক্ষর" class="input-modern" />
                 <x-input-error :messages="$errors->get('password')" class="mt-1 text-sm text-red-600" />
             </div>
-
-            <!-- Confirm Password -->
             <div>
                 <label for="password_confirmation" class="block text-sm font-medium text-slate-700 mb-1">নিশ্চিত করুন</label>
                 <input id="password_confirmation" type="password" name="password_confirmation" required autocomplete="new-password" placeholder="পুনরায় লিখুন" class="input-modern" />
@@ -135,33 +143,42 @@
 
     <script>
         function toggleDonorFields() {
-            const roleInput = document.querySelector('input[name="role"]:checked');
-            if (!roleInput) return;
-            
-            const role = roleInput.value;
-            const donorFields = document.getElementById('donor_fields');
-            
-            if (role === 'donor') {
-                donorFields.classList.remove('hidden');
-                donorFields.style.animation = "fadeIn 0.3s ease-in-out";
+            const intentInput = document.querySelector('input[name="registration_intent"]:checked');
+            if (!intentInput) return;
+
+            const isDonor = intentInput.value === 'donor';
+            const phoneField       = document.getElementById('field_phone');
+            const requiredBadge    = document.getElementById('blood_group_required');
+            const optionalBadge    = document.getElementById('blood_group_optional');
+
+            if (isDonor) {
+                // Show phone (required)
+                phoneField.classList.remove('hidden');
+                phoneField.style.animation = 'fadeIn 0.25s ease-in-out';
+                // Mark blood group as required
+                requiredBadge.classList.remove('hidden');
+                optionalBadge.classList.add('hidden');
             } else {
-                donorFields.classList.add('hidden');
+                // Hide phone
+                phoneField.classList.add('hidden');
+                // Blood group stays but is optional
+                requiredBadge.classList.add('hidden');
+                optionalBadge.classList.remove('hidden');
             }
         }
-        
-        if(!document.getElementById('fade-style')) {
+
+        if (!document.getElementById('fade-style')) {
             const style = document.createElement('style');
             style.id = 'fade-style';
             style.innerHTML = `
                 @keyframes fadeIn {
                     from { opacity: 0; transform: translateY(-5px); }
-                    to { opacity: 1; transform: translateY(0); }
+                    to   { opacity: 1; transform: translateY(0); }
                 }
             `;
             document.head.appendChild(style);
         }
 
-        // Run on page load
         document.addEventListener('DOMContentLoaded', toggleDonorFields);
     </script>
 </x-auth-split-layout>

@@ -59,6 +59,7 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         'qr_token',             // 🔐 Dynamic QR Smart Card token
         'last_login_at',
         'spam_strikes',
+        'is_donor',
 
         'welcome_back_checked',
         'last_donated_at',      // 🎯 ডাটাবেসের আসল কলাম

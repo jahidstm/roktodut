@@ -25,18 +25,34 @@ class RegisteredUserController extends Controller
     /**
      * Handle an incoming registration request.
      *
+     * Architecture:
+     * - "is_donor" boolean controls search visibility (not role enum).
+     * - donor: phone + blood_group required. is_donor = true.
+     * - recipient: phone + blood_group nullable (optional for analytics). is_donor = false.
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse
     {
+        $isDonor = $request->input('registration_intent') === 'donor';
+
         $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'string', 'in:donor,recipient'],
-            'phone' => ['required_if:role,donor', 'nullable', 'string', 'max:20', 'unique:users,phone'],
-            'blood_group' => ['required_if:role,donor', 'nullable', 'string', 'in:A+,A-,B+,B-,O+,O-,AB+,AB-'],
-            'referred_by_code' => ['nullable', 'string', 'exists:users,referral_code'],
+            'name'               => ['required', 'string', 'max:255'],
+            'email'              => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'password'           => ['required', 'confirmed', Rules\Password::defaults()],
+            'registration_intent'=> ['required', 'string', 'in:donor,recipient'],
+
+            // ✅ The Final 1% Polish: Dynamic validation via required_if
+            'phone'              => [
+                'required_if:registration_intent,donor',
+                'nullable', 'string', 'max:20', 'unique:users,phone'
+            ],
+            'blood_group'        => [
+                'required_if:registration_intent,donor',
+                'nullable', 'string', 'in:A+,A-,B+,B-,O+,O-,AB+,AB-'
+            ],
+
+            'referred_by_code'   => ['nullable', 'string', 'exists:users,referral_code'],
         ]);
 
         $referredById = null;
@@ -48,19 +64,20 @@ class RegisteredUserController extends Controller
         }
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-            'phone' => $request->role === 'donor' ? $request->phone : null,
-            'blood_group' => $request->role === 'donor' ? $request->blood_group : null,
-            'referred_by' => $referredById,
+            'name'         => $request->name,
+            'email'        => $request->email,
+            'password'     => Hash::make($request->password),
+            'role'         => $isDonor ? 'donor' : 'recipient', // keep role for backward compat
+            'is_donor'     => $isDonor,                          // ✅ new flexible flag
+            'phone'        => $isDonor ? $request->phone : null,
+            // ✅ Blood group: save even for recipients (optional analytics goldmine)
+            'blood_group'  => $request->filled('blood_group') ? $request->blood_group : null,
+            'referred_by'  => $referredById,
 
-            // 🎯 THE FIX: Recipient হলে সরাসরি onboarded হিসেবে মার্ক করা হচ্ছে
-            'is_onboarded' => $request->role === 'recipient' ? true : false,
+            // Recipient → skip onboarding. Donor → must complete onboarding.
+            'is_onboarded' => !$isDonor,
         ]);
 
-        // Award 10 points right at registration as promised (+10 pts signup bonus)
         if ($referredById) {
             $referrerModel = User::find($referredById);
             if ($referrerModel) {
@@ -69,18 +86,11 @@ class RegisteredUserController extends Controller
         }
 
         event(new Registered($user));
-
         Auth::login($user);
 
-        // 🚀 ডাইনামিক রিডাইরেকশন লজিক
-        $roleValue = $user->role instanceof \App\Enums\UserRole ? $user->role->value : $user->role;
-        
-        if ($roleValue === 'recipient') {
-            // Recipient হলে সরাসরি হোম পেজে
-            return redirect()->route('home');
-        }
-
-        // Donor হলে অনবোর্ডিং পেজে
-        return redirect()->route('onboarding.show');
+        // Recipient → home. Donor → onboarding.
+        return $isDonor
+            ? redirect()->route('onboarding.show')
+            : redirect()->route('home');
     }
 }

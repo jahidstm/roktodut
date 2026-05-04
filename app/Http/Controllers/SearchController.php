@@ -17,11 +17,15 @@ class SearchController extends Controller
      */
     public function index(Request $request)
     {
-        // 🛡️ বেস কোয়েরি: শুধুমাত্র ডোনার এবং অর্গ-অ্যাডমিনরা
+        // 🛡️ বেস কোয়েরি: শুধুমাত্র is_donor=true ইউজার (shadowbanned নয়)
+        // Architecture Note: role enum এর বদলে is_donor flag ব্যবহার করা হচ্ছে।
+        // এটি flexible — একজন ইউজার ডোনার হিসেবে search-এ থাকতে পারবে
+        // এবং একই সাথে রক্তের রিকোয়েস্টও করতে পারবে।
         $query = User::query()
             ->with(['district:id,name', 'upazila:id,name'])
-            ->whereIn('users.role', ['donor', 'org_admin'])
-            ->where('users.is_available', true) // ম্যানুয়াল অফলাইন স্ট্যাটাস চেক
+            ->where('users.is_donor', true)            // ✅ Flexible flag — not enum
+            ->where('users.is_shadowbanned', false)    // ✅ Shadowban filter
+            ->where('users.is_available', true)        // ম্যানুয়াল অফলাইন স্ট্যাটাস চেক
             ->where(function ($inner) {
                 // ⚙️ অটো-কুলডাউন ইঞ্জিন (৪ মাসের গ্যাপ চেক)
                 $inner->whereNull('users.cooldown_until')

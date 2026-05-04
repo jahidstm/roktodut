@@ -218,6 +218,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/upgrade-to-donor', [ProfileController::class, 'upgradeToDonor'])->name('profile.upgrade_to_donor');
     Route::post('/profile/availability', [ProfileController::class, 'toggleEmergencyMode'])->name('donor_profile.is_available_now');
     Route::post('/profile/toggle-hide-phone', [ProfileController::class, 'toggleHidePhone'])->name('profile.toggle.hide_phone');
 

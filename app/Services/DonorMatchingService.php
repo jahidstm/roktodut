@@ -100,8 +100,8 @@ class DonorMatchingService
     private function buildBaseQuery(BloodRequest $request, Carbon $cooldownCutoff)
     {
         return User::query()
-            // ✅ রোল ফিল্টার
-            ->whereIn('role', ['donor', 'org_admin'])
+            // ✅ is_donor flag — flexible, not role enum
+            ->where('is_donor', true)
 
             // ✅ ব্লাড গ্রুপ ম্যাচ
             ->where('blood_group', $request->blood_group->value)
