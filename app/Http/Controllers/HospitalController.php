@@ -90,11 +90,50 @@ class HospitalController extends Controller
             ->orderByDesc('blood_requests_count')
             ->paginate(20);
 
-        return view('admin.hospitals.unverified', compact('hospitals'));
+        // Merge target list: only verified hospitals
+        $verified = Hospital::verified()
+            ->select('id', 'name', 'name_bn')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.hospitals.unverified', compact('hospitals', 'verified'));
     }
 
     // ─────────────────────────────────────────────────────────────
-    // Admin: Verify a hospital (PATCH)
+    // Admin: Flow 1 — Merge with existing (PATCH)
+    // ─────────────────────────────────────────────────────────────
+    public function merge(Request $request, Hospital $hospital)
+    {
+        $request->validate([
+            'target_hospital_id' => 'required|integer|exists:hospitals,id|different:hospital',
+        ]);
+
+        abort_if($hospital->is_verified, 403, 'Verified হাসপাতাল merge করা যাবে না।');
+
+        $target = Hospital::findOrFail($request->target_hospital_id);
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($hospital, $target) {
+            // ১. সব blood_requests-এর hospital_id পরিবর্তন করা
+            \App\Models\BloodRequest::where('hospital_id', $hospital->id)
+                ->update(['hospital_id' => $target->id]);
+
+            // ২. টাইপোটি target-এর aliases-এ যোগ করা (self-learning!)
+            $aliases = $target->aliases ?? [];
+            if (!in_array($hospital->name, $aliases)) {
+                $aliases[] = $hospital->name;
+                $target->update(['aliases' => $aliases]);
+            }
+
+            // ৩. আনভেরিফাইড এন্ট্রি ডিলিট
+            $hospital->delete();
+        });
+
+        Cache::flush();
+        return back()->with('success', "✅ মার্জ সম্পন্ন! '{$hospital->name}' → '{$target->name}' এ সফলভাবে মার্জ হয়েছে।");
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Admin: Flow 2 — Approve as New (PATCH)
     // ─────────────────────────────────────────────────────────────
     public function verify(Request $request, Hospital $hospital)
     {
@@ -109,20 +148,27 @@ class HospitalController extends Controller
             'is_verified' => true,
         ]);
 
-        // Search cache invalidate করা
         Cache::flush();
-
-        return back()->with('success', '✅ হাসপাতালটি ভেরিফাই করা হয়েছে।');
+        return back()->with('success', "✅ '{$hospital->name}' সফলভাবে ভেরিফাই করা হয়েছে।");
     }
 
     // ─────────────────────────────────────────────────────────────
-    // Admin: Delete a duplicate/spam unverified hospital
+    // Admin: Flow 3 — Reject & Nullify (DELETE — safe)
     // ─────────────────────────────────────────────────────────────
     public function destroy(Hospital $hospital)
     {
         abort_if($hospital->is_verified, 403, 'Verified হাসপাতাল ডিলিট করা যাবে না।');
 
+        $name = $hospital->name;
+
+        // nullOnDelete() migration constraint দ্বারা hospital_id স্বয়ংক্রিয় null হবে
+        // তবুও explicit করে null করা — extra safety layer
+        \App\Models\BloodRequest::where('hospital_id', $hospital->id)
+            ->update(['hospital_id' => null]);
+
         $hospital->delete();
-        return back()->with('success', 'হাসপাতালটি মুছে ফেলা হয়েছে।');
+        Cache::flush();
+
+        return back()->with('success', "🗑️ '{$name}' প্রত্যাখ্যান করা হয়েছে। সংশ্লিষ্ট রিকোয়েস্টগুলো অক্ষত আছে।");
     }
 }

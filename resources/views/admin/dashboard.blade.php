@@ -199,6 +199,11 @@
                     <div class="hidden sm:flex flex-wrap gap-2">
                         <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-blue-100">💬 রিপ্লাই</span>
                     </div>
+                    @if(isset($pendingSupportMessages) && $pendingSupportMessages > 0)
+                        <span class="bg-blue-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">{{ $pendingSupportMessages }} টি নতুন</span>
+                    @else
+                        <span class="bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-full">০ টি নতুন</span>
+                    @endif
                     <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-blue-100 text-blue-600': activeAccordion === 4}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </div>
@@ -245,6 +250,11 @@
                         <span class="bg-violet-50 text-violet-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-violet-100">✍️ রিভিউ</span>
                         <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-emerald-100">✅ অ্যাপ্রুভ</span>
                     </div>
+                    @if(isset($pendingBlogCount) && $pendingBlogCount > 0)
+                        <span class="bg-violet-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">{{ $pendingBlogCount }} টি পেন্ডিং</span>
+                    @else
+                        <span class="bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-full">০ টি পেন্ডিং</span>
+                    @endif
                     <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-violet-100 text-violet-600': activeAccordion === 5}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </div>
@@ -280,6 +290,7 @@
                         <span class="bg-red-50 text-red-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-red-100">🚫 Shadowban</span>
                         <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-blue-100">🔧 Point Adjust</span>
                     </div>
+                    <span class="bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-full">Live Monitor</span>
                     <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-red-100 text-red-600': activeAccordion === 6}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </div>
@@ -315,6 +326,7 @@
                         <span class="bg-red-50 text-red-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-red-100">📈 Chart</span>
                         <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-emerald-100">⬇ CSV</span>
                     </div>
+                    <span class="bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-full">Real-time</span>
                     <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-red-100 text-red-600': activeAccordion === 7}">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
                     </div>
@@ -335,9 +347,59 @@
                 </div>
             </div>
         </div>
+
+        {{-- 8) Hospital Name Verification --}}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+             :class="{'border-amber-200 ring-2 ring-amber-50': activeAccordion === 8}">
+            <button @click="activeAccordion = activeAccordion === 8 ? null : 8"
+                    @keydown.enter="activeAccordion = activeAccordion === 8 ? null : 8"
+                    @keydown.space.prevent="activeAccordion = activeAccordion === 8 ? null : 8"
+                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-amber-50/30 transition-colors focus:outline-none">
+                <div class="flex items-center gap-4 text-left">
+                    <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 8}">🏗️</div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                            <h3 class="text-lg font-extrabold text-slate-900">হাসপাতালের নাম যাচাই</h3>
+                            @if($pendingHospitals > 0)
+                                <span class="bg-amber-100 text-amber-700 text-[10px] font-black px-2 py-0.5 rounded-full border border-amber-200 animate-pulse">🟡 {{ $pendingHospitals }} পেন্ডিং</span>
+                            @else
+                                <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-100">✅ সব ক্লিয়ার</span>
+                            @endif
+                        </div>
+                        <p class="text-sm text-slate-500 font-medium">ইউজারের টাইপ করা নতুন হাসপাতালের নাম Merge, Approve বা Reject করুন</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex flex-wrap gap-2">
+                        <span class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2.5 py-1 rounded-md border border-blue-100">🔀 Merge</span>
+                        <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-emerald-100">✅ Approve</span>
+                        <span class="bg-red-50 text-red-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-red-100">🗑️ Reject</span>
+                    </div>
+                    @if($pendingHospitals > 0)
+                        <span class="bg-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">{{ $pendingHospitals }} টি পেন্ডিং</span>
+                    @endif
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-amber-100 text-amber-600': activeAccordion === 8}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </button>
+            <div x-show="activeAccordion === 8" x-collapse style="display: none;">
+                <div class="p-6 border-t border-slate-100 bg-slate-50/50">
+                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">
+                        ইউজাররা যেসব নতুন হাসপাতালের নাম টাইপ করেছে সেগুলো পর্যালোচনা করুন।
+                        টাইপো হলে মার্জ করুন, সত্যিকারের নতুন হলে অ্যাপ্রুভ করুন, স্প্যাম হলে নিরাপদে রিজেক্ট করুন।
+                    </p>
+                    <a href="{{ route('admin.hospitals.unverified') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
+                        রিভিউ প্যানেলে প্রবেশ করুন
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- 🔒 ৫. সিকিউরিটি ও অডিট প্যানেল --}}
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
         {{-- Security Radar Widget --}}
         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[400px]">

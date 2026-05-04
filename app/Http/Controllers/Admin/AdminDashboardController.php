@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\BloodRequest;
 use App\Models\BloodRequestResponse;
+use App\Models\Hospital;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\AuditLogger;
@@ -83,6 +84,9 @@ class AdminDashboardController extends Controller
         // 📬 ১০. Support Inbox
         $pendingSupportMessages = \App\Models\ContactMessage::where('status', 'new')->count();
 
+        // 🏥 ১১. Unverified Hospitals Pending Review
+        $pendingHospitals = Hospital::unverified()->count();
+
         return view('admin.dashboard', compact(
             'totalUsers',
             'totalDonors',
@@ -98,7 +102,8 @@ class AdminDashboardController extends Controller
             'recentAuditLogs',
             'todaysSecurityEventsCount',
             'recentSecurityLogs',
-            'pendingSupportMessages'
+            'pendingSupportMessages',
+            'pendingHospitals'
         ));
     }
 

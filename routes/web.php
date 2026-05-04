@@ -328,6 +328,7 @@ Route::post('/api/hospitals', [HospitalController::class, 'store'])
 // --- অ্যাডমিন হসপিটাল ম্যানেজমেন্ট ---
 Route::middleware(['auth', 'role:admin'])->prefix('admin/hospitals')->name('admin.hospitals.')->group(function () {
     Route::get('/unverified', [HospitalController::class, 'unverified'])->name('unverified');
+    Route::patch('/{hospital}/merge', [HospitalController::class, 'merge'])->name('merge');
     Route::patch('/{hospital}/verify', [HospitalController::class, 'verify'])->name('verify');
     Route::delete('/{hospital}', [HospitalController::class, 'destroy'])->name('destroy');
 });
