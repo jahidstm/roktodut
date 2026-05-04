@@ -58,6 +58,8 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         'nid_status',
         'qr_token',             // 🔐 Dynamic QR Smart Card token
         'last_login_at',
+        'spam_strikes',
+
         'welcome_back_checked',
         'last_donated_at',      // 🎯 ডাটাবেসের আসল কলাম
         'is_onboarded',
@@ -144,6 +146,11 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
     public function bloodRequestResponses(): HasMany
     {
         return $this->hasMany(BloodRequestResponse::class, 'donor_user_id');
+    }
+
+    public function reports(): HasMany
+    {
+        return $this->hasMany(BloodRequestReport::class, 'user_id');
     }
 
     public function badges(): BelongsToMany

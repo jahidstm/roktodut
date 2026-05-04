@@ -39,6 +39,9 @@ class BloodRequest extends Model
         'status',
         'notes',
         'is_phone_hidden',
+        'spam_report_count',
+        'managed_report_count',
+        'is_hidden',
     ];
 
     protected function casts(): array
@@ -48,7 +51,16 @@ class BloodRequest extends Model
             'urgency'         => UrgencyLevel::class,
             'needed_at'       => 'datetime',
             'is_phone_hidden' => 'boolean',
+            'is_hidden'       => 'boolean',
         ];
+    }
+
+    /**
+     * Reports on this request
+     */
+    public function reports()
+    {
+        return $this->hasMany(BloodRequestReport::class, 'blood_request_id');
     }
 
     /**

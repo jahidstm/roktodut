@@ -204,6 +204,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/responses/{response}/claim', [DonationClaimController::class, 'store'])->name('donations.claim');
     Route::post('/responses/{response}/recipient-verify', [DonationClaimController::class, 'verifyByRecipient'])->name('donations.recipient_verify');
     Route::post('/requests/{bloodRequest}/fulfill', [BloodRequestController::class, 'fulfill'])->name('requests.fulfill');
+    Route::post('/requests/{bloodRequest}/report', [\App\Http\Controllers\BloodRequestReportController::class, 'store'])->name('requests.report');
 
     Route::post('/requests/{bloodRequest}/donors/{donor}/reveal-phone', [DonorRevealController::class, 'revealPhone'])
         ->middleware('throttle:phone-reveal')

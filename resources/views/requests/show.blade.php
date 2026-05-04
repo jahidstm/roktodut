@@ -90,45 +90,33 @@
     </div>
 
     <x-modal name="report-blood-request" maxWidth="lg">
-        <form method="POST" action="{{ route('reports.store') }}" class="p-6">
+        <form method="POST" action="{{ route('requests.report', $bloodRequest) }}" class="p-6">
             @csrf
-            <input type="hidden" name="reportable_type" value="blood_request">
-            <input type="hidden" name="reportable_id" value="{{ $bloodRequest->id }}">
 
             <h3 class="text-lg font-extrabold text-slate-900">রিকোয়েস্ট রিপোর্ট করুন</h3>
-            <p class="mt-1 text-sm font-medium text-slate-500">ভুল তথ্য, স্প্যাম বা অপব্যবহার হলে রিপোর্ট পাঠান।</p>
+            <p class="mt-1 text-sm font-medium text-slate-500">স্প্যাম, ফেক নম্বর বা রক্ত ম্যানেজ হয়ে গেলে রিপোর্ট করুন।</p>
 
             <div class="mt-4">
-                <label for="report-category" class="block text-sm font-bold text-slate-700 mb-2">কারণ</label>
-                <select id="report-category" name="category" required class="w-full rounded-xl border-slate-300 text-sm font-semibold">
+                <label for="report-reason" class="block text-sm font-bold text-slate-700 mb-2">রিপোর্টের কারণ</label>
+                <select id="report-reason" name="reason" required class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:ring-red-500 focus:border-red-500">
                     <option value="">কারণ নির্বাচন করুন</option>
-                    <option value="fake_info">Fake info</option>
-                    <option value="harassment">Harassment</option>
-                    <option value="spam">Spam</option>
-                    <option value="inappropriate">Inappropriate</option>
-                    <option value="other">Other</option>
+                    <option value="already_managed">রক্ত ম্যানেজ হয়ে গেছে (Already Managed)</option>
+                    <option value="fake_number">ভুল নম্বর (Fake Number)</option>
+                    <option value="spam">স্প্যাম রিকোয়েস্ট (Spam)</option>
+                    <option value="abusive">খারাপ আচরণ (Abusive)</option>
                 </select>
-                @error('category')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+                @error('reason')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
             </div>
-
-            <div class="mt-4">
-                <label for="report-message" class="block text-sm font-bold text-slate-700 mb-2">বিস্তারিত (ঐচ্ছিক)</label>
-                <textarea id="report-message" name="message" rows="4" class="w-full rounded-xl border-slate-300 text-sm">{{ old('message') }}</textarea>
-                @error('message')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
-            </div>
-
-            @error('reportable_type')<p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
-            @error('reportable_id')<p class="mt-2 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
 
             <div class="mt-6 flex items-center justify-end gap-2">
                 <button type="button"
                         x-data
                         @click="$dispatch('close-modal', 'report-blood-request')"
-                        class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50">
-                    Cancel
+                        class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50 transition">
+                    বাতিল
                 </button>
-                <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-black text-white hover:bg-red-700">
-                    Submit report
+                <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-sm font-black text-white hover:bg-red-700 shadow-sm transition">
+                    রিপোর্ট সাবমিট করুন
                 </button>
             </div>
         </form>
