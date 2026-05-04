@@ -217,6 +217,7 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/profile/availability', [ProfileController::class, 'toggleEmergencyMode'])->name('donor_profile.is_available_now');
+    Route::post('/profile/toggle-hide-phone', [ProfileController::class, 'toggleHidePhone'])->name('profile.toggle.hide_phone');
 
     Route::post('/welcome-back/update', [ProfileController::class, 'welcomeBackUpdate'])->name('welcome_back.update');
     Route::post('/donor/upload-nid', [ProfileController::class, 'uploadNid'])->name('donor.upload_nid');

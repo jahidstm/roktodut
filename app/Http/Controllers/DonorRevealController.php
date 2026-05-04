@@ -44,6 +44,19 @@ class DonorRevealController extends Controller
             return $this->deny($request, (int)$donor->id, 'এই ইউজার ডোনার না।', 404);
         }
 
+        // 🛡️ Privacy Guard: ডোনার ফোন নম্বর গোপন রেখেছেন
+        if ($donor->hide_phone) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'ok'       => false,
+                    'hidden'   => true,
+                    'donor_id' => $donor->id,
+                    'message'  => '🛡️ এই ডোনার তাদের নম্বর গোপন রেখেছেন। তারা নিজে সিদ্ধান্ত নিয়ে আপনার সাথে যোগাযোগ করবেন।',
+                ], 403);
+            }
+            return back()->with('error', '🛡️ এই ডোনার তাদের নম্বর গোপন রেখেছেন।');
+        }
+
         $captchaQuestion = $mathCaptchaService->generate();
 
         if ($request->expectsJson()) {

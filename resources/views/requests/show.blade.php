@@ -52,7 +52,7 @@
             </div>
         </div>
 
-        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
             <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
                 <div class="text-xs text-slate-500 font-semibold">দরকার</div>
                 <div class="font-extrabold text-slate-800 mt-1">{{ $bloodRequest->needed_at?->format('d M, Y h:i A') ?? 'ASAP' }}</div>
@@ -60,6 +60,19 @@
             <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
                 <div class="text-xs text-slate-500 font-semibold">ব্যাগ</div>
                 <div class="font-extrabold text-slate-800 mt-1">{{ $bloodRequest->bags_needed ?? '-' }}</div>
+            </div>
+            <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
+                <div class="text-xs text-slate-500 font-semibold">যোগাযোগ</div>
+                <div class="font-extrabold text-slate-800 mt-1">
+                    @auth
+                        <a href="tel:{{ $bloodRequest->contact_number }}" class="text-red-600 hover:text-red-700 hover:underline">
+                            {{ $bloodRequest->contact_number }}
+                        </a>
+                    @else
+                        {{ substr($bloodRequest->contact_number, 0, 3) . '****' . substr($bloodRequest->contact_number, -3) }}
+                        <span class="text-[10px] text-slate-400 block mt-0.5">দেখতে <a href="{{ route('login') }}" class="text-red-500 hover:underline">লগইন</a> করুন</span>
+                    @endauth
+                </div>
             </div>
             <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
                 <div class="text-xs text-slate-500 font-semibold">স্ট্যাটাস</div>

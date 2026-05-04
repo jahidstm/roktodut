@@ -86,28 +86,45 @@
         </div>
     </div>
 
-    <div class="mt-4 rounded-xl border border-slate-200 bg-white p-3">
-        <div class="mb-3 flex items-center justify-between gap-2">
-            <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">মোবাইল নম্বর</p>
-            <p class="font-mono text-sm font-bold text-slate-800 js-phone-text">{{ $masked }}</p>
-        </div>
+    <div class="mt-4 rounded-xl border p-3 {{ $donor->hide_phone ? 'border-purple-200 bg-purple-50/60' : 'border-slate-200 bg-white' }}">
+        @if($donor->hide_phone)
+            {{-- 🛡️ Privacy Mode: নম্বর গোপন --}}
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.955 11.955 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.249-8.25-3.285Z"/>
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-extrabold text-purple-700">নম্বর সুরক্ষিত 🛡️</p>
+                    <p class="text-[11px] font-medium text-purple-500 mt-0.5 leading-tight">এই ডোনার তাদের নম্বর গোপন রেখেছেন। তারা নিজে সিদ্ধান্ত নিয়ে আপনার সাথে যোগাযোগ করবেন।</p>
+                </div>
+            </div>
+        @else
+            {{-- Normal Reveal Flow --}}
+            <div class="mb-3 flex items-center justify-between gap-2">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">মোবাইল নম্বর</p>
+                <p class="font-mono text-sm font-bold text-slate-800 js-phone-text">{{ $masked }}</p>
+            </div>
 
-        <div class="js-reveal-container">
-            <button type="button"
-                    data-reveal-start
-                    class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
-                <svg class="hidden h-4 w-4 animate-spin reveal-spinner" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"></path>
-                </svg>
-                <span class="reveal-btn-text">নম্বর দেখুন</span>
-            </button>
-        </div>
+            <div class="js-reveal-container">
+                <button type="button"
+                        data-reveal-start
+                        class="inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">
+                    <svg class="hidden h-4 w-4 animate-spin reveal-spinner" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 0 1 8-8v4a4 4 0 0 0-4 4H4z"></path>
+                    </svg>
+                    <span class="reveal-btn-text">নম্বর দেখুন</span>
+                </button>
+            </div>
 
-        <p class="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 js-inline-error {{ $showInlineError ? '' : 'hidden' }}">
-            {{ $showInlineError ? session('error') : '' }}
-        </p>
+            <p class="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 js-inline-error {{ $showInlineError ? '' : 'hidden' }}">
+                {{ $showInlineError ? session('error') : '' }}
+            </p>
+        @endif
     </div>
+
 
     <div class="mt-3 flex flex-wrap gap-2">
         @if(!empty($donor->qr_token))

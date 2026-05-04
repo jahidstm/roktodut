@@ -465,6 +465,68 @@
             @endif
         </div>
 
+        {{-- 🛡️ প্রাইভেসি ও সুরক্ষা কার্ড (ডোনারদের জন্য) --}}
+        @if(($user->role?->value ?? $user->role) === 'donor')
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl border border-purple-100 hover:border-purple-200 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden"
+             x-data="privacyToggle({{ $user->hide_phone ? 'true' : 'false' }})">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-[80px] pointer-events-none"></div>
+
+            <div class="flex items-center gap-3 mb-2 relative z-10">
+                <div class="w-10 h-10 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.955 11.955 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.249-8.25-3.285Z"/>
+                    </svg>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">প্রাইভেসি ও সুরক্ষা</h2>
+                    <p class="text-xs font-semibold text-purple-600 mt-0.5">Female Donor Protection</p>
+                </div>
+            </div>
+
+            <p class="text-sm font-medium text-slate-500 mb-6 pb-5 border-b border-slate-100 max-w-2xl relative z-10">
+                নিজের ফোন নম্বর পাবলিক সার্চে গোপন রাখুন। চালু করলে কেউ আপনার নম্বর দেখতে পাবে না — আপনি নিজে সিদ্ধান্ত নিয়ে রোগীর সাথে যোগাযোগ করবেন।
+            </p>
+
+            <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+                {{-- Status Info --}}
+                <div class="flex items-start gap-4 flex-1">
+                    <div class="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 transition-all duration-300"
+                         :class="isHidden ? 'bg-purple-100 text-purple-600' : 'bg-slate-100 text-slate-500'">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <template x-if="isHidden">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88"/>
+                            </template>
+                            <template x-if="!isHidden">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z"/>
+                            </template>
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="font-extrabold text-slate-800 text-sm" x-text="isHidden ? '🛡️ নম্বর গোপন — সুরক্ষিত মোড চালু' : '👁️ নম্বর দৃশ্যমান — যে কেউ দেখতে পাবে'"></p>
+                        <p class="text-xs text-slate-500 font-medium mt-1 max-w-sm" x-text="isHidden ? 'সার্চ পেজে আপনার কার্ডে নম্বর দেখানো হবে না। আপনি নিজে পছন্দ করে রোগীর সাথে যোগাযোগ করবেন।' : 'সার্চ পেজে আপনার নম্বর ম্যাথ ক্যাপচার মাধ্যমে দেখা যাবে।'"></p>
+                    </div>
+                </div>
+
+                {{-- Toggle Button --}}
+                <button type="button"
+                        @click="toggle"
+                        :disabled="isLoading"
+                        class="shrink-0 relative inline-flex h-8 w-14 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 disabled:opacity-60"
+                        :class="isHidden ? 'bg-purple-600' : 'bg-slate-200'">
+                    <span class="inline-block h-6 w-6 transform rounded-full bg-white shadow-lg transition-transform duration-300"
+                          :class="isHidden ? 'translate-x-7' : 'translate-x-1'"></span>
+                </button>
+            </div>
+
+            {{-- Toast Feedback --}}
+            <div x-show="toast" x-transition x-cloak
+                 class="mt-4 p-3 rounded-xl text-sm font-bold relative z-10"
+                 :class="toastType === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'"
+                 x-text="toastMsg">
+            </div>
+        </div>
+        @endif
+
         {{-- ৭. পাসওয়ার্ড পরিবর্তন কার্ড --}}
         <div class="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200 hover:border-slate-300 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300">
             <div class="flex items-center gap-3 mb-8 border-b border-slate-100 pb-5">
@@ -609,6 +671,41 @@
                     },
                     { enableHighAccuracy: true, timeout: 15000 }
                 );
+            }
+        }));
+
+        Alpine.data('privacyToggle', (initial) => ({
+            isHidden: initial,
+            isLoading: false,
+            toast: false,
+            toastMsg: '',
+            toastType: 'success',
+
+            async toggle() {
+                this.isLoading = true;
+                try {
+                    const res = await axios.post('{{ route('profile.toggle.hide_phone') }}', {}, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                        }
+                    });
+                    if (res.data.success) {
+                        this.isHidden = res.data.hide_phone;
+                        this.showToast(res.data.message, 'success');
+                    }
+                } catch (e) {
+                    this.showToast('সমস্যা হয়েছে। আবার চেষ্টা করুন।', 'error');
+                } finally {
+                    this.isLoading = false;
+                }
+            },
+
+            showToast(msg, type) {
+                this.toastMsg = msg;
+                this.toastType = type;
+                this.toast = true;
+                setTimeout(() => { this.toast = false; }, 3500);
             }
         }));
     });

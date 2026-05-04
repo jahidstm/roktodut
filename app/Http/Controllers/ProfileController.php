@@ -132,6 +132,32 @@ class ProfileController extends Controller
     }
 
     /**
+     * 🛡️ Phone Privacy টগল (hide_phone)
+     */
+    public function toggleHidePhone(Request $request)
+    {
+        $user = $request->user();
+        $user->hide_phone = !$user->hide_phone;
+        $user->save();
+
+        $msg = $user->hide_phone
+            ? '🛡️ নম্বর সুরক্ষিত! এখন থেকে সার্চ পেজে আপনার নম্বর কেউ দেখতে পাবে না।'
+            : '👁️ নম্বর দৃশ্যমান করা হয়েছে। ম্যাথ ক্যাপচার মাধ্যমে দেখা যাবে।';
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success'    => true,
+                'hide_phone' => (bool) $user->hide_phone,
+                'message'    => $msg,
+            ]);
+        }
+
+        return Redirect::route('profile.edit')
+            ->with('status', 'profile-updated')
+            ->with('success_msg', $msg);
+    }
+
+    /**
      * Welcome Back স্ট্যাটাস আপডেট
      */
     public function welcomeBackUpdate(Request $request): RedirectResponse
