@@ -4,9 +4,15 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
+    <meta name="theme-color" content="#dc2626" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="রক্তদূত" />
     <title>@yield('title', 'রক্তদূত')</title>
-
+    <link rel="manifest" href="/manifest.json" />
     <link rel="icon" href="{{ asset('images/image_14.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ asset('images/image_14.png') }}">
     {{-- JS globals for Alpine + Echo (auth'd users only) --}}
     @auth
     <script>
@@ -350,6 +356,97 @@
     </script>
 
     @include('layouts.chatbot-widget')
+
+    {{-- 📱 PWA: Install Prompt Banner --}}
+    <div id="pwa-install-banner"
+         style="display:none;"
+         class="fixed bottom-0 left-0 right-0 z-[9990] p-4 sm:p-0 sm:bottom-6 sm:right-6 sm:left-auto">
+        <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 sm:p-5 sm:w-80 flex items-start gap-4">
+            <div class="shrink-0 w-12 h-12 rounded-xl overflow-hidden border border-slate-100">
+                <img src="/images/image_14.png" alt="রক্তদূত" class="w-full h-full object-contain p-1">
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="font-black text-slate-900 text-sm leading-tight">রক্তদূত ইনস্টল করুন</p>
+                <p class="text-xs text-slate-500 font-medium mt-0.5 leading-snug">হোম স্ক্রিনে যোগ করুন — অফলাইনেও কাজ করবে!</p>
+                <div class="flex items-center gap-2 mt-3">
+                    <button id="pwa-install-btn"
+                            class="flex-1 bg-red-600 hover:bg-red-700 text-white text-xs font-black py-2 px-3 rounded-lg transition-colors">
+                        ইনস্টল করুন
+                    </button>
+                    <button id="pwa-dismiss-btn"
+                            class="text-xs text-slate-400 hover:text-slate-600 font-bold transition-colors">
+                        পরে
+                    </button>
+                </div>
+            </div>
+            <button id="pwa-close-btn" class="shrink-0 text-slate-300 hover:text-slate-500 transition-colors -mt-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+    </div>
+
+    {{-- 📱 PWA: Service Worker Registration + Install Prompt Logic --}}
+    <script>
+    (() => {
+        // ১. Service Worker রেজিস্ট্রেশন
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                    .then(reg => console.log('[SW] Registered:', reg.scope))
+                    .catch(err => console.warn('[SW] Registration failed:', err));
+            });
+        }
+
+        // ২. Install Prompt (beforeinstallprompt event)
+        let deferredPrompt = null;
+        const banner    = document.getElementById('pwa-install-banner');
+        const installBtn = document.getElementById('pwa-install-btn');
+        const dismissBtn = document.getElementById('pwa-dismiss-btn');
+        const closeBtn  = document.getElementById('pwa-close-btn');
+
+        // ইতিমধ্যে install হয়েছে বা dismiss করা হয়েছে → দেখাবো না
+        const dismissed = sessionStorage.getItem('pwa_dismissed');
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+                          || window.navigator.standalone === true;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+
+            if (!dismissed && !isStandalone) {
+                setTimeout(() => {
+                    banner.style.display = 'block';
+                }, 3000); // 3 সেকেন্ড পর দেখাবে
+            }
+        });
+
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    banner.style.display = 'none';
+                }
+                deferredPrompt = null;
+            });
+        }
+
+        const hideBanner = () => {
+            if (banner) banner.style.display = 'none';
+            sessionStorage.setItem('pwa_dismissed', '1');
+        };
+
+        if (dismissBtn) dismissBtn.addEventListener('click', hideBanner);
+        if (closeBtn) closeBtn.addEventListener('click', hideBanner);
+
+        // ৩. App install হলে banner hide করা
+        window.addEventListener('appinstalled', () => {
+            banner.style.display = 'none';
+            console.log('[PWA] App installed successfully!');
+        });
+    })();
+    </script>
 
 </body>
 </html>

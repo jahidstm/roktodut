@@ -412,6 +412,7 @@ class BloodRequestController extends Controller
 
         $accepted = $bloodRequest->responses->where('status', 'accepted')->values();
         $declined = $bloodRequest->responses->where('status', 'declined')->values();
+        $pending = $bloodRequest->responses->where('status', 'pending')->values();
 
         $canViewAcceptedDonors = $request->user()?->can('viewAcceptedDonors', $bloodRequest) ?? false;
 
@@ -419,7 +420,9 @@ class BloodRequestController extends Controller
             'bloodRequest' => $bloodRequest,
             'acceptedCount' => $accepted->count(),
             'declinedCount' => $declined->count(),
+            'pendingCount' => $pending->count(),
             'acceptedResponses' => $canViewAcceptedDonors ? $accepted : collect(),
+            'pendingResponses' => $canViewAcceptedDonors ? $pending : collect(),
             'canViewAcceptedDonors' => $canViewAcceptedDonors,
         ]);
     }

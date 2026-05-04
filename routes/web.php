@@ -31,6 +31,8 @@ use App\Http\Controllers\Admin\SupportMessageController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\AuditLogController;
+use App\Http\Controllers\TelegramController;
+use App\Http\Controllers\PwaController;
 use App\Models\Division;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -42,9 +44,19 @@ Route::get('/verify/{token}', [PublicVerificationController::class, 'show'])
     ->middleware('throttle:60,1')
     ->name('public.verify');
 
+// ─────────────────────────────────────────────────────────────────────────
+// 🤖 Telegram Bot Webhook (NO auth — Telegram সার্ভার থেকে আসে)
+// ─────────────────────────────────────────────────────────────────────────
+Route::post('/telegram/webhook', [TelegramController::class, 'webhook'])
+    ->name('telegram.webhook')
+    ->withoutMiddleware(['web']);
+
 
 
 // --- ১. পাবলিক রাউটস (No Login Required) ---
+
+// 📱 PWA Offline Fallback
+Route::get('/offline', [PwaController::class, 'offline'])->name('pwa.offline');
 
 Route::get('/', function () {
     $divisions  = \App\Models\Division::all();
@@ -214,7 +226,12 @@ Route::middleware(['auth'])->group(function () {
 
     // 📍 Geospatial: ডোনারের GPS লোকেশন সেভ করা
     Route::post('/profile/location', [ProfileController::class, 'updateLocation'])->name('profile.location.update');
+
+    // 🤖 Telegram Bot: কানেক্ট ও ডিসকানেক্ট
+    Route::get('/telegram/connect', [TelegramController::class, 'generateConnectLink'])->name('telegram.connect');
+    Route::post('/telegram/disconnect', [TelegramController::class, 'disconnect'])->name('telegram.disconnect');
 });
+
 
 // --- ৫. ড্যাশবোর্ড রাউটস (রোল ভিত্তিক) ---
 Route::get('/dashboard', [DashboardController::class, 'index'])

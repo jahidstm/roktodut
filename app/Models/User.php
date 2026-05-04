@@ -67,7 +67,12 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         'provider_id',
         'is_shadowbanned',
         'opt_out_org_broadcast',
+        // 🤖 Telegram
+        'telegram_chat_id',
+        'telegram_connected_at',
+        'telegram_verify_token',
     ];
+
 
     protected $hidden = [
         'password',
