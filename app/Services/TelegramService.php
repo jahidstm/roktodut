@@ -120,4 +120,31 @@ MSG;
 
         return $this->send($chatId, $text);
     }
+    // ─────────────────────────────────────────────────────────────
+    // 🚨 ওয়ান-ওয়ে হ্যান্ডশেক: ডোনারের নম্বর রোগীর Telegram-এ পুশ করা
+    // ─────────────────────────────────────────────────────────────
+    public function sendDonorPingToRequester(
+        string|int $requesterChatId,
+        string $donorName,
+        string $donorBloodGroup,
+        string $donorPhone,
+        string $requestUrl
+    ): bool {
+        $text = <<<MSG
+🚨 <b>জরুরি: একজন রক্তদাতা আপনার রিকোয়েস্টে সাড়া দিয়েছেন!</b>
+
+👤 <b>দাতা:</b> {$donorName}
+🩸 <b>গ্রুপ:</b> {$donorBloodGroup}
+
+📞 <b>এখনই কল দিন:</b> <code>{$donorPhone}</code>
+
+<i>এই নম্বরে কল করুন এবং দাতাকে আসার ব্যবস্থা করুন। দাতার সাথে হাসপাতালের ঠিকানা শেয়ার করুন।</i>
+
+👉 <a href="{$requestUrl}">রিকোয়েস্ট ডিটেইলস দেখুন</a>
+
+<i>— রক্তদূত প্ল্যাটফর্ম</i>
+MSG;
+
+        return $this->send($requesterChatId, $text);
+    }
 }

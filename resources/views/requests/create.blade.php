@@ -203,6 +203,26 @@
                 </div>
             </div>
 
+            {{-- 🛡️ ওয়ান-ওয়ে হ্যান্ডশেক: প্রাইভেসি অপশন --}}
+            <div class="rounded-2xl border border-purple-200 bg-purple-50 p-4 flex items-start gap-4">
+                <div class="pt-0.5 shrink-0">
+                    <input type="checkbox" name="is_phone_hidden" id="is_phone_hidden" value="1"
+                           class="h-5 w-5 rounded border-purple-300 text-purple-600 focus:ring-purple-500 cursor-pointer"
+                           {{ old('is_phone_hidden') ? 'checked' : '' }}>
+                </div>
+                <label for="is_phone_hidden" class="cursor-pointer">
+                    <p class="font-extrabold text-purple-900 text-sm">🛡️ আমার নম্বর ফিডে গোপন রাখুন</p>
+                    <p class="text-xs text-purple-700 font-medium mt-1">
+                        চালু করলে ফিডে শুধু "রক্ত দিতে চাই" বাটন দেখাবে। ডোনার ক্লিক করার সাথে সাথে সার্ভার সরাসরি আপনার Telegram-এ ডোনারের ফোন নম্বর পাঠিয়ে দেবে — আপনাকে অ্যাপ খুলতে হবে না।
+                    </p>
+                    @if(!auth()->user()->telegram_chat_id)
+                        <p class="text-xs text-amber-700 font-bold mt-1.5 bg-amber-50 border border-amber-200 rounded-lg px-2 py-1">
+                            ⚠️ এই ফিচার ব্যবহার করতে প্রথমে <a href="{{ route('profile.edit') }}" class="underline">প্রোফাইলে</a> Telegram কানেক্ট করুন।
+                        </p>
+                    @endif
+                </label>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                     <label class="text-sm font-extrabold text-slate-800">জরুরিতা <span class="text-red-500">*</span></label>
@@ -261,6 +281,8 @@
     </div>
 </div>
 
+@endsection
+
 @push('scripts')
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLs=" crossorigin=""></script>
@@ -270,6 +292,24 @@ document.addEventListener('DOMContentLoaded', function () {
     const neededAtInput = document.getElementById('needed_at');
     const note = document.getElementById('urgency-threshold-note');
 
+    function updateUrgencyAvailability() {
+        if (!neededAtInput.value) return;
+
+        const neededAt = new Date(neededAtInput.value);
+        const now = new Date();
+        const diffHours = (neededAt - now) / (1000 * 60 * 60);
+
+        const normalOption = Array.from(urgencySelect.options).find(opt => opt.value === 'normal');
+        const disableEmergency = diffHours > 24;
+        const disableUrgent = diffHours > 72;
+
+        Array.from(urgencySelect.options).forEach(opt => {
+            if (opt.value === 'emergency') opt.disabled = disableEmergency;
+            if (opt.value === 'urgent') opt.disabled = disableUrgent;
+        });
+
+        if (urgencySelect.value === 'emergency' && disableEmergency) {
+            urgencySelect.value = normalOption ? 'normal' : '';
         }
 
         if (urgencySelect.value === 'urgent' && disableUrgent) {
@@ -290,11 +330,66 @@ document.addEventListener('DOMContentLoaded', function () {
 
         note.classList.add('hidden');
         note.textContent = '';
-    };
+    }
 
     neededAtInput.addEventListener('change', updateUrgencyAvailability);
     neededAtInput.addEventListener('input', updateUrgencyAvailability);
     updateUrgencyAvailability();
+
+    // 📍 Leaflet Map Initialization
+    let map = L.map('hospital-map').setView([23.8103, 90.4125], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    let marker = null;
+    const latInput = document.getElementById('input-latitude');
+    const lngInput = document.getElementById('input-longitude');
+    const displayDiv = document.getElementById('map-coords-display');
+    const latDisplay = document.getElementById('map-lat-display');
+    const lngDisplay = document.getElementById('map-lng-display');
+
+    function setMarker(lat, lng) {
+        if (marker) map.removeLayer(marker);
+        marker = L.marker([lat, lng]).addTo(map);
+        latInput.value = lat.toFixed(6);
+        lngInput.value = lng.toFixed(6);
+        latDisplay.textContent = lat.toFixed(6);
+        lngDisplay.textContent = lng.toFixed(6);
+        displayDiv.classList.remove('hidden');
+    }
+
+    // If old values exist
+    if (latInput.value && lngInput.value) {
+        let oldLat = parseFloat(latInput.value);
+        let oldLng = parseFloat(lngInput.value);
+        setMarker(oldLat, oldLng);
+        map.setView([oldLat, oldLng], 15);
+    }
+
+    map.on('click', function(e) {
+        setMarker(e.latlng.lat, e.latlng.lng);
+    });
+
+    document.getElementById('use-my-location').addEventListener('click', function() {
+        if (!navigator.geolocation) {
+            alert('আপনার ব্রাউজার লোকেশন সাপোর্ট করে না।');
+            return;
+        }
+        const originalText = this.innerHTML;
+        this.innerHTML = 'খুঁজছি...';
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                setMarker(position.coords.latitude, position.coords.longitude);
+                map.setView([position.coords.latitude, position.coords.longitude], 15);
+                this.innerHTML = originalText;
+            },
+            () => {
+                alert('লোকেশন পাওয়া যায়নি। দয়া করে ম্যাপে ক্লিক করে পিন বসান।');
+                this.innerHTML = originalText;
+            }
+        );
+    });
 });
 </script>
 
@@ -351,7 +446,6 @@ function hospitalAutocomplete(initialId = null, initialDisplay = '') {
             this.results    = [];
         },
 
-        // নতুন হসপিটাল: API-এ POST করে ID নিয়ে নেওয়া
         async createNew() {
             const name = this.query.trim();
             if (!name) return;
@@ -385,7 +479,6 @@ function hospitalAutocomplete(initialId = null, initialDisplay = '') {
         },
 
         handleBlur() {
-            // 200ms পর বন্ধ করা (mousedown event আগে যেন fire হতে পারে)
             setTimeout(() => { this.open = false; }, 200);
         },
 
@@ -407,5 +500,5 @@ function hospitalAutocomplete(initialId = null, initialDisplay = '') {
     };
 }
 </script>
-@endsection
+@endpush
 

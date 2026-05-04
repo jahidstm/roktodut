@@ -272,6 +272,7 @@ class BloodRequestController extends Controller
         }
 
         $data['status'] = 'pending';
+        $data['is_phone_hidden'] = $request->boolean('is_phone_hidden');
 
         // ১. রিকোয়েস্ট সেভ করা
         $bloodRequest = BloodRequest::create($data);
@@ -291,8 +292,12 @@ class BloodRequestController extends Controller
             );
         }
 
+        $successMsg = $data['is_phone_hidden']
+            ? '🛡️ আপনার রিকোয়েস্ট তৈরি হয়েছে! নম্বর গোপন রাখা হয়েছে — ডোনাররা সরাসরি আপনার Telegram-এ নিজের নম্বর পাঠাবে।'
+            : 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে এবং ' . $donors->count() . ' জন ডোনারকে অ্যালার্ট পাঠানো হয়েছে।';
+
         return redirect()->route('requests.show', $bloodRequest)
-            ->with('success', 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে এবং ' . $donors->count() . ' জন ডোনারকে অ্যালার্ট পাঠানো হয়েছে।');
+            ->with('success', $successMsg);
     }
 
     /**

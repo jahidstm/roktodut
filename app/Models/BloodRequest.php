@@ -38,14 +38,16 @@ class BloodRequest extends Model
         'needed_at',
         'status',
         'notes',
+        'is_phone_hidden',
     ];
 
     protected function casts(): array
     {
         return [
-            'blood_group' => BloodGroup::class,
-            'urgency'     => UrgencyLevel::class,
-            'needed_at'   => 'datetime',
+            'blood_group'     => BloodGroup::class,
+            'urgency'         => UrgencyLevel::class,
+            'needed_at'       => 'datetime',
+            'is_phone_hidden' => 'boolean',
         ];
     }
 

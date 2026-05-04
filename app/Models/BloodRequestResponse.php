@@ -14,17 +14,21 @@ class BloodRequestResponse extends Model
         'blood_request_id',
         'user_id',
         'status',
-        'verification_pin',    // 🚀 নতুন কলাম
-        'proof_image_path',   // 🚀 নতুন কলাম
-        'verification_status', // 🚀 নতুন কলাম
-        'donor_claimed_at',    // 🚀 নতুন কলাম
+        'verification_pin',
+        'proof_image_path',
+        'verification_status',
+        'donor_claimed_at',
         'fulfilled_at',
         'fulfilled_by',
+        'is_ping_sent',
+        'pinged_at',
     ];
 
     protected $casts = [
         'donor_claimed_at' => 'datetime',
-        'fulfilled_at' => 'datetime',
+        'fulfilled_at'     => 'datetime',
+        'pinged_at'        => 'datetime',
+        'is_ping_sent'     => 'boolean',
     ];
 
     /**

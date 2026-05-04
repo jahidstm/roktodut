@@ -64,14 +64,15 @@
             <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
                 <div class="text-xs text-slate-500 font-semibold">যোগাযোগ</div>
                 <div class="font-extrabold text-slate-800 mt-1">
-                    @auth
+                    @if($bloodRequest->is_phone_hidden)
+                        <span class="inline-flex items-center gap-1 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-200 rounded-full px-2 py-0.5">
+                            🛡️ সুরক্ষিত মোড — ডোনাররা Telegram-এ পাঠাবে
+                        </span>
+                    @else
                         <a href="tel:{{ $bloodRequest->contact_number }}" class="text-red-600 hover:text-red-700 hover:underline">
                             {{ $bloodRequest->contact_number }}
                         </a>
-                    @else
-                        {{ substr($bloodRequest->contact_number, 0, 3) . '****' . substr($bloodRequest->contact_number, -3) }}
-                        <span class="text-[10px] text-slate-400 block mt-0.5">দেখতে <a href="{{ route('login') }}" class="text-red-500 hover:underline">লগইন</a> করুন</span>
-                    @endauth
+                    @endif
                 </div>
             </div>
             <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
@@ -171,6 +172,22 @@
             @if (Route::has('requests.respond') && !$isOwner && strtolower($bloodRequest->status) !== 'fulfilled')
                 @if (!$myResponse)
                     @if(auth()->check() && auth()->user()->is_eligible_to_donate)
+
+                        @if($bloodRequest->is_phone_hidden)
+                        {{-- 🚨 UNIDIRECTIONAL PUSH: ক্লিক করলেই রোগীর Telegram-এ পিং যাবে --}}
+                        <form method="POST" action="{{ route('requests.respond', $bloodRequest) }}">
+                            @csrf
+                            <input type="hidden" name="status" value="pending" />
+                            <button class="px-8 py-3 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-black shadow-sm transition flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                                রক্ত দিতে চাই (রোগীকে পিং করুন)
+                            </button>
+                        </form>
+                        <p class="text-xs text-purple-700 font-semibold bg-purple-50 border border-purple-100 rounded-lg px-3 py-2">
+                            🛡️ ক্লিক করলে আপনার নম্বর সরাসরি রোগীর Telegram-এ পৌঁছাবে — কোনো অপেক্ষা নেই।
+                        </p>
+
+                        @else
                         <form method="POST" action="{{ route('requests.respond', $bloodRequest) }}">
                             @csrf
                             <input type="hidden" name="status" value="pending" />
@@ -178,12 +195,15 @@
                                 রক্ত দিতে চাই (Send Request)
                             </button>
                         </form>
+                        @endif
+
                     @else
                         <button disabled title="আপনি রক্তদানের যোগ্য নন" class="px-8 py-3 rounded-xl bg-slate-200 text-slate-400 font-black cursor-not-allowed border border-slate-300">
                             রক্ত দিতে চাই
                         </button>
                     @endif
 
+                    @if(!$bloodRequest->is_phone_hidden)
                     <form method="POST" action="{{ route('requests.respond', $bloodRequest) }}">
                         @csrf
                         <input type="hidden" name="status" value="declined" />
@@ -191,6 +211,16 @@
                             Decline
                         </button>
                     </form>
+                    @endif
+
+                @elseif ($myResponse->status === 'contacted')
+                    <div class="flex items-center gap-4">
+                        <span class="px-6 py-3 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 font-black flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            পিং পাঠানো হয়েছে — রোগী Telegram-এ আপনার নম্বর পেয়েছেন
+                        </span>
+                    </div>
+
                 @elseif ($myResponse->status === 'pending')
                     <div class="flex items-center gap-4">
                         <span class="px-6 py-3 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 font-black flex items-center gap-2">

@@ -88,17 +88,16 @@
         <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 sm:col-span-2 flex items-center justify-between">
             <div>
                 <p class="text-[11px] font-semibold text-slate-500">যোগাযোগ</p>
-                <p class="mt-0.5 text-sm font-bold text-slate-800">
-                    @auth
+                @if($request->is_phone_hidden)
+                    <p class="mt-0.5 text-xs font-bold text-purple-700 flex items-center gap-1">
+                        🛡️ নম্বর সুরক্ষিত — ডোনাররা সরাসরি টেলিগ্রামে পাঠাবে
+                    </p>
+                @else
+                    <p class="mt-0.5 text-sm font-bold text-slate-800">
                         <a href="tel:{{ $request->contact_number }}" class="text-red-600 hover:underline">{{ $request->contact_number }}</a>
-                    @else
-                        {{ substr($request->contact_number, 0, 3) . '****' . substr($request->contact_number, -3) }}
-                    @endauth
-                </p>
+                    </p>
+                @endif
             </div>
-            @guest
-                <a href="{{ route('login') }}" class="text-[10px] bg-red-50 text-red-600 font-bold px-2 py-1 rounded border border-red-100 hover:bg-red-100 transition">লগইন করুন</a>
-            @endguest
         </div>
     </div>
 

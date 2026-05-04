@@ -36,6 +36,7 @@ class StoreBloodRequestRequest extends FormRequest
             'urgency'        => ['required', Rule::enum(UrgencyLevel::class)],
             'needed_at'      => ['required', 'date'],
             'notes'          => ['nullable', 'string', 'max:1000'],
+            'is_phone_hidden' => ['sometimes', 'boolean'],
         ];
     }
 
