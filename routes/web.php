@@ -39,12 +39,18 @@ use App\Models\Division;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\SmartCardImageController;
+
 // ─────────────────────────────────────────────────────────────────────────
 // 🔐 Dynamic QR Smart Card — Public Verification (NO auth middleware)
 // ─────────────────────────────────────────────────────────────────────────
 Route::get('/verify/{token}', [PublicVerificationController::class, 'show'])
     ->middleware('throttle:60,1')
     ->name('public.verify');
+Route::get('/verify/{token}/download-pass', [SmartCardImageController::class, 'downloadPass'])
+    ->name('public.verify.download');
+Route::get('/verify/{token}/og-image.png', [SmartCardImageController::class, 'socialOg'])
+    ->name('public.verify.og');
 
 // ─────────────────────────────────────────────────────────────────────────
 // 🤖 Telegram Bot Webhook (NO auth — Telegram সার্ভার থেকে আসে)

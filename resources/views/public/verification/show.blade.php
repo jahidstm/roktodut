@@ -8,7 +8,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-
+    
+    <!-- Open Graph for Social Sharing -->
+    <meta property="og:title" content="{{ $name }} - ভেরিফাইড রক্তদাতা | রক্তদূত">
+    <meta property="og:description" content="রক্তদূতের একজন ভেরিফাইড রক্তদাতা। রক্তের প্রয়োজনে প্রোফাইলটি দেখতে ক্লিক করুন।">
+    <meta property="og:image" content="{{ route('public.verify.og', ['token' => $qr_token]) }}">
+    <meta property="og:url" content="{{ route('public.verify', ['token' => $qr_token]) }}">
+    <meta property="og:type" content="profile">
+    <meta name="twitter:card" content="summary_large_image">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 

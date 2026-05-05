@@ -93,6 +93,7 @@ class PublicVerificationController extends Controller
             'availability' => $availability,   // 'available' | 'cooldown'
             'district'     => $user->district?->name ?? null,
             'verified_at'  => $user->updated_at?->format('d M Y'), // approx
+            'qr_token'     => $user->qr_token,
             // ─── নিম্নলিখিত কিছুই পাঠানো যাবে না ───
             // ❌  'phone'   => ...
             // ❌  'email'   => ...
