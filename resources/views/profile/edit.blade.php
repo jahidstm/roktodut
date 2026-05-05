@@ -140,46 +140,28 @@
         @endif
 
         @if($isDonor && $completionPercent < 100)
-            {{-- ২. প্রোফাইল কমপ্লিশন কার্ড (Premium Dark UI) --}}
-            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-3xl border border-slate-700/50 overflow-hidden shadow-xl shadow-slate-900/10 mb-10">
-                <div class="p-6 sm:p-8">
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-                                <h2 class="text-white font-extrabold text-xl tracking-wide">প্রোফাইল কমপ্লিশন</h2>
-                            </div>
-                            <p class="text-slate-400 text-sm font-medium">তথ্য সম্পূর্ণ করে আপনার প্রোফাইল শক্তিশালী করুন এবং টপ ডোনার লিস্টে যুক্ত হোন</p>
+            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl border border-slate-700/50 shadow-lg mb-10 p-5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div class="flex-1 w-full">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                            <h2 class="text-white font-bold text-lg">প্রোফাইল কমপ্লিশন</h2>
                         </div>
-                        <div class="flex flex-col w-full sm:w-1/3">
-                            <div class="flex justify-between items-end mb-2">
-                                <span class="text-slate-400 text-xs font-bold uppercase tracking-wider">Progress</span>
-                                <span class="text-2xl font-black text-white">{{ $completionPercent }}%</span>
-                            </div>
-                            <div class="w-full bg-slate-700/50 h-3 rounded-full overflow-hidden backdrop-blur-sm border border-slate-600/50">
-                                <div class="bg-gradient-to-r from-emerald-500 to-green-400 h-full transition-all duration-1000 relative" style="width: {{ $completionPercent }}%">
-                                    <div class="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
-                                </div>
-                            </div>
+                        <span class="text-sm font-black text-emerald-400">{{ $completionPercent }}% সম্পূর্ণ</span>
+                    </div>
+                    
+                    <div class="w-full bg-slate-700/50 h-2.5 rounded-full overflow-hidden mb-4 border border-slate-600/50">
+                        <div class="bg-gradient-to-r from-emerald-500 to-green-400 h-full relative transition-all duration-1000" style="width: {{ $completionPercent }}%">
+                            <div class="absolute inset-0 bg-white/20 w-full h-full animate-[shimmer_2s_infinite]"></div>
                         </div>
                     </div>
 
-                    <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                        @foreach($completionSteps as $step)
-                        <div class="flex items-center gap-3 p-3 rounded-2xl transition-all {{ $step['done'] ? 'bg-white/5 border border-white/10' : 'hover:bg-white/5 border border-transparent' }}">
-                            @if($step['done'])
-                                <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center shrink-0 border border-green-500/30">
-                                    <svg class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-                                </div>
-                                <span class="text-sm font-semibold text-slate-200">{{ $step['label'] }}</span>
-                            @else
-                                <div class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center shrink-0 border border-slate-700">
-                                    <span class="w-2 h-2 rounded-full bg-slate-600"></span>
-                                </div>
-                                <span class="text-sm font-medium text-slate-500">{{ $step['label'] }}</span>
-                                <span class="ml-auto text-xs font-bold text-slate-600 px-2.5 py-1 bg-slate-800 rounded-lg border border-slate-700">+{{ $step['weight'] }}%</span>
-                            @endif
-                        </div>
+                    <div class="flex flex-wrap gap-2 sm:gap-3">
+                        @foreach(collect($completionSteps)->filter(fn($s) => !$s['done']) as $step)
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 border border-slate-600/50 rounded-lg text-xs font-semibold text-slate-300 transition-colors cursor-default">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                {{ $step['label'] }} <span class="text-slate-500 font-bold ml-0.5">(+{{ $step['weight'] }}%)</span>
+                            </span>
                         @endforeach
                     </div>
                 </div>
@@ -464,10 +446,15 @@
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">NID ডকুমেন্টের ছবি</label>
                         <div class="relative group">
-                            <label class="flex flex-col items-center justify-center w-full h-[3.25rem] bg-slate-50/50 border-2 border-dashed border-slate-300 rounded-xl cursor-pointer hover:bg-slate-50 hover:border-red-300 transition-all">
-                                <div class="flex items-center justify-center gap-2">
-                                    <svg class="w-5 h-5 text-slate-400 group-hover:text-red-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                    <span class="text-sm font-bold text-slate-600 group-hover:text-red-600 transition-colors" id="fileNameDisplay">ফাইল নির্বাচন করুন</span>
+                            <label class="flex flex-col items-center justify-center w-full h-[3.25rem] bg-slate-50/50 border-2 border-dashed {{ $user->nid_path ? 'border-emerald-300 bg-emerald-50/50 hover:border-emerald-400' : 'border-slate-300 hover:bg-slate-50 hover:border-red-300' }} rounded-xl cursor-pointer transition-all">
+                                <div class="flex items-center justify-center gap-2 px-3 text-center">
+                                    @if($user->nid_path)
+                                        <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                        <span class="text-sm font-bold text-emerald-700 truncate" id="fileNameDisplay">ডকুমেন্ট আপলোড করা হয়েছে (পরিবর্তন করুন)</span>
+                                    @else
+                                        <svg class="w-5 h-5 text-slate-400 group-hover:text-red-500 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                                        <span class="text-sm font-bold text-slate-600 group-hover:text-red-600 transition-colors truncate" id="fileNameDisplay">ফাইল নির্বাচন করুন</span>
+                                    @endif
                                 </div>
                                 <input type="file" name="nid_document" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="document.getElementById('fileNameDisplay').textContent = this.files[0]?.name || 'ফাইল নির্বাচন করুন'">
                             </label>

@@ -157,14 +157,14 @@ class DashboardController extends Controller
             $nextMilestone = null;
             $progressPercent = 0;
             foreach ($milestones as $m) {
-                if ($totalDonationsGamification < $m['donations']) {
+                if ($totalDonations < $m['donations']) {
                     $nextMilestone = $m;
                     $prevDonations = 0;
                     foreach ($milestones as $prev) {
                         if ($prev['donations'] < $m['donations']) $prevDonations = $prev['donations'];
                     }
                     $progressPercent = $prevDonations < $m['donations']
-                        ? min(99, round(($totalDonationsGamification - $prevDonations) / ($m['donations'] - $prevDonations) * 100))
+                        ? min(99, round(($totalDonations - $prevDonations) / ($m['donations'] - $prevDonations) * 100))
                         : 100;
                     break;
                 }

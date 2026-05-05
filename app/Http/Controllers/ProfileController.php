@@ -236,6 +236,15 @@ class ProfileController extends Controller
                         taskType: 'nid_review',
                     ));
                 }
+
+                if ($user->organization_id && $user->organization && $user->organization->admin) {
+                    $user->organization->admin->notify(new AdminTaskNotification(
+                        message: "আপনার সদস্য {$user->name} নতুন NID তথ্য জমা দিয়েছে।",
+                        url: route('org.dashboard'),
+                        title: '🪪 সদস্যের NID ভেরিফিকেশন',
+                        taskType: 'member_nid_review',
+                    ));
+                }
             }
 
             // NID আপলোড করলে প্রোফাইল ১০০% হয় কিনা চেক করা

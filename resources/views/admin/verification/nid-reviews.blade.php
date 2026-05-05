@@ -10,7 +10,7 @@
                 <span class="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-lg">🪪</span>
                 NID ভেরিফিকেশন রিভিউ
             </h1>
-            <p class="text-slate-500 text-sm font-semibold mt-1">অর্গানাইজেশন-বিহীন ইউজারদের NID approve/reject করুন</p>
+            <p class="text-slate-500 text-sm font-semibold mt-1">সিস্টেমের যেকোনো ডোনারের NID approve/reject করুন</p>
         </div>
         <div class="flex items-center gap-3">
             <span class="inline-flex items-center gap-1.5 bg-blue-600 text-white text-sm font-black px-4 py-2 rounded-full shadow-sm">
@@ -48,7 +48,7 @@
 
     <div class="py-6 pb-16">
     <div class="mb-5 text-sm font-semibold text-slate-500 bg-blue-50 border border-blue-100 p-3 rounded-xl border-l-4 border-l-blue-500">
-        ℹ️ এখানে শুধুমাত্র সেইসব ইউজারদের NID দেখানো হয় যারা কোনো ক্লাব/অর্গানাইজেশনের সদস্য নন।
+        ℹ️ সিস্টেম অ্যাডমিন হিসেবে আপনি যেকোনো সাধারণ ডোনার বা অর্গানাইজেশন সদস্যের NID অ্যাপ্রুভ বা রিজেক্ট করতে পারবেন।
     </div>
 
     @if($pendingNids->isEmpty())

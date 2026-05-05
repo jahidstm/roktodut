@@ -138,7 +138,6 @@ class AdminDashboardController extends Controller
         $pendingNids = User::with('district')
             ->where('nid_status', 'pending')
             ->whereNotNull('nid_path')
-            ->whereNull('organization_id')
             ->orderBy('updated_at', 'asc')
             ->paginate(15)
             ->withQueryString();
@@ -146,7 +145,6 @@ class AdminDashboardController extends Controller
         $nidStats = [
             'total_pending' => User::where('nid_status', 'pending')
                 ->whereNotNull('nid_path')
-                ->whereNull('organization_id')
                 ->count(),
             'approved' => User::where(function ($q) {
                 $q->where('nid_status', 'approved')->orWhere('verified_badge', 1);
