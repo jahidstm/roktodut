@@ -60,11 +60,7 @@ class NotificationController extends Controller
                     'message'    => $n->data['message']    ?? 'নতুন নোটিফিকেশন',
                     'blood_group'=> $n->data['blood_group'] ?? null,
                     'urgency'    => $n->data['urgency']    ?? 'normal',
-                    'url'        => $n->data['url']        ?? (
-                        isset($n->data['request_id'])
-                            ? route('requests.show', $n->data['request_id'])
-                            : route('dashboard')
-                    ),
+                    'url'        => route('notifications.read', $n->id),
                     'read_at'    => $n->read_at?->toISOString(),
                     'time_ago'   => $n->created_at->diffForHumans(),
                 ];

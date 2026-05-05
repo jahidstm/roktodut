@@ -322,6 +322,7 @@
                     />
                     
                     {{-- 📍 Smart Geospatial Update --}}
+                    @if($isDonor)
                     <div class="mt-6 p-4 rounded-xl border border-blue-100 bg-blue-50/50 flex flex-col sm:flex-row items-center justify-between gap-4" x-data="geoUpdater()">
                         <div>
                             <p class="text-sm font-bold text-blue-900 flex items-center gap-1.5">
@@ -339,6 +340,7 @@
                             <span x-text="loading ? 'লোকেশন নেওয়া হচ্ছে...' : 'আমার লোকেশন আপডেট করুন'"></span>
                         </button>
                     </div>
+                    @endif
                 </div>
 
                 {{-- Additional Fields --}}

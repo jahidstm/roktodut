@@ -88,7 +88,7 @@ export function initNotifications(userId) {
                     message: event.message ?? 'নতুন নোটিফিকেশন',
                     blood_group: event.blood_group ?? null,
                     urgency: event.urgency ?? 'normal',
-                    url: event.url ?? '#',
+                    url: event.id ? `/notifications/${event.id}/read` : (event.url ?? '#'),
                     read_at: null,
                     time_ago: 'এইমাত্র',
                 },

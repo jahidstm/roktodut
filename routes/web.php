@@ -211,7 +211,7 @@ Route::middleware(['auth'])->group(function () {
         ->middleware('throttle:phone-reveal')
         ->name('requests.donors.reveal_phone');
 
-    Route::post('/notifications/{id}/mark-as-read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::get('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllRead'])->name('notifications.read-all');
     Route::get('/notifications/recent', [NotificationController::class, 'getRecent'])->name('notifications.recent');
 
