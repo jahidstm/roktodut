@@ -57,6 +57,12 @@ class GamificationService
             actionType: PointLog::ACTION_PROFILE_COMPLETION,
             metadata:   ['reason' => 'প্রোফাইল ১০০% সম্পূর্ণ করা হয়েছে।'],
         );
+        
+        $user->notify(new \App\Notifications\GamificationRewardNotification(
+            title: '✅ প্রোফাইল ১০০% কমপ্লিট!',
+            message: 'অভিনন্দন! আপনার প্রোফাইল সফলভাবে ১০০% সম্পূর্ণ হয়েছে। বোনাস হিসেবে আপনি ' . self::POINTS_PROFILE_COMPLETE . ' পয়েন্ট পেয়েছেন।',
+            points: self::POINTS_PROFILE_COMPLETE
+        ));
 
         Log::info("GamificationService: Profile completion bonus awarded.", ['user_id' => $user->id]);
 
@@ -174,6 +180,12 @@ class GamificationService
                 metadata:   ['blood_request_id' => $bloodRequest->id],
             );
             $this->updateMonthlyPoints($donor, self::POINTS_FIRST_RESPONDER_BONUS);
+            
+            $donor->notify(new \App\Notifications\GamificationRewardNotification(
+                title: '⚡ First Responder বোনাস!',
+                message: 'আপনি ইমার্জেন্সি রিকোয়েস্টে ৩ ঘণ্টার মধ্যে দ্রুত রেসপন্ড করে রক্তদান করায় বিশেষ ' . self::POINTS_FIRST_RESPONDER_BONUS . ' পয়েন্ট বোনাস পেয়েছেন!',
+                points: self::POINTS_FIRST_RESPONDER_BONUS
+            ));
         }
 
         // ─── ৩.৫ Midnight Savior 배지 (রাত ১২টা - ভোর ৫টা) ──────────
@@ -194,6 +206,13 @@ class GamificationService
                     actionType: PointLog::ACTION_REFERRAL_FIRST_DONATION,
                     metadata:   ['referred_donor_id' => $donor->id],
                 );
+                
+                $referrer->notify(new \App\Notifications\GamificationRewardNotification(
+                    title: '🎁 স্পেশাল রেফারেল বোনাস!',
+                    message: 'আপনার রেফার করা ব্যক্তি জীবনে প্রথমবার রক্তদান করেছেন! এই বিশেষ অর্জনের জন্য আপনি ' . self::POINTS_REFERRAL_FIRST_DONATION . ' পয়েন্ট বোনাস পেয়েছেন।',
+                    points: self::POINTS_REFERRAL_FIRST_DONATION
+                ));
+                
                 $this->checkAndAwardBadges($referrer);
             }
         }
@@ -265,6 +284,13 @@ class GamificationService
             actionType: PointLog::ACTION_REFERRAL_SIGNUP,
             metadata:   ['reason' => 'রেফারেল সাইন-আপ বোনাস'],
         );
+        
+        $referrer->notify(new \App\Notifications\GamificationRewardNotification(
+            title: '🎉 রেফারেল বোনাস অর্জিত!',
+            message: 'আপনার রেফারেল কোড ব্যবহার করে একজন নতুন বন্ধু যুক্ত হয়েছেন। আপনি ' . self::POINTS_REFERRAL_SIGNUP . ' পয়েন্ট পেয়েছেন!',
+            points: self::POINTS_REFERRAL_SIGNUP
+        ));
+        
         $this->checkAndAwardBadges($referrer);
     }
 
@@ -276,16 +302,20 @@ class GamificationService
             actionType: PointLog::ACTION_RECIPIENT_REVIEW,
             metadata:   ['reason' => 'গ্রহীতার পজিটিভ রিভিউ'],
         );
+        
+        $donor->notify(new \App\Notifications\GamificationRewardNotification(
+            title: '💬 পজিটিভ রিভিউ বোনাস!',
+            message: 'রক্তগ্রহীতা আপনার রক্তদান নিশ্চিত করেছেন এবং পজিটিভ ফিডব্যাক দিয়েছেন। আপনি ' . self::POINTS_RECIPIENT_REVIEW . ' পয়েন্ট পেয়েছেন!',
+            points: self::POINTS_RECIPIENT_REVIEW
+        ));
+        
         $this->checkAndAwardBadges($donor);
     }
 
     public function awardProfileCompletionPoints(User $user): void
     {
-        // শুধুমাত্র একবার দেওয়া হবে
-        if ($user->points === 0 || !$user->badges()->where('name', 'profile_complete_bonus')->exists()) {
-            $this->addPoints($user, self::POINTS_PROFILE_COMPLETE);
-            $this->checkAndAwardBadges($user);
-        }
+        $this->awardProfileCompletionBonus($user);
+        $this->checkAndAwardBadges($user);
     }
 
     // ==========================================
@@ -366,6 +396,13 @@ class GamificationService
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+            
+            // Send notification for badge unlock
+            $user->notify(new \App\Notifications\GamificationRewardNotification(
+                title: '🏅 নতুন ব্যাজ আনলক হয়েছে!',
+                message: "অভিনন্দন! আপনি '{$badge->name_bn}' ব্যাজটি অর্জন করেছেন।",
+                points: 0 // No points, just a badge
+            ));
         }
     }
 
