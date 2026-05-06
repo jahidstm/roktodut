@@ -4,17 +4,7 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    @if(session('success'))
-        <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800 font-bold">
-            {{ session('success') }}
-        </div>
-    @endif
 
-    @if(session('error'))
-        <div class="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-red-700 font-bold">
-            {{ session('error') }}
-        </div>
-    @endif
 
     {{-- Header Section --}}
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">

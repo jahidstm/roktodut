@@ -160,6 +160,11 @@ class BloodRequestResponseController extends Controller
             }
         });
 
+        // Send notification to the donor
+        if ($response->user) {
+            $response->user->notify(new \App\Notifications\BloodResponseNotification($bloodRequest, $request->user(), $request->status));
+        }
+
         $msg = $request->status === 'accepted'
             ? 'ডোনারকে সফলভাবে অ্যাকসেপ্ট করা হয়েছে। এখন আপনি তার ফোন নম্বর দেখতে পারবেন।'
             : 'ডোনারকে ডিক্লাইন করা হয়েছে।';

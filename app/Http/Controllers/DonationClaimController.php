@@ -107,6 +107,19 @@ class DonationClaimController extends Controller
 
                 // 🎯 গ্রহীতার রিভিউ পয়েন্ট (+১০)
                 $this->gamification->awardReviewPoints($donor);
+
+                // Send notification to the donor
+                $donor->notify(new \App\Notifications\BloodResponseNotification($bloodRequest ?? new \App\Models\BloodRequest(), Auth::user(), 'verified'));
+
+                // Auto-fulfill the Blood Request if bags needed is met
+                if ($bloodRequest) {
+                    $verifiedCount = $bloodRequest->responses()->where('verification_status', 'verified')->count();
+                    $bagsNeeded = $bloodRequest->bags_needed > 0 ? $bloodRequest->bags_needed : 1;
+                    
+                    if ($verifiedCount >= $bagsNeeded && strtolower($bloodRequest->status) !== 'fulfilled') {
+                        $bloodRequest->update(['status' => 'fulfilled']);
+                    }
+                }
             }
 
             return back()->with('success', '✅ ডোনারকে সফলভাবে ভেরিফাই করা হয়েছে। তাকে পয়েন্ট ও ব্যাজ দেওয়া হয়েছে।');
@@ -115,6 +128,11 @@ class DonationClaimController extends Controller
         if ($request->decision === 'dispute') {
             $response->update(['verification_status' => 'disputed']);
             $this->notifyAdminsForProofReview($response, 'dispute');
+            
+            if ($response->user) {
+                $response->user->notify(new \App\Notifications\BloodResponseNotification($response->bloodRequest ?? new \App\Models\BloodRequest(), Auth::user(), 'disputed'));
+            }
+
             return back()->with('error', 'অভিযোগটি গ্রহণ করা হয়েছে।');
         }
     }
@@ -164,6 +182,19 @@ class DonationClaimController extends Controller
                     isFirstResponder: $isFirstResponder,
                     isMidnightSavior: $isMidnightSavior
                 );
+
+                // Send notification to the donor
+                $donor->notify(new \App\Notifications\BloodResponseNotification($bloodRequest ?? new \App\Models\BloodRequest(), Auth::user(), 'verified'));
+
+                // Auto-fulfill the Blood Request if bags needed is met
+                if ($bloodRequest) {
+                    $verifiedCount = $bloodRequest->responses()->where('verification_status', 'verified')->count();
+                    $bagsNeeded = $bloodRequest->bags_needed > 0 ? $bloodRequest->bags_needed : 1;
+                    
+                    if ($verifiedCount >= $bagsNeeded && strtolower($bloodRequest->status) !== 'fulfilled') {
+                        $bloodRequest->update(['status' => 'fulfilled']);
+                    }
+                }
             }
 
             return back()->with('success', '✅ অ্যাপ্রুভ করা হয়েছে। ডোনারকে পয়েন্ট ও ব্যাজ দেওয়া হয়েছে।');
@@ -171,6 +202,12 @@ class DonationClaimController extends Controller
 
         if ($request->status === 'rejected') {
             $response->update(['verification_status' => 'rejected']);
+            
+            if ($response->user) {
+                // We use 'disputed' message since it essentially means rejected/invalid
+                $response->user->notify(new \App\Notifications\BloodResponseNotification($response->bloodRequest ?? new \App\Models\BloodRequest(), Auth::user(), 'disputed'));
+            }
+
             return back()->with('error', 'বাতিল করা হয়েছে।');
         }
     }

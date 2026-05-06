@@ -58,7 +58,16 @@ class BloodResponseNotification extends Notification
 
     private function buildPayload(): array
     {
-        $action = $this->status === 'accepted' ? 'এক্সেপ্ট' : 'ডিক্লাইন';
+        $message = match($this->status) {
+            'accepted' => "রোগীর পক্ষ থেকে আপনাকে ডোনার হিসেবে নির্বাচন করা হয়েছে।",
+            'verified' => "আপনার রক্তদান সফলভাবে ভেরিফাইড হয়েছে! আপনাকে পয়েন্ট এবং ব্যাজ দেওয়া হয়েছে।",
+            'disputed' => "আপনার রক্তদান ক্লেইমটি ডিসপুট করা হয়েছে। অ্যাডমিন রিভিউ করবে।",
+            'declined', 'withdrawn' => "{$this->responder->name} রিকোয়েস্ট থেকে সরে দাঁড়িয়েছেন।",
+            'rejected' => "রোগী দুঃখজনকভাবে আপনার সাড়া গ্রহণ করতে পারেননি।",
+            'pending' => "{$this->responder->name} আপনার রক্তের রিকোয়েস্টে রক্ত দিতে আগ্রহ প্রকাশ করেছেন।",
+            default => "আপনার রক্তের রিকোয়েস্টে একটি আপডেট এসেছে।"
+        };
+
         $bloodGroup = $this->bloodRequest->blood_group instanceof \App\Enums\BloodGroup
             ? $this->bloodRequest->blood_group->value
             : (string) $this->bloodRequest->blood_group;
@@ -72,7 +81,7 @@ class BloodResponseNotification extends Notification
             'responder_id' => $this->responder->id,
             'responder_name' => $this->responder->name,
             'status' => $this->status,
-            'message' => "{$this->responder->name} আপনার রক্তের রিকোয়েস্টটি {$action} করেছেন।",
+            'message' => $message,
             'blood_group' => $bloodGroup,
             'urgency' => $urgency,
             'url' => route('requests.show', $this->bloodRequest->id),

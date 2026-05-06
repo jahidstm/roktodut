@@ -198,9 +198,9 @@
             @csrf
             <div class="flex-1 md:w-48">
                 <label class="block text-xs font-bold text-slate-500 mb-1">শেষ রক্তদানের তারিখ আপডেট করুন</label>
-                <input type="date" name="last_donated_at" value="{{ $user->last_donated_at?->format('Y-m-d') }}" max="{{ date('Y-m-d') }}" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+                <input type="date" name="last_donated_at" value="{{ $user->last_donated_at?->format('Y-m-d') }}" max="{{ date('Y-m-d') }}" {{ !$isEligible && $user->last_donated_at ? 'readonly disabled' : '' }} class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700 {{ !$isEligible && $user->last_donated_at ? 'bg-slate-100 cursor-not-allowed opacity-70' : '' }}">
             </div>
-            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
+            <button type="submit" {{ !$isEligible && $user->last_donated_at ? 'disabled' : '' }} class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors {{ !$isEligible && $user->last_donated_at ? 'opacity-50 cursor-not-allowed' : '' }}">
                 সেভ
             </button>
         </form>
