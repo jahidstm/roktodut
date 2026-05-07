@@ -22,6 +22,8 @@ use App\Http\Controllers\DonationClaimController;
 use App\Http\Controllers\LeaderboardController;
 use App\Http\Controllers\PublicVerificationController;
 use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\ClaimVerificationController;
+use App\Http\Controllers\OfflineClaimController;
 
 use App\Http\Controllers\PublicBloodRequestController;
 use App\Http\Controllers\BlogController;
@@ -51,6 +53,13 @@ Route::get('/verify/{token}/download-pass', [SmartCardImageController::class, 'd
     ->name('public.verify.download');
 Route::get('/verify/{token}/og-image.png', [SmartCardImageController::class, 'socialOg'])
     ->name('public.verify.og');
+
+Route::get('/offline-verify/{claim}', [ClaimVerificationController::class, 'show'])
+    ->name('offline.verify')
+    ->middleware('signed');
+Route::post('/offline-verify/{claim}/confirm', [ClaimVerificationController::class, 'confirm'])
+    ->name('offline.confirm')
+    ->middleware('signed');
 
 // ─────────────────────────────────────────────────────────────────────────
 // 🤖 Telegram Bot Webhook (NO auth — Telegram সার্ভার থেকে আসে)
@@ -213,6 +222,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/responses/{response}/recipient-verify', [DonationClaimController::class, 'verifyByRecipient'])->name('donations.recipient_verify');
     Route::post('/requests/{bloodRequest}/fulfill', [BloodRequestController::class, 'fulfill'])->name('requests.fulfill');
     Route::post('/requests/{bloodRequest}/report', [\App\Http\Controllers\BloodRequestReportController::class, 'store'])->name('requests.report');
+    Route::post('/offline-claims', [OfflineClaimController::class, 'store'])->name('offline-claims.store');
 
     Route::post('/requests/{bloodRequest}/donors/{donor}/reveal-phone', [DonorRevealController::class, 'revealPhone'])
         ->middleware('throttle:phone-reveal')
@@ -263,6 +273,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         ->middleware('signed')
         ->name('admin.nid.image');
     Route::post('/admin/donations/{response}/verify', [DonationClaimController::class, 'adminVerify'])->name('admin.donations.verify');
+    Route::post('/admin/offline-claims/{claim}/approve', [ClaimVerificationController::class, 'adminApprove'])->name('admin.offline-claims.approve');
     Route::post('/admin/users/{user}/verify-nid', [AdminDashboardController::class, 'verifyNid'])->name('admin.nid.verify');
     Route::post('/admin/orgs/{organization}/verify', [AdminDashboardController::class, 'verifyOrg'])->name('admin.org.verify');
     Route::get('/admin/orgs/{organization}/document', [AdminDashboardController::class, 'viewOrgDocument'])->name('admin.org.document');

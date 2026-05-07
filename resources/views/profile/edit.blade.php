@@ -180,7 +180,7 @@
 
         @if($isDonor)
         {{-- ৩. অ্যাভেইলেবল স্ট্যাটাস কার্ড (Premium Alpine.js Toggle) --}}
-        <div x-data="emergencyToggle({{ $user->is_available ? 'true' : 'false' }})" 
+        <div x-data="emergencyToggle({{ ($user->is_available && $user->is_eligible_to_donate) ? 'true' : 'false' }}, {{ $user->is_eligible_to_donate ? 'false' : 'true' }})" 
              :class="isAvailable ? 'bg-gradient-to-r from-emerald-50 to-white border-emerald-200 shadow-[0_8px_30px_rgb(16,185,129,0.12)]' : 'bg-gradient-to-r from-slate-50 to-white border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)]'"
              class="rounded-3xl border p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 transition-all duration-500 relative overflow-hidden group mb-10">
             
@@ -200,16 +200,16 @@
                 <div class="flex-1">
                     <h2 :class="isAvailable ? 'text-emerald-900' : 'text-slate-800'" class="text-xl font-extrabold transition-colors">অ্যাভেইলেবল স্ট্যাটাস</h2>
                     <p :class="isAvailable ? 'text-emerald-700' : 'text-slate-500'" 
-                       x-text="isAvailable ? 'আপনি বর্তমানে রক্তদানের জন্য সম্পূর্ণ প্রস্তুত। ইমার্জেন্সি নোটিফিকেশন চালু আছে।' : 'আপনি বর্তমানে রক্তদানের জন্য এক্টিভ নন। ব্লাড রিকোয়েস্ট পেতে টগলটি চালু করুন।'"
+                       x-text="isLocked ? 'আপনি কুলডাউনে আছেন। ১২০ দিন পূর্ণ না হওয়া পর্যন্ত এই স্ট্যাটাস চালু করা যাবে না।' : (isAvailable ? 'আপনি বর্তমানে রক্তদানের জন্য সম্পূর্ণ প্রস্তুত। ইমার্জেন্সি নোটিফিকেশন চালু আছে।' : 'আপনি বর্তমানে রক্তদানের জন্য এক্টিভ নন। ব্লাড রিকোয়েস্ট পেতে টগলটি চালু করুন।')"
                        class="text-sm font-semibold mt-1 transition-colors leading-relaxed"></p>
                 </div>
             </div>
             
             <div class="shrink-0">
                 <button type="button" @click="toggleStatus" 
-                        :disabled="isLoading"
-                        :class="isAvailable ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]' : 'bg-slate-200 hover:bg-slate-300'"
-                        class="relative w-20 h-10 rounded-full transition-all duration-300 focus:outline-none disabled:opacity-50 cursor-pointer flex items-center p-1">
+                        :disabled="isLoading || isLocked"
+                        :class="isAvailable ? 'bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.4)]' : (isLocked ? 'bg-slate-200' : 'bg-slate-200 hover:bg-slate-300')"
+                        class="relative w-20 h-10 rounded-full transition-all duration-300 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer flex items-center p-1">
                     <span :class="isAvailable ? 'translate-x-10 bg-white' : 'translate-x-0 bg-white'" 
                           class="transform transition-transform duration-300 w-8 h-8 rounded-full shadow-lg flex items-center justify-center">
                           <svg x-show="isAvailable" class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
@@ -687,11 +687,16 @@
 
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('emergencyToggle', (initialStatus) => ({
+        Alpine.data('emergencyToggle', (initialStatus, lockedStatus) => ({
             isAvailable: initialStatus,
+            isLocked: lockedStatus,
             isLoading: false,
 
             async toggleStatus() {
+                if (this.isLocked) {
+                    return;
+                }
+
                 this.isLoading = true;
                 
                 try {

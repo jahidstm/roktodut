@@ -52,12 +52,12 @@ class GamificationService
         }
 
         $this->awardPoints(
-            user:       $user,
-            points:     self::POINTS_PROFILE_COMPLETE,
+            user: $user,
+            points: self::POINTS_PROFILE_COMPLETE,
             actionType: PointLog::ACTION_PROFILE_COMPLETION,
-            metadata:   ['reason' => 'প্রোফাইল ১০০% সম্পূর্ণ করা হয়েছে।'],
+            metadata: ['reason' => 'প্রোফাইল ১০০% সম্পূর্ণ করা হয়েছে।'],
         );
-        
+
         $user->notify(new \App\Notifications\GamificationRewardNotification(
             title: '✅ প্রোফাইল ১০০% কমপ্লিট!',
             message: 'অভিনন্দন! আপনার প্রোফাইল সফলভাবে ১০০% সম্পূর্ণ হয়েছে। বোনাস হিসেবে আপনি ' . self::POINTS_PROFILE_COMPLETE . ' পয়েন্ট পেয়েছেন।',
@@ -155,15 +155,19 @@ class GamificationService
 
         // ─── ১. ডোনেশন কাউন্ট ও তারিখ আপডেট ──────────────────────────
         $donor->increment('total_verified_donations');
-        $donor->update(['last_donated_at' => now()->toDateString()]);
+        $donor->update([
+            'last_donated_at' => now()->toDateString(),
+            'is_available' => false,
+        ]);
+        $this->handleReadyNowBadge($donor, false);
         $donor->refresh();
 
         // ─── ২. মূল ডোনেশন পয়েন্ট (+৫০) ──────────────────────────────
         $this->awardPoints(
-            user:       $donor,
-            points:     self::POINTS_SUCCESSFUL_DONATION,
+            user: $donor,
+            points: self::POINTS_SUCCESSFUL_DONATION,
             actionType: PointLog::ACTION_DONATION_COMPLETED,
-            metadata:   [
+            metadata: [
                 'blood_request_id' => $bloodRequest->id,
                 'blood_group'      => $bloodRequest->blood_group,
                 'district_id'      => $bloodRequest->district_id,
@@ -174,13 +178,13 @@ class GamificationService
         // ─── ৩. First Responder বোনাস (+১০) — ৩ ঘণ্টার মধ্যে রেসপন্ড ──
         if ($isFirstResponder) {
             $this->awardPoints(
-                user:       $donor,
-                points:     self::POINTS_FIRST_RESPONDER_BONUS,
+                user: $donor,
+                points: self::POINTS_FIRST_RESPONDER_BONUS,
                 actionType: PointLog::ACTION_FIRST_RESPONDER_BONUS,
-                metadata:   ['blood_request_id' => $bloodRequest->id],
+                metadata: ['blood_request_id' => $bloodRequest->id],
             );
             $this->updateMonthlyPoints($donor, self::POINTS_FIRST_RESPONDER_BONUS);
-            
+
             $donor->notify(new \App\Notifications\GamificationRewardNotification(
                 title: '⚡ First Responder বোনাস!',
                 message: 'আপনি ইমার্জেন্সি রিকোয়েস্টে ৩ ঘণ্টার মধ্যে দ্রুত রেসপন্ড করে রক্তদান করায় বিশেষ ' . self::POINTS_FIRST_RESPONDER_BONUS . ' পয়েন্ট বোনাস পেয়েছেন!',
@@ -201,21 +205,69 @@ class GamificationService
             $referrer = User::find($donor->referred_by);
             if ($referrer) {
                 $this->awardPoints(
-                    user:       $referrer,
-                    points:     self::POINTS_REFERRAL_FIRST_DONATION,
+                    user: $referrer,
+                    points: self::POINTS_REFERRAL_FIRST_DONATION,
                     actionType: PointLog::ACTION_REFERRAL_FIRST_DONATION,
-                    metadata:   ['referred_donor_id' => $donor->id],
+                    metadata: ['referred_donor_id' => $donor->id],
                 );
-                
+
                 $referrer->notify(new \App\Notifications\GamificationRewardNotification(
                     title: '🎁 স্পেশাল রেফারেল বোনাস!',
                     message: 'আপনার রেফার করা ব্যক্তি জীবনে প্রথমবার রক্তদান করেছেন! এই বিশেষ অর্জনের জন্য আপনি ' . self::POINTS_REFERRAL_FIRST_DONATION . ' পয়েন্ট বোনাস পেয়েছেন।',
                     points: self::POINTS_REFERRAL_FIRST_DONATION
                 ));
-                
+
                 $this->checkAndAwardBadges($referrer);
             }
         }
+    }
+
+    public function processOfflineDonationReward(
+        User $donor,
+        ?BloodRequest $bloodRequest,
+        Carbon $donationDate,
+        int $rewardPercentage = 100,
+    ): void {
+        $rewardPercentage = max(0, min(100, $rewardPercentage));
+        if ($rewardPercentage === 0) {
+            throw new RuntimeException('অফলাইন ডোনেশন রিওয়ার্ড পার্সেন্টেজ শূন্য হতে পারবে না।');
+        }
+
+        $this->enforceDonationCooldownForDate($donor, $donationDate);
+
+        $donor->increment('total_verified_donations');
+        $donor->update([
+            'last_donated_at' => $donationDate->toDateString(),
+            'is_available' => false,
+        ]);
+        $this->handleReadyNowBadge($donor, false);
+        $donor->refresh();
+
+        $points = (int) floor(self::POINTS_SUCCESSFUL_DONATION * ($rewardPercentage / 100));
+
+        $this->awardPoints(
+            user: $donor,
+            points: $points,
+            actionType: PointLog::ACTION_DONATION_COMPLETED,
+            metadata: [
+                'offline_claim' => true,
+                'reward_percentage' => $rewardPercentage,
+                'blood_request_id' => $bloodRequest?->id,
+                'blood_group' => $bloodRequest?->blood_group,
+                'district_id' => $bloodRequest?->district_id,
+                'donation_date' => $donationDate->toDateString(),
+            ],
+        );
+
+        $this->updateMonthlyPoints($donor, $points);
+        
+        $donor->notify(new \App\Notifications\GamificationRewardNotification(
+            title: '✅ অফলাইন রক্তদান ভেরিফাইড!',
+            message: "আপনার অফলাইন রক্তদানের ক্লেইমটি সফলভাবে ভেরিফাই হয়েছে এবং আপনি {$points} পয়েন্ট পেয়েছেন!",
+            points: $points
+        ));
+        
+        $this->checkAndAwardBadges($donor);
     }
 
     // ==========================================
@@ -257,8 +309,26 @@ class GamificationService
 
             throw new RuntimeException(
                 "অ্যান্টি-চিট: কুলডাউন এখনো শেষ হয়নি। "
-                . "পরবর্তী ডোনেশন রিওয়ার্ড পাওয়া যাবে {$daysRemaining} দিন পরে "
-                . "({$cooldownEnds->toDateString()})।"
+                    . "পরবর্তী ডোনেশন রিওয়ার্ড পাওয়া যাবে {$daysRemaining} দিন পরে "
+                    . "({$cooldownEnds->toDateString()})।"
+            );
+        }
+    }
+
+    private function enforceDonationCooldownForDate(User $donor, Carbon $targetDonationDate): void
+    {
+        if (is_null($donor->last_donated_at)) {
+            return;
+        }
+
+        $lastDonation = Carbon::parse($donor->last_donated_at)->startOfDay();
+        $cooldownEnds = $lastDonation->copy()->addDays(self::DONATION_COOLDOWN_DAYS);
+        $targetDate = $targetDonationDate->copy()->startOfDay();
+
+        if ($targetDate->lt($cooldownEnds)) {
+            throw new RuntimeException(
+                "অ্যান্টি-চিট: শেষ রক্তদানের ১২০ দিন পূর্ণ হওয়ার আগে নতুন রিওয়ার্ড দেওয়া যাবে না। "
+                    . "পরবর্তী যোগ্য তারিখ {$cooldownEnds->toDateString()}।"
             );
         }
     }
@@ -270,8 +340,8 @@ class GamificationService
     public function awardDonationPoints(User $donor, bool $isFirstResponder = false): void
     {
         $this->processDonationReward(
-            donor:            $donor,
-            bloodRequest:     new BloodRequest(), // fallback, নতুন কোডে event দিয়ে call করুন
+            donor: $donor,
+            bloodRequest: new BloodRequest(), // fallback, নতুন কোডে event দিয়ে call করুন
             isFirstResponder: $isFirstResponder,
         );
     }
@@ -279,36 +349,36 @@ class GamificationService
     public function awardReferralSignupPoints(User $referrer): void
     {
         $this->awardPoints(
-            user:       $referrer,
-            points:     self::POINTS_REFERRAL_SIGNUP,
+            user: $referrer,
+            points: self::POINTS_REFERRAL_SIGNUP,
             actionType: PointLog::ACTION_REFERRAL_SIGNUP,
-            metadata:   ['reason' => 'রেফারেল সাইন-আপ বোনাস'],
+            metadata: ['reason' => 'রেফারেল সাইন-আপ বোনাস'],
         );
-        
+
         $referrer->notify(new \App\Notifications\GamificationRewardNotification(
             title: '🎉 রেফারেল বোনাস অর্জিত!',
             message: 'আপনার রেফারেল কোড ব্যবহার করে একজন নতুন বন্ধু যুক্ত হয়েছেন। আপনি ' . self::POINTS_REFERRAL_SIGNUP . ' পয়েন্ট পেয়েছেন!',
             points: self::POINTS_REFERRAL_SIGNUP
         ));
-        
+
         $this->checkAndAwardBadges($referrer);
     }
 
     public function awardReviewPoints(User $donor): void
     {
         $this->awardPoints(
-            user:       $donor,
-            points:     self::POINTS_RECIPIENT_REVIEW,
+            user: $donor,
+            points: self::POINTS_RECIPIENT_REVIEW,
             actionType: PointLog::ACTION_RECIPIENT_REVIEW,
-            metadata:   ['reason' => 'গ্রহীতার পজিটিভ রিভিউ'],
+            metadata: ['reason' => 'গ্রহীতার পজিটিভ রিভিউ'],
         );
-        
+
         $donor->notify(new \App\Notifications\GamificationRewardNotification(
             title: '💬 পজিটিভ রিভিউ বোনাস!',
             message: 'রক্তগ্রহীতা আপনার রক্তদান নিশ্চিত করেছেন এবং পজিটিভ ফিডব্যাক দিয়েছেন। আপনি ' . self::POINTS_RECIPIENT_REVIEW . ' পয়েন্ট পেয়েছেন!',
             points: self::POINTS_RECIPIENT_REVIEW
         ));
-        
+
         $this->checkAndAwardBadges($donor);
     }
 
@@ -396,7 +466,7 @@ class GamificationService
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-            
+
             // Send notification for badge unlock
             $user->notify(new \App\Notifications\GamificationRewardNotification(
                 title: '🏅 নতুন ব্যাজ আনলক হয়েছে!',
@@ -429,7 +499,7 @@ class GamificationService
             ->notShadowbanned()
             ->where(function ($q) {
                 $q->where('total_verified_donations', '>', 0)
-                  ->orWhere('points', '>', 0);
+                    ->orWhere('points', '>', 0);
             })
             ->with(['badges', 'district']);
 
@@ -442,12 +512,12 @@ class GamificationService
         if ($time === 'month') {
             $currentMonth = now()->format('Y-m');
             $query->where('monthly_points_month', $currentMonth)
-                  ->orderByDesc('monthly_points')
-                  ->orderByDesc('total_verified_donations');
+                ->orderByDesc('monthly_points')
+                ->orderByDesc('total_verified_donations');
         } else {
             // সর্বকাল: প্রথমে ডোনেশন কাউন্ট, তারপর পয়েন্ট
             $query->orderByDesc('total_verified_donations')
-                  ->orderByDesc('points');
+                ->orderByDesc('points');
         }
 
         return $query->limit($limit)->get();

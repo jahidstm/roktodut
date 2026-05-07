@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BloodRequest;
 use App\Models\BloodRequestResponse;
 use App\Models\Hospital;
+use App\Models\OfflineDonationClaim;
 use App\Models\Post;
 use App\Models\User;
 use App\Services\AuditLogger;
@@ -121,13 +122,20 @@ class AdminDashboardController extends Controller
             ->paginate(12)
             ->withQueryString();
 
+        $offlineClaims = OfflineDonationClaim::with(['donor', 'district'])
+            ->where('status', 'admin_review')
+            ->orderByDesc('created_at')
+            ->paginate(12, ['*'], 'offline_page')
+            ->withQueryString();
+
         $reviewStats = [
             'total_pending' => BloodRequestResponse::whereIn('verification_status', ['claimed', 'disputed'])->count(),
             'claimed' => BloodRequestResponse::where('verification_status', 'claimed')->count(),
             'disputed' => BloodRequestResponse::where('verification_status', 'disputed')->count(),
+            'offline_admin_review' => OfflineDonationClaim::where('status', 'admin_review')->count(),
         ];
 
-        return view('admin.donations.proof-reviews', compact('pendingClaims', 'reviewStats'));
+        return view('admin.donations.proof-reviews', compact('pendingClaims', 'offlineClaims', 'reviewStats'));
     }
 
     /**

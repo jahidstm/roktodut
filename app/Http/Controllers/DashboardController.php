@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\BloodRequest;
 use App\Models\BloodRequestResponse;
+use App\Models\District;
 use App\Models\User;
-use App\Services\GamificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -25,8 +25,8 @@ class DashboardController extends Controller
         // "মোট রিকোয়েস্ট": Donor হলে responded requests, Recipient হলে created requests
         $totalRequestsMade = $isDonor
             ? BloodRequestResponse::where('user_id', $user->id)
-                ->distinct('blood_request_id')
-                ->count('blood_request_id')
+            ->distinct('blood_request_id')
+            ->count('blood_request_id')
             : BloodRequest::where('requested_by', $user->id)->count();
 
         // "আপনার অবদান": verified/fulfilled responses
@@ -100,6 +100,7 @@ class DashboardController extends Controller
             ->count();
 
         $livesSaved = $totalContributions * 3;
+        $districts = District::query()->orderBy('name')->get(['id', 'name']);
 
         // ৬. গ্রহীতার রিকোয়েস্টে কোনো ডোনার 'claimed' অবস্থায় আছে কি না (পপ-আপ লজিক)
         $pendingClaim = BloodRequestResponse::whereHas('bloodRequest', function ($query) use ($user) {
@@ -159,13 +160,7 @@ class DashboardController extends Controller
             foreach ($milestones as $m) {
                 if ($totalDonations < $m['donations']) {
                     $nextMilestone = $m;
-                    $prevDonations = 0;
-                    foreach ($milestones as $prev) {
-                        if ($prev['donations'] < $m['donations']) $prevDonations = $prev['donations'];
-                    }
-                    $progressPercent = $prevDonations < $m['donations']
-                        ? min(99, round(($totalDonations - $prevDonations) / ($m['donations'] - $prevDonations) * 100))
-                        : 100;
+                    $progressPercent = max(0, min(99, round(($totalDonations / $m['donations']) * 100)));
                     break;
                 }
             }
@@ -174,13 +169,17 @@ class DashboardController extends Controller
                 ->where(fn($q) => $q->where('total_verified_donations', '>', 0)->orWhere('points', '>', 0))
                 ->where(function ($q) use ($totalDonations, $currentPoints) {
                     $q->where('total_verified_donations', '>', $totalDonations)
-                      ->orWhere(fn($q2) => $q2->where('total_verified_donations', $totalDonations)->where('points', '>', $currentPoints));
+                        ->orWhere(fn($q2) => $q2->where('total_verified_donations', $totalDonations)->where('points', '>', $currentPoints));
                 })
                 ->count() + 1;
 
             $gamificationStats = compact(
-                'currentPoints', 'totalDonations', 'milestones',
-                'nextMilestone', 'progressPercent', 'myRank'
+                'currentPoints',
+                'totalDonations',
+                'milestones',
+                'nextMilestone',
+                'progressPercent',
+                'myRank'
             );
         }
 
@@ -191,7 +190,7 @@ class DashboardController extends Controller
             // Rule 2 & 3: New User Check & Inactivity Check
             // অ্যাকাউন্ট অন্তত ৩০ দিনের পুরোনো হতে হবে। LogSuccessfulLogin ইভেন্ট ৩০ দিন পর welcome_back_checked অটোমেটিক false করে।
             $accountAgeDays = $user->created_at ? $user->created_at->diffInDays(now()) : 0;
-            
+
             if ($accountAgeDays >= 30) {
                 $showInactivePopup = true;
             }
@@ -208,6 +207,7 @@ class DashboardController extends Controller
             'donationHistory',
             'successfulDonationsCount',
             'livesSaved',
+            'districts',
             'gamificationStats',
             'radarRequests',
             'showInactivePopup',

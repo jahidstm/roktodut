@@ -108,6 +108,34 @@ class ProfileController extends Controller
     public function toggleEmergencyMode(Request $request)
     {
         $user = $request->user();
+        $isInCooldown = ! $user->canDonate();
+
+        if ($isInCooldown) {
+            if ($user->is_available) {
+                $user->is_available = false;
+                $user->save();
+            }
+
+            $this->gamification->handleReadyNowBadge($user, false);
+
+            $nextEligibleDate = $user->next_eligible_date?->format('d M, Y');
+            $msg = $nextEligibleDate
+                ? "⏳ আপনি কুলডাউনে আছেন। {$nextEligibleDate} পর্যন্ত অ্যাভেইলেবল স্ট্যাটাস চালু করা যাবে না।"
+                : '⏳ আপনি কুলডাউনে আছেন। আপাতত অ্যাভেইলেবল স্ট্যাটাস চালু করা যাবে না।';
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'is_available' => false,
+                    'message' => $msg,
+                ]);
+            }
+
+            return Redirect::route('profile.edit')
+                ->with('status', 'emergency-updated')
+                ->with('emergency_msg', $msg);
+        }
+
         $user->is_available = !$user->is_available;
         $user->save();
 
@@ -163,7 +191,8 @@ class ProfileController extends Controller
     public function welcomeBackUpdate(Request $request): RedirectResponse
     {
         $user = $request->user();
-        $user->is_available         = $request->has('is_available');
+        $requestedAvailable = $request->has('is_available');
+        $user->is_available = $requestedAvailable && $user->canDonate();
         $user->welcome_back_checked = true;
         $user->save();
 

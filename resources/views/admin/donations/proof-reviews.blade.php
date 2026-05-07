@@ -22,7 +22,7 @@
         </div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
         <div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
             <div class="text-xl mb-1">⏳</div>
             <div class="text-2xl font-extrabold text-slate-900">{{ $reviewStats['total_pending'] }}</div>
@@ -37,6 +37,11 @@
             <div class="text-xl mb-1">🔴</div>
             <div class="text-2xl font-extrabold text-slate-900">{{ $reviewStats['disputed'] }}</div>
             <div class="text-xs text-slate-500 font-semibold mt-0.5">Disputed</div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-xl p-4 text-center shadow-sm">
+            <div class="text-xl mb-1">🧾</div>
+            <div class="text-2xl font-extrabold text-slate-900">{{ $reviewStats['offline_admin_review'] }}</div>
+            <div class="text-xs text-slate-500 font-semibold mt-0.5">Offline Admin Review</div>
         </div>
     </div>
 
@@ -133,6 +138,65 @@
             </div>
         @endif
     @endif
+    </div>
+
+    <div class="mt-8 py-6 pb-16">
+        <h2 class="text-xl font-extrabold text-slate-900 mb-4">অফলাইন ক্লেইম (Admin Review)</h2>
+
+        @if($offlineClaims->isEmpty())
+            <div class="bg-white rounded-3xl border border-slate-200 p-10 text-center">
+                <p class="font-semibold text-slate-600">অফলাইন admin_review ক্লেইম নেই।</p>
+            </div>
+        @else
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                @foreach($offlineClaims as $claim)
+                    <article class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+                        <div class="flex items-center justify-between mb-3">
+                            <p class="text-xs font-black uppercase tracking-wider text-slate-500">Claim #{{ $claim->id }}</p>
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-800">
+                                admin_review
+                            </span>
+                        </div>
+
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between gap-2">
+                                <span class="text-slate-500 font-medium">ডোনার</span>
+                                <span class="font-bold text-slate-800 text-right">{{ $claim->donor?->name ?? 'N/A' }}</span>
+                            </div>
+                            <div class="flex justify-between gap-2">
+                                <span class="text-slate-500 font-medium">রোগীর নাম</span>
+                                <span class="font-bold text-slate-800 text-right">{{ $claim->patient_name }}</span>
+                            </div>
+                            <div class="flex justify-between gap-2">
+                                <span class="text-slate-500 font-medium">রক্তদানের তারিখ</span>
+                                <span class="font-bold text-slate-800 text-right">{{ $claim->donation_date?->format('d M, Y') }}</span>
+                            </div>
+                            <div class="flex justify-between gap-2">
+                                <span class="text-slate-500 font-medium">জেলা</span>
+                                <span class="font-bold text-slate-800 text-right">{{ $claim->district?->name ?? 'N/A' }}</span>
+                            </div>
+                            <div class="flex justify-between gap-2">
+                                <span class="text-slate-500 font-medium">প্রুফ</span>
+                                <span class="font-bold {{ $claim->proof_path ? 'text-emerald-600' : 'text-red-600' }}">{{ $claim->proof_path ? 'আছে' : 'নেই' }}</span>
+                            </div>
+                        </div>
+
+                        <form action="{{ route('admin.offline-claims.approve', $claim->id) }}" method="POST" class="mt-4">
+                            @csrf
+                            <button type="submit" class="w-full bg-emerald-600 text-white py-2.5 rounded-xl text-sm font-extrabold shadow-sm hover:bg-emerald-700 transition">
+                                অ্যাপ্রুভ ({{ $claim->proof_path ? '100%' : '50%' }} পয়েন্ট)
+                            </button>
+                        </form>
+                    </article>
+                @endforeach
+            </div>
+
+            @if($offlineClaims->hasPages())
+                <div class="mt-8">
+                    {{ $offlineClaims->links() }}
+                </div>
+            @endif
+        @endif
     </div>
 </div>
 @endsection
