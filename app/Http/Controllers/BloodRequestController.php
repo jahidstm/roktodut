@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\UrgencyLevel;
 use App\Events\DonationCompleted;
 use App\Http\Requests\StoreBloodRequestRequest;
+use App\Jobs\DispatchEmergencyAlert;
 use App\Jobs\SendEmergencyBloodRequestNotificationJob;
 use App\Models\BloodRequest;
 use App\Models\BloodRequestResponse;
@@ -276,6 +277,9 @@ class BloodRequestController extends Controller
 
         // ১. রিকোয়েস্ট সেভ করা
         $bloodRequest = BloodRequest::create($data);
+
+        // ১.১ FCM push dispatch (queue)
+        DispatchEmergencyAlert::dispatch($bloodRequest)->afterCommit();
 
         // ২. জেলার নাম বের করা (নোটিফিকেশনে দেখানোর জন্য)
         $districtName = District::find($bloodRequest->district_id)->name ?? 'আপনার';

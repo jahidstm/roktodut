@@ -74,6 +74,7 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         'telegram_chat_id',
         'telegram_connected_at',
         'telegram_verify_token',
+        'fcm_token',
     ];
 
 
@@ -85,6 +86,7 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         'phone',                // Privacy Shield — সরাসরি serialize-এ দেখা যাবে না
         'email',                // Privacy Shield
         'nid_number',           // Privacy Shield
+        'fcm_token',
     ];
 
     protected function casts(): array

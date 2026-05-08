@@ -361,6 +361,88 @@
 
     @include('layouts.chatbot-widget')
 
+    @auth
+    <script type="module">
+    (() => {
+        const firebaseConfig = {
+            apiKey: "{{ config('services.firebase.api_key') }}",
+            authDomain: "{{ config('services.firebase.auth_domain') }}",
+            projectId: "{{ config('services.firebase.project_id') }}",
+            storageBucket: "{{ config('services.firebase.storage_bucket') }}",
+            messagingSenderId: "{{ config('services.firebase.messaging_sender_id') }}",
+            appId: "{{ config('services.firebase.app_id') }}",
+            measurementId: "{{ config('services.firebase.measurement_id') }}"
+        };
+
+        const vapidKey = "{{ config('services.firebase.vapid_key') }}";
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+        const updateTokenUrl = "{{ route('profile.fcm-token.update') }}";
+
+        const requiredFirebaseKeys = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
+        const hasFirebaseConfig = requiredFirebaseKeys.every((key) => {
+            const value = firebaseConfig[key];
+            return typeof value === 'string' && value.length > 0;
+        });
+        if (!hasFirebaseConfig || !vapidKey || !('Notification' in window) || !('serviceWorker' in navigator)) {
+            return;
+        }
+
+        const initFcm = async () => {
+            const [{ initializeApp }, { getMessaging, getToken, isSupported }] = await Promise.all([
+                import('https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js'),
+                import('https://www.gstatic.com/firebasejs/12.3.0/firebase-messaging.js'),
+            ]);
+
+            const supported = await isSupported();
+            if (!supported) {
+                return;
+            }
+
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') {
+                return;
+            }
+
+            const serviceWorkerRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+            const firebaseApp = initializeApp(firebaseConfig);
+            const messaging = getMessaging(firebaseApp);
+
+            const token = await getToken(messaging, {
+                vapidKey,
+                serviceWorkerRegistration,
+            });
+
+            if (!token || localStorage.getItem('fcm_token') === token) {
+                return;
+            }
+
+            const response = await fetch(updateTokenUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken,
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify({ fcm_token: token }),
+            });
+
+            if (!response.ok) {
+                throw new Error('Unable to store FCM token.');
+            }
+
+            localStorage.setItem('fcm_token', token);
+        };
+
+        window.addEventListener('load', () => {
+            initFcm().catch((error) => {
+                console.warn('[FCM] Token initialization failed:', error);
+            });
+        });
+    })();
+    </script>
+    @endauth
+
     {{-- 📱 PWA: Install Prompt Banner --}}
     <div id="pwa-install-banner"
          style="display:none;"

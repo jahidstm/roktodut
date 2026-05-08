@@ -24,6 +24,7 @@ use App\Http\Controllers\PublicVerificationController;
 use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\ClaimVerificationController;
 use App\Http\Controllers\OfflineClaimController;
+use App\Http\Controllers\FcmTokenController;
 
 use App\Http\Controllers\PublicBloodRequestController;
 use App\Http\Controllers\BlogController;
@@ -238,6 +239,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/upgrade-to-donor', [ProfileController::class, 'upgradeToDonor'])->name('profile.upgrade_to_donor');
     Route::post('/profile/availability', [ProfileController::class, 'toggleEmergencyMode'])->name('donor_profile.is_available_now');
     Route::post('/profile/toggle-hide-phone', [ProfileController::class, 'toggleHidePhone'])->name('profile.toggle.hide_phone');
+    Route::post('/profile/fcm-token', FcmTokenController::class)->name('profile.fcm-token.update');
 
     Route::post('/welcome-back/update', [ProfileController::class, 'welcomeBackUpdate'])->name('welcome_back.update');
     Route::post('/donor/upload-nid', [ProfileController::class, 'uploadNid'])->name('donor.upload_nid');
