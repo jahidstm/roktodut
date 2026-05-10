@@ -16,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
         ]);
 
+        $middleware->trustProxies(at: '*');
+
         // 🤖 Telegram webhook CSRF থেকে বাদ রাখা (Telegram server থেকে POST আসে)
         $middleware->validateCsrfTokens(except: [
             'telegram/webhook',

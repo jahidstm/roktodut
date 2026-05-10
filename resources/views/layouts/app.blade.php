@@ -403,7 +403,7 @@
                 return;
             }
 
-            const serviceWorkerRegistration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+            const serviceWorkerRegistration = await navigator.serviceWorker.register('{{ route('firebase.messaging.sw') }}');
             const firebaseApp = initializeApp(firebaseConfig);
             const messaging = getMessaging(firebaseApp);
 
