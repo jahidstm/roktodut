@@ -75,6 +75,23 @@ Route::post('/telegram/webhook', [TelegramController::class, 'webhook'])
 
 // 📱 PWA Offline Fallback
 Route::get('/offline', [PwaController::class, 'offline'])->name('pwa.offline');
+Route::get('/fcm-sw.js', function () {
+    $firebaseConfig = [
+        'apiKey' => (string) config('services.firebase.api_key', ''),
+        'authDomain' => (string) config('services.firebase.auth_domain', ''),
+        'projectId' => (string) config('services.firebase.project_id', ''),
+        'storageBucket' => (string) config('services.firebase.storage_bucket', ''),
+        'messagingSenderId' => (string) config('services.firebase.messaging_sender_id', ''),
+        'appId' => (string) config('services.firebase.app_id', ''),
+        'measurementId' => (string) config('services.firebase.measurement_id', ''),
+    ];
+
+    return response()
+        ->view('pwa.fcm-sw', ['firebaseConfig' => $firebaseConfig])
+        ->header('Content-Type', 'application/javascript; charset=UTF-8')
+        ->header('Service-Worker-Allowed', '/')
+        ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+})->name('firebase.messaging.sw');
 
 Route::get('/', function () {
     $divisions  = \App\Models\Division::all();
@@ -222,6 +239,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/responses/{response}/claim', [DonationClaimController::class, 'store'])->name('donations.claim');
     Route::post('/responses/{response}/recipient-verify', [DonationClaimController::class, 'verifyByRecipient'])->name('donations.recipient_verify');
     Route::post('/requests/{bloodRequest}/fulfill', [BloodRequestController::class, 'fulfill'])->name('requests.fulfill');
+    Route::post('/requests/{bloodRequest}/subscribe', [BloodRequestController::class, 'subscribeRecurring'])->name('requests.subscribe');
     Route::post('/requests/{bloodRequest}/report', [\App\Http\Controllers\BloodRequestReportController::class, 'store'])->name('requests.report');
     Route::post('/offline-claims', [OfflineClaimController::class, 'store'])->name('offline-claims.store');
 

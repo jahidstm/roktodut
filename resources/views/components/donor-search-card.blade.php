@@ -9,6 +9,9 @@
     $isNidVerified = in_array($donor->nid_status, ['approved', 'verified'], true);
     $isAvailableNow = (bool) $donor->is_ready_now;
     $canDonate = $donor->is_eligible_to_donate;
+    $isPlateletReady = !empty($donor->weight)
+        && (float) $donor->weight >= 50
+        && $donor->canDonate(\App\Enums\BloodComponentType::PLATELETS);
     $daysFromLastDonation = $donor->last_donated_at ? (int) $donor->last_donated_at->diffInDays(now()) : null;
     $location = trim(($donor->district?->name ?? 'জেলা নেই') . (($donor->upazila?->name ?? null) ? ' · ' . $donor->upazila->name : ''));
 
@@ -57,7 +60,10 @@
         @if($isNidVerified)
             <span class="inline-flex h-7 items-center rounded-full border border-teal-200 bg-teal-50 px-3 text-xs font-bold text-teal-700">NID Verified</span>
         @endif
-        @if(!$isAvailableNow && !$isOrgVerified && !$isNidVerified)
+        @if($isPlateletReady)
+            <span class="inline-flex h-7 items-center rounded-full border border-fuchsia-200 bg-fuchsia-50 px-3 text-xs font-bold text-fuchsia-700">Platelet Ready</span>
+        @endif
+        @if(!$isAvailableNow && !$isOrgVerified && !$isNidVerified && !$isPlateletReady)
             <span class="inline-flex h-7 items-center rounded-full border border-slate-200 bg-slate-100 px-3 text-xs font-bold text-slate-700">Regular</span>
         @endif
     </div>

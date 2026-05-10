@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BloodGroup;
+use App\Enums\BloodComponentType;
 use App\Enums\UrgencyLevel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +21,7 @@ class BloodRequest extends Model
         'created_ip_hash',
         'patient_name',
         'blood_group',
+        'component_type',
         'bags_needed',
         'hospital_id',
 
@@ -48,6 +50,7 @@ class BloodRequest extends Model
     {
         return [
             'blood_group'     => BloodGroup::class,
+            'component_type'  => BloodComponentType::class,
             'urgency'         => UrgencyLevel::class,
             'needed_at'       => 'datetime',
             'is_phone_hidden' => 'boolean',
@@ -185,5 +188,19 @@ class BloodRequest extends Model
     public function isExpired(): bool
     {
         return $this->status === 'expired';
+    }
+
+    public function componentLabel(): string
+    {
+        $component = $this->component_type;
+        if ($component instanceof BloodComponentType) {
+            return $component->shortLabel();
+        }
+
+        try {
+            return BloodComponentType::from((string) $component)->shortLabel();
+        } catch (\Throwable) {
+            return 'Whole Blood';
+        }
     }
 }

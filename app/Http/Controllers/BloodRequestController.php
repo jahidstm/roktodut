@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BloodComponentType;
 use App\Enums\UrgencyLevel;
 use App\Events\DonationCompleted;
 use App\Http\Requests\StoreBloodRequestRequest;
 use App\Jobs\DispatchEmergencyAlert;
 use App\Jobs\SendEmergencyBloodRequestNotificationJob;
 use App\Models\BloodRequest;
+use App\Models\ChronicRequestSubscription;
 use App\Models\BloodRequestResponse;
 use App\Models\District;
 use App\Services\DonorMatchingService;
@@ -219,6 +221,7 @@ class BloodRequestController extends Controller
         ]);
 
         $data = $request->validated();
+        $data['component_type'] = $data['component_type'] ?? BloodComponentType::WHOLE_BLOOD->value;
 
         $data['contact_number_normalized'] = $normalizedPhone;
         $data['created_ip_hash'] = $ipHash;
@@ -240,6 +243,7 @@ class BloodRequestController extends Controller
         $existingRequest = BloodRequest::query()
             ->where('contact_number_normalized', $data['contact_number_normalized'])
             ->where('blood_group', $data['blood_group'])
+            ->where('component_type', $data['component_type'])
             ->where('district_id', $data['district_id'])
             ->whereIn('status', ['pending', 'in_progress'])
             ->where('created_at', '>=', now()->subHours(6))
@@ -434,5 +438,56 @@ class BloodRequestController extends Controller
             'pendingResponses' => $canViewAcceptedDonors ? $pending : collect(),
             'canViewAcceptedDonors' => $canViewAcceptedDonors,
         ]);
+    }
+
+    public function subscribeRecurring(Request $request, BloodRequest $bloodRequest)
+    {
+        $user = $request->user();
+        abort_if((int) $bloodRequest->requested_by !== (int) $user->id, 403, 'এই রিকোয়েস্টে সাবস্ক্রাইব করার অনুমতি আপনার নেই।');
+
+        $validated = $request->validate([
+            'cadence_days' => ['required', 'integer', 'min:14', 'max:90'],
+            'lead_time_days' => ['required', 'integer', 'min:1', 'max:7'],
+            'next_needed_at' => ['required', 'date', 'after:now'],
+        ], [
+            'cadence_days.required' => 'প্রতি কত দিন পর রক্ত লাগবে তা দিন।',
+            'next_needed_at.required' => 'পরবর্তী রক্তের তারিখ দিন।',
+        ]);
+
+        $rawPhone = (string) ($bloodRequest->contact_number ?? '');
+        $normalizedPhone = (string) ($bloodRequest->contact_number_normalized ?? '');
+        if ($normalizedPhone === '' && $rawPhone !== '') {
+            $normalizedPhone = PhoneNormalizer::normalizeBdPhone($rawPhone);
+        }
+
+        ChronicRequestSubscription::updateOrCreate(
+            [
+                'user_id' => $user->id,
+                'source_blood_request_id' => $bloodRequest->id,
+            ],
+            [
+                'patient_name' => $bloodRequest->patient_name,
+                'blood_group' => $bloodRequest->blood_group instanceof \App\Enums\BloodGroup ? $bloodRequest->blood_group->value : (string) $bloodRequest->blood_group,
+                'component_type' => $bloodRequest->component_type instanceof \App\Enums\BloodComponentType ? $bloodRequest->component_type->value : (string) $bloodRequest->component_type,
+                'bags_needed' => (int) ($bloodRequest->bags_needed ?? 1),
+                'hospital_id' => $bloodRequest->hospital_id,
+                'division_id' => $bloodRequest->division_id,
+                'district_id' => $bloodRequest->district_id,
+                'upazila_id' => $bloodRequest->upazila_id,
+                'address' => $bloodRequest->address,
+                'contact_name' => $bloodRequest->contact_name,
+                'contact_number' => $rawPhone,
+                'contact_number_normalized' => $normalizedPhone,
+                'urgency' => $bloodRequest->urgency instanceof \App\Enums\UrgencyLevel ? $bloodRequest->urgency->value : (string) $bloodRequest->urgency,
+                'notes' => $bloodRequest->notes,
+                'is_phone_hidden' => (bool) $bloodRequest->is_phone_hidden,
+                'cadence_days' => (int) $validated['cadence_days'],
+                'lead_time_days' => (int) $validated['lead_time_days'],
+                'next_needed_at' => Carbon::parse((string) $validated['next_needed_at']),
+                'is_active' => true,
+            ]
+        );
+
+        return back()->with('success', '✅ Chronic plan save হয়েছে। নির্ধারিত সময়ে অটো রিকোয়েস্ট তৈরি হবে।');
     }
 }

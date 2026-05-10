@@ -31,8 +31,11 @@ class BloodRequestResponseController extends Controller
         $user = $request->user();
 
         // ২. মেডিকেল কমপ্লায়েন্স চেক (৯০-দিনের রুল)
-        if ($request->status === 'pending' && !$user->canDonate()) {
-            $remainingDays = $user->daysUntilNextDonation();
+        $componentType = is_object($bloodRequest->component_type)
+            ? $bloodRequest->component_type->value
+            : $bloodRequest->component_type;
+        if ($request->status === 'pending' && !$user->canDonate($componentType)) {
+            $remainingDays = $user->daysUntilNextDonation($componentType);
             return back()->with('error', "মেডিকেল গাইডলাইন অনুযায়ী আপনি আগামী {$remainingDays} দিন রক্ত দিতে পারবেন না।");
         }
 
@@ -84,10 +87,10 @@ class BloodRequestResponseController extends Controller
                 try {
                     app(TelegramService::class)->sendDonorPingToRequester(
                         requesterChatId: $requester->telegram_chat_id,
-                        donorName:       $user->name,
+                        donorName: $user->name,
                         donorBloodGroup: $bloodGroup,
-                        donorPhone:      $donorPhone,
-                        requestUrl:      route('requests.show', $bloodRequest->id),
+                        donorPhone: $donorPhone,
+                        requestUrl: route('requests.show', $bloodRequest->id),
                     );
                 } catch (\Throwable $e) {
                     Log::error('[DonorPing] Telegram send failed: ' . $e->getMessage());

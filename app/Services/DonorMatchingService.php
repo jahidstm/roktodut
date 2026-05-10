@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\BloodComponentType;
 use App\Enums\UrgencyLevel;
 use App\Models\BloodRequest;
 use App\Models\User;
@@ -25,6 +26,7 @@ class DonorMatchingService
     private const CAP_EMERGENCY = 50;
     private const CAP_NORMAL    = 20;
     private const COOLDOWN_DAYS = 120;
+    private const PLATELET_COOLDOWN_DAYS = 14;
 
     // 📍 Radius per urgency (km)
     private const RADIUS = [
@@ -40,7 +42,7 @@ class DonorMatchingService
     public function match(BloodRequest $request): Collection
     {
         $cap            = $this->getCap($request->urgency);
-        $cooldownCutoff = Carbon::now()->subDays(self::COOLDOWN_DAYS);
+        $cooldownCutoff = Carbon::now()->subDays($this->getCooldownDays($request));
 
         // ── রিকোয়েস্টে lat/lng আছে কিনা চেক করা ──────────────────────────
         $hasCoords = $request->latitude !== null && $request->longitude !== null;
@@ -138,5 +140,17 @@ class DonorMatchingService
         return $value === UrgencyLevel::EMERGENCY->value
             ? self::CAP_EMERGENCY
             : self::CAP_NORMAL;
+    }
+
+    private function getCooldownDays(BloodRequest $request): int
+    {
+        $component = $request->component_type;
+        $value = $component instanceof BloodComponentType
+            ? $component->value
+            : (string) $component;
+
+        return $value === BloodComponentType::PLATELETS->value
+            ? self::PLATELET_COOLDOWN_DAYS
+            : self::COOLDOWN_DAYS;
     }
 }

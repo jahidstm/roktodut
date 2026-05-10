@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\BloodGroup;
+use App\Enums\BloodComponentType;
 use App\Enums\UserRole;
 // use Illuminate\Contracts\Auth\MustVerifyEmail; // আপাতত বন্ধ রাখা হয়েছে
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -248,21 +249,23 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
     }
 
     // 🎯 FIX: 'last_donated_at' কলাম ব্যবহার করা হলো
-    public function canDonate(): bool
+    public function canDonate(mixed $componentType = null): bool
     {
         if (!$this->last_donated_at) {
             return true;
         }
-        return $this->last_donated_at->copy()->addDays(120)->isPast();
+        $cooldownDays = $this->resolveCooldownDaysForComponent($componentType);
+        return $this->last_donated_at->copy()->addDays($cooldownDays)->isPast();
     }
 
     // 🎯 FIX: 'last_donated_at' কলাম ব্যবহার করা হলো
-    public function daysUntilNextDonation(): int
+    public function daysUntilNextDonation(mixed $componentType = null): int
     {
         if (!$this->last_donated_at) {
             return 0;
         }
-        $nextDonationDate = $this->last_donated_at->copy()->addDays(120);
+        $cooldownDays = $this->resolveCooldownDaysForComponent($componentType);
+        $nextDonationDate = $this->last_donated_at->copy()->addDays($cooldownDays);
         return max(0, (int) now()->diffInDays($nextDonationDate, false));
     }
 
@@ -275,6 +278,15 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
     public function getIsEligibleToDonateAttribute()
     {
         return $this->canDonate();
+    }
+
+    private function resolveCooldownDaysForComponent(mixed $componentType = null): int
+    {
+        $value = $componentType instanceof BloodComponentType
+            ? $componentType->value
+            : (string) ($componentType ?? BloodComponentType::WHOLE_BLOOD->value);
+
+        return $value === BloodComponentType::PLATELETS->value ? 14 : 120;
     }
 
     public function scopeInSameOrganization($query)

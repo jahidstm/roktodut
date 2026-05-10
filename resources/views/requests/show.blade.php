@@ -42,7 +42,7 @@
             </div>
         </div>
 
-        <div class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+        <div class="mt-4 grid grid-cols-1 md:grid-cols-5 gap-3 text-sm">
             <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
                 <div class="text-xs text-slate-500 font-semibold">দরকার</div>
                 <div class="font-extrabold text-slate-800 mt-1">{{ $bloodRequest->needed_at?->format('d M, Y h:i A') ?? 'ASAP' }}</div>
@@ -50,6 +50,10 @@
             <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
                 <div class="text-xs text-slate-500 font-semibold">ব্যাগ</div>
                 <div class="font-extrabold text-slate-800 mt-1">{{ $bloodRequest->bags_needed ?? '-' }}</div>
+            </div>
+            <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
+                <div class="text-xs text-slate-500 font-semibold">ধরন</div>
+                <div class="font-extrabold text-slate-800 mt-1">{{ $bloodRequest->componentLabel() }}</div>
             </div>
             <div class="rounded-xl bg-slate-50 border border-slate-100 p-3">
                 <div class="text-xs text-slate-500 font-semibold">যোগাযোগ</div>
@@ -303,6 +307,41 @@
             </div>
         @endif
     </div>
+
+    @if($isOwner)
+        <div class="mt-6 mb-6 rounded-2xl border border-violet-200 bg-violet-50/40 p-5">
+            <h3 class="text-base font-black text-violet-900">♻️ Chronic Patient Subscription</h3>
+            <p class="mt-1 text-xs font-semibold text-violet-700">থ্যালাসেমিয়া/ক্যান্সার টাইপ রোগীদের জন্য অটো-রিকোয়েস্ট চালু করুন।</p>
+
+            <form method="POST" action="{{ route('requests.subscribe', $bloodRequest) }}" class="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3 items-end">
+                @csrf
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Cycle (দিন)</label>
+                    <input type="number" name="cadence_days" min="14" max="90"
+                           value="{{ old('cadence_days', 28) }}"
+                           class="w-full rounded-lg border-slate-300 text-sm font-semibold focus:border-violet-500 focus:ring-violet-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">আগে থেকে অ্যালার্ট (দিন)</label>
+                    <input type="number" name="lead_time_days" min="1" max="7"
+                           value="{{ old('lead_time_days', 2) }}"
+                           class="w-full rounded-lg border-slate-300 text-sm font-semibold focus:border-violet-500 focus:ring-violet-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">পরবর্তী দরকারের তারিখ</label>
+                    <input type="datetime-local" name="next_needed_at"
+                           value="{{ old('next_needed_at', optional($bloodRequest->needed_at)->format('Y-m-d\TH:i')) }}"
+                           class="w-full rounded-lg border-slate-300 text-sm font-semibold focus:border-violet-500 focus:ring-violet-500">
+                </div>
+
+                <button type="submit" class="w-full md:w-auto px-4 py-2.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-sm font-black">
+                    Auto Plan চালু করুন
+                </button>
+            </form>
+        </div>
+    @endif
 
     {{-- 🎯 ডোনারের জন্য Donation Claim Action Box --}}
     @if($myResponse && strtolower($myResponse->status) === 'accepted' && $myResponse->verification_status === 'pending')

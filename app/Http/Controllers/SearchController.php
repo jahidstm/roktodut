@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\BloodComponentType;
 use App\Models\User;
 use App\Models\Division;
 use App\Models\District;
@@ -35,6 +36,17 @@ class SearchController extends Controller
         // 🔍 ১. রক্তের গ্রুপ ফিল্টার
         if ($request->filled('blood_group')) {
             $query->where('users.blood_group', $request->blood_group);
+        }
+
+        $componentType = (string) $request->input('component_type', '');
+        if ($componentType === BloodComponentType::PLATELETS->value) {
+            // Platelet-ready baseline: minimum weight + shorter 14-day cooldown check.
+            $query->whereNotNull('users.weight')
+                ->where('users.weight', '>=', 50)
+                ->where(function ($q) {
+                    $q->whereNull('users.last_donated_at')
+                        ->orWhere('users.last_donated_at', '<=', now()->subDays(14)->toDateString());
+                });
         }
 
         // 🔍 ২. লোকেশন ফিল্টারস (বিভাগ, জেলা, উপজেলা)
@@ -92,6 +104,18 @@ class SearchController extends Controller
             $upazilaName = Upazila::whereKey($request->upazila_id)->value('name');
             if ($upazilaName) {
                 $selectedFilters[] = 'উপজেলা: ' . $upazilaName;
+            }
+        }
+        if ($componentType !== '') {
+            $componentLabel = match ($componentType) {
+                BloodComponentType::WHOLE_BLOOD->value => 'পূর্ণ রক্ত',
+                BloodComponentType::PACKED_RBC->value => 'PRBC',
+                BloodComponentType::PLATELETS->value => 'Platelet',
+                BloodComponentType::PLASMA->value => 'Plasma',
+                default => null,
+            };
+            if ($componentLabel) {
+                $selectedFilters[] = 'কম্পোনেন্ট: ' . $componentLabel;
             }
         }
         return view('search.index', compact('donors', 'request', 'bloodGroups', 'selectedFilters'));

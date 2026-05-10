@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\BloodComponentType;
 use App\Enums\UrgencyLevel;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -18,6 +19,7 @@ class StoreBloodRequestRequest extends FormRequest
         return [
             'patient_name'   => ['nullable', 'string', 'max:120'],
             'blood_group'    => ['required', 'string', 'in:A+,A-,B+,B-,AB+,AB-,O+,O-'],
+            'component_type' => ['required', Rule::enum(BloodComponentType::class)],
             'hospital_id'    => ['nullable', 'integer', 'exists:hospitals,id'],
             'bags_needed'    => ['required', 'integer', 'min:1', 'max:10'],
 
@@ -44,6 +46,7 @@ class StoreBloodRequestRequest extends FormRequest
     {
         return [
             'blood_group.required' => 'রক্তের গ্রুপ দেওয়া বাধ্যতামূলক।',
+            'component_type.required' => 'রক্তের ধরন নির্বাচন করা বাধ্যতামূলক।',
             'division_id.required' => 'বিভাগ নির্বাচন করুন।',
             'district_id.required' => 'জেলা নির্বাচন করুন।',
             'upazila_id.required'  => 'উপজেলা নির্বাচন করুন।',

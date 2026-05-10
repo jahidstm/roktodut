@@ -35,7 +35,7 @@
         <form method="POST" action="{{ route('requests.store') }}" class="space-y-6" x-data="{ isSubmitting: false }" @submit="if(isSubmitting) { $event.preventDefault(); return false; } isSubmitting = true;">
             @csrf
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                     <label class="text-sm font-extrabold text-slate-800">রোগীর নাম</label>
                     <input name="patient_name" value="{{ old('patient_name') }}"
@@ -52,6 +52,18 @@
                         @endforeach
                     </select>
                     @error('blood_group') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
+                </div>
+
+                <div>
+                    <label class="text-sm font-extrabold text-slate-800">রক্তের ধরন <span class="text-red-500">*</span></label>
+                    <select name="component_type" class="mt-2 w-full rounded-xl border-slate-200 bg-white focus:border-red-500 focus:ring-red-500 font-bold px-4 py-3">
+                        @foreach(\App\Enums\BloodComponentType::cases() as $component)
+                            <option value="{{ $component->value }}" @selected(old('component_type', \App\Enums\BloodComponentType::WHOLE_BLOOD->value) === $component->value)>
+                                {{ $component->label() }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('component_type') <div class="text-sm text-red-600 font-bold mt-1">{{ $message }}</div> @enderror
                 </div>
             </div>
 
@@ -501,4 +513,3 @@ function hospitalAutocomplete(initialId = null, initialDisplay = '') {
 }
 </script>
 @endpush
-

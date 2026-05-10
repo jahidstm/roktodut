@@ -7,6 +7,7 @@
 @php
     $urgency = $request->urgency?->value ?? $request->urgency ?? 'normal';
     $bloodGroup = $request->blood_group?->value ?? (string) $request->blood_group;
+    $componentLabel = method_exists($request, 'componentLabel') ? $request->componentLabel() : 'Whole Blood';
     $neededAt = $request->needed_at;
     $status = strtolower((string) $request->status);
     $acceptedCount = (int) ($request->accepted_responses_count ?? 0);
@@ -53,6 +54,9 @@
                 <h3 class="text-lg font-black tracking-tight text-slate-900">
                     {{ $bloodGroup }} রক্ত প্রয়োজন
                 </h3>
+                <span class="inline-flex h-7 items-center rounded-full border border-violet-200 bg-violet-50 px-3 text-xs font-extrabold text-violet-700">
+                    {{ $componentLabel }}
+                </span>
                 <span class="inline-flex h-7 items-center rounded-full border px-3 text-xs font-extrabold {{ $urgencyInfo['cls'] }}">
                     {{ $urgencyInfo['label'] }}
                 </span>

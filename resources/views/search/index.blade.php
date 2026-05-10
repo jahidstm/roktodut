@@ -37,6 +37,17 @@
                 </div>
 
                 <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">রক্তের ধরন</label>
+                    <select name="component_type" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+                        <option value="">সব ধরন</option>
+                        <option value="{{ \App\Enums\BloodComponentType::WHOLE_BLOOD->value }}" @selected(($request['component_type'] ?? '') === \App\Enums\BloodComponentType::WHOLE_BLOOD->value)>পূর্ণ রক্ত</option>
+                        <option value="{{ \App\Enums\BloodComponentType::PACKED_RBC->value }}" @selected(($request['component_type'] ?? '') === \App\Enums\BloodComponentType::PACKED_RBC->value)>PRBC</option>
+                        <option value="{{ \App\Enums\BloodComponentType::PLATELETS->value }}" @selected(($request['component_type'] ?? '') === \App\Enums\BloodComponentType::PLATELETS->value)>Platelet (Apheresis)</option>
+                        <option value="{{ \App\Enums\BloodComponentType::PLASMA->value }}" @selected(($request['component_type'] ?? '') === \App\Enums\BloodComponentType::PLASMA->value)>Plasma</option>
+                    </select>
+                </div>
+
+                <div>
                     <label for="filter_division" class="block text-sm font-bold text-slate-700 mb-1">বিভাগ</label>
                     <select name="division_id" id="filter_division" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
                         <option value="">বিভাগ নির্বাচন</option>
@@ -60,7 +71,7 @@
                     </select>
                 </div>
                 <div class="md:col-span-4 flex justify-end gap-2 mt-2">
-                    @if(request()->hasAny(['blood_group', 'division_id', 'district_id', 'upazila_id']))
+                    @if(request()->hasAny(['blood_group', 'component_type', 'division_id', 'district_id', 'upazila_id']))
                         <x-secondary-button href="{{ route('search') }}">
                             রিসেট
                         </x-secondary-button>

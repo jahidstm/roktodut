@@ -20,6 +20,8 @@
                 search: new URLSearchParams(location.search).get('search') || '',
                 blood_group: new URLSearchParams(location.search).get('blood_group') || '',
                 district: new URLSearchParams(location.search).get('district') || '',
+                component_type: new URLSearchParams(location.search).get('component_type') || '',
+                dengue_mode: new URLSearchParams(location.search).get('dengue_mode') === '1',
 
                 fetchResults() {
                     this.loading = true;
@@ -27,6 +29,8 @@
                     if (this.search)      params.append('search', this.search);
                     if (this.blood_group) params.append('blood_group', this.blood_group);
                     if (this.district)    params.append('district', this.district);
+                    if (this.component_type) params.append('component_type', this.component_type);
+                    if (this.dengue_mode) params.append('dengue_mode', '1');
 
                     const url = `{{ route('public.requests.index') }}?${params.toString()}`;
                     window.history.replaceState({}, '', url);
@@ -42,7 +46,7 @@
 
             <p class="text-sm font-bold text-slate-500 mb-5 uppercase tracking-wider">ফিল্টার করুন</p>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
 
                 {{-- Live Search --}}
                 <div>
@@ -85,8 +89,27 @@
                     </select>
                 </div>
 
-                {{-- Search Button --}}
+                {{-- Component --}}
                 <div>
+                    <label class="block text-xs font-bold text-slate-600 mb-1.5">রক্তের ধরন</label>
+                    <select x-model="component_type" @change="fetchResults()"
+                            class="w-full rounded-xl border border-slate-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 text-sm font-medium text-slate-700 py-2.5 px-3 transition-all bg-white">
+                        <option value="">সব ধরন</option>
+                        <option value="{{ \App\Enums\BloodComponentType::WHOLE_BLOOD->value }}">পূর্ণ রক্ত</option>
+                        <option value="{{ \App\Enums\BloodComponentType::PACKED_RBC->value }}">PRBC</option>
+                        <option value="{{ \App\Enums\BloodComponentType::PLATELETS->value }}">Platelet</option>
+                        <option value="{{ \App\Enums\BloodComponentType::PLASMA->value }}">Plasma</option>
+                    </select>
+                </div>
+
+                {{-- Search Button --}}
+                <div class="space-y-2">
+                    <button @click="dengue_mode = !dengue_mode; if (dengue_mode) component_type='{{ \App\Enums\BloodComponentType::PLATELETS->value }}'; fetchResults();"
+                            type="button"
+                            :class="dengue_mode ? 'bg-fuchsia-600 hover:bg-fuchsia-700 text-white' : 'bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200'"
+                            class="w-full font-bold py-2.5 px-4 rounded-xl transition-all text-sm">
+                        🦟 Dengue Mode
+                    </button>
                     <button @click="fetchResults()"
                             class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-6 rounded-xl transition-all flex items-center justify-center gap-2 shadow-sm">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
