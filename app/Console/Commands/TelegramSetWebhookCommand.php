@@ -13,8 +13,12 @@ class TelegramSetWebhookCommand extends Command
     public function handle(TelegramService $telegram): void
     {
         $webhookUrl = route('telegram.webhook');
+        $secret = (string) config('services.telegram.webhook_secret', '');
 
         $this->info("Webhook URL: {$webhookUrl}");
+        if ($secret === '') {
+            $this->warn('⚠️ TELEGRAM_WEBHOOK_SECRET সেট করা নেই। webhook request 403 পেতে পারে।');
+        }
 
         $result = $telegram->setWebhook($webhookUrl);
 

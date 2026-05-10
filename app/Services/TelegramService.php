@@ -55,11 +55,18 @@ class TelegramService
     // ─────────────────────────────────────────────────────────────
     public function setWebhook(string $url): array
     {
-        $response = Http::post("{$this->baseUrl}/setWebhook", [
+        $payload = [
             'url'             => $url,
             'allowed_updates' => ['message'],
             'drop_pending_updates' => true,
-        ]);
+        ];
+
+        $secret = (string) config('services.telegram.webhook_secret', '');
+        if ($secret !== '') {
+            $payload['secret_token'] = $secret;
+        }
+
+        $response = Http::post("{$this->baseUrl}/setWebhook", $payload);
 
         return $response->json();
     }
@@ -78,16 +85,18 @@ class TelegramService
     // ─────────────────────────────────────────────────────────────
     public function sendBloodAlert(string|int $chatId, array $data): bool
     {
-        $urgencyLabel = match($data['urgency'] ?? 'normal') {
+        $urgencyLabel = match ($data['urgency'] ?? 'normal') {
             'emergency' => '🚨 জরুরি (Emergency)',
             'urgent'    => '⚠️ আর্জেন্ট (Urgent)',
             default     => '🩸 সাধারণ (Normal)',
         };
+        $component = $data['component'] ?? 'Whole Blood';
 
         $text = <<<MSG
 🔴 <b>নতুন রক্তের অনুরোধ! {$urgencyLabel}</b>
 
 🩸 <b>রক্তের গ্রুপ:</b> {$data['blood_group']}
+🧪 <b>কম্পোনেন্ট:</b> {$component}
 🏥 <b>হাসপাতাল:</b> {$data['hospital']}
 📍 <b>লোকেশন:</b> {$data['location']}
 📦 <b>ব্যাগ প্রয়োজন:</b> {$data['bags_needed']}

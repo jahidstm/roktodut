@@ -12,3 +12,4 @@ Artisan::command('inspire', function () {
 Schedule::command('requests:expire')->everyFifteenMinutes();
 
 Schedule::command('donations:auto-approve')->hourly();
+Schedule::command('subscriptions:dispatch-requests')->hourly();

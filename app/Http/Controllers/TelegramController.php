@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Services\TelegramService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class TelegramController extends Controller
@@ -37,6 +38,15 @@ class TelegramController extends Controller
     // ─────────────────────────────────────────────────────────────
     public function webhook(Request $request): \Illuminate\Http\JsonResponse
     {
+        if (! $this->hasValidWebhookSecret($request)) {
+            Log::warning('[TelegramWebhook] Invalid webhook secret token.', [
+                'ip' => $request->ip(),
+                'ua' => (string) $request->userAgent(),
+            ]);
+
+            abort(403, 'Invalid webhook secret.');
+        }
+
         $update = $request->all();
 
         // শুধুমাত্র /start verify_TOKEN কমান্ড প্রসেস করব
@@ -61,6 +71,21 @@ class TelegramController extends Controller
         }
 
         return response()->json(['ok' => true]);
+    }
+
+    private function hasValidWebhookSecret(Request $request): bool
+    {
+        $expected = (string) config('services.telegram.webhook_secret', '');
+        if ($expected === '') {
+            return false;
+        }
+
+        $provided = (string) $request->header('X-Telegram-Bot-Api-Secret-Token', '');
+        if ($provided === '') {
+            return false;
+        }
+
+        return hash_equals($expected, $provided);
     }
 
     // ─────────────────────────────────────────────────────────────

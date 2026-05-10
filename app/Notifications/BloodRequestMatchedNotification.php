@@ -67,16 +67,21 @@ class BloodRequestMatchedNotification extends Notification implements ShouldQueu
         $urgency = $this->bloodRequest->urgency instanceof \App\Enums\UrgencyLevel
             ? $this->bloodRequest->urgency->label()
             : (string) $this->bloodRequest->urgency;
+        $component = $this->bloodRequest->componentLabel();
 
         $message = "{$this->districtName} জেলায় {$bloodGroup} রক্তের জরুরি প্রয়োজন! "
-                 . "({$urgency}) — আপনি কি সাহায্য করতে পারবেন?";
+            . "({$component}, {$urgency}) — আপনি কি সাহায্য করতে পারবেন?";
 
         return [
             'request_id'    => $this->bloodRequest->id,
             'blood_group'   => $bloodGroup,
+            'component_type' => $this->bloodRequest->component_type instanceof \App\Enums\BloodComponentType
+                                ? $this->bloodRequest->component_type->value
+                                : (string) $this->bloodRequest->component_type,
+            'component_label' => $component,
             'urgency'       => $this->bloodRequest->urgency instanceof \App\Enums\UrgencyLevel
-                                ? $this->bloodRequest->urgency->value
-                                : (string) $this->bloodRequest->urgency,
+                ? $this->bloodRequest->urgency->value
+                : (string) $this->bloodRequest->urgency,
             'district_name' => $this->districtName,
             'upazila_name'  => $this->bloodRequest->upazila?->name ?? '',
             'message'       => $message,

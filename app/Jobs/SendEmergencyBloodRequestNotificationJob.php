@@ -52,6 +52,7 @@ class SendEmergencyBloodRequestNotificationJob implements ShouldQueue
 
         $alertData = [
             'blood_group'  => $bloodGroup,
+            'component'    => $bloodRequest->componentLabel(),
             'hospital'     => $bloodRequest->hospital ?? 'উল্লেখ নেই',
             'location'     => $location ?: $this->districtName,
             'bags_needed'  => $bloodRequest->bags_needed ?? 1,
@@ -66,7 +67,7 @@ class SendEmergencyBloodRequestNotificationJob implements ShouldQueue
         User::query()
             ->whereIn('id', $this->donorIds)
             ->chunk(25, function ($donors) use ($bloodRequest, $telegram, $alertData) {
-                
+
                 // ১. In-App Notification
                 Notification::send($donors, new BloodRequestMatchedNotification($bloodRequest, $this->districtName));
 
