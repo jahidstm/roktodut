@@ -13,3 +13,4 @@ Schedule::command('requests:expire')->everyFifteenMinutes();
 
 Schedule::command('donations:auto-approve')->hourly();
 Schedule::command('subscriptions:dispatch-requests')->hourly();
+Schedule::command('nid:purge-expired')->daily();
