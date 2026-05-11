@@ -102,7 +102,7 @@ Route::get('/', function () {
             'responses as claimed_verifications_count' => fn($q) => $q->where('verification_status', 'claimed'),
             'responses as verified_verifications_count' => fn($q) => $q->where('verification_status', 'verified'),
         ])
-        ->orderByRaw("FIELD(urgency, 'emergency', 'urgent', 'normal')")
+        ->orderByRaw("CASE urgency WHEN 'emergency' THEN 1 WHEN 'urgent' THEN 2 WHEN 'normal' THEN 3 ELSE 4 END")
         ->orderBy('needed_at', 'asc')
         ->limit(3)
         ->get();
