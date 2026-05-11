@@ -12,6 +12,8 @@ class ProfileUpdateRequest extends FormRequest
     {
         return [
             'date_of_birth.before_or_equal' => 'রক্তদানের জন্য আপনার বয়স ন্যূনতম ১৮ বছর হতে হবে।',
+            'profile_image.mimes' => 'প্রোফাইল ছবির জন্য শুধুমাত্র JPG, JPEG, PNG বা WEBP ফাইল দিন।',
+            'profile_image.max' => 'প্রোফাইল ছবির সাইজ সর্বোচ্চ 2MB হতে হবে।',
         ];
     }
 
@@ -37,7 +39,7 @@ class ProfileUpdateRequest extends FormRequest
             'gender' => ['nullable', 'string', 'in:male,female'],
             'weight' => ['nullable', 'numeric', 'min:30'],
             'organization_id' => ['nullable', 'exists:organizations,id'],
-            'profile_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'], // Max 2MB
+            'profile_image' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp', 'max:2048'], // Max 2MB
         ];
     }
 }

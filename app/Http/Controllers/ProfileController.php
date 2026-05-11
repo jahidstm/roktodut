@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Notifications\AdminTaskNotification;
 use App\Services\AuditLogger;
 use App\Services\GamificationService;
+use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -485,5 +486,17 @@ class ProfileController extends Controller
         return redirect()->route('dashboard')
             ->with('status', 'donor-upgraded')
             ->with('success_msg', 'অভিনন্দন! আপনি এখন সফলভাবে রক্তদাতা হিসেবে যুক্ত হয়েছেন।');
+    }
+
+    public function avatar(User $user): Response
+    {
+        $path = (string) $user->profile_image;
+        if ($path === '' || !Storage::disk('public')->exists($path)) {
+            abort(404);
+        }
+
+        return response()->file(Storage::disk('public')->path($path), [
+            'Cache-Control' => 'public, max-age=86400',
+        ]);
     }
 }

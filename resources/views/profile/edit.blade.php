@@ -237,9 +237,9 @@
                 <div class="flex flex-col sm:flex-row items-center gap-6 p-6 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-red-50/30 hover:border-red-200 transition-all group">
                     <div class="w-24 h-24 rounded-full border-4 border-white overflow-hidden shrink-0 flex items-center justify-center shadow-lg group-hover:shadow-red-500/20 transition-all">
                         @if($user->profile_image)
-                            <img src="{{ asset('storage/' . $user->profile_image) }}" alt="Avatar" class="w-full h-full object-cover">
+                            <img id="profileImagePreview" src="{{ route('profile.avatar', $user) }}" alt="Avatar" class="w-full h-full object-cover">
                         @else
-                            <div class="w-full h-full bg-slate-100 flex items-center justify-center">
+                            <div id="profileImagePlaceholder" class="w-full h-full bg-slate-100 flex items-center justify-center">
                                 <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                             </div>
                         @endif
@@ -250,8 +250,8 @@
                         
                         <label class="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-bold text-slate-700 cursor-pointer shadow-sm hover:shadow hover:border-red-300 hover:text-red-600 transition-all">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                            ছবি নির্বাচন করুন
-                            <input type="file" name="profile_image" accept="image/*" class="hidden">
+                            <span id="profileImageFileName">ছবি নির্বাচন করুন</span>
+                            <input id="profileImageInput" type="file" name="profile_image" accept=".jpg,.jpeg,.png,.webp,image/*" class="hidden">
                         </label>
                         @error('profile_image') <span class="text-red-500 text-xs font-bold mt-2 block">{{ $message }}</span> @enderror
                     </div>
@@ -450,13 +450,13 @@
                                 <div class="flex items-center justify-center gap-2 px-3 text-center">
                                     @if($user->nid_path)
                                         <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                        <span class="text-sm font-bold text-emerald-700 truncate" id="fileNameDisplay">ডকুমেন্ট আপলোড করা হয়েছে (পরিবর্তন করুন)</span>
+                                        <span class="text-sm font-bold text-emerald-700 truncate" id="nidFileNameDisplay">ডকুমেন্ট আপলোড করা হয়েছে (পরিবর্তন করুন)</span>
                                     @else
                                         <svg class="w-5 h-5 text-slate-400 group-hover:text-red-500 transition-colors shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                                        <span class="text-sm font-bold text-slate-600 group-hover:text-red-600 transition-colors truncate" id="fileNameDisplay">ফাইল নির্বাচন করুন</span>
+                                        <span class="text-sm font-bold text-slate-600 group-hover:text-red-600 transition-colors truncate" id="nidFileNameDisplay">ফাইল নির্বাচন করুন</span>
                                     @endif
                                 </div>
-                                <input type="file" name="nid_document" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="document.getElementById('fileNameDisplay').textContent = this.files[0]?.name || 'ফাইল নির্বাচন করুন'">
+                                <input type="file" name="nid_document" accept=".jpg,.jpeg,.png,.pdf" class="hidden" onchange="document.getElementById('nidFileNameDisplay').textContent = this.files[0]?.name || 'ফাইল নির্বাচন করুন'">
                             </label>
                         </div>
                         @error('nid_document') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
@@ -686,6 +686,46 @@
 </style>
 
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const profileImageInput = document.getElementById('profileImageInput');
+        const profileImageFileName = document.getElementById('profileImageFileName');
+
+        if (!profileImageInput || !profileImageFileName) {
+            return;
+        }
+
+        profileImageInput.addEventListener('change', (event) => {
+            const file = event.target.files?.[0];
+            profileImageFileName.textContent = file ? file.name : 'ছবি নির্বাচন করুন';
+
+            if (!file) {
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const currentImage = document.getElementById('profileImagePreview');
+                if (currentImage) {
+                    currentImage.src = String(e.target?.result ?? '');
+                    return;
+                }
+
+                const placeholder = document.getElementById('profileImagePlaceholder');
+                if (!placeholder) {
+                    return;
+                }
+
+                const img = document.createElement('img');
+                img.id = 'profileImagePreview';
+                img.className = 'w-full h-full object-cover';
+                img.alt = 'Avatar';
+                img.src = String(e.target?.result ?? '');
+                placeholder.replaceWith(img);
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
     document.addEventListener('alpine:init', () => {
         Alpine.data('emergencyToggle', (initialStatus, lockedStatus) => ({
             isAvailable: initialStatus,

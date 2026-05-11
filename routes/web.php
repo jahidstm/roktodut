@@ -62,6 +62,10 @@ Route::post('/offline-verify/{claim}/confirm', [ClaimVerificationController::cla
     ->name('offline.confirm')
     ->middleware('signed');
 
+Route::get('/avatar/{user}', [ProfileController::class, 'avatar'])
+    ->middleware('throttle:120,1')
+    ->name('profile.avatar');
+
 // ─────────────────────────────────────────────────────────────────────────
 // 🤖 Telegram Bot Webhook (NO auth — Telegram সার্ভার থেকে আসে)
 // ─────────────────────────────────────────────────────────────────────────
