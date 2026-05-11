@@ -65,6 +65,7 @@ class BloodResponseNotification extends Notification
             'declined', 'withdrawn' => "{$this->responder->name} রিকোয়েস্ট থেকে সরে দাঁড়িয়েছেন।",
             'rejected' => "রোগী দুঃখজনকভাবে আপনার সাড়া গ্রহণ করতে পারেননি।",
             'pending' => "{$this->responder->name} আপনার রক্তের রিকোয়েস্টে রক্ত দিতে আগ্রহ প্রকাশ করেছেন।",
+            'contacted' => "🚨 {$this->responder->name} সরাসরি আপনাকে সাহায্য করতে প্রস্তুত! তিনি তার নম্বর পাঠিয়েছেন।",
             default => "আপনার রক্তের রিকোয়েস্টে একটি আপডেট এসেছে।"
         };
 

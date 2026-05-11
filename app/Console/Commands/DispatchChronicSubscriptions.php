@@ -76,6 +76,12 @@ class DispatchChronicSubscriptions extends Command
 
                         DispatchEmergencyAlert::dispatch($request)->afterCommit();
 
+                        // Notify the requester that the chronic request was created
+                        $requesterUser = \App\Models\User::find($subscription->user_id);
+                        if ($requesterUser) {
+                            $requesterUser->notify(new \App\Notifications\ChronicRequestCreatedNotification($request));
+                        }
+
                         $districtName = District::find($request->district_id)?->name ?? 'আপনার';
                         $donors = $matcher->match($request);
                         if ($donors->isNotEmpty()) {

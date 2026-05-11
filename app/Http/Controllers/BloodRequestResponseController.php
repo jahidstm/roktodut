@@ -76,24 +76,29 @@ class BloodRequestResponseController extends Controller
 
             // ৪b. রোগীর Telegram-এ ডোনারের নম্বর সরাসরি পুশ করো
             $requester = $bloodRequest->requester;
-            if ($requester && $requester->telegram_chat_id) {
+            if ($requester) {
+                // ১. In-app Notification (Missing feature added!)
+                $requester->notify(new BloodResponseNotification($bloodRequest, $user, 'contacted'));
 
-                $bloodGroup = is_object($user->blood_group)
-                    ? $user->blood_group->value
-                    : (string) $user->blood_group;
+                // ২. Telegram Push
+                if ($requester->telegram_chat_id) {
+                    $bloodGroup = is_object($user->blood_group)
+                        ? $user->blood_group->value
+                        : (string) $user->blood_group;
 
-                $donorPhone = $user->phone ?? 'উল্লেখ নেই';
+                    $donorPhone = $user->phone ?? 'উল্লেখ নেই';
 
-                try {
-                    app(TelegramService::class)->sendDonorPingToRequester(
-                        requesterChatId: $requester->telegram_chat_id,
-                        donorName: $user->name,
-                        donorBloodGroup: $bloodGroup,
-                        donorPhone: $donorPhone,
-                        requestUrl: route('requests.show', $bloodRequest->id),
-                    );
-                } catch (\Throwable $e) {
-                    Log::error('[DonorPing] Telegram send failed: ' . $e->getMessage());
+                    try {
+                        app(TelegramService::class)->sendDonorPingToRequester(
+                            requesterChatId: $requester->telegram_chat_id,
+                            donorName: $user->name,
+                            donorBloodGroup: $bloodGroup,
+                            donorPhone: $donorPhone,
+                            requestUrl: route('requests.show', $bloodRequest->id),
+                        );
+                    } catch (\Throwable $e) {
+                        Log::error('[DonorPing] Telegram send failed: ' . $e->getMessage());
+                    }
                 }
             }
 

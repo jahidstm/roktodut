@@ -29,12 +29,20 @@ class CloseExpiredRequests extends Command
             return self::SUCCESS;
         }
 
+        $requestsToExpire = BloodRequest::with('requester')->whereIn('id', $idsToExpire)->get();
+
         $expiredCount = 0;
 
-        DB::transaction(function () use (&$expiredCount, $idsToExpire, $threshold): void {
+        DB::transaction(function () use (&$expiredCount, $idsToExpire, $threshold, $requestsToExpire): void {
             $expiredCount = BloodRequest::query()
                 ->whereIn('id', $idsToExpire)
                 ->update(['status' => 'expired']);
+
+            foreach ($requestsToExpire as $request) {
+                if ($request->requester) {
+                    $request->requester->notify(new \App\Notifications\BloodRequestExpiredNotification($request));
+                }
+            }
 
             AuditLogger::log(
                 action: 'system.expire_request',
