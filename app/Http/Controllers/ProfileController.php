@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\User;
 use App\Notifications\AdminTaskNotification;
+use App\Services\AuditLogger;
 use App\Services\GamificationService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -239,12 +240,18 @@ class ProfileController extends Controller
 
         // NID নাম্বার সেভ করা
         if ($request->filled('nid_number')) {
-            $user->nid_number = $request->nid_number;
+            $normalizedNid = preg_replace('/\s+/', '', (string) $request->input('nid_number'));
+            $user->nid_number = $normalizedNid;
+            $user->nid_number_hash = hash('sha256', $normalizedNid . '|' . (string) config('app.key'));
             $changed = true;
         }
 
         // NID ডকুমেন্ট আপলোড করা (Private Storage)
         if ($request->hasFile('nid_document')) {
+            if (!empty($user->nid_path) && Storage::disk('private')->exists($user->nid_path)) {
+                Storage::disk('private')->delete($user->nid_path);
+            }
+
             $path           = $request->file('nid_document')->store('nid_uploads', 'private');
             $user->nid_path = $path;
             $user->nid_status = 'pending'; // নতুন ডকুমেন্টে সর্বদা pending
@@ -252,6 +259,9 @@ class ProfileController extends Controller
         }
 
         if ($changed) {
+            $retentionDays = max(30, (int) config('privacy.nid_retention_days', 365));
+            $user->nid_uploaded_at = now();
+            $user->nid_retention_until = now()->addDays($retentionDays);
             $user->save();
             $user->refresh();
 
@@ -366,6 +376,12 @@ class ProfileController extends Controller
         if (!Storage::disk('private')->exists($user->nid_path)) {
             abort(404, 'ফাইলটি সার্ভারে পাওয়া যায়নি।');
         }
+
+        $user->forceFill(['nid_last_accessed_at' => now()])->saveQuietly();
+        AuditLogger::log('privacy.nid.viewed', $user, [
+            'viewer_user_id' => auth()->id(),
+            'viewer_role' => auth()->user()?->role?->value ?? (string) auth()->user()?->role,
+        ]);
 
         return Storage::disk('private')->response($user->nid_path);
     }

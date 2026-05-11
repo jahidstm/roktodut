@@ -56,7 +56,11 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         'nid_image',
         'nid_path',
         'nid_number',
+        'nid_number_hash',
         'nid_status',
+        'nid_uploaded_at',
+        'nid_retention_until',
+        'nid_last_accessed_at',
         'qr_token',             // 🔐 Dynamic QR Smart Card token
         'last_login_at',
         'spam_strikes',
@@ -87,6 +91,7 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         'phone',                // Privacy Shield — সরাসরি serialize-এ দেখা যাবে না
         'email',                // Privacy Shield
         'nid_number',           // Privacy Shield
+        'nid_number_hash',
         'fcm_token',
     ];
 
@@ -110,6 +115,9 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
             'is_campus_hero'    => 'boolean',
             'is_shadowbanned'   => 'boolean',
             'opt_out_org_broadcast' => 'boolean',
+            'nid_uploaded_at' => 'datetime',
+            'nid_retention_until' => 'datetime',
+            'nid_last_accessed_at' => 'datetime',
         ];
     }
 
@@ -316,6 +324,15 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
      */
     public function scopeCloseTo($query, float $lat, float $lng, float $radiusKm = 5.0)
     {
+        $latDelta = $radiusKm / 111.045;
+        $safeCos = max(0.01, abs(cos(deg2rad($lat))));
+        $lngDelta = $radiusKm / (111.045 * $safeCos);
+
+        $latMin = $lat - $latDelta;
+        $latMax = $lat + $latDelta;
+        $lngMin = $lng - $lngDelta;
+        $lngMax = $lng + $lngDelta;
+
         $haversine = "(6371 * acos(
             cos(radians({$lat}))
             * cos(radians(latitude))
@@ -327,6 +344,8 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
             ->selectRaw("*, {$haversine} AS distance_km")
             ->whereNotNull('latitude')
             ->whereNotNull('longitude')
+            ->whereBetween('latitude', [$latMin, $latMax])
+            ->whereBetween('longitude', [$lngMin, $lngMax])
             ->havingRaw("{$haversine} <= ?", [$radiusKm])
             ->orderByRaw("{$haversine} ASC");
     }
