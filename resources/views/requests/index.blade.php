@@ -91,7 +91,7 @@
             <div class="text-slate-500 text-sm mt-2 font-medium">নতুন রিকোয়েস্ট তৈরি হলে এখানে দেখাবে। অথবা আপনার ফিল্টার পরিবর্তন করে দেখতে পারেন।</div>
         </div>
     @else
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             @foreach ($requests as $r)
                 <x-request-feed-card :request="$r" :show-requester="true" />
             @endforeach
