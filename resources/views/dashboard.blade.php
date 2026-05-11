@@ -147,7 +147,7 @@
                             <h2 class="text-xl sm:text-2xl font-black text-white leading-tight flex items-center gap-2">
                                 <span class="truncate">{{ $user->name }}</span>
                                 @if($user->nid_status === 'verified' || $user->nid_status === 'approved' || $user->verified_badge)
-                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500/25 border border-blue-200/40 text-blue-100" title="Verified Donor">
+                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500/25 border border-blue-200/40 text-blue-100" title="ভেরিফাইড ডোনার">
                                         <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                                             <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                         </svg>
@@ -166,10 +166,10 @@
                             @csrf
                             <button type="submit"
                                     {{ !$isEligibleTop ? 'disabled' : '' }}
-                                    title="{{ !$isEligibleTop ? 'কুলডাউন চলাকালীন স্ট্যাটাস পরিবর্তন করা যাবে না' : 'Availability টগল করুন' }}"
+                                    title="{{ !$isEligibleTop ? 'কুলডাউন চলাকালীন স্ট্যাটাস পরিবর্তন করা যাবে না' : 'উপস্থিতি স্ট্যাটাস পরিবর্তন করুন' }}"
                                     class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black border disabled:opacity-60 disabled:cursor-not-allowed {{ $isEffectivelyAvailableTop ? 'bg-emerald-500/20 border-emerald-200/40 text-emerald-100' : 'bg-slate-100/20 border-white/20 text-slate-200' }}">
                                 <span class="inline-block w-1.5 h-1.5 rounded-full {{ $isEffectivelyAvailableTop ? 'bg-emerald-300' : 'bg-slate-300' }}"></span>
-                                {{ $isEffectivelyAvailableTop ? 'Available' : 'Busy' }}
+                                {{ $isEffectivelyAvailableTop ? 'উপলব্ধ' : 'ব্যস্ত' }}
                             </button>
                         </form>
                         <a href="{{ route('gamification.guide') }}" class="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold text-white/90 bg-white/10 border border-white/20 hover:bg-white/20 transition">
@@ -198,7 +198,7 @@
                     </div>
                     <div class="rounded-2xl border {{ $isEligibleTop ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50' }} p-3 text-center">
                         <p class="text-sm font-black {{ $isEligibleTop ? 'text-emerald-700' : 'text-amber-700' }}">
-                            {{ $isEligibleTop ? 'Eligible' : 'In Cooldown' }}
+                            {{ $isEligibleTop ? 'যোগ্য' : 'কুলডাউনে' }}
                         </p>
                         <p class="text-[11px] font-bold {{ $isEligibleTop ? 'text-emerald-600/80' : 'text-amber-600/80' }} mt-0.5">
                             @if(!$isEligibleTop && $nextDateTop)
@@ -297,7 +297,7 @@
             </div>
             <div>
                 <h3 class="text-xl font-extrabold {{ $isEligible ? 'text-emerald-700' : 'text-amber-700' }}">
-                    {{ $isEligible ? 'আপনি রক্তদানের জন্য যোগ্য (Eligible)' : 'আপনি আপাতত রক্তদানের জন্য যোগ্য নন' }}
+                    {{ $isEligible ? 'আপনি রক্তদানের জন্য যোগ্য' : 'আপনি আপাতত রক্তদানের জন্য যোগ্য নন' }}
                 </h3>
                 <p class="text-sm font-semibold text-slate-500 mt-1">
                     @if(!$user->last_donated_at)
@@ -323,6 +323,7 @@
             </button>
         </form>
     </div>
+
     @else
     {{-- Become a Donor Upgrade CTA --}}
     <div x-data="{ upgradeModalOpen: {{ $errors->any() ? 'true' : 'false' }} }" class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-3xl border border-red-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
@@ -750,11 +751,11 @@
                     @foreach($ongoingCommitments as $commitment)
                         <tr class="hover:bg-slate-50 transition">
                             <td class="px-6 py-4">
-                                <div class="font-extrabold text-slate-900">রোগী: {{ $commitment->bloodRequest->patient_name ?? 'N/A' }}</div>
+                                <div class="font-extrabold text-slate-900">রোগী: {{ $commitment->bloodRequest->patient_name ?? 'তথ্য নেই' }}</div>
                                 <div class="text-xs font-bold text-slate-500 mt-0.5">গ্রুপ: <span class="text-blue-600">{{ $commitment->bloodRequest->blood_group?->value ?? $commitment->bloodRequest->blood_group }}</span></div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="font-semibold text-slate-700">{{ $commitment->bloodRequest->hospital?->display_name ?? 'N/A' }}</div>
+                                <div class="font-semibold text-slate-700">{{ $commitment->bloodRequest->hospital?->display_name ?? 'তথ্য নেই' }}</div>
                                 <div class="text-xs font-bold text-slate-500 mt-0.5">{{ $commitment->bloodRequest->district?->name ?? 'অজানা জেলা' }}</div>
                             </td>
                             <td class="px-6 py-4">
@@ -814,7 +815,7 @@
                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
             </div>
             <div>
-                <div class="text-2xl font-black text-blue-600">{{ $successRate ?? 0 }}{{ ($successRate !== 'N/A') ? '%' : '' }}</div>
+                <div class="text-2xl font-black text-blue-600">{{ $successRate ?? 0 }}{{ ($successRate !== 'তথ্য নেই') ? '%' : '' }}</div>
                 <div class="text-xs font-bold text-blue-500 mt-0.5">সফলতার হার</div>
             </div>
         </div>
@@ -847,11 +848,11 @@
                             @forelse($donationHistory as $history)
                                 <tr class="hover:bg-slate-50 transition">
                                     <td class="px-6 py-4">
-                                        <div class="font-extrabold text-slate-900">{{ $history->fulfilled_at ? $history->fulfilled_at->format('d M, Y') : 'N/A' }}</div>
+                                        <div class="font-extrabold text-slate-900">{{ $history->fulfilled_at ? $history->fulfilled_at->format('d M, Y') : 'তথ্য নেই' }}</div>
                                     </td>
                                     <td class="px-6 py-4">
-                                        <div class="font-semibold text-slate-700">{{ $history->bloodRequest->hospital?->display_name ?? 'N/A' }}</div>
-                                        <div class="text-xs text-slate-500 font-medium">{{ $history->bloodRequest->district?->name ?? 'N/A' }}, {{ $history->bloodRequest->upazila?->name ?? '' }}</div>
+                                        <div class="font-semibold text-slate-700">{{ $history->bloodRequest->hospital?->display_name ?? 'তথ্য নেই' }}</div>
+                                        <div class="text-xs text-slate-500 font-medium">{{ $history->bloodRequest->district?->name ?? 'তথ্য নেই' }}, {{ $history->bloodRequest->upazila?->name ?? '' }}</div>
                                     </td>
                                     <td class="px-6 py-4">
                                         <span class="text-xs font-bold text-slate-400 font-mono bg-slate-100 px-2 py-1 rounded-md">
@@ -888,7 +889,7 @@
             </div>
             <div>
                 <h2 class="text-base font-extrabold text-slate-900">আপনার সাম্প্রতিক রিকোয়েস্টসমূহ</h2>
-                <p class="text-xs text-slate-500 font-medium mt-0.5">{{ ($isDonor ?? false) ? 'আপনি যেসব রিকোয়েস্টে সাড়া দিয়েছেন (Accepted)' : 'সর্বশেষ ৫টি রিকোয়েস্টের আপডেট' }}</p>
+                <p class="text-xs text-slate-500 font-medium mt-0.5">{{ ($isDonor ?? false) ? 'আপনি যেসব রিকোয়েস্টে সাড়া দিয়েছেন (গৃহীত)' : 'সর্বশেষ ৫টি রিকোয়েস্টের আপডেট' }}</p>
             </div>
         </div>
 
@@ -898,7 +899,7 @@
                     <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold">
                         <th class="px-6 py-4 border-b border-slate-100">{{ ($isDonor ?? false) ? 'রিকোয়েস্ট ও গ্রুপ' : 'রোগীর নাম ও গ্রুপ' }}</th>
                         <th class="px-6 py-4 border-b border-slate-100">দরকার</th>
-                        <th class="px-6 py-4 border-b border-slate-100">সাড়া (Accepted)</th>
+                        <th class="px-6 py-4 border-b border-slate-100">সাড়া (গৃহীত)</th>
                         <th class="px-6 py-4 border-b border-slate-100">স্ট্যাটাস</th>
                         <th class="px-6 py-4 border-b border-slate-100 text-right">অ্যাকশন</th>
                     </tr>
@@ -919,7 +920,7 @@
                                 <div class="text-xs font-bold text-red-600 mt-0.5">{{ $req->blood_group?->value ?? (string) $req->blood_group }}</div>
                             </td>
                             <td class="px-6 py-4">
-                                <div class="font-semibold text-slate-700">{{ $req->needed_at?->format('d M, Y') ?? 'ASAP' }}</div>
+                                <div class="font-semibold text-slate-700">{{ $req->needed_at?->format('d M, Y') ?? 'যত দ্রুত সম্ভব' }}</div>
                                 <div class="text-xs text-slate-500 font-medium">{{ $req->needed_at?->format('h:i A') ?? '' }}</div>
                             </td>
                             <td class="px-6 py-4">
@@ -932,7 +933,7 @@
                             <td class="px-6 py-4">
                                 @if(strtolower($req->status) === 'fulfilled')
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 uppercase">
-                                        Fulfilled
+                                        সম্পন্ন
                                     </span>
                                 @else
                                     <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 uppercase">
@@ -1010,7 +1011,7 @@
                     @empty
                         <tr>
                             <td colspan="5" class="px-6 py-10 text-center text-slate-500 font-medium">
-                                {{ ($isDonor ?? false) ? 'আপনি এখনো কোনো রিকোয়েস্টে Accepted সাড়া দেননি।' : 'আপনি এখনো কোনো রক্তের রিকোয়েস্ট করেননি।' }}
+                                {{ ($isDonor ?? false) ? 'আপনি এখনো কোনো রিকোয়েস্টে গৃহীত সাড়া দেননি।' : 'আপনি এখনো কোনো রক্তের রিকোয়েস্ট করেননি।' }}
                             </td>
                         </tr>
                     @endforelse
@@ -1049,7 +1050,7 @@
                         </svg>
                     </div>
                     <div>
-                        <h2 class="text-white font-black text-base leading-tight">Digital Smart Card</h2>
+                        <h2 class="text-white font-black text-base leading-tight">ডিজিটাল স্মার্ট কার্ড</h2>
                         <p class="text-slate-500 text-xs font-semibold mt-0.5">QR কোড স্ক্যান করে পরিচয় যাচাই করুন</p>
                     </div>
                 </div>
@@ -1058,7 +1059,7 @@
                     <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                     </svg>
-                    NID Verified
+                    এনআইডি ভেরিফাইড
                 </span>
             </div>
 
@@ -1086,7 +1087,7 @@
                         {{-- Blood Group --}}
                         <span class="inline-flex items-center gap-1.5 text-lg font-black px-4 py-2 rounded-xl text-red-300"
                               style="background:rgba(220,38,38,.15); border:1.5px solid rgba(220,38,38,.3);">
-                            🩸 {{ $user->blood_group?->value ?? 'N/A' }}
+                            🩸 {{ $user->blood_group?->value ?? 'তথ্য নেই' }}
                         </span>
 
                         {{-- Availability Status --}}
@@ -1094,13 +1095,13 @@
                             <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl text-emerald-300"
                                   style="background:rgba(22,163,74,.12); border:1.5px solid rgba(22,163,74,.25);">
                                 <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                                Available
+                                উপলব্ধ
                             </span>
                         @else
                             <span class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl text-amber-300"
                                   style="background:rgba(217,119,6,.1); border:1.5px solid rgba(217,119,6,.25);">
                                 <span class="inline-block w-2 h-2 rounded-full bg-amber-400"></span>
-                                In Cooldown
+                                কুলডাউনে
                             </span>
                         @endif
 
@@ -1131,7 +1132,7 @@
                             <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">গ্যামিফিকেশন পয়েন্ট</p>
                             <p class="text-amber-400 font-black text-xl leading-none">
                                 {{ number_format($user->points ?? 0) }}
-                                <span class="text-slate-500 font-semibold text-xs ml-0.5">pts</span>
+                                <span class="text-slate-500 font-semibold text-xs ml-0.5">পয়েন্ট</span>
                             </p>
                         </div>
                     </div>
@@ -1219,6 +1220,9 @@
     @endif
 
     @if($isDonor)
+
+    <x-dashboard.recovery-timer :items="$donationRecoveryCards" />
+
     {{-- 7. Static Info (Points & Badges Rules) --}}
     {{-- ══════════════════════════════════════════
          🪙 পয়েন্ট ও ব্যাজ সিস্টেম — Quick Guide Teaser
@@ -1263,7 +1267,7 @@
                 <div class="flex items-center gap-3 p-4 bg-orange-50 border border-orange-100 rounded-2xl">
                     <div class="w-10 h-10 rounded-xl bg-orange-100 flex items-center justify-center text-lg shrink-0">⚡</div>
                     <div class="flex-1 min-w-0">
-                        <p class="text-sm font-extrabold text-slate-800">First Responder বোনাস</p>
+                        <p class="text-sm font-extrabold text-slate-800">প্রথম সাড়াদাতা বোনাস</p>
                         <p class="text-xs text-slate-500 font-medium truncate">৩ ঘণ্টার মধ্যে ইমার্জেন্সিতে রেসপন্ড</p>
                     </div>
                     <span class="text-sm font-black text-orange-600 shrink-0">+১০</span>
@@ -1304,7 +1308,7 @@
                     <div class="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-lg shrink-0">🏅</div>
                     <div class="flex-1 min-w-0">
                         <p class="text-sm font-extrabold text-slate-800">মাইলস্টোন ব্যাজ</p>
-                        <p class="text-xs text-slate-500 font-medium truncate">Bronze → Silver → Gold → Platinum</p>
+                        <p class="text-xs text-slate-500 font-medium truncate">ব্রোঞ্জ → সিলভার → গোল্ড → প্লাটিনাম</p>
                     </div>
                     <a href="{{ route('gamification.guide') }}"
                        class="text-xs font-extrabold text-amber-600 hover:text-amber-700 shrink-0 underline underline-offset-2">
@@ -1358,10 +1362,10 @@
                 </p>
                 <div class="flex flex-wrap gap-2 mt-3">
                     <span class="inline-flex items-center gap-1 bg-white/20 border border-white/30 text-white text-xs font-extrabold px-3 py-1 rounded-full">
-                        🎉 সাইন-আপ বোনাস: +১০ pts
+                        🎉 সাইন-আপ বোনাস: +১০ পয়েন্ট
                     </span>
                     <span class="inline-flex items-center gap-1 bg-white/20 border border-white/30 text-white text-xs font-extrabold px-3 py-1 rounded-full">
-                        🩸 প্রথম ডোনেশন বোনাস: +৩০ pts
+                        🩸 প্রথম ডোনেশন বোনাস: +৩০ পয়েন্ট
                     </span>
                 </div>
             </div>
