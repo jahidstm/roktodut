@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
@@ -55,7 +54,7 @@ return new class extends Migration
             return;
         }
 
-        if ($this->hasIndexOnColumn($tableName, $column)) {
+        if (Schema::hasIndex($tableName, $column)) {
             return;
         }
 
@@ -64,44 +63,8 @@ return new class extends Migration
 
     private function dropIndexIfExists(Blueprint $table, string $tableName, string $indexName): void
     {
-        if ($this->hasIndexByName($tableName, $indexName)) {
+        if (Schema::hasIndex($tableName, $indexName)) {
             $table->dropIndex($indexName);
         }
     }
-
-    private function hasIndexOnColumn(string $tableName, string $column): bool
-    {
-        $schema = DB::getDatabaseName();
-
-        $result = DB::selectOne(
-            'SELECT 1
-             FROM information_schema.statistics
-             WHERE table_schema = ?
-               AND table_name = ?
-               AND column_name = ?
-               AND index_name <> ?
-             LIMIT 1',
-            [$schema, $tableName, $column, 'PRIMARY']
-        );
-
-        return $result !== null;
-    }
-
-    private function hasIndexByName(string $tableName, string $indexName): bool
-    {
-        $schema = DB::getDatabaseName();
-
-        $result = DB::selectOne(
-            'SELECT 1
-             FROM information_schema.statistics
-             WHERE table_schema = ?
-               AND table_name = ?
-               AND index_name = ?
-             LIMIT 1',
-            [$schema, $tableName, $indexName]
-        );
-
-        return $result !== null;
-    }
 };
-
