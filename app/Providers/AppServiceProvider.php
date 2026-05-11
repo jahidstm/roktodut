@@ -6,6 +6,7 @@ use App\Models\Post;
 use App\Models\Division;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
@@ -28,6 +29,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if (str_contains(request()->getHost(), 'ngrok')) {
+            URL::forceScheme('https');
+        }
+
         $this->configureViteDevServer();
 
         Event::listen(

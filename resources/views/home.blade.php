@@ -99,6 +99,18 @@
 
         <form action="{{ route('search') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
             
+            {{-- Blood Group --}}
+            <div class="lg:col-span-1">
+                <div class="relative">
+                    <select name="blood_group" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] transition-all appearance-none cursor-pointer">
+                        <option value="">রক্তের গ্রুপ</option>
+                        @foreach(\App\Enums\BloodGroup::cases() as $bg)
+                            <option value="{{ $bg->value }}">{{ $bg->value }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+
             {{-- Division --}}
             <div class="lg:col-span-1">
                 <div class="relative">
@@ -131,18 +143,6 @@
                         <template x-for="u in upazilas" :key="u.id">
                             <option :value="u.id" x-text="u.name"></option>
                         </template>
-                    </select>
-                </div>
-            </div>
-
-            {{-- Blood Group --}}
-            <div class="lg:col-span-1">
-                <div class="relative">
-                    <select name="blood_group" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-700 focus:ring-2 focus:ring-[#D32F2F]/20 focus:border-[#D32F2F] transition-all appearance-none cursor-pointer">
-                        <option value="">রক্তের গ্রুপ</option>
-                        @foreach(\App\Enums\BloodGroup::cases() as $bg)
-                            <option value="{{ $bg->value }}">{{ $bg->value }}</option>
-                        @endforeach
                     </select>
                 </div>
             </div>
