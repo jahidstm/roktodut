@@ -10,6 +10,11 @@
             <h1 class="text-2xl font-extrabold tracking-tight">রক্তদাতা খুঁজুন</h1>
             <p class="text-slate-500 font-medium mt-1">লোকেশন ও গ্রুপের ভিত্তিতে ডোনার সার্চ করুন</p>
         </div>
+
+        <a href="{{ route('requests.create') }}"
+           class="shrink-0 inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-extrabold shadow-sm shadow-red-200">
+            নতুন রিকোয়েস্ট
+        </a>
     </div>
 
     @include('partials.pilot-banner')

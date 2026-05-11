@@ -100,7 +100,7 @@ class DonorRevealController extends Controller
             DB::table('phone_reveal_attempts')->insert([
                 'donor_id' => $donor->id,
                 'ip_hash' => $ipHash,
-                'status' => 'blocked_suspicious',
+                'status' => 'rate_limited',
                 'created_at' => now(),
             ]);
 
