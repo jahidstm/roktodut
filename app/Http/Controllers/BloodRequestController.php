@@ -65,7 +65,7 @@ class BloodRequestController extends Controller
 
         $requests = $query
             // প্রায়োরিটি ১: ইমার্জেন্সি লেভেল
-            ->orderByRaw("FIELD(LOWER(urgency), 'emergency', 'urgent', 'normal')")
+            ->orderByRaw("CASE LOWER(urgency) WHEN 'emergency' THEN 1 WHEN 'urgent' THEN 2 WHEN 'normal' THEN 3 ELSE 4 END")
             // প্রায়োরিটি ২: যার ডেডলাইন সবচেয়ে কাছে (Ascending)
             ->orderBy('needed_at', 'asc')
             ->paginate(10)
