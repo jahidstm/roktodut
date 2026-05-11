@@ -18,7 +18,7 @@ return new class extends Migration
             });
         }
 
-        if (!$this->hasIndexByName('blood_requests', 'blood_requests_component_type_idx')) {
+        if (!Schema::hasIndex('blood_requests', 'blood_requests_component_type_idx')) {
             Schema::table('blood_requests', function (Blueprint $table) {
                 $table->index('component_type', 'blood_requests_component_type_idx');
             });
@@ -31,31 +31,16 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('blood_requests', function (Blueprint $table) {
-            if ($this->hasIndexByName('blood_requests', 'blood_requests_component_type_idx')) {
+        if (Schema::hasIndex('blood_requests', 'blood_requests_component_type_idx')) {
+            Schema::table('blood_requests', function (Blueprint $table) {
                 $table->dropIndex('blood_requests_component_type_idx');
-            }
+            });
+        }
 
-            if (Schema::hasColumn('blood_requests', 'component_type')) {
+        if (Schema::hasColumn('blood_requests', 'component_type')) {
+            Schema::table('blood_requests', function (Blueprint $table) {
                 $table->dropColumn('component_type');
-            }
-        });
-    }
-
-    private function hasIndexByName(string $tableName, string $indexName): bool
-    {
-        $schema = DB::getDatabaseName();
-
-        $result = DB::selectOne(
-            'SELECT 1
-             FROM information_schema.statistics
-             WHERE table_schema = ?
-               AND table_name = ?
-               AND index_name = ?
-             LIMIT 1',
-            [$schema, $tableName, $indexName]
-        );
-
-        return $result !== null;
+            });
+        }
     }
 };
