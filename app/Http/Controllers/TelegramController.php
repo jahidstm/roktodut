@@ -70,6 +70,18 @@ class TelegramController extends Controller
             $this->telegram->send($chatId, "🩸 <b>রক্তদূত বটে স্বাগতম!</b>\n\nআপনার অ্যাকাউন্ট কানেক্ট করতে রক্তদূত প্রোফাইল পেজ থেকে <b>\"Connect Telegram\"</b> বাটনে ক্লিক করুন।");
         }
 
+        // /stop এলে সংযোগ বিচ্ছিন্ন করা
+        if ($messageText === '/stop') {
+            $user = User::where('telegram_chat_id', (string) $chatId)->first();
+            if ($user) {
+                $user->update([
+                    'telegram_chat_id'       => null,
+                    'telegram_connected_at'  => null,
+                ]);
+                $this->telegram->send($chatId, "❌ <b>সংযোগ বিচ্ছিন্ন করা হয়েছে।</b>\n\nআপনি আর রক্তদূতের কোনো নোটিফিকেশন পাবেন না। পুনরায় যুক্ত হতে প্রোফাইল থেকে আবার কানেক্ট করুন।");
+            }
+        }
+
         return response()->json(['ok' => true]);
     }
 

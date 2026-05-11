@@ -69,6 +69,17 @@ class TelegramPullUpdatesCommand extends Command
             } elseif ($messageText === '/start') {
                 $telegramService->send($chatId, "🩸 রক্তদূত বটে স্বাগতম! প্রোফাইল থেকে Connect করুন।");
                 $processedCount++;
+            } elseif ($messageText === '/stop') {
+                $user = User::where('telegram_chat_id', (string) $chatId)->first();
+                if ($user) {
+                    $user->update([
+                        'telegram_chat_id' => null,
+                        'telegram_connected_at' => null,
+                    ]);
+                    $telegramService->send($chatId, "❌ সংযোগ বিচ্ছিন্ন করা হয়েছে।");
+                    $this->info("User {$user->name} disconnected.");
+                    $processedCount++;
+                }
             }
         }
 

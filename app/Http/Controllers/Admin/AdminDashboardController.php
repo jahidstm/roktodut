@@ -212,6 +212,9 @@ class AdminDashboardController extends Controller
                 'decision' => 'approve',
                 'nid_status' => $user->nid_status,
             ]);
+
+            $user->notify(new \App\Notifications\DonorVerificationStatusNotification('approved'));
+
             return back()->with('success', "✅ {$user->name}-এর NID ভেরিফাই সম্পন্ন হয়েছে। 'Verified Donor' ব্যাজ যুক্ত হয়েছে।");
         }
 
@@ -238,6 +241,9 @@ class AdminDashboardController extends Controller
             'nid_status' => $user->nid_status,
             'prior_rejection_count' => $rejectionCount,
         ]);
+
+        $user->notify(new \App\Notifications\DonorVerificationStatusNotification('rejected'));
+
         return back()->with('error', "❌ {$user->name}-এর NID ভেরিফিকেশন বাতিল হয়েছে।");
     }
 

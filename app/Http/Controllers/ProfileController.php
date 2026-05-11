@@ -309,6 +309,32 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        // 🛡️ Data Privacy: ডিলিট করার আগে সেন্সিটিভ ফাইলগুলো স্টোরেজ থেকে মুছে ফেলা
+        if ($user->nid_path && \Illuminate\Support\Facades\Storage::disk('private')->exists($user->nid_path)) {
+            \Illuminate\Support\Facades\Storage::disk('private')->delete($user->nid_path);
+        }
+
+        // 🛡️ Data Privacy: ডোনারের আপলোড করা প্রমাণাদি (Offline / Online) মুছে ফেলা
+        $responsesWithProofs = \App\Models\BloodRequestResponse::where('user_id', $user->id)
+            ->whereNotNull('proof_image_path')
+            ->get();
+            
+        foreach ($responsesWithProofs as $response) {
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($response->proof_image_path)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($response->proof_image_path);
+            }
+        }
+
+        $offlineClaimsWithProofs = \App\Models\OfflineDonationClaim::where('donor_id', $user->id)
+            ->whereNotNull('proof_path')
+            ->get();
+            
+        foreach ($offlineClaimsWithProofs as $claim) {
+            if (\Illuminate\Support\Facades\Storage::disk('public')->exists($claim->proof_path)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($claim->proof_path);
+            }
+        }
+
         Auth::logout();
         $user->delete();
 
