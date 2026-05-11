@@ -24,8 +24,8 @@
         </div>
     @endif
 
-    <x-card class="mb-8" paddings="p-5">
-        <form method="GET" action="{{ route('search') }}" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+    <x-card class="mb-8 border-slate-200" paddings="p-5">
+        <form method="GET" action="{{ route('search') }}" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1">রক্তের গ্রুপ</label>
                     <select name="blood_group" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
@@ -70,15 +70,15 @@
                         <option value="">প্রথমে জেলা নির্বাচন করুন</option>
                     </select>
                 </div>
-                <div class="md:col-span-4 flex justify-end gap-2 mt-2">
+                <div class="md:col-span-5 flex justify-end gap-2 mt-2">
                     @if(request()->hasAny(['blood_group', 'component_type', 'division_id', 'district_id', 'upazila_id']))
-                        <x-secondary-button href="{{ route('search') }}">
+                        <a href="{{ route('search') }}" class="shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg font-extrabold transition-colors flex items-center justify-center">
                             রিসেট
-                        </x-secondary-button>
+                        </a>
                     @endif
-                    <x-primary-button>
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-8 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
                         খুঁজুন
-                    </x-primary-button>
+                    </button>
                 </div>
 
                 <input type="hidden" id="selectedDivision" value="{{ $selectedDivision }}">
