@@ -17,7 +17,6 @@
         </a>
     </div>
 
-    @include('partials.pilot-banner')
 
     @php
         $selectedDivision = $request['division_id'] ?? '';
