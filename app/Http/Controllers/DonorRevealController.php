@@ -83,7 +83,29 @@ class DonorRevealController extends Controller
             'captcha_answer.required' => 'ক্যাপচা উত্তর দেওয়া বাধ্যতামূলক।',
         ]);
 
-        $ipHash = hash('sha256', ((string) $request->ip()) . '|' . ((string) config('app.key')));
+        $ipHash = hash('sha256', implode('|', [
+            (string) $request->ip(),
+            (string) $request->userAgent(),
+            (string) $request->header('Accept-Language', ''),
+            (string) config('app.key'),
+        ]));
+
+        $failedCaptchaBurst = DB::table('phone_reveal_attempts')
+            ->where('ip_hash', $ipHash)
+            ->where('status', 'failed_captcha')
+            ->where('created_at', '>=', Carbon::now()->subMinutes(30))
+            ->count();
+
+        if ($failedCaptchaBurst >= 5) {
+            DB::table('phone_reveal_attempts')->insert([
+                'donor_id' => $donor->id,
+                'ip_hash' => $ipHash,
+                'status' => 'blocked_suspicious',
+                'created_at' => now(),
+            ]);
+
+            return $this->deny($request, (int) $donor->id, 'বারবার ভুল যাচাইকরণ চেষ্টার কারণে এই ডিভাইসটি সাময়িকভাবে ব্লক করা হয়েছে। ৩০ মিনিট পরে আবার চেষ্টা করুন।', 429);
+        }
 
         if (!$mathCaptchaService->verify($request->input('captcha_answer'))) {
             DB::table('phone_reveal_attempts')->insert([

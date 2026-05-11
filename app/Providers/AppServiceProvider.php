@@ -77,30 +77,51 @@ class AppServiceProvider extends ServiceProvider
 
         RateLimiter::for('requests-store', function (Request $request) {
             $message = 'অনেক বেশি অনুরোধ করা হয়েছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।';
+            $fingerprint = $this->requestFingerprint($request);
 
-            return ($request->user() ? Limit::perMinute(10) : Limit::perMinute(5))
-                ->by('requests-store:' . $request->ip())
-                ->response(function (Request $request) use ($message) {
-                    if ($request->expectsJson()) {
-                        return response()->json(['message' => $message], 429);
-                    }
+            $limits = $request->user()
+                ? [
+                    Limit::perMinute(10)->by('requests-store:user:' . $request->user()->id),
+                    Limit::perHour(30)->by('requests-store:user-hour:' . $request->user()->id),
+                ]
+                : [
+                    Limit::perMinute(4)->by('requests-store:device:' . $fingerprint),
+                    Limit::perHour(12)->by('requests-store:device-hour:' . $fingerprint),
+                ];
 
-                    return back()->withInput()->with('error', $message);
-                });
+            return collect($limits)->map(fn(Limit $limit) => $limit->response(function (Request $request) use ($message) {
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => $message], 429);
+                }
+
+                return back()->withInput()->with('error', $message);
+            }))->all();
         });
 
         RateLimiter::for('reports-submit', function (Request $request) {
             $message = 'অল্প সময়ের মধ্যে অনেক বেশি রিপোর্ট করা হয়েছে। অনুগ্রহ করে ১ মিনিট পরে আবার চেষ্টা করুন।';
+            $fingerprint = $this->requestFingerprint($request);
 
-            return Limit::perMinute(3)
-                ->by('reports-submit:' . $request->ip())
-                ->response(function (Request $request) use ($message) {
-                    if ($request->expectsJson()) {
-                        return response()->json(['message' => $message], 429);
-                    }
+            return [
+                Limit::perMinute(3)
+                    ->by('reports-submit:device:' . $fingerprint)
+                    ->response(function (Request $request) use ($message) {
+                        if ($request->expectsJson()) {
+                            return response()->json(['message' => $message], 429);
+                        }
 
-                    return back()->withInput()->with('error', $message);
-                });
+                        return back()->withInput()->with('error', $message);
+                    }),
+                Limit::perHour(10)
+                    ->by('reports-submit:device-hour:' . $fingerprint)
+                    ->response(function (Request $request) use ($message) {
+                        if ($request->expectsJson()) {
+                            return response()->json(['message' => $message], 429);
+                        }
+
+                        return back()->withInput()->with('error', $message);
+                    }),
+            ];
         });
 
         RateLimiter::for('phone-reveal', function (Request $request) {
@@ -108,16 +129,27 @@ class AppServiceProvider extends ServiceProvider
                 return Limit::none();
             }
 
-            return Limit::perMinutes(15, 5)->by($request->user()?->id ?: $request->ip())
-                ->response(function (Request $request) {
-                    if ($request->expectsJson()) {
-                        return response()->json([
-                            'message' => 'অত্যধিক রিকোয়েস্ট! স্প্যাম প্রতিরোধের জন্য আপনাকে সাময়িকভাবে ব্লক করা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পর আবার চেষ্টা করুন।'
-                        ], 429);
-                    }
+            $fingerprint = $this->requestFingerprint($request);
+            $message = 'অত্যধিক রিকোয়েস্ট! স্প্যাম প্রতিরোধের জন্য আপনাকে সাময়িকভাবে ব্লক করা হয়েছে। অনুগ্রহ করে ১৫ মিনিট পর আবার চেষ্টা করুন।';
 
-                    return back()->with('error', 'অত্যধিক রিকোয়েস্ট! অনুগ্রহ করে ১৫ মিনিট পর আবার চেষ্টা করুন।');
-                });
+            return [
+                Limit::perMinutes(15, 5)->by('phone-reveal:device:' . $fingerprint)
+                    ->response(function (Request $request) use ($message) {
+                        if ($request->expectsJson()) {
+                            return response()->json(['message' => $message], 429);
+                        }
+
+                        return back()->with('error', $message);
+                    }),
+                Limit::perDay(20)->by('phone-reveal:device-day:' . $fingerprint)
+                    ->response(function (Request $request) use ($message) {
+                        if ($request->expectsJson()) {
+                            return response()->json(['message' => $message], 429);
+                        }
+
+                        return back()->with('error', $message);
+                    }),
+            ];
         });
 
         View::composer('admin.layouts.sidebar', function ($view) {
@@ -137,5 +169,23 @@ class AppServiceProvider extends ServiceProvider
 
         // Force built assets even if a stale public/hot file exists.
         Vite::useHotFile(storage_path('framework/vite.hot'));
+    }
+
+    private function requestFingerprint(Request $request): string
+    {
+        $userId = (string) ($request->user()?->id ?? 'guest');
+        $ip = (string) $request->ip();
+        $userAgent = (string) $request->userAgent();
+        $language = (string) $request->header('Accept-Language', '');
+        $deviceId = (string) $request->header('X-Device-Id', '');
+
+        return hash('sha256', implode('|', [
+            $userId,
+            $ip,
+            $userAgent,
+            $language,
+            $deviceId,
+            (string) config('app.key'),
+        ]));
     }
 }
