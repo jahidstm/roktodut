@@ -46,7 +46,7 @@ class PublicBloodRequestController extends Controller
         }
 
         $requests = $query
-            ->orderByRaw("FIELD(urgency, 'emergency', 'urgent', 'normal')")
+            ->orderByRaw("CASE urgency WHEN 'emergency' THEN 1 WHEN 'urgent' THEN 2 WHEN 'normal' THEN 3 ELSE 4 END")
             ->orderBy('needed_at', 'asc')
             ->paginate(12)
             ->withQueryString();
