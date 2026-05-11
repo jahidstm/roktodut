@@ -111,6 +111,9 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
             'last_login_at'     => 'datetime',
             'date_of_birth'     => 'date',
             'last_donated_at'   => 'date',
+            'last_whole_blood_donated_at' => 'date',
+            'last_plasma_donated_at'      => 'date',
+            'last_platelet_donated_at'    => 'date',
             'is_onboarded'      => 'boolean',
             'is_campus_hero'    => 'boolean',
             'is_shadowbanned'   => 'boolean',
@@ -256,31 +259,39 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         return $this->cooldown_until && $this->cooldown_until->isFuture();
     }
 
-    // 🎯 FIX: 'last_donated_at' কলাম ব্যবহার করা হলো
     public function canDonate(mixed $componentType = null): bool
     {
-        if (!$this->last_donated_at) {
-            return true;
-        }
-        $cooldownDays = $this->resolveCooldownDaysForComponent($componentType);
-        return $this->last_donated_at->copy()->addDays($cooldownDays)->isPast();
+        return $this->daysUntilNextDonation($componentType) === 0;
     }
 
-    // 🎯 FIX: 'last_donated_at' কলাম ব্যবহার করা হলো
     public function daysUntilNextDonation(mixed $componentType = null): int
     {
-        if (!$this->last_donated_at) {
+        $value = $this->resolveComponentValue($componentType);
+        
+        $lastDonatedAt = match($value) {
+            BloodComponentType::PLASMA->value    => $this->last_plasma_donated_at,
+            BloodComponentType::PLATELETS->value => $this->last_platelet_donated_at,
+            default                              => $this->last_whole_blood_donated_at ?? $this->last_donated_at,
+        };
+
+        if (!$lastDonatedAt) {
             return 0;
         }
-        $cooldownDays = $this->resolveCooldownDaysForComponent($componentType);
-        $nextDonationDate = $this->last_donated_at->copy()->addDays($cooldownDays);
+
+        $cooldownDays = match($value) {
+            BloodComponentType::PLASMA->value    => 28,
+            BloodComponentType::PLATELETS->value => 14,
+            default                              => 120,
+        };
+
+        $nextDonationDate = $lastDonatedAt->copy()->addDays($cooldownDays);
         return max(0, (int) now()->diffInDays($nextDonationDate, false));
     }
 
-    // 🎯 FIX: 'last_donated_at' কলাম ব্যবহার করা হলো
     public function getNextEligibleDateAttribute()
     {
-        return $this->last_donated_at ? $this->last_donated_at->copy()->addDays(120) : null;
+        $lastDonatedAt = $this->last_whole_blood_donated_at ?? $this->last_donated_at;
+        return $lastDonatedAt ? $lastDonatedAt->copy()->addDays(120) : null;
     }
 
     public function getIsEligibleToDonateAttribute()
@@ -288,13 +299,11 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         return $this->canDonate();
     }
 
-    private function resolveCooldownDaysForComponent(mixed $componentType = null): int
+    private function resolveComponentValue(mixed $componentType): string
     {
-        $value = $componentType instanceof BloodComponentType
+        return $componentType instanceof BloodComponentType
             ? $componentType->value
             : (string) ($componentType ?? BloodComponentType::WHOLE_BLOOD->value);
-
-        return $value === BloodComponentType::PLATELETS->value ? 14 : 120;
     }
 
     public function scopeInSameOrganization($query)

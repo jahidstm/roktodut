@@ -266,7 +266,15 @@
                         তথ্যসূত্র
                     </h3>
                     <ol class="space-y-2">
-                        @foreach($post->healthMeta->sources_json as $i => $src)
+                        @php
+                            $sources = $post->healthMeta->sources_json;
+                            if (is_string($sources)) {
+                                $sources = json_decode($sources, true) ?? [];
+                            } elseif (!is_array($sources) && !is_object($sources)) {
+                                $sources = [];
+                            }
+                        @endphp
+                        @foreach($sources as $i => $src)
                             <li class="flex items-start gap-2 text-sm text-slate-600 font-medium">
                                 <span class="shrink-0 text-red-600 font-black">{{ $i + 1 }}.</span>
                                 @if(isset($src['url']))

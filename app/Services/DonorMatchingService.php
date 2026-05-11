@@ -42,7 +42,6 @@ class DonorMatchingService
     public function match(BloodRequest $request): Collection
     {
         $cap            = $this->getCap($request->urgency);
-        $cooldownCutoff = Carbon::now()->subDays($this->getCooldownDays($request));
 
         // ── রিকোয়েস্টে lat/lng আছে কিনা চেক করা ──────────────────────────
         $hasCoords = $request->latitude !== null && $request->longitude !== null;
@@ -54,7 +53,7 @@ class DonorMatchingService
 
             $radiusKm = self::RADIUS[$urgencyValue] ?? self::RADIUS['normal'];
 
-            $donors = $this->buildBaseQuery($request, $cooldownCutoff)
+            $donors = $this->buildBaseQuery($request)
                 ->closeTo((float) $request->latitude, (float) $request->longitude, $radiusKm)
                 // Smart Sorting: দূরত্ব আগে (scopeCloseTo already sorts by distance)
                 // তারপর gamification tier
@@ -71,7 +70,7 @@ class DonorMatchingService
             }
 
             // ── কম ডোনার পেলে radius দ্বিগুণ করে আবার চেষ্টা (expanded search) ─
-            $expandedDonors = $this->buildBaseQuery($request, $cooldownCutoff)
+            $expandedDonors = $this->buildBaseQuery($request)
                 ->closeTo((float) $request->latitude, (float) $request->longitude, $radiusKm * 2)
                 ->orderByDesc('is_ready_now')
                 ->orderByDesc('verified_badge')
@@ -86,7 +85,7 @@ class DonorMatchingService
         }
 
         // ── Fallback: জেলা-ভিত্তিক পুরনো পদ্ধতি ────────────────────────────
-        return $this->buildBaseQuery($request, $cooldownCutoff)
+        return $this->buildBaseQuery($request)
             ->where('district_id', $request->district_id)
             ->orderByDesc('is_ready_now')
             ->orderByDesc('verified_badge')
@@ -99,7 +98,7 @@ class DonorMatchingService
     /**
      * Base query — সব রিকোয়েস্টে common ফিল্টারগুলো।
      */
-    private function buildBaseQuery(BloodRequest $request, Carbon $cooldownCutoff)
+    private function buildBaseQuery(BloodRequest $request)
     {
         return User::query()
             // ✅ is_donor flag — flexible, not role enum
@@ -123,10 +122,26 @@ class DonorMatchingService
                     ->orWhere('is_available', true);
             })
 
-            // ✅ ১২০ দিনের কুলডাউন পার হয়েছে
-            ->where(function ($q) use ($cooldownCutoff) {
-                $q->whereNull('last_donated_at')
-                    ->orWhere('last_donated_at', '<=', $cooldownCutoff);
+            // ✅ Component ভিত্তিক 3-Tier কুলডাউন চেক
+            ->where(function ($q) use ($request) {
+                $component = $request->component_type instanceof BloodComponentType 
+                    ? $request->component_type->value 
+                    : (string) ($request->component_type ?? BloodComponentType::WHOLE_BLOOD->value);
+
+                if ($component === BloodComponentType::PLASMA->value) {
+                    $q->whereNull('last_plasma_donated_at')
+                      ->orWhere('last_plasma_donated_at', '<=', now()->subDays(28));
+                } elseif ($component === BloodComponentType::PLATELETS->value) {
+                    $q->whereNull('last_platelet_donated_at')
+                      ->orWhere('last_platelet_donated_at', '<=', now()->subDays(14));
+                } else {
+                    $q->whereNull('last_whole_blood_donated_at')
+                      ->orWhere('last_whole_blood_donated_at', '<=', now()->subDays(120))
+                      ->where(function ($subQ) {
+                          $subQ->whereNull('last_donated_at')
+                               ->orWhere('last_donated_at', '<=', now()->subDays(120));
+                      });
+                }
             });
     }
 
@@ -142,15 +157,5 @@ class DonorMatchingService
             : self::CAP_NORMAL;
     }
 
-    private function getCooldownDays(BloodRequest $request): int
-    {
-        $component = $request->component_type;
-        $value = $component instanceof BloodComponentType
-            ? $component->value
-            : (string) $component;
 
-        return $value === BloodComponentType::PLATELETS->value
-            ? self::PLATELET_COOLDOWN_DAYS
-            : self::COOLDOWN_DAYS;
-    }
 }
