@@ -12,6 +12,7 @@ use App\Models\BloodRequest;
 use App\Models\ChronicRequestSubscription;
 use App\Models\BloodRequestResponse;
 use App\Models\District;
+use App\Models\User;
 use App\Services\DonorMatchingService;
 use App\Services\MathCaptchaService;
 use App\Support\PhoneNormalizer;
@@ -282,8 +283,9 @@ class BloodRequestController extends Controller
         // ১. রিকোয়েস্ট সেভ করা
         $bloodRequest = BloodRequest::create($data);
 
-        // ১.১ FCM push dispatch (queue)
-        DispatchEmergencyAlert::dispatch($bloodRequest)->afterCommit();
+        // ১.১ FCM push dispatch
+        // queue worker বন্ধ থাকলেও যাতে alert যায়, তাই sync dispatch।
+        DispatchEmergencyAlert::dispatchSync($bloodRequest);
 
         // ২. জেলার নাম বের করা (নোটিফিকেশনে দেখানোর জন্য)
         $districtName = District::find($bloodRequest->district_id)->name ?? 'আপনার';
@@ -291,18 +293,27 @@ class BloodRequestController extends Controller
         // ⚙️ ৩. স্মার্ট ডোনার ম্যাচিং সার্ভিস (fixes last_donation_date bug)
         $donors = app(DonorMatchingService::class)->match($bloodRequest);
 
-        // 🚀 ৪. টার্গেটেড নোটিফিকেশন ব্যাকগ্রাউন্ড জবে পাঠানো (UI ব্লক হবে না)
+        // 🚀 ৪. টার্গেটেড নোটিফিকেশন (queue worker ছাড়া fallback)
         if ($donors->isNotEmpty()) {
-            SendEmergencyBloodRequestNotificationJob::dispatch(
+            SendEmergencyBloodRequestNotificationJob::dispatchSync(
                 bloodRequestId: $bloodRequest->id,
                 districtName: $districtName,
                 donorIds: $donors->pluck('id')->all()
             );
         }
 
+        $telegramConnectedCount = User::query()
+            ->whereIn('id', $donors->pluck('id'))
+            ->whereNotNull('telegram_chat_id')
+            ->count();
+
         $successMsg = $data['is_phone_hidden']
             ? '🛡️ আপনার রিকোয়েস্ট তৈরি হয়েছে! নম্বর গোপন রাখা হয়েছে — ডোনাররা সরাসরি আপনার Telegram-এ নিজের নম্বর পাঠাবে।'
-            : 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে এবং ' . $donors->count() . ' জন ডোনারকে অ্যালার্ট পাঠানো হয়েছে।';
+            : 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে। '
+                . $donors->count()
+                . ' জন ডোনারকে ইন-অ্যাপ অ্যালার্ট পাঠানো হয়েছে, এর মধ্যে Telegram-এ সংযুক্ত '
+                . $telegramConnectedCount
+                . ' জন।';
 
         return redirect()->route('requests.show', $bloodRequest)
             ->with('success', $successMsg);

@@ -69,7 +69,7 @@ class SendEmergencyBloodRequestNotificationJob implements ShouldQueue
             ->chunk(25, function ($donors) use ($bloodRequest, $telegram, $alertData) {
 
                 // ১. In-App Notification
-                Notification::send($donors, new BloodRequestMatchedNotification($bloodRequest, $this->districtName));
+                Notification::sendNow($donors, new BloodRequestMatchedNotification($bloodRequest, $this->districtName));
 
                 // ২. Telegram Alert
                 $telegramDonors = $donors->filter(fn($d) => !empty($d->telegram_chat_id));

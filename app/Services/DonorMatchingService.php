@@ -129,18 +129,23 @@ class DonorMatchingService
                     : (string) ($request->component_type ?? BloodComponentType::WHOLE_BLOOD->value);
 
                 if ($component === BloodComponentType::PLASMA->value) {
-                    $q->whereNull('last_plasma_donated_at')
-                      ->orWhere('last_plasma_donated_at', '<=', now()->subDays(28));
+                    $q->where(function ($sq) {
+                        $sq->whereNull('last_plasma_donated_at')
+                           ->orWhere('last_plasma_donated_at', '<=', now()->subDays(28));
+                    });
                 } elseif ($component === BloodComponentType::PLATELETS->value) {
-                    $q->whereNull('last_platelet_donated_at')
-                      ->orWhere('last_platelet_donated_at', '<=', now()->subDays(14));
+                    $q->where(function ($sq) {
+                        $sq->whereNull('last_platelet_donated_at')
+                           ->orWhere('last_platelet_donated_at', '<=', now()->subDays(14));
+                    });
                 } else {
-                    $q->whereNull('last_whole_blood_donated_at')
-                      ->orWhere('last_whole_blood_donated_at', '<=', now()->subDays(120))
-                      ->where(function ($subQ) {
-                          $subQ->whereNull('last_donated_at')
-                               ->orWhere('last_donated_at', '<=', now()->subDays(120));
-                      });
+                    $q->where(function ($sq) {
+                        $sq->whereNull('last_whole_blood_donated_at')
+                           ->orWhere('last_whole_blood_donated_at', '<=', now()->subDays(120));
+                    })->where(function ($sq) {
+                        $sq->whereNull('last_donated_at')
+                           ->orWhere('last_donated_at', '<=', now()->subDays(120));
+                    });
                 }
             });
     }

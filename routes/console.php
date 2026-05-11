@@ -14,3 +14,9 @@ Schedule::command('requests:expire')->everyFifteenMinutes();
 Schedule::command('donations:auto-approve')->hourly();
 Schedule::command('subscriptions:dispatch-requests')->hourly();
 Schedule::command('nid:purge-expired')->daily();
+
+// Queue worker fallback (shared hosting / no Supervisor)
+// IMPORTANT: Server-এ cron দিয়ে `php artisan schedule:run` চালু থাকতে হবে।
+Schedule::command('queue:work --stop-when-empty --sleep=1 --tries=3')
+    ->everyMinute()
+    ->withoutOverlapping();
