@@ -52,6 +52,10 @@ class BloodRequestController extends Controller
             $query->where('blood_group', $request->blood_group);
         }
 
+        if ($request->filled('component_type')) {
+            $query->where('component_type', $request->component_type);
+        }
+
         if ($request->filled('division_id')) {
             $query->where('division_id', $request->division_id);
         }

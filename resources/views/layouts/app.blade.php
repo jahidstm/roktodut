@@ -220,7 +220,7 @@
                         {{-- Avatar Thumbnail --}}
                         <div class="w-7 h-7 sm:w-8 sm:h-8 shrink-0 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden">
                             @if(auth()->user()->profile_image)
-                                <img src="{{ asset('storage/' . auth()->user()->profile_image) }}" alt="Profile" class="w-full h-full object-cover" loading="lazy" decoding="async">
+                                <img src="{{ route('profile.avatar', auth()->user()) }}" alt="Profile" class="w-full h-full object-cover" loading="lazy" decoding="async">
                             @else
                                 <span class="text-slate-600 font-black text-xs sm:text-sm">{{ mb_substr(auth()->user()->name, 0, 1) }}</span>
                             @endif

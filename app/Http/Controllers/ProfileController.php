@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Notifications\AdminTaskNotification;
 use App\Services\AuditLogger;
 use App\Services\GamificationService;
-use Illuminate\Http\Response;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,6 +15,7 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProfileController extends Controller
 {
@@ -488,7 +488,7 @@ class ProfileController extends Controller
             ->with('success_msg', 'অভিনন্দন! আপনি এখন সফলভাবে রক্তদাতা হিসেবে যুক্ত হয়েছেন।');
     }
 
-    public function avatar(User $user): Response
+    public function avatar(User $user): BinaryFileResponse
     {
         $path = (string) $user->profile_image;
         if ($path === '' || !Storage::disk('public')->exists($path)) {

@@ -20,7 +20,7 @@
 
     {{-- 🎯 Advanced Filter Section (Server-side Divisions + AJAX Cascade) --}}
     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8">
-        <form action="{{ route('requests.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+        <form action="{{ route('requests.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
             
             <div>
                 <label for="blood_group" class="block text-sm font-bold text-slate-700 mb-1">রক্তের গ্রুপ</label>
@@ -29,6 +29,17 @@
                     @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bg)
                         <option value="{{ $bg }}" {{ request('blood_group') == $bg ? 'selected' : '' }}>{{ $bg }}</option>
                     @endforeach
+                </select>
+            </div>
+
+            <div>
+                <label for="component_type" class="block text-sm font-bold text-slate-700 mb-1">রক্তের ধরন</label>
+                <select name="component_type" id="component_type" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
+                    <option value="">সব ধরন</option>
+                    <option value="whole_blood" {{ request('component_type') == 'whole_blood' ? 'selected' : '' }}>পূর্ণ রক্ত</option>
+                    <option value="prbc" {{ request('component_type') == 'prbc' ? 'selected' : '' }}>PRBC</option>
+                    <option value="platelet" {{ request('component_type') == 'platelet' ? 'selected' : '' }}>Platelet (Apheresis)</option>
+                    <option value="plasma" {{ request('component_type') == 'plasma' ? 'selected' : '' }}>Plasma</option>
                 </select>
             </div>
 
@@ -57,8 +68,8 @@
                 </select>
             </div>
 
-             <div class="md:col-span-4 flex justify-end gap-2 mt-2">
-                 @if(request()->hasAny(['blood_group', 'division_id', 'district_id', 'upazila_id']))
+             <div class="md:col-span-5 flex justify-end gap-2 mt-2">
+                 @if(request()->hasAny(['blood_group', 'component_type', 'division_id', 'district_id', 'upazila_id']))
                      <a href="{{ route('requests.index') }}" class="shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg font-extrabold transition-colors flex items-center justify-center">
                          ক্লিয়ার
                     </a>
