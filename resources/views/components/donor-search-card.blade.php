@@ -50,22 +50,25 @@
         </span>
     </div>
 
-    <div class="mt-3 flex flex-wrap gap-2">
-        @if($isAvailableNow)
-            <span class="inline-flex h-7 items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 text-xs font-bold text-emerald-700">Available</span>
-        @endif
-        @if($isOrgVerified)
-            <span class="inline-flex h-7 items-center rounded-full border border-blue-200 bg-blue-50 px-3 text-xs font-bold text-blue-700">Org Verified</span>
-        @endif
-        @if($isNidVerified)
-            <span class="inline-flex h-7 items-center rounded-full border border-teal-200 bg-teal-50 px-3 text-xs font-bold text-teal-700">NID Verified</span>
-        @endif
-        @if($isPlateletReady)
-            <span class="inline-flex h-7 items-center rounded-full border border-fuchsia-200 bg-fuchsia-50 px-3 text-xs font-bold text-fuchsia-700">Platelet Ready</span>
-        @endif
-        @if(!$isAvailableNow && !$isOrgVerified && !$isNidVerified && !$isPlateletReady)
-            <span class="inline-flex h-7 items-center rounded-full border border-slate-200 bg-slate-100 px-3 text-xs font-bold text-slate-700">Regular</span>
-        @endif
+    @php
+        $badges = [];
+        if($isAvailableNow) $badges[] = '<span class="inline-flex h-7 shrink-0 items-center rounded-full border border-emerald-200 bg-emerald-50 px-3 text-xs font-bold text-emerald-700">Available</span>';
+        if($isOrgVerified) $badges[] = '<span class="inline-flex h-7 shrink-0 items-center rounded-full border border-blue-200 bg-blue-50 px-3 text-xs font-bold text-blue-700">Org Verified</span>';
+        if($isNidVerified) $badges[] = '<span class="inline-flex h-7 shrink-0 items-center rounded-full border border-teal-200 bg-teal-50 px-3 text-xs font-bold text-teal-700">NID Verified</span>';
+        if($isPlateletReady) $badges[] = '<span class="inline-flex h-7 shrink-0 items-center rounded-full border border-fuchsia-200 bg-fuchsia-50 px-3 text-xs font-bold text-fuchsia-700">Platelet Ready</span>';
+        
+        if(empty($badges)) {
+            $badges[] = '<span class="inline-flex h-7 shrink-0 items-center rounded-full border border-slate-200 bg-slate-100 px-3 text-xs font-bold text-slate-700">Regular</span>';
+        }
+        
+        // Take max 3 badges
+        $badges = array_slice($badges, 0, 3);
+    @endphp
+
+    <div class="mt-3 flex flex-wrap gap-2 h-7 overflow-hidden">
+        @foreach($badges as $badge)
+            {!! $badge !!}
+        @endforeach
     </div>
 
     <div class="mt-3 grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">

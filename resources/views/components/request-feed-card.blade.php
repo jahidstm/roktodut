@@ -89,20 +89,31 @@
             <p class="text-[11px] font-semibold text-slate-500">পোস্ট</p>
             <p class="mt-0.5 text-sm font-bold text-slate-800">{{ \App\Support\BanglaDate::relative($request->created_at) }}</p>
         </div>
-        <div class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 sm:col-span-2 flex items-center justify-between">
-            <div>
-                <p class="text-[11px] font-semibold text-slate-500">যোগাযোগ</p>
-                @if($request->is_phone_hidden)
-                    <p class="mt-0.5 text-xs font-bold text-purple-700 flex items-center gap-1">
-                        🛡️ নম্বর সুরক্ষিত — ডোনাররা সরাসরি টেলিগ্রামে পাঠাবে
-                    </p>
-                @else
-                    <p class="mt-0.5 text-sm font-bold text-slate-800">
-                        <a href="tel:{{ $request->contact_number }}" class="text-red-600 hover:underline">{{ $request->contact_number }}</a>
-                    </p>
-                @endif
+    </div>
+
+    <hr class="my-4 border-slate-100">
+
+    <div class="mb-4">
+        @if($request->is_phone_hidden)
+            <div class="flex items-center gap-3">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-purple-100 text-purple-600">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.955 11.955 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.249-8.25-3.285Z"/>
+                    </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-extrabold text-purple-700">নম্বর সুরক্ষিত 🛡️</p>
+                    <p class="text-[11px] font-medium text-purple-500 mt-0.5 leading-tight">ডোনাররা সরাসরি টেলিগ্রামে সাড়া পাঠাবে।</p>
+                </div>
             </div>
-        </div>
+        @else
+            <div class="flex items-center justify-between gap-2">
+                <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">মোবাইল নম্বর</p>
+                <a href="tel:{{ $request->contact_number }}" class="font-mono text-sm font-bold text-red-600 hover:text-red-700 hover:underline">
+                    {{ $request->contact_number }}
+                </a>
+            </div>
+        @endif
     </div>
 
     <div class="mt-3 flex items-center justify-between gap-2">
