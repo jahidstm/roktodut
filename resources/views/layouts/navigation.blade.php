@@ -20,13 +20,13 @@
                     @auth
                         <a href="{{ route('requests.index') }}"
                            class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('requests.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                            রক্তদান
+                            রক্তের অনুরোধ
                         </a>
                     @endauth
                     @guest
                         <a href="{{ route('public.requests.index') }}"
                            class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('public.requests.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                            রক্তদান
+                            রক্তের অনুরোধ
                         </a>
                     @endguest
                     <a href="{{ route('requests.my-requests') }}"
@@ -39,7 +39,7 @@
                     </a>
                     <a href="{{ route('leaderboard') }}"
                        class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('leaderboard') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                        সেরা রক্তদাতা
+                        লিডারবোর্ড
                     </a>
                     <a href="{{ route('blog.index') }}"
                        class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('blog.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
@@ -143,12 +143,12 @@
             </x-responsive-nav-link>
             @auth
                 <x-responsive-nav-link :href="route('requests.index')" :active="request()->routeIs('requests.*')" class="font-bold">
-                    রক্তদান
+                    রক্তের অনুরোধ
                 </x-responsive-nav-link>
             @endauth
             @guest
                 <x-responsive-nav-link :href="route('public.requests.index')" class="font-bold">
-                    রক্তদান
+                    রক্তের অনুরোধ
                 </x-responsive-nav-link>
             @endguest
             <x-responsive-nav-link :href="route('requests.my-requests')" :active="request()->routeIs('requests.my-requests')" class="font-bold">
@@ -158,7 +158,7 @@
                 রক্তদাতা খুঁজুন
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('leaderboard')" :active="request()->routeIs('leaderboard')" class="font-bold">
-                সেরা রক্তদাতা
+                লিডারবোর্ড
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('blog.index')" :active="request()->routeIs('blog.*')" class="font-bold">
                 স্বাস্থ্যবার্তা

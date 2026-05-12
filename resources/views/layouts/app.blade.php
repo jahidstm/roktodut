@@ -44,7 +44,6 @@
     <div class="mx-auto max-w-6xl px-4 py-4 sm:py-5 relative flex items-center justify-between">
         @php
             $requestsRoute = \Illuminate\Support\Facades\Route::has('requests') ? route('requests') : route('requests.index');
-            $isCompactHeader = request()->routeIs('requests.*') || request()->routeIs('search') || request()->routeIs('search.*');
         @endphp
         
         {{-- 🩸 Logo & Brand --}}
@@ -60,42 +59,29 @@
 
         {{-- 🧭 Navigation & Actions --}}
         <nav class="ml-auto flex items-center gap-3 sm:gap-5">
-            @unless($isCompactHeader)
-                {{-- Center Menu (Exact 5 items) --}}
-                <div class="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 text-[15px] font-semibold text-slate-600">
-                    <a href="{{ route('home') }}"
-                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('home') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                        হোম
-                    </a>
-                    <a href="{{ $requestsRoute }}"
-                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('requests') || request()->routeIs('requests.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                        রক্তদান
-                    </a>
-                    <a href="{{ route('search') }}"
-                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('search') || request()->routeIs('search.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                        রক্তদাতা খুঁজুন
-                    </a>
-                    <a href="{{ route('leaderboard') }}"
-                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('leaderboard') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                        সেরা রক্তদাতা
-                    </a>
-                    <a href="{{ route('blog.index') }}"
-                       class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('blog.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                        স্বাস্থ্যবার্তা
-                    </a>
-                </div>
-            @endunless
-
-            @if($isCompactHeader)
-                @auth
-                    <a href="{{ $requestsRoute }}" class="hidden md:block text-sm font-bold text-slate-700 hover:text-red-600 transition-colors">
-                        রিকোয়েস্ট ফিড
-                    </a>
-                @endauth
-                <a href="{{ route('requests.create') }}" class="hidden md:inline-flex items-center bg-[#0f172a] hover:bg-slate-900 text-white px-4 py-2 rounded-xl font-black text-sm shadow-sm transition-colors">
-                    রিকোয়েস্ট করুন
+            {{-- Center Menu (Exact 5 items) --}}
+            <div class="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 text-[15px] font-semibold text-slate-600">
+                <a href="{{ route('home') }}"
+                   class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('home') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                    হোম
                 </a>
-            @endif
+                <a href="{{ $requestsRoute }}"
+                   class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('requests') || request()->routeIs('requests.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                    রক্তের অনুরোধ
+                </a>
+                <a href="{{ route('search') }}"
+                   class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('search') || request()->routeIs('search.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                    রক্তদাতা খুঁজুন
+                </a>
+                <a href="{{ route('leaderboard') }}"
+                   class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('leaderboard') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                    লিডারবোর্ড
+                </a>
+                <a href="{{ route('blog.index') }}"
+                   class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('blog.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
+                    স্বাস্থ্যবার্তা
+                </a>
+            </div>
 
             @auth
                 {{-- ৩. Notification Bell (Real-time via Reverb) --}}

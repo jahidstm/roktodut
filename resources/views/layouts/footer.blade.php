@@ -55,12 +55,12 @@
                     </li>
                     <li>
                         <a href="{{ route('public.requests.index') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
-                            রক্তদান
+                            রক্তের অনুরোধ
                         </a>
                     </li>
                     <li>
                         <a href="{{ route('leaderboard') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
-                            সেরা রক্তদাতা
+                            লিডারবোর্ড
                         </a>
                     </li>
                     <li>
