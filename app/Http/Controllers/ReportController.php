@@ -38,7 +38,7 @@ class ReportController extends Controller
 
         $user = $request->user();
 
-        Report::create([
+        $report = Report::create([
             'reportable_type' => $reportableClass,
             'reportable_id' => $reportable->getKey(),
             'category' => $validated['category'],
@@ -48,6 +48,9 @@ class ReportController extends Controller
             'reporter_ip_hash' => hash('sha256', ((string) $request->ip()) . '|' . ((string) config('app.key'))),
             'status' => 'open',
         ]);
+
+        $admins = User::where('role', 'admin')->get();
+        \Illuminate\Support\Facades\Notification::send($admins, new \App\Notifications\ReportSubmittedNotification($report));
 
         return back()->with('success', 'ধন্যবাদ। রিপোর্টটি জমা হয়েছে এবং অ্যাডমিন টিম রিভিউ করবে।');
     }

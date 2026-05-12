@@ -88,6 +88,9 @@ class AdminDashboardController extends Controller
         // 🏥 ১১. Unverified Hospitals Pending Review
         $pendingHospitals = Hospital::unverified()->count();
 
+        // ১২. Pending Reports
+        $pendingReports = \App\Models\Report::where('status', 'open')->count();
+
         return view('admin.dashboard', compact(
             'totalUsers',
             'totalDonors',
@@ -104,7 +107,8 @@ class AdminDashboardController extends Controller
             'todaysSecurityEventsCount',
             'recentSecurityLogs',
             'pendingSupportMessages',
-            'pendingHospitals'
+            'pendingHospitals',
+            'pendingReports'
         ));
     }
 

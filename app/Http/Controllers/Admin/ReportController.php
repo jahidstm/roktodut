@@ -13,7 +13,7 @@ class ReportController extends Controller
 {
     public function index(Request $request): View
     {
-        $status = $request->query('status');
+        $status = $request->query('status', 'open'); // Default to 'open'
         $validStatuses = ['open', 'reviewing', 'resolved', 'dismissed'];
 
         $reports = Report::query()

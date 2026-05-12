@@ -20,8 +20,14 @@ class NotificationController extends Controller
         // 🧠 ডাইনামিক রিডাইরেক্ট লজিক (Smart Routing)
         if (isset($notification->data['url'])) {
             return redirect($notification->data['url']);
+        } elseif (isset($notification->data['link'])) {
+            return redirect($notification->data['link']);
         } elseif (isset($notification->data['request_id'])) {
             return redirect()->route('requests.show', $notification->data['request_id']);
+        }
+
+        if ($request->user()->role === 'admin') {
+            return redirect()->route('admin.dashboard');
         }
 
         return redirect()->route('dashboard');

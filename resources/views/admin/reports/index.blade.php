@@ -9,26 +9,22 @@
         <p class="text-sm text-slate-500 font-semibold mt-1">ইউজার ও গেস্ট রিপোর্ট রিভিউ করুন</p>
     </div>
 
-    @if(session('success'))
-        <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800 font-bold">
-            {{ session('success') }}
-        </div>
-    @endif
+
 
     @php
         $tabs = [
-            null => ['label' => 'সব', 'count' => $counts['total']],
             'open' => ['label' => 'Open', 'count' => $counts['open']],
             'reviewing' => ['label' => 'Reviewing', 'count' => $counts['reviewing']],
             'resolved' => ['label' => 'Resolved', 'count' => $counts['resolved']],
             'dismissed' => ['label' => 'Dismissed', 'count' => $counts['dismissed']],
+            'all' => ['label' => 'সব', 'count' => $counts['total']],
         ];
     @endphp
 
     <div class="mb-6 flex flex-wrap gap-2">
         @foreach($tabs as $key => $tab)
-            @php $active = ($status === $key) || ($status === null && $key === null); @endphp
-            <a href="{{ route('admin.reports.index', $key ? ['status' => $key] : []) }}"
+            @php $active = ($status === $key); @endphp
+            <a href="{{ route('admin.reports.index', ['status' => $key]) }}"
                class="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-bold {{ $active ? 'bg-slate-900 text-white' : 'border border-slate-200 bg-white text-slate-700 hover:bg-slate-50' }}">
                 <span>{{ $tab['label'] }}</span>
                 <span class="rounded-full px-2 py-0.5 text-xs {{ $active ? 'bg-white/20' : 'bg-slate-100' }}">{{ $tab['count'] }}</span>

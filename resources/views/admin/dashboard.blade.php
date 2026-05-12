@@ -307,6 +307,53 @@
             </div>
         </div>
 
+        {{-- Reports Governance --}}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+             :class="{'border-rose-200 ring-2 ring-rose-50': activeAccordion === 'reports'}">
+            <button @click="activeAccordion = activeAccordion === 'reports' ? null : 'reports'"
+                    @keydown.enter="activeAccordion = activeAccordion === 'reports' ? null : 'reports'"
+                    @keydown.space.prevent="activeAccordion = activeAccordion === 'reports' ? null : 'reports'"
+                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-rose-50/30 transition-colors focus:outline-none">
+                <div class="flex items-center gap-4 text-left">
+                    <div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 'reports'}">⚠️</div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                            <h3 class="text-lg font-extrabold text-slate-900">ডোনার ও রিকোয়েস্ট রিপোর্ট</h3>
+                            @if(isset($pendingReports) && $pendingReports > 0)
+                                <span class="bg-rose-100 text-rose-600 text-[10px] font-black px-2 py-0.5 rounded-full border border-rose-200 animate-pulse">🔴 {{ $pendingReports }} পেন্ডিং</span>
+                            @else
+                                <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-100">✅ সব ক্লিয়ার</span>
+                            @endif
+                        </div>
+                        <p class="text-sm text-slate-500 font-medium">ফেক ইনফো, হ্যারাসমেন্ট বা স্ক্যাম রিপোর্ট রিভিউ করুন</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex flex-wrap gap-2">
+                        <span class="bg-rose-50 text-rose-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-rose-100">⚠️ রিপোর্ট</span>
+                        <span class="bg-slate-50 text-slate-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-slate-200">🔨 অ্যাকশন</span>
+                    </div>
+                    @if(isset($pendingReports) && $pendingReports > 0)
+                        <span class="bg-rose-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">{{ $pendingReports }} টি পেন্ডিং</span>
+                    @else
+                        <span class="bg-slate-800 text-white text-xs font-bold px-3 py-1.5 rounded-full">০ টি পেন্ডিং</span>
+                    @endif
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-rose-100 text-rose-600': activeAccordion === 'reports'}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </button>
+            <div x-show="activeAccordion === 'reports'" x-collapse style="display: none;">
+                <div class="p-6 border-t border-slate-100 bg-slate-50/50">
+                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">ইউজারদের জমা দেওয়া অভিযোগ এবং রিপোর্টগুলো যাচাই করুন এবং উপযুক্ত অ্যাকশন (সাসপেন্ড/ব্যান) গ্রহণ করুন।</p>
+                    <a href="{{ route('admin.reports.index') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
+                        রিপোর্ট প্যানেলে প্রবেশ করুন
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+
         {{-- Spam Radar --}}
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
              :class="{'border-red-200 ring-2 ring-red-50': activeAccordion === 'spam_radar'}">
@@ -318,7 +365,7 @@
                     <div class="w-12 h-12 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 'spam_radar'}">🛑</div>
                     <div>
                         <h3 class="text-lg font-extrabold text-slate-900">Spam Radar</h3>
-                        <p class="text-sm text-slate-500 font-medium">ফেক রিকোয়েস্ট রিপোর্ট রিভিউ এবং স্প্যামার শ্যাডোব্যান</p>
+                        <p class="text-sm text-slate-500 font-medium">অস্বাভাবিক রিকোয়েস্ট এবং স্প্যামারদের শ্যাডোব্যান</p>
                     </div>
                 </div>
                 <div class="flex items-center gap-4">
@@ -330,7 +377,7 @@
             </button>
             <div x-show="activeAccordion === 'spam_radar'" x-collapse style="display: none;">
                 <div class="p-6 border-t border-slate-100 bg-slate-50/50">
-                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">ডোনারদের রিপোর্ট করা ফেক এবং স্প্যাম রিকোয়েস্টগুলো রিভিউ করে স্ট্রাইক অ্যাপ্রুভ করুন।</p>
+                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">সিস্টেম দ্বারা ডিটেক্ট হওয়া সন্দেহজনক রিকোয়েস্টগুলো রিভিউ করে স্ট্রাইক অ্যাপ্রুভ করুন।</p>
                     <a href="{{ route('admin.spam-radar.index') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
                         Go to Spam Radar
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
