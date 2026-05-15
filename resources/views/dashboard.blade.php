@@ -136,115 +136,111 @@
             $nextDateTop = $user->next_eligible_date;
             $isEffectivelyAvailableTop = $isEligibleTop && $user->is_available;
         @endphp
-        <div class="rounded-3xl overflow-hidden border border-slate-200 bg-white shadow-sm">
-            <div class="bg-gradient-to-r from-red-600 via-red-700 to-rose-700 px-5 sm:px-6 py-4">
-                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                    <div class="flex items-start sm:items-center gap-3">
-                        <div class="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center shrink-0">
-                            <span class="text-2xl font-black text-white">{{ $user->blood_group?->value ?? $user->blood_group ?? '?' }}</span>
+        <div class="rounded-[2rem] overflow-hidden bg-slate-900 shadow-xl p-6 sm:p-8 relative">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 sm:gap-8">
+                {{-- User Profile --}}
+                <div class="flex items-center gap-4 sm:gap-5">
+                    <div class="relative">
+                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center border-4 border-slate-800 shadow-xl">
+                            <span class="text-2xl sm:text-3xl font-black text-white">{{ $user->blood_group?->value ?? $user->blood_group ?? '?' }}</span>
                         </div>
-                        <div>
-                            <h2 class="text-xl sm:text-2xl font-black text-white leading-tight flex items-center gap-2">
-                                <span class="truncate">{{ $user->name }}</span>
-                                @if($user->nid_status === 'verified' || $user->nid_status === 'approved' || $user->verified_badge)
-                                    <span class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-blue-500/25 border border-blue-200/40 text-blue-100" title="ভেরিফাইড ডোনার">
-                                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                        </svg>
-                                    </span>
-                                @endif
-                            </h2>
-                            <p class="text-red-100 text-xs sm:text-sm font-semibold mt-1 flex items-center gap-1">
-                                <svg class="w-3.5 h-3.5 text-red-200 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-                                <span class="truncate">{{ $user->upazila?->name ?? 'উপজেলা দেওয়া নেই' }}, {{ $user->district?->name ?? 'জেলা দেওয়া নেই' }}</span>
-                            </p>
+                        @if($user->nid_status === 'verified' || $user->nid_status === 'approved' || $user->verified_badge)
+                        <div class="absolute bottom-0 right-0 w-5 h-5 sm:w-6 sm:h-6 bg-blue-500 rounded-full border-2 border-slate-900 flex items-center justify-center text-white" title="Verified">
+                            <svg class="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                         </div>
+                        @endif
                     </div>
+                    <div>
+                        <p class="text-slate-400 text-xs sm:text-sm font-semibold mb-0.5">স্বাগতম ফিরে আসার জন্য,</p>
+                        <h2 class="text-xl sm:text-2xl font-black text-white leading-tight">{{ $user->name }}</h2>
+                        <p class="text-slate-400 text-xs sm:text-sm font-medium mt-1 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
+                            <span class="truncate">{{ $user->upazila?->name ?? 'উপজেলা দেওয়া নেই' }}, {{ $user->district?->name ?? 'জেলা দেওয়া নেই' }}</span>
+                        </p>
+                    </div>
+                </div>
 
-                    <div class="flex items-center gap-2">
-                        <form action="{{ route('donor_profile.is_available_now') }}" method="POST">
-                            @csrf
-                            <button type="submit"
-                                    {{ !$isEligibleTop ? 'disabled' : '' }}
-                                    title="{{ !$isEligibleTop ? 'কুলডাউন চলাকালীন স্ট্যাটাস পরিবর্তন করা যাবে না' : 'উপস্থিতি স্ট্যাটাস পরিবর্তন করুন' }}"
-                                    class="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-black border disabled:opacity-60 disabled:cursor-not-allowed {{ $isEffectivelyAvailableTop ? 'bg-emerald-500/20 border-emerald-200/40 text-emerald-100' : 'bg-slate-100/20 border-white/20 text-slate-200' }}">
-                                <span class="inline-block w-1.5 h-1.5 rounded-full {{ $isEffectivelyAvailableTop ? 'bg-emerald-300' : 'bg-slate-300' }}"></span>
-                                {{ $isEffectivelyAvailableTop ? 'উপলব্ধ' : 'ব্যস্ত' }}
-                            </button>
-                        </form>
-                        <a href="{{ route('gamification.guide') }}" class="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold text-white/90 bg-white/10 border border-white/20 hover:bg-white/20 transition">
-                            🪙 গাইড
-                        </a>
-                        <a href="{{ route('leaderboard') }}" class="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold text-white/90 bg-white/10 border border-white/20 hover:bg-white/20 transition">
-                            লিডারবোর্ড
-                        </a>
-                    </div>
+                {{-- Actions --}}
+                <div class="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
+                    <a href="{{ route('gamification.guide') }}" class="flex-1 md:flex-none text-center inline-flex items-center justify-center bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition">
+                        🪙 গাইড
+                    </a>
+                    <a href="{{ route('leaderboard') }}" class="flex-1 md:flex-none text-center inline-flex items-center justify-center bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition">
+                        লিডারবোর্ড
+                    </a>
+                    
+                    <form action="{{ route('donor_profile.is_available_now') }}" method="POST" class="m-0 w-full sm:w-auto">
+                        @csrf
+                        <button type="submit" 
+                                {{ !$isEligibleTop ? 'disabled' : '' }}
+                                title="{{ !$isEligibleTop ? 'কুলডাউন চলাকালীন স্ট্যাটাস পরিবর্তন করা যাবে না' : 'উপস্থিতি স্ট্যাটাস পরিবর্তন করুন' }}"
+                                class="inline-flex items-center justify-center gap-2 {{ $isEffectivelyAvailableTop ? 'bg-red-600 hover:bg-red-700 shadow-red-900/50' : 'bg-slate-700 hover:bg-slate-600 shadow-slate-900/50' }} text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed w-full">
+                            <span class="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full {{ $isEffectivelyAvailableTop ? 'bg-white animate-pulse' : 'bg-slate-400' }}"></span>
+                            {{ $isEffectivelyAvailableTop ? 'রক্তদানে প্রস্তুত' : 'বর্তমানে ব্যস্ত' }}
+                        </button>
+                    </form>
                 </div>
             </div>
 
-            <div class="p-5 sm:p-6">
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
-                    <div class="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-center">
-                        <p class="text-xl sm:text-2xl font-black text-amber-600">{{ number_format($currentPoints) }}</p>
-                        <p class="text-[11px] font-bold text-amber-600/80 mt-0.5">মোট পয়েন্ট</p>
-                    </div>
-                    <div class="rounded-2xl border border-red-200 bg-red-50 p-3 text-center">
-                        <p class="text-xl sm:text-2xl font-black text-red-600">{{ $totalDonations }}</p>
-                        <p class="text-[11px] font-bold text-red-600/80 mt-0.5">রক্তদান</p>
-                    </div>
-                    <div class="rounded-2xl border border-blue-200 bg-blue-50 p-3 text-center">
-                        <p class="text-xl sm:text-2xl font-black text-blue-600">{{ $myRank ? '#'.$myRank : '--' }}</p>
-                        <p class="text-[11px] font-bold text-blue-600/80 mt-0.5">র‍্যাঙ্ক</p>
-                    </div>
-                    <div class="rounded-2xl border {{ $isEligibleTop ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50' }} p-3 text-center">
-                        <p class="text-sm font-black {{ $isEligibleTop ? 'text-emerald-700' : 'text-amber-700' }}">
-                            {{ $isEligibleTop ? 'যোগ্য' : 'কুলডাউনে' }}
-                        </p>
-                        <p class="text-[11px] font-bold {{ $isEligibleTop ? 'text-emerald-600/80' : 'text-amber-600/80' }} mt-0.5">
-                            @if(!$isEligibleTop && $nextDateTop)
-                                {{ (int) now()->startOfDay()->diffInDays($nextDateTop->copy()->startOfDay()) }} দিন বাকি
-                            @else
-                                রক্তদানে প্রস্তুত
-                            @endif
-                        </p>
-                    </div>
+            {{-- Stats Row --}}
+            <div class="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8">
+                <div class="bg-white/5 rounded-2xl p-4 sm:p-5 border border-white/10 flex flex-col justify-center">
+                    <p class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1">মোট পয়েন্ট</p>
+                    <p class="text-2xl sm:text-3xl font-black text-white">{{ number_format($currentPoints) }}</p>
                 </div>
-
-                @if($user->badges->count() > 0)
-                    <div class="flex flex-wrap gap-2 mb-4">
-                        @foreach($user->badges->take(4) as $badge)
-                            @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
-                            <div class="inline-flex items-center gap-1.5 text-xs font-bold {{ $bd['color'] }} border rounded-full px-3 py-1">
-                                <span>{{ $bd['emoji'] }}</span>
-                                <span>{{ $bd['bn'] }}</span>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-
+                <div class="bg-white/5 rounded-2xl p-4 sm:p-5 border border-white/10 flex flex-col justify-center">
+                    <p class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1">রক্তদান</p>
+                    <p class="text-2xl sm:text-3xl font-black text-white">{{ $totalDonations }}</p>
+                </div>
+                <div class="bg-white/5 rounded-2xl p-4 sm:p-5 border border-white/10 flex flex-col justify-center">
+                    <p class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1">গ্লোবাল র‍্যাঙ্ক</p>
+                    <p class="text-2xl sm:text-3xl font-black text-blue-400">{{ $myRank ? '#'.$myRank : '--' }}</p>
+                </div>
+                
                 @if($nextMilestone)
-                    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                        <div class="flex items-center justify-between mb-2">
-                            <p class="text-sm font-black text-slate-800">
-                                {{ $nextMilestone['emoji'] }} পরবর্তী লক্ষ্য: <span class="text-red-600">{{ $nextMilestone['bn'] }}</span>
-                            </p>
-                            <p class="text-xs font-bold text-slate-500">{{ $totalDonations }}/{{ $nextMilestone['donations'] }} রক্তদান</p>
-                        </div>
-                        <div class="w-full h-2.5 rounded-full bg-slate-200 overflow-hidden">
-                            <div class="h-full bg-gradient-to-r from-red-500 to-red-600 rounded-full" style="width: {{ $progressPercent }}%"></div>
-                        </div>
-                        <div class="mt-1.5 flex justify-between text-[10px] font-bold text-slate-500">
-                            <span>{{ $progressPercent }}% সম্পন্ন</span>
-                            <span>আর {{ $nextMilestone['donations'] - $totalDonations }} টি ডোনেশন বাকি</span>
-                        </div>
+                <div class="bg-white/5 rounded-2xl p-4 sm:p-5 border border-white/10 flex flex-col justify-center">
+                    <p class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1">পরবর্তী লক্ষ্য</p>
+                    <div class="flex items-end justify-between mt-1">
+                        <p class="text-xs sm:text-sm font-bold text-white truncate">{{ $nextMilestone['bn'] }}</p>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-400">{{ $progressPercent }}%</span>
                     </div>
+                    <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden mt-2" title="আর {{ $nextMilestone['donations'] - $totalDonations }} টি ডোনেশন বাকি">
+                        <div class="h-full bg-gradient-to-r from-red-500 to-rose-500 rounded-full" style="width: {{ $progressPercent }}%"></div>
+                    </div>
+                </div>
+                @else
+                <div class="bg-white/5 rounded-2xl p-4 sm:p-5 border border-white/10 flex flex-col justify-center">
+                    <p class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1">স্ট্যাটাস</p>
+                    <p class="text-sm sm:text-base font-black {{ $isEligibleTop ? 'text-emerald-400' : 'text-amber-400' }}">
+                        {{ $isEligibleTop ? 'রক্তদানে যোগ্য' : 'কুলডাউনে আছেন' }}
+                    </p>
+                    @if(!$isEligibleTop && $nextDateTop)
+                        <p class="text-[10px] sm:text-xs font-bold text-slate-400 mt-1">
+                            {{ (int) now()->startOfDay()->diffInDays($nextDateTop->copy()->startOfDay()) }} দিন বাকি
+                        </p>
+                    @endif
+                </div>
                 @endif
             </div>
+
+            @if($user->badges->count() > 0)
+                <div class="relative z-10 flex flex-wrap gap-2 mt-4 sm:mt-5">
+                    @foreach($user->badges->take(4) as $badge)
+                        @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
+                        <div class="inline-flex items-center gap-1.5 text-[10px] sm:text-xs font-bold bg-white/5 border border-white/10 text-slate-300 rounded-full px-2.5 py-1 sm:px-3 sm:py-1.5" title="{{ $bd['bn'] }}">
+                            <span>{{ $bd['emoji'] }}</span>
+                            <span class="truncate">{{ $bd['bn'] }}</span>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
     @else
         <x-donor-identity-header :user="$user" :total-contributions="$totalContributions ?? 0" />
     @endif
-    
+
     {{-- 🚀 NID Upload Prompt for Organization Members --}}
     @if($user->organization_id && $user->nid_status === 'pending' && empty($user->nid_path))
         <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 shadow-sm">
