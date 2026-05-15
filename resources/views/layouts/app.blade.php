@@ -61,40 +61,51 @@
         <nav class="ml-auto flex items-center gap-3 sm:gap-5">
             {{-- Center Menu (Exact 5 items) --}}
             <div class="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center">
-                <div class="flex items-center gap-1 p-1.5 bg-slate-100/80 border border-slate-200/60 rounded-full shadow-sm backdrop-blur-md">
-                    <a href="{{ route('home') }}"
-                       class="relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ease-out
-                              {{ request()->routeIs('home') 
-                                 ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
-                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
-                        হোম
-                    </a>
+                <div x-data="{ left: 0, width: 0, opacity: 0 }"
+                     @mouseleave="opacity = 0"
+                     class="relative flex items-center gap-1 p-1.5 bg-slate-100/80 border border-slate-200/60 rounded-full shadow-sm backdrop-blur-md">
+                     
+                    {{-- Sliding Hover Indicator --}}
+                    <div class="absolute top-1.5 bottom-1.5 bg-slate-200/80 rounded-full transition-all duration-300 ease-out z-0 pointer-events-none"
+                         :style="`left: ${left}px; width: ${width}px; opacity: ${opacity}; transform: scale(${opacity ? 1 : 0.95})`"></div>
+
+                    {{-- 1. রক্তের অনুরোধ --}}
                     <a href="{{ $requestsRoute }}"
-                       class="relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ease-out
+                       @mouseenter="left = $el.offsetLeft; width = $el.offsetWidth; opacity = 1"
+                       class="relative z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors duration-300 ease-out
                               {{ request()->routeIs('requests') || request()->routeIs('requests.*') 
                                  ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
-                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
+                                 : 'text-slate-600 hover:text-slate-900' }}">
                         রক্তের অনুরোধ
                     </a>
+
+                    {{-- 2. রক্তদাতা খুঁজুন --}}
                     <a href="{{ route('search') }}"
-                       class="relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ease-out
+                       @mouseenter="left = $el.offsetLeft; width = $el.offsetWidth; opacity = 1"
+                       class="relative z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors duration-300 ease-out
                               {{ request()->routeIs('search') || request()->routeIs('search.*') 
                                  ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
-                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
+                                 : 'text-slate-600 hover:text-slate-900' }}">
                         রক্তদাতা খুঁজুন
                     </a>
+
+                    {{-- 3. লিডারবোর্ড --}}
                     <a href="{{ route('leaderboard') }}"
-                       class="relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ease-out
+                       @mouseenter="left = $el.offsetLeft; width = $el.offsetWidth; opacity = 1"
+                       class="relative z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors duration-300 ease-out
                               {{ request()->routeIs('leaderboard') 
                                  ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
-                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
+                                 : 'text-slate-600 hover:text-slate-900' }}">
                         লিডারবোর্ড
                     </a>
+
+                    {{-- 4. স্বাস্থ্যবার্তা --}}
                     <a href="{{ route('blog.index') }}"
-                       class="relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ease-out
+                       @mouseenter="left = $el.offsetLeft; width = $el.offsetWidth; opacity = 1"
+                       class="relative z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors duration-300 ease-out
                               {{ request()->routeIs('blog.*') 
                                  ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
-                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
+                                 : 'text-slate-600 hover:text-slate-900' }}">
                         স্বাস্থ্যবার্তা
                     </a>
                 </div>
