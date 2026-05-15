@@ -60,27 +60,44 @@
         {{-- 🧭 Navigation & Actions --}}
         <nav class="ml-auto flex items-center gap-3 sm:gap-5">
             {{-- Center Menu (Exact 5 items) --}}
-            <div class="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-1 text-[15px] font-semibold text-slate-600">
-                <a href="{{ route('home') }}"
-                   class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('home') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                    হোম
-                </a>
-                <a href="{{ $requestsRoute }}"
-                   class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('requests') || request()->routeIs('requests.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                    রক্তের অনুরোধ
-                </a>
-                <a href="{{ route('search') }}"
-                   class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('search') || request()->routeIs('search.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                    রক্তদাতা খুঁজুন
-                </a>
-                <a href="{{ route('leaderboard') }}"
-                   class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('leaderboard') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                    লিডারবোর্ড
-                </a>
-                <a href="{{ route('blog.index') }}"
-                   class="px-3 py-2 rounded-lg hover:text-red-600 hover:bg-red-50 transition-colors {{ request()->routeIs('blog.*') ? 'text-red-600 font-bold bg-red-50' : '' }}">
-                    স্বাস্থ্যবার্তা
-                </a>
+            <div class="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center justify-center">
+                <div class="flex items-center gap-1 p-1.5 bg-slate-100/80 border border-slate-200/60 rounded-full shadow-sm backdrop-blur-md">
+                    <a href="{{ route('home') }}"
+                       class="relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ease-out
+                              {{ request()->routeIs('home') 
+                                 ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
+                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
+                        হোম
+                    </a>
+                    <a href="{{ $requestsRoute }}"
+                       class="relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ease-out
+                              {{ request()->routeIs('requests') || request()->routeIs('requests.*') 
+                                 ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
+                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
+                        রক্তের অনুরোধ
+                    </a>
+                    <a href="{{ route('search') }}"
+                       class="relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ease-out
+                              {{ request()->routeIs('search') || request()->routeIs('search.*') 
+                                 ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
+                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
+                        রক্তদাতা খুঁজুন
+                    </a>
+                    <a href="{{ route('leaderboard') }}"
+                       class="relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ease-out
+                              {{ request()->routeIs('leaderboard') 
+                                 ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
+                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
+                        লিডারবোর্ড
+                    </a>
+                    <a href="{{ route('blog.index') }}"
+                       class="relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ease-out
+                              {{ request()->routeIs('blog.*') 
+                                 ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
+                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
+                        স্বাস্থ্যবার্তা
+                    </a>
+                </div>
             </div>
 
             @auth
