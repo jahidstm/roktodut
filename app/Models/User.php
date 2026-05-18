@@ -278,10 +278,12 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
             return 0;
         }
 
+        $defaultCooldown = strtolower((string) $this->gender) === 'female' ? 120 : 90;
+
         $cooldownDays = match($value) {
             BloodComponentType::PLASMA->value    => 28,
             BloodComponentType::PLATELETS->value => 14,
-            default                              => 120,
+            default                              => $defaultCooldown,
         };
 
         $nextDonationDate = $lastDonatedAt->copy()->addDays($cooldownDays);
@@ -291,7 +293,12 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
     public function getNextEligibleDateAttribute()
     {
         $lastDonatedAt = $this->last_whole_blood_donated_at ?? $this->last_donated_at;
-        return $lastDonatedAt ? $lastDonatedAt->copy()->addDays(120) : null;
+        if (!$lastDonatedAt) {
+            return null;
+        }
+        
+        $cooldownDays = strtolower((string) $this->gender) === 'female' ? 120 : 90;
+        return $lastDonatedAt->copy()->addDays($cooldownDays);
     }
 
     public function getIsEligibleToDonateAttribute()

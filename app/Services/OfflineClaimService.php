@@ -30,6 +30,14 @@ class OfflineClaimService
         $this->assertCooldown($donor, $data->donationDate);
 
         $normalizedPhone = $this->normalizeToPlus880($data->recipientPhone);
+        
+        // 🛡️ ANTI-CHEAT: Prevent Self-Claim Farming
+        if ($donor->phone && $normalizedPhone === $this->normalizeToPlus880($donor->phone)) {
+            throw ValidationException::withMessages([
+                'recipient_phone' => 'অ্যান্টি-চিট অ্যালার্ট: আপনি নিজের ফোন নাম্বার ব্যবহার করে ক্লেইম করতে পারবেন না।',
+            ]);
+        }
+
         $ipHash = $this->hashIp($ipAddress);
         $matchedRequest = $this->findMatchedRequest($normalizedPhone, $data->donationDate);
         $hasRecipientAccount = (bool) $matchedRequest?->requester;
@@ -161,10 +169,12 @@ class OfflineClaimService
             return;
         }
 
-        $cooldownEnd = CarbonImmutable::parse((string) $donor->last_donated_at)->addDays(120)->startOfDay();
+        $cooldownDays = strtolower((string) $donor->gender) === 'female' ? 120 : 90;
+        
+        $cooldownEnd = CarbonImmutable::parse((string) $donor->last_donated_at)->addDays($cooldownDays)->startOfDay();
         if ($cooldownEnd->gt($donationDate)) {
             throw ValidationException::withMessages([
-                'donation_date' => 'শেষ রক্তদানের ১২০ দিন পূর্ণ হওয়ার আগে নতুন ক্লেইম করা যাবে না।',
+                'donation_date' => "শেষ রক্তদানের {$cooldownDays} দিন পূর্ণ হওয়ার আগে নতুন ক্লেইম করা যাবে না।",
             ]);
         }
     }
