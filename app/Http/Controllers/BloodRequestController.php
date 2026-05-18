@@ -6,12 +6,10 @@ use App\Enums\BloodComponentType;
 use App\Enums\UrgencyLevel;
 use App\Events\DonationCompleted;
 use App\Http\Requests\StoreBloodRequestRequest;
-use App\Jobs\DispatchEmergencyAlert;
-use App\Jobs\SendEmergencyBloodRequestNotificationJob;
+use App\Jobs\DispatchEmergencyAlertsJob;
 use App\Models\BloodRequest;
 use App\Models\ChronicRequestSubscription;
 use App\Models\BloodRequestResponse;
-use App\Models\District;
 use App\Models\User;
 use App\Services\DonorMatchingService;
 use App\Services\MathCaptchaService;
@@ -288,37 +286,29 @@ class BloodRequestController extends Controller
         // ১. রিকোয়েস্ট সেভ করা
         $bloodRequest = BloodRequest::create($data);
 
-        // ১.১ FCM push dispatch
-        // queue worker বন্ধ থাকলেও যাতে alert যায়, তাই sync dispatch।
-        DispatchEmergencyAlert::dispatchSync($bloodRequest);
+        // ⚙️ AI Ranking + Cascading Dispatch Pipeline
+        $rankedDonors = app(DonorMatchingService::class)->rankDonors($bloodRequest, 50);
+        $firstBatchDonorIds = $rankedDonors->take(5)->pluck('donor_id')->map(fn($id) => (int) $id)->all();
 
-        // ২. জেলার নাম বের করা (নোটিফিকেশনে দেখানোর জন্য)
-        $districtName = District::find($bloodRequest->district_id)->name ?? 'আপনার';
-
-        // ⚙️ ৩. স্মার্ট ডোনার ম্যাচিং সার্ভিস (fixes last_donation_date bug)
-        $donors = app(DonorMatchingService::class)->match($bloodRequest);
-
-        // 🚀 ৪. টার্গেটেড নোটিফিকেশন (queue worker ছাড়া fallback)
-        if ($donors->isNotEmpty()) {
-            SendEmergencyBloodRequestNotificationJob::dispatchSync(
+        if ($rankedDonors->isNotEmpty()) {
+            DispatchEmergencyAlertsJob::dispatch(
                 bloodRequestId: $bloodRequest->id,
-                districtName: $districtName,
-                donorIds: $donors->pluck('id')->all()
-            );
+                rankedDonors: $rankedDonors->values()->all()
+            )->afterCommit();
         }
 
         $telegramConnectedCount = User::query()
-            ->whereIn('id', $donors->pluck('id'))
+            ->whereIn('id', $firstBatchDonorIds)
             ->whereNotNull('telegram_chat_id')
             ->count();
 
         $successMsg = $data['is_phone_hidden']
             ? '🛡️ আপনার রিকোয়েস্ট তৈরি হয়েছে! নম্বর গোপন রাখা হয়েছে — ডোনাররা সরাসরি আপনার Telegram-এ নিজের নম্বর পাঠাবে।'
             : 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে। '
-                . $donors->count()
-                . ' জন ডোনারকে ইন-অ্যাপ অ্যালার্ট পাঠানো হয়েছে, এর মধ্যে Telegram-এ সংযুক্ত '
-                . $telegramConnectedCount
-                . ' জন।';
+            . count($firstBatchDonorIds)
+            . ' জন ডোনারকে ইন-অ্যাপ অ্যালার্ট পাঠানো হয়েছে, এর মধ্যে Telegram-এ সংযুক্ত '
+            . $telegramConnectedCount
+            . ' জন।';
 
         return redirect()->route('requests.show', $bloodRequest)
             ->with('success', $successMsg);

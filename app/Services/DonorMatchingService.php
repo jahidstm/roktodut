@@ -3,164 +3,268 @@
 namespace App\Services;
 
 use App\Enums\BloodComponentType;
-use App\Enums\UrgencyLevel;
 use App\Models\BloodRequest;
+use App\Models\DonorResponseLog;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
-/**
- * DonorMatchingService — Geospatial-First Matching
- *
- * Priority order:
- *   1. Radius-based (Haversine) — hospital lat/lng → ডোনারের lat/lng
- *      Emergency: 10 km | Urgent: 15 km | Normal: 20 km
- *   2. Fallback: same district (existing behaviour) — যখন request-এ lat/lng নেই
- *      বা radius-এ পর্যাপ্ত ডোনার পাওয়া না গেলে।
- *
- * Smart Sorting: Ready Now > Org Verified > NID Verified > Closest Distance > Points
- * Cap: Emergency → 50, Otherwise → 20
- */
 class DonorMatchingService
 {
-    private const CAP_EMERGENCY = 50;
-    private const CAP_NORMAL    = 20;
-    private const COOLDOWN_DAYS = 120;
-    private const PLATELET_COOLDOWN_DAYS = 14;
-
-    // 📍 Radius per urgency (km)
-    private const RADIUS = [
-        'emergency' => 10.0,
-        'urgent'    => 15.0,
-        'normal'    => 20.0,
-    ];
+    private const FASTAPI_RANKING_URL = 'http://127.0.0.1:8001/api/v1/rank-donors';
+    private const MAX_CANDIDATES = 50;
+    private const DEFAULT_BATCH_SIZE = 5;
+    private const MAX_DISTANCE_KM = 20.0;
 
     /**
-     * নতুন ব্লাড রিকোয়েস্টের জন্য যোগ্য ডোনারদের তালিকা ফেরত দেয়।
-     * Radius-based matching → district fallback।
+     * Backward-compatible method used in existing flows.
      */
-    public function match(BloodRequest $request): Collection
+    public function match(BloodRequest $request): EloquentCollection
     {
-        $cap            = $this->getCap($request->urgency);
+        $ids = $this->rankDonors($request, self::MAX_CANDIDATES)
+            ->pluck('donor_id')
+            ->values()
+            ->all();
 
-        // ── রিকোয়েস্টে lat/lng আছে কিনা চেক করা ──────────────────────────
-        $hasCoords = $request->latitude !== null && $request->longitude !== null;
-
-        if ($hasCoords) {
-            $urgencyValue = $request->urgency instanceof UrgencyLevel
-                ? $request->urgency->value
-                : (string) $request->urgency;
-
-            $radiusKm = self::RADIUS[$urgencyValue] ?? self::RADIUS['normal'];
-
-            $donors = $this->buildBaseQuery($request)
-                ->closeTo((float) $request->latitude, (float) $request->longitude, $radiusKm)
-                // Smart Sorting: দূরত্ব আগে (scopeCloseTo already sorts by distance)
-                // তারপর gamification tier
-                ->orderByDesc('is_ready_now')
-                ->orderByDesc('verified_badge')
-                ->orderByRaw("CASE WHEN nid_status = 'approved' THEN 1 ELSE 0 END DESC")
-                ->orderByDesc('points')
-                ->limit($cap)
-                ->get(['id', 'name', 'blood_group', 'district_id', 'latitude', 'longitude', 'is_ready_now', 'verified_badge', 'distance_km']);
-
-            // ── পর্যাপ্ত ডোনার পাওয়া গেছে? ────────────────────────────────
-            if ($donors->count() >= min(5, $cap)) {
-                return $donors;
-            }
-
-            // ── কম ডোনার পেলে radius দ্বিগুণ করে আবার চেষ্টা (expanded search) ─
-            $expandedDonors = $this->buildBaseQuery($request)
-                ->closeTo((float) $request->latitude, (float) $request->longitude, $radiusKm * 2)
-                ->orderByDesc('is_ready_now')
-                ->orderByDesc('verified_badge')
-                ->orderByRaw("CASE WHEN nid_status = 'approved' THEN 1 ELSE 0 END DESC")
-                ->orderByDesc('points')
-                ->limit($cap)
-                ->get(['id', 'name', 'blood_group', 'district_id', 'latitude', 'longitude', 'is_ready_now', 'verified_badge', 'distance_km']);
-
-            if ($expandedDonors->isNotEmpty()) {
-                return $expandedDonors;
-            }
+        if ($ids === []) {
+            return new EloquentCollection();
         }
 
-        // ── Fallback: জেলা-ভিত্তিক পুরনো পদ্ধতি ────────────────────────────
-        return $this->buildBaseQuery($request)
-            ->where('district_id', $request->district_id)
-            ->orderByDesc('is_ready_now')
-            ->orderByDesc('verified_badge')
-            ->orderByRaw("CASE WHEN nid_status = 'approved' THEN 1 ELSE 0 END DESC")
-            ->orderByDesc('points')
-            ->limit($cap)
-            ->get(['id', 'name', 'blood_group', 'district_id', 'latitude', 'longitude', 'is_ready_now', 'verified_badge']);
+        $donorsById = User::query()
+            ->whereIn('id', $ids)
+            ->get()
+            ->keyBy('id');
+
+        return new EloquentCollection(
+            collect($ids)
+                ->map(fn (int $id) => $donorsById->get($id))
+                ->filter()
+                ->values()
+                ->all()
+        );
     }
 
     /**
-     * Base query — সব রিকোয়েস্টে common ফিল্টারগুলো।
+     * Generate AI candidate list:
+     * - active/available donors
+     * - matching blood group
+     * - within 20km when request coordinates are available
+     * - not on active cooldown
      */
-    private function buildBaseQuery(BloodRequest $request)
+    public function generateCandidateList(BloodRequest $request, int $limit = self::MAX_CANDIDATES): Collection
     {
+        $limit = max(1, min($limit, self::MAX_CANDIDATES));
+        $now = now();
+        $temporalHour = (int) $now->hour;
+        $isWeekend = $now->isWeekend();
+
+        $query = $this->buildBaseQuery($request)
+            ->select([
+                'id',
+                'blood_group',
+                'district_id',
+                'latitude',
+                'longitude',
+                'last_donated_at',
+                'cooldown_until',
+                'is_available',
+                'is_donor',
+            ]);
+
+        if ($request->latitude !== null && $request->longitude !== null) {
+            $lat = (float) $request->latitude;
+            $lng = (float) $request->longitude;
+
+            $haversine = '(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude))))';
+
+            $query
+                ->whereNotNull('latitude')
+                ->whereNotNull('longitude')
+                ->selectRaw("{$haversine} AS distance_km", [$lat, $lng, $lat])
+                ->having('distance_km', '<=', self::MAX_DISTANCE_KM)
+                ->orderBy('distance_km');
+        } else {
+            $query
+                ->where('district_id', $request->district_id)
+                ->selectRaw('9999.00 AS distance_km')
+                ->orderBy('id');
+        }
+
+        $donors = $query->limit($limit)->get();
+
+        if ($donors->isEmpty()) {
+            return collect();
+        }
+
+        $historicalRates = $this->getHistoricalResponseRates($donors->pluck('id')->all());
+
+        return $donors->map(function (User $donor) use ($historicalRates, $now, $temporalHour, $isWeekend): array {
+            $lastDonatedAt = $donor->last_donated_at instanceof Carbon
+                ? $donor->last_donated_at
+                : ($donor->last_donated_at ? Carbon::parse((string) $donor->last_donated_at) : null);
+
+            $daysSinceLastDonation = $lastDonatedAt
+                ? max(0, $lastDonatedAt->diffInDays($now))
+                : 365;
+
+            $distanceKm = round((float) ($donor->distance_km ?? 9999.0), 2);
+
+            return [
+                'donor_id' => (int) $donor->id,
+                'distance_km' => $distanceKm,
+                'days_since_last_donation' => $daysSinceLastDonation,
+                'temporal_hour' => $temporalHour,
+                'is_weekend' => $isWeekend,
+                'historical_response_rate' => round((float) ($historicalRates[$donor->id] ?? 0.0), 4),
+            ];
+        })->values();
+    }
+
+    /**
+     * Returns ranked candidates with rank/probability for dispatch workflow.
+     * Fallback path (service down/timeout): closest donors first.
+     */
+    public function rankDonors(BloodRequest $request, int $limit = self::DEFAULT_BATCH_SIZE): Collection
+    {
+        $limit = max(1, $limit);
+        $candidates = $this->generateCandidateList($request, self::MAX_CANDIDATES);
+
+        if ($candidates->isEmpty()) {
+            return collect();
+        }
+
+        try {
+            $response = Http::timeout(2)
+                ->withHeaders([
+                    'X-API-Key' => env('ROKTODUT_AI_SECRET', 'ROKTODUT_AI_SECRET'),
+                ])
+                ->post(self::FASTAPI_RANKING_URL, [
+                    'request_details' => [
+                        'request_id' => $request->id,
+                        'blood_group' => (string) ($request->blood_group?->value ?? $request->blood_group),
+                        'urgency' => (string) $request->urgency,
+                        'units_needed' => (int) ($request->units_needed ?? $request->bags_needed ?? 1),
+                    ],
+                    'candidate_donors' => $candidates->values()->all(),
+                ]);
+
+            $response->throw();
+            $rankedFromAi = collect($response->json());
+
+            if ($rankedFromAi->isEmpty()) {
+                throw new \RuntimeException('Empty ranking response from AI service.');
+            }
+
+            $candidateById = $candidates->keyBy('donor_id');
+
+            return $rankedFromAi
+                ->filter(fn ($row) => isset($row['donor_id']) && $candidateById->has((int) $row['donor_id']))
+                ->map(function (array $row, int $index) use ($candidateById): array {
+                    $donorId = (int) $row['donor_id'];
+                    $base = $candidateById->get($donorId, []);
+
+                    return array_merge($base, [
+                        'probability_score' => isset($row['probability_score']) ? (float) $row['probability_score'] : 0.0,
+                        'rank' => isset($row['rank']) ? (int) $row['rank'] : ($index + 1),
+                    ]);
+                })
+                ->sortBy('rank')
+                ->values()
+                ->take($limit)
+                ->values();
+        } catch (\Throwable $e) {
+            Log::warning('AI donor ranking failed; using distance fallback.', [
+                'blood_request_id' => $request->id,
+                'message' => $e->getMessage(),
+            ]);
+
+            return $candidates
+                ->sortBy('distance_km')
+                ->values()
+                ->take($limit)
+                ->values()
+                ->map(fn (array $row, int $index) => array_merge($row, [
+                    'probability_score' => 0.0,
+                    'rank' => $index + 1,
+                ]));
+        }
+    }
+
+    private function buildBaseQuery(BloodRequest $request): Builder
+    {
+        $bloodGroup = is_object($request->blood_group)
+            ? $request->blood_group->value
+            : (string) $request->blood_group;
+
         return User::query()
-            // ✅ is_donor flag — flexible, not role enum
             ->where('is_donor', true)
-
-            // ✅ ব্লাড গ্রুপ ম্যাচ
-            ->where('blood_group', $request->blood_group->value)
-
-            // ✅ রিকোয়েস্টকারী নিজে বাদ (guest হলে skip)
+            ->where('blood_group', $bloodGroup)
             ->when(
                 $request->requested_by !== null,
-                fn($q) => $q->where('id', '!=', $request->requested_by)
+                fn (Builder $q) => $q->where('id', '!=', $request->requested_by)
             )
-
-            // ✅ শ্যাডোব্যান্ড ইউজার বাদ
             ->where('is_shadowbanned', false)
-
-            // ✅ যারা availability বন্ধ করেননি
-            ->where(function ($q) {
-                $q->whereNull('is_available')
-                    ->orWhere('is_available', true);
+            ->where(function (Builder $q) {
+                $q->whereNull('is_available')->orWhere('is_available', true);
             })
-
-            // ✅ Component ভিত্তিক 3-Tier কুলডাউন চেক
-            ->where(function ($q) use ($request) {
-                $component = $request->component_type instanceof BloodComponentType 
-                    ? $request->component_type->value 
+            ->where(function (Builder $q) {
+                $q->whereNull('cooldown_until')->orWhere('cooldown_until', '<=', now());
+            })
+            ->where(function (Builder $q) use ($request) {
+                $component = $request->component_type instanceof BloodComponentType
+                    ? $request->component_type->value
                     : (string) ($request->component_type ?? BloodComponentType::WHOLE_BLOOD->value);
 
                 if ($component === BloodComponentType::PLASMA->value) {
-                    $q->where(function ($sq) {
+                    $q->where(function (Builder $sq) {
                         $sq->whereNull('last_plasma_donated_at')
-                           ->orWhere('last_plasma_donated_at', '<=', now()->subDays(28));
+                            ->orWhere('last_plasma_donated_at', '<=', now()->subDays(28));
                     });
                 } elseif ($component === BloodComponentType::PLATELETS->value) {
-                    $q->where(function ($sq) {
+                    $q->where(function (Builder $sq) {
                         $sq->whereNull('last_platelet_donated_at')
-                           ->orWhere('last_platelet_donated_at', '<=', now()->subDays(14));
+                            ->orWhere('last_platelet_donated_at', '<=', now()->subDays(14));
                     });
                 } else {
-                    $q->where(function ($sq) {
+                    $q->where(function (Builder $sq) {
                         $sq->whereNull('last_whole_blood_donated_at')
-                           ->orWhere('last_whole_blood_donated_at', '<=', now()->subDays(120));
-                    })->where(function ($sq) {
+                            ->orWhere('last_whole_blood_donated_at', '<=', now()->subDays(120));
+                    })->where(function (Builder $sq) {
                         $sq->whereNull('last_donated_at')
-                           ->orWhere('last_donated_at', '<=', now()->subDays(120));
+                            ->orWhere('last_donated_at', '<=', now()->subDays(120));
                     });
                 }
             });
     }
 
     /**
-     * urgency অনুযায়ী recipient cap নির্ধারণ করে।
+     * @param array<int> $donorIds
+     * @return array<int, float>
      */
-    private function getCap(mixed $urgency): int
+    private function getHistoricalResponseRates(array $donorIds): array
     {
-        $value = $urgency instanceof UrgencyLevel ? $urgency->value : (string) $urgency;
+        if ($donorIds === []) {
+            return [];
+        }
 
-        return $value === UrgencyLevel::EMERGENCY->value
-            ? self::CAP_EMERGENCY
-            : self::CAP_NORMAL;
+        $stats = DonorResponseLog::query()
+            ->whereIn('donor_id', $donorIds)
+            ->selectRaw('donor_id, SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) AS accepted_count, COUNT(*) AS total_count', ['accepted'])
+            ->groupBy('donor_id')
+            ->get();
+
+        $rates = [];
+        foreach ($stats as $row) {
+            $total = (int) $row->total_count;
+            $accepted = (int) $row->accepted_count;
+            $rates[(int) $row->donor_id] = $total > 0 ? round($accepted / $total, 4) : 0.0;
+        }
+
+        return $rates;
     }
-
-
 }
+

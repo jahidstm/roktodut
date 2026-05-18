@@ -2,12 +2,10 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\DispatchEmergencyAlert;
-use App\Jobs\SendEmergencyBloodRequestNotificationJob;
+use App\Jobs\DispatchEmergencyAlertsJob;
 use App\Models\BloodRequest;
 use App\Models\ChronicRequestSubscription;
 use App\Models\ChronicSubscriptionBuddy;
-use App\Models\District;
 use App\Services\DonorMatchingService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -74,26 +72,30 @@ class DispatchChronicSubscriptions extends Command
                             'is_phone_hidden' => (bool) $subscription->is_phone_hidden,
                         ]);
 
-                        DispatchEmergencyAlert::dispatch($request)->afterCommit();
-
                         // Notify the requester that the chronic request was created
                         $requesterUser = \App\Models\User::find($subscription->user_id);
                         if ($requesterUser) {
                             $requesterUser->notify(new \App\Notifications\ChronicRequestCreatedNotification($request));
                         }
 
-                        $districtName = District::find($request->district_id)?->name ?? 'আপনার';
-                        $donors = $matcher->match($request);
-                        if ($donors->isNotEmpty()) {
-                            $donorIds = $donors->pluck('id')->all();
+                        $rankedDonors = $matcher->rankDonors($request, 50);
+                        if ($rankedDonors->isNotEmpty()) {
+                            $donorIds = $rankedDonors->pluck('donor_id')->map(fn($id) => (int) $id)->all();
                             $this->ensureBuddyPool($subscription, $donorIds);
                             $priorityDonorIds = $this->resolvePriorityDonorIds($subscription, $donorIds);
 
-                            SendEmergencyBloodRequestNotificationJob::dispatch(
+                            $rankedByPriority = collect($rankedDonors)
+                                ->sortBy(function (array $row) use ($priorityDonorIds): int {
+                                    $position = array_search((int) ($row['donor_id'] ?? 0), $priorityDonorIds, true);
+                                    return $position === false ? PHP_INT_MAX : $position;
+                                })
+                                ->values()
+                                ->all();
+
+                            DispatchEmergencyAlertsJob::dispatch(
                                 bloodRequestId: $request->id,
-                                districtName: $districtName,
-                                donorIds: $priorityDonorIds
-                            );
+                                rankedDonors: $rankedByPriority
+                            )->afterCommit();
                         }
 
                         $created++;
