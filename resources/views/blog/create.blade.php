@@ -118,6 +118,27 @@
                 </div>
             </div>
 
+            {{-- Categories --}}
+            <div class="mb-6">
+                <label class="block text-sm font-extrabold text-slate-700 mb-2">
+                    বিভাগ (Categories) <span class="text-slate-400 font-normal text-xs ml-1">(ঐচ্ছিক — একাধিক নির্বাচন করা যাবে)</span>
+                </label>
+                <div class="flex flex-wrap gap-2">
+                    @if(isset($categories))
+                        @foreach($categories as $category)
+                            <label class="cursor-pointer">
+                                <input type="checkbox" name="categories[]" value="{{ $category->id }}"
+                                       class="peer sr-only"
+                                       {{ in_array($category->id, old('categories', [])) ? 'checked' : '' }}>
+                                <span class="inline-flex items-center justify-center px-4 py-2 text-sm font-bold text-slate-600 bg-slate-50 border border-slate-200 rounded-full peer-checked:bg-red-50 peer-checked:text-red-600 peer-checked:border-red-200 hover:bg-slate-100 transition-colors select-none">
+                                    {{ $category->name }}
+                                </span>
+                            </label>
+                        @endforeach
+                    @endif
+                </div>
+            </div>
+
             {{-- Title --}}
             <div class="mb-6">
                 <label for="post-title"

@@ -54,7 +54,8 @@ class BlogSubmissionController extends Controller
      */
     public function create(): View
     {
-        return view('blog.create');
+        $categories = \App\Models\Category::all();
+        return view('blog.create', compact('categories'));
     }
 
     // =========================================================================
@@ -81,7 +82,6 @@ class BlogSubmissionController extends Controller
             $coverImagePath = $this->processCoverImage($request->file('cover_image'));
         }
 
-        // ── Create Post (status = pending_review) ──────────────────────────
         $post = Post::create([
             'author_user_id' => Auth::id(),
             'title'          => $validated['title'],
@@ -92,6 +92,10 @@ class BlogSubmissionController extends Controller
             'status'         => 'pending_review',
             'published_at'   => null,
         ]);
+
+        if (!empty($validated['categories'])) {
+            $post->categories()->attach($validated['categories']);
+        }
 
         $admins = User::where('role', 'admin')->get();
         if ($admins->isNotEmpty()) {
@@ -170,6 +174,10 @@ class BlogSubmissionController extends Controller
                 'mimes:jpeg,jpg,png,webp,gif',
                 'max:2048',   // 2 MB in kilobytes (Laravel's max rule uses KB)
             ],
+
+            // ── Categories ──
+            'categories' => ['nullable', 'array'],
+            'categories.*' => ['integer', 'exists:categories,id'],
         ];
 
         // ── Health Meta Rules ──────────────────────────────────────────
