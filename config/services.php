@@ -48,4 +48,10 @@ return [
         'vapid_key' => env('FIREBASE_VAPID_KEY'),
     ],
 
+    'roktodut_ml' => [
+        'base_url' => env('ROKTODUT_ML_BASE_URL', 'http://127.0.0.1:8001'),
+        'api_key' => env('ROKTODUT_AI_SECRET', 'ROKTODUT_AI_SECRET'),
+        'internal_secret' => env('INTERNAL_WEBHOOK_SECRET', 'ROKTODUT_INTERNAL_SECRET'),
+    ],
+
 ];

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\InternalNlpRequestController;
 use App\Http\Controllers\Api\LocationController;
 use App\Http\Controllers\FcmTokenController;
 
@@ -9,3 +10,7 @@ Route::get('/locations', [LocationController::class, 'getLocations'])->name('api
 Route::middleware('auth:sanctum')
     ->post('/user/fcm-token', FcmTokenController::class)
     ->name('api.user.fcm-token.update');
+
+Route::middleware('internal.secret')
+    ->post('/internal/requests/nlp', [InternalNlpRequestController::class, 'store'])
+    ->name('api.internal.requests.nlp.store');

@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import asyncio
+import json
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 import joblib
 import pandas as pd
 from fastapi import Depends, FastAPI, Header, HTTPException, status
+from groq import Groq
 from pydantic import BaseModel, ConfigDict, Field
 
 DEFAULT_API_KEY = "ROKTODUT_AI_SECRET"
@@ -19,6 +22,32 @@ DEFAULT_FEATURE_COLUMNS = [
     "is_weekend",
     "historical_response_rate",
 ]
+DEFAULT_GROQ_MODEL = "llama3-8b-8192"
+
+NER_SYSTEM_PROMPT = """You are a strict medical NER extractor for blood request triage.
+Your task: extract structured fields from Bengali/English free-text blood request messages.
+
+Return ONLY valid JSON object with this exact schema:
+{
+  "blood_group": "A+|A-|B+|B-|AB+|AB-|O+|O-",
+  "urgency": "emergency|high|medium",
+  "location_text": "string",
+  "units_needed": integer >= 1,
+  "confidence_score": float between 0.0 and 1.0
+}
+
+Rules:
+1) blood_group must be one of the 8 standard groups. Infer normalized form.
+2) urgency mapping:
+   - emergency for phrases like: emergency, urgent now, immediately, tonight critical, এক্ষুনি, ইমারজেন্সি, অতি জরুরি
+   - high for: urgent, today, within hours, জরুরি
+   - medium for all other or unclear cases.
+3) location_text should be the most specific place string available in input.
+4) units_needed must be integer; if missing assume 1.
+5) confidence_score reflects extraction confidence based on clarity/completeness.
+6) If uncertain, still output best guess with lower confidence.
+7) NEVER output markdown, explanations, comments, or additional keys.
+"""
 
 
 class CandidateDonor(BaseModel):
@@ -32,7 +61,6 @@ class CandidateDonor(BaseModel):
 
 class RankingRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-
     request_details: dict[str, Any] | None = None
     candidate_donors: list[CandidateDonor] = Field(..., min_length=1)
 
@@ -41,6 +69,19 @@ class RankedDonor(BaseModel):
     donor_id: int
     probability_score: float
     rank: int
+
+
+class ParseRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    text: str = Field(..., min_length=3)
+
+
+class ParsedBloodRequest(BaseModel):
+    blood_group: Literal["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
+    urgency: Literal["emergency", "high", "medium"]
+    location_text: str = Field(..., min_length=2, max_length=255)
+    units_needed: int = Field(..., ge=1, le=20)
+    confidence_score: float = Field(..., ge=0.0, le=1.0)
 
 
 def _resolve_expected_api_key() -> str:
@@ -52,7 +93,6 @@ def _load_model_artifact() -> tuple[Any, list[str]]:
         raise RuntimeError(f"Model not found: {MODEL_PATH}")
 
     artifact = joblib.load(MODEL_PATH)
-
     if isinstance(artifact, dict):
         model = artifact.get("model")
         feature_columns = artifact.get("feature_columns", DEFAULT_FEATURE_COLUMNS)
@@ -66,18 +106,27 @@ def _load_model_artifact() -> tuple[Any, list[str]]:
     return model, list(feature_columns)
 
 
+def _resolve_groq_client() -> Groq | None:
+    api_key = os.getenv("GROQ_API_KEY", "").strip()
+    if api_key == "":
+        return None
+    return Groq(api_key=api_key)
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     model, feature_columns = _load_model_artifact()
     app.state.model = model
     app.state.feature_columns = feature_columns
     app.state.api_key = _resolve_expected_api_key()
+    app.state.groq_client = _resolve_groq_client()
+    app.state.groq_model = os.getenv("GROQ_MODEL", DEFAULT_GROQ_MODEL).strip() or DEFAULT_GROQ_MODEL
     yield
 
 
 app = FastAPI(
     title="RoktoDut ML Service",
-    version="1.0.0",
+    version="1.1.0",
     lifespan=lifespan,
 )
 
@@ -127,3 +176,45 @@ async def rank_donors(
         )
         for idx, item in enumerate(ranked)
     ]
+
+
+def _call_groq_parse(client: Groq, model_name: str, text: str) -> ParsedBloodRequest:
+    completion = client.chat.completions.create(
+        model=model_name,
+        temperature=0,
+        response_format={"type": "json_object"},
+        messages=[
+            {"role": "system", "content": NER_SYSTEM_PROMPT},
+            {"role": "user", "content": text},
+        ],
+    )
+
+    content = completion.choices[0].message.content if completion.choices else None
+    if not content:
+        raise RuntimeError("Groq returned empty content.")
+
+    parsed_raw = json.loads(content)
+    return ParsedBloodRequest.model_validate(parsed_raw)
+
+
+@app.post("/api/v1/parse-request", response_model=ParsedBloodRequest)
+async def parse_request(
+    payload: ParseRequest,
+    _: None = Depends(require_api_key),
+) -> ParsedBloodRequest:
+    client: Groq | None = app.state.groq_client
+    if client is None:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="GROQ_API_KEY is not configured.",
+        )
+
+    model_name: str = app.state.groq_model
+    try:
+        return await asyncio.to_thread(_call_groq_parse, client, model_name, payload.text)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"NLP parsing failed: {exc}",
+        ) from exc
+
