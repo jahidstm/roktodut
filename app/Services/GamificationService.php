@@ -155,8 +155,19 @@ class GamificationService
 
         // ─── ১. ডোনেশন কাউন্ট ও তারিখ আপডেট ──────────────────────────
         $donor->increment('total_verified_donations');
+        $component = $bloodRequest->component_type instanceof \App\Enums\BloodComponentType 
+            ? $bloodRequest->component_type->value 
+            : (string) $bloodRequest->component_type;
+
+        $cooldownDays = match ($component) {
+            'platelets' => 14,
+            'plasma' => 28,
+            default => strtolower((string)$donor->gender) === 'male' ? 90 : 120,
+        };
+
         $donor->update([
             'last_donated_at' => now()->toDateString(),
+            'cooldown_until' => now()->addDays($cooldownDays)->toDateString(),
             'is_available' => false,
         ]);
         $this->handleReadyNowBadge($donor, false);
@@ -236,8 +247,16 @@ class GamificationService
         $this->enforceDonationCooldownForDate($donor, $donationDate);
 
         $donor->increment('total_verified_donations');
+        $component = $bloodRequest ? ($bloodRequest->component_type instanceof \App\Enums\BloodComponentType ? $bloodRequest->component_type->value : (string) $bloodRequest->component_type) : 'whole_blood';
+        $cooldownDays = match ($component) {
+            'platelets' => 14,
+            'plasma' => 28,
+            default => strtolower((string)$donor->gender) === 'male' ? 90 : 120,
+        };
+
         $donor->update([
             'last_donated_at' => $donationDate->toDateString(),
+            'cooldown_until' => $donationDate->copy()->addDays($cooldownDays)->toDateString(),
             'is_available' => false,
         ]);
         $this->handleReadyNowBadge($donor, false);
