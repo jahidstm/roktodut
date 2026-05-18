@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\BloodRequest;
+use App\Notifications\SpamStrikeWarningNotification;
 
 class SpamRadarController extends Controller
 {
@@ -57,6 +58,9 @@ class SpamRadarController extends Controller
 
         // The request remains hidden (is_hidden = true) because it's confirmed spam
         $bloodRequest->update(['is_hidden' => true]);
+        
+        // Notify user about the strike/ban
+        $requester->notify(new SpamStrikeWarningNotification($requester->spam_strikes, $requester->is_shadowbanned));
 
         return back()->with('success', "স্ট্রাইক অ্যাপ্রুভ করা হয়েছে। ইউজারের বর্তমান স্ট্রাইক: {$requester->spam_strikes}");
     }

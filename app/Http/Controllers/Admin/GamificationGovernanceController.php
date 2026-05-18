@@ -11,6 +11,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
+use App\Notifications\GamificationRewardNotification;
 
 /**
  * GamificationGovernanceController
@@ -179,6 +180,16 @@ class GamificationGovernanceController extends Controller
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);
+                
+                // Notify the user about the new badge
+                $user->notify(new GamificationRewardNotification(
+                    rewardType: 'badge',
+                    points: 0,
+                    message: "অ্যাডমিন আপনাকে '{$badge->bn_name}' ব্যাজটি প্রদান করেছেন। অভিনন্দন!",
+                    badgeName: $badge->bn_name,
+                    icon: $badge->icon_class ?? 'award'
+                ));
+                
                 $msg = "✅ '{$badge->bn_name}' ব্যাজ {$user->name}-কে অ্যাসাইন করা হয়েছে।";
             } else {
                 $msg = "ℹ️ {$user->name} ইতিমধ্যেই এই ব্যাজটির মালিক।";
