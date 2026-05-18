@@ -26,6 +26,8 @@ class AdminTaskNotification extends Notification
             $channels[] = 'broadcast';
         }
 
+        $channels[] = \App\Notifications\Channels\AdminTelegramChannel::class;
+
         return $channels;
     }
 
@@ -50,5 +52,12 @@ class AdminTaskNotification extends Notification
             'blood_group' => null,
             'created_at' => now()->toISOString(),
         ];
+    }
+
+    public function toAdminTelegram(object $notifiable): string
+    {
+        return "🛡️ <b>{$this->title}</b>\n\n"
+             . "{$this->message}\n\n"
+             . "🔗 <a href=\"{$this->url}\">অ্যাডমিন প্যানেলে দেখুন</a>";
     }
 }

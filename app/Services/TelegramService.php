@@ -9,11 +9,13 @@ class TelegramService
 {
     private string $token;
     private string $baseUrl;
+    private string $adminChatId;
 
     public function __construct()
     {
-        $this->token   = config('services.telegram.token', '');
-        $this->baseUrl = "https://api.telegram.org/bot{$this->token}";
+        $this->token       = config('services.telegram.token', '');
+        $this->baseUrl     = "https://api.telegram.org/bot{$this->token}";
+        $this->adminChatId = config('services.telegram.admin_chat_id', '');
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -155,5 +157,18 @@ MSG;
 MSG;
 
         return $this->send($requesterChatId, $text);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // 🛡️ অ্যাডমিন অ্যালার্ট (সরাসরি অ্যাডমিন প্যানেল গ্রুপে/চ্যাটে)
+    // ─────────────────────────────────────────────────────────────
+    public function sendAdminAlert(string $text): bool
+    {
+        if (empty($this->adminChatId)) {
+            Log::warning('[Telegram] Admin chat ID not configured.');
+            return false;
+        }
+
+        return $this->send($this->adminChatId, $text);
     }
 }
