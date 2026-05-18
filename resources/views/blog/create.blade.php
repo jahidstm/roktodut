@@ -258,7 +258,40 @@
 
 
         {{-- ╔══════════════════════════════════════════════════════════════╗
-             ║  SECTION 3 — Success Story Meta (conditionally shown)         ║
+             ║  SECTION 3 — Health Blog Meta (conditionally shown)           ║
+             ╚══════════════════════════════════════════════════════════════╝ --}}
+        <div
+            id="health-meta-section"
+            class="{{ old('type', 'health') !== 'health' ? 'hidden' : '' }} bg-gradient-to-br from-sky-50 to-blue-50 rounded-2xl border border-sky-100 shadow-sm p-6 sm:p-8"
+            aria-live="polite">
+
+            <h2 class="text-lg font-extrabold text-sky-800 mb-1 flex items-center gap-2">
+                <span class="w-7 h-7 bg-sky-200 text-sky-700 rounded-lg flex items-center justify-center text-sm font-black">৩</span>
+                স্বাস্থ্য ব্লগের তথ্য
+            </h2>
+            <p class="text-sm text-sky-600 font-medium mb-6">
+                সঠিক চিকিৎসা তথ্য নিশ্চিত করতে আপনার পোস্টের তথ্যসূত্র বা রেফারেন্স উল্লেখ করুন।
+            </p>
+
+            <div class="mb-2">
+                <label class="block text-sm font-extrabold text-sky-800 mb-2">
+                    তথ্যসূত্র (References) <span class="text-slate-400 font-normal text-xs ml-1">(ঐচ্ছিক — সর্বাধিক ৫টি)</span>
+                </label>
+                
+                <div id="sources-container" class="space-y-3">
+                    {{-- Default empty row or old validation values will be injected by JS --}}
+                </div>
+                
+                <button type="button" id="add-source-btn" class="mt-4 inline-flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-sky-700 bg-white border border-sky-200 hover:bg-sky-100 hover:border-sky-300 rounded-xl transition-colors shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                    নতুন তথ্যসূত্র যোগ করুন
+                </button>
+            </div>
+        </div>{{-- /health-meta-section --}}
+
+
+        {{-- ╔══════════════════════════════════════════════════════════════╗
+             ║  SECTION 4 — Success Story Meta (conditionally shown)         ║
              ╚══════════════════════════════════════════════════════════════╝ --}}
         <div
             id="story-meta-section"
@@ -469,9 +502,9 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    // ── 1. Post Type Toggle ──────────────────────────────────────────────
     const typeRadios       = document.querySelectorAll('.type-radio');
     const storyMetaSection = document.getElementById('story-meta-section');
+    const healthMetaSection = document.getElementById('health-meta-section');
     const healthLabel      = document.getElementById('type-health-label');
     const storyLabel       = document.getElementById('type-story-label');
 
@@ -481,8 +514,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateTypeUI() {
         const isStory = document.getElementById('type-story').checked;
 
-        // Toggle story-meta panel visibility
+        // Toggle meta panels visibility
         storyMetaSection.classList.toggle('hidden', !isStory);
+        healthMetaSection.classList.toggle('hidden', isStory);
 
         // Update label styles
         healthLabel.className = healthLabel.className
@@ -594,6 +628,54 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     initQuill();
+
+    // ── 5. Dynamic Sources (Health Meta) ─────────────────────────────────
+    const sourcesContainer = document.getElementById('sources-container');
+    const addSourceBtn = document.getElementById('add-source-btn');
+    let sourceIndex = 0;
+
+    // Load old values if validation failed
+    const oldSources = @json(old('sources', []));
+
+    function addSourceRow(title = '', url = '') {
+        if (sourcesContainer.children.length >= 5) {
+            alert('সর্বোচ্চ ৫টি তথ্যসূত্র যোগ করা যাবে।');
+            return;
+        }
+
+        const div = document.createElement('div');
+        div.className = 'flex flex-col sm:flex-row gap-3 items-start source-row bg-white p-3.5 rounded-xl border border-sky-100 shadow-sm relative group transition-all';
+        div.innerHTML = `
+            <div class="flex-1 w-full">
+                <input type="text" name="sources[${sourceIndex}][title]" value="${title}" placeholder="উৎস বা বই/আর্টিকেলের শিরোনাম" class="w-full px-4 py-2.5 text-sm font-medium rounded-lg border border-slate-200 focus:ring-2 focus:ring-sky-400 focus:outline-none placeholder:text-slate-400 mb-2 sm:mb-0 transition-colors">
+            </div>
+            <div class="flex-1 w-full relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                </div>
+                <input type="url" name="sources[${sourceIndex}][url]" value="${url}" placeholder="লিংক (URL) - ঐচ্ছিক" class="w-full pl-9 pr-4 py-2.5 text-sm font-medium rounded-lg border border-slate-200 focus:ring-2 focus:ring-sky-400 focus:outline-none placeholder:text-slate-400 transition-colors">
+            </div>
+            <button type="button" class="remove-source-btn text-slate-300 hover:text-rose-500 p-2.5 sm:mt-0 transition-colors" title="মুছে ফেলুন">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+        `;
+
+        div.querySelector('.remove-source-btn').addEventListener('click', function() {
+            div.remove();
+        });
+
+        sourcesContainer.appendChild(div);
+        sourceIndex++;
+    }
+
+    if (oldSources.length > 0) {
+        oldSources.forEach(source => addSourceRow(source.title || '', source.url || ''));
+    } else {
+        // Add one empty row initially
+        addSourceRow();
+    }
+
+    addSourceBtn.addEventListener('click', () => addSourceRow());
 
 });
 </script>

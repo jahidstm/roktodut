@@ -103,6 +103,28 @@ class BlogSubmissionController extends Controller
             ));
         }
 
+        // ── Health Meta ────────────────────────────────────────────────────
+        if ($post->type === 'health') {
+            $sourcesJson = [];
+            if (!empty($validated['sources']) && is_array($validated['sources'])) {
+                foreach ($validated['sources'] as $source) {
+                    if (!empty($source['title'])) {
+                        $sourcesJson[] = [
+                            'title' => $source['title'],
+                            'url' => $source['url'] ?? null,
+                            'accessed_at' => date('Y-m-d')
+                        ];
+                    }
+                }
+            }
+            // Use an array directly; HealthBlogMeta casts 'sources_json' to array
+            \App\Models\HealthBlogMeta::create([
+                'post_id' => $post->id,
+                'medically_reviewed_by' => null, // Will be set during review
+                'sources_json' => $sourcesJson
+            ]);
+        }
+
         // ── Story Meta ─────────────────────────────────────────────────────
         if ($post->type === 'story') {
             SuccessStoryMeta::create([
@@ -149,6 +171,15 @@ class BlogSubmissionController extends Controller
                 'max:2048',   // 2 MB in kilobytes (Laravel's max rule uses KB)
             ],
         ];
+
+        // ── Health Meta Rules ──────────────────────────────────────────
+        if (!$isStory) {
+            $rules = array_merge($rules, [
+                'sources' => ['nullable', 'array', 'max:5'],
+                'sources.*.title' => ['required_with:sources.*.url', 'string', 'max:255'],
+                'sources.*.url' => ['nullable', 'url', 'max:1000'],
+            ]);
+        }
 
         // ── Story-Specific Rules ─────────────────────────────────────────
         if ($isStory) {
