@@ -102,12 +102,16 @@ class DonationClaimController extends Controller
                     }
                 }
 
-                $this->gamification->processDonationReward(
-                    donor: $donor,
-                    bloodRequest: $bloodRequest ?? new \App\Models\BloodRequest(),
-                    isFirstResponder: $isFirstResponder,
-                    isMidnightSavior: $isMidnightSavior
-                );
+                try {
+                    $this->gamification->processDonationReward(
+                        donor: $donor,
+                        bloodRequest: $bloodRequest ?? new \App\Models\BloodRequest(),
+                        isFirstResponder: $isFirstResponder,
+                        isMidnightSavior: $isMidnightSavior
+                    );
+                } catch (\RuntimeException $e) {
+                    return back()->with('error', $e->getMessage());
+                }
 
                 // 🎯 গ্রহীতার রিভিউ পয়েন্ট (+১০)
                 $this->gamification->awardReviewPoints($donor);
