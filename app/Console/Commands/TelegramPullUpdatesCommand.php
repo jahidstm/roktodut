@@ -80,6 +80,15 @@ class TelegramPullUpdatesCommand extends Command
                     $this->info("User {$user->name} disconnected.");
                     $processedCount++;
                 }
+            } elseif (str_starts_with($messageText, '/approve ')) {
+                $requestId = str_replace('/approve ', '', $messageText);
+                $this->handleApproval($chatId, $requestId, $telegramService);
+                $processedCount++;
+            } elseif ($messageText !== '' && !str_starts_with($messageText, '/')) {
+                // Free-text message (NLP Intake for Blood Requests)
+                $this->info("Processing NLP intake for text: {$messageText}");
+                $this->handleNlpIntake($chatId, $messageText, $telegramService);
+                $processedCount++;
             }
         }
 
@@ -91,5 +100,65 @@ class TelegramPullUpdatesCommand extends Command
         }
 
         $this->info("Done! Processed {$processedCount} new messages.");
+    }
+
+    private function handleNlpIntake(int|string $chatId, string $messageText, TelegramService $telegramService): void
+    {
+        $mlBaseUrl = rtrim((string) config('services.roktodut_ml.base_url'), '/');
+        $mlApiKey = (string) config('services.roktodut_ml.api_key');
+        $internalSecret = (string) config('services.roktodut_ml.internal_secret');
+        $internalUrl = url('/api/internal/requests/nlp');
+
+        try {
+            $parseResponse = Http::timeout(15)
+                ->withHeaders(['X-API-Key' => $mlApiKey])
+                ->post("{$mlBaseUrl}/api/v1/parse-request", ['text' => $messageText]);
+
+            $parseResponse->throw();
+            $parsed = $parseResponse->json();
+
+            $linkedUser = User::query()->where('telegram_chat_id', (string) $chatId)->first();
+
+            $persistPayload = array_merge($parsed, [
+                'requested_by' => $linkedUser?->id,
+                'telegram_chat_id' => (string) $chatId,
+                'raw_text' => $messageText,
+            ]);
+
+            $saveResponse = Http::timeout(15)
+                ->withHeaders(['X-Internal-Secret' => $internalSecret])
+                ->post($internalUrl, $persistPayload);
+
+            $saveResponse->throw();
+            $telegramService->send($chatId, 'আপনার রিকোয়েস্টটি যাচাই করা হচ্ছে।');
+        } catch (\Throwable $e) {
+            $this->error("NLP Error: " . $e->getMessage());
+            $telegramService->send($chatId, 'দুঃখিত, আপনার অনুরোধটি এখন প্রক্রিয়া করা গেল না। একটু পর আবার চেষ্টা করুন।');
+        }
+    }
+
+    private function handleApproval(int|string $chatId, string $requestId, TelegramService $telegramService): void
+    {
+        $adminChatId = config('services.telegram.admin_chat_id');
+        if ((string) $chatId !== (string) $adminChatId) {
+            $telegramService->send($chatId, '❌ You do not have permission to approve requests.');
+            return;
+        }
+
+        $request = \App\Models\BloodRequest::find($requestId);
+        if (!$request) {
+            $telegramService->send($chatId, '❌ Request not found.');
+            return;
+        }
+
+        if ($request->status !== 'nlp_pending') {
+            $telegramService->send($chatId, "❌ Request is already {$request->status}.");
+            return;
+        }
+
+        $request->update(['status' => 'pending']);
+        \App\Jobs\DispatchEmergencyAlertsJob::dispatch($request);
+        
+        $telegramService->send($chatId, "✅ Request #{$requestId} approved and published! Alerts are being dispatched.");
     }
 }

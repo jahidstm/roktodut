@@ -7,6 +7,12 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any, Literal
 
+from dotenv import load_dotenv
+
+# Load the parent Laravel .env file automatically
+env_path = Path(__file__).resolve().parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
+
 import joblib
 import pandas as pd
 from fastapi import Depends, FastAPI, Header, HTTPException, status

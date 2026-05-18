@@ -61,6 +61,23 @@ class InternalNlpRequestController extends Controller
             ),
         ]);
 
+        $adminChatId = config('services.telegram.admin_chat_id');
+        if ($adminChatId) {
+            $msg = "🤖 <b>New NLP Request Needs Approval</b>\n\n";
+            $msg .= "<b>ID:</b> {$bloodRequest->id}\n";
+            $msg .= "<b>Group:</b> {$bloodRequest->blood_group->value}\n";
+            $msg .= "<b>Location:</b> {$bloodRequest->location_text}\n";
+            $msg .= "<b>Urgency:</b> {$bloodRequest->urgency}\n";
+            $msg .= "<b>Confidence:</b> {$bloodRequest->ml_confidence_score}\n\n";
+            $msg .= "<i>Reply with </i><code>/approve {$bloodRequest->id}</code><i> to publish this request.</i>";
+            
+            try {
+                app(\App\Services\TelegramService::class)->send($adminChatId, $msg);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error("Failed to notify admin of NLP request: " . $e->getMessage());
+            }
+        }
+
         return response()->json([
             'id' => $bloodRequest->id,
             'status' => $bloodRequest->status,
