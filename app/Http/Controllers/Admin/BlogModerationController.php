@@ -10,6 +10,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use App\Notifications\BlogPostModeratedNotification;
 
 /**
  * BlogModerationController — RoktoDut Admin Module
@@ -114,6 +115,9 @@ class BlogModerationController extends Controller
                     $meta->update(['is_verified_story' => true]);
                 }
             }
+            
+            // Notify the author
+            $post->author->notify(new BlogPostModeratedNotification($post, 'approved'));
         });
 
         $label = $post->isSuccessStory()
@@ -159,8 +163,8 @@ class BlogModerationController extends Controller
         DB::transaction(function () use ($request, $post) {
             $post->update(['status' => 'rejected']);
 
-            // Future hook: store rejection reason + fire author notification
-            // NotificationService::notifyRejection($post, $request->rejection_reason);
+            // Notify the author with the rejection reason
+            $post->author->notify(new BlogPostModeratedNotification($post, 'rejected', $request->rejection_reason));
         });
 
         return redirect()
