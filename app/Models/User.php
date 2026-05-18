@@ -163,6 +163,11 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         return $this->hasMany(BloodRequestResponse::class, 'donor_user_id');
     }
 
+    public function donorResponseLogs(): HasMany
+    {
+        return $this->hasMany(DonorResponseLog::class, 'donor_id');
+    }
+
     public function bloodRequestReports(): HasMany
     {
         return $this->hasMany(BloodRequestReport::class, 'user_id');
@@ -267,8 +272,8 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
     public function daysUntilNextDonation(mixed $componentType = null): int
     {
         $value = $this->resolveComponentValue($componentType);
-        
-        $lastDonatedAt = match($value) {
+
+        $lastDonatedAt = match ($value) {
             BloodComponentType::PLASMA->value    => $this->last_plasma_donated_at,
             BloodComponentType::PLATELETS->value => $this->last_platelet_donated_at,
             default                              => $this->last_whole_blood_donated_at ?? $this->last_donated_at,
@@ -280,7 +285,7 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
 
         $defaultCooldown = strtolower((string) $this->gender) === 'female' ? 120 : 90;
 
-        $cooldownDays = match($value) {
+        $cooldownDays = match ($value) {
             BloodComponentType::PLASMA->value    => 28,
             BloodComponentType::PLATELETS->value => 14,
             default                              => $defaultCooldown,
@@ -296,7 +301,7 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         if (!$lastDonatedAt) {
             return null;
         }
-        
+
         $cooldownDays = strtolower((string) $this->gender) === 'female' ? 120 : 90;
         return $lastDonatedAt->copy()->addDays($cooldownDays);
     }

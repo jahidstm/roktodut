@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\BloodGroup;
 use App\Enums\BloodComponentType;
-use App\Enums\UrgencyLevel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -21,7 +20,9 @@ class BloodRequest extends Model
         'created_ip_hash',
         'patient_name',
         'blood_group',
+        'location_text',
         'component_type',
+        'units_needed',
         'bags_needed',
         'hospital_id',
 
@@ -39,6 +40,7 @@ class BloodRequest extends Model
         'urgency',
         'needed_at',
         'status',
+        'ml_confidence_score',
         'notes',
         'is_phone_hidden',
         'spam_report_count',
@@ -51,8 +53,12 @@ class BloodRequest extends Model
         return [
             'blood_group'     => BloodGroup::class,
             'component_type'  => BloodComponentType::class,
-            'urgency'         => UrgencyLevel::class,
+            'urgency'         => 'string',
+            'latitude'        => 'decimal:8',
+            'longitude'       => 'decimal:8',
             'needed_at'       => 'datetime',
+            'units_needed'    => 'integer',
+            'ml_confidence_score' => 'float',
             'is_phone_hidden' => 'boolean',
             'is_hidden'       => 'boolean',
         ];
@@ -95,6 +101,11 @@ class BloodRequest extends Model
     public function broadcastLogs(): HasMany
     {
         return $this->hasMany(BroadcastLog::class, 'blood_request_id');
+    }
+
+    public function donorResponseLogs(): HasMany
+    {
+        return $this->hasMany(DonorResponseLog::class, 'request_id');
     }
 
     // 📍 নতুন যুক্ত করা লোকেশন রিলেশনশিপস (Eager Loading এর জন্য)
@@ -196,9 +207,24 @@ class BloodRequest extends Model
         return $this->status === 'fulfilled';
     }
 
+    public function isApproved(): bool
+    {
+        return $this->status === 'approved';
+    }
+
+    public function isRejected(): bool
+    {
+        return $this->status === 'rejected';
+    }
+
+    public function isNlpPending(): bool
+    {
+        return $this->status === 'nlp_pending';
+    }
+
     public function isExpired(): bool
     {
-        return $this->status === 'expired';
+        return $this->status === 'rejected';
     }
 
     public function componentLabel(): string
@@ -213,5 +239,28 @@ class BloodRequest extends Model
         } catch (\Throwable) {
             return 'Whole Blood';
         }
+    }
+
+    public function getUnitsNeededAttribute($value): int
+    {
+        if ($value !== null) {
+            return (int) $value;
+        }
+
+        return max((int) ($this->attributes['bags_needed'] ?? 1), 1);
+    }
+
+    public function setUnitsNeededAttribute($value): void
+    {
+        $units = max((int) $value, 1);
+        $this->attributes['units_needed'] = $units;
+        $this->attributes['bags_needed'] = $units;
+    }
+
+    public function setBagsNeededAttribute($value): void
+    {
+        $units = max((int) $value, 1);
+        $this->attributes['bags_needed'] = $units;
+        $this->attributes['units_needed'] = $units;
     }
 }
