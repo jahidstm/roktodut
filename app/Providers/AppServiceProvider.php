@@ -12,7 +12,9 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Support\Facades\Log;
 use App\Listeners\LogSuccessfulLogin;
 use App\Events\DonationCompleted;
 use App\Listeners\RewardDonorPoints;
@@ -44,6 +46,19 @@ class AppServiceProvider extends ServiceProvider
             DonationCompleted::class,
             RewardDonorPoints::class,
         );
+        
+        // ─── Queue Failed Job Listener ─────────────────────────────────────────
+        Event::listen(JobFailed::class, function (JobFailed $event) {
+            Log::critical('[QUEUE_JOB_FAILED]', [
+                'connection' => $event->connectionName,
+                'queue'      => $event->job->getQueue(),
+                'job_name'   => $event->job->resolveName(),
+                'exception'  => $event->exception->getMessage(),
+                'time'       => now()->toDateTimeString(),
+            ]);
+            
+            // In the future, this can be extended to send a Telegram alert to Admin
+        });
 
         ResetPassword::toMailUsing(function (object $notifiable, string $token) {
             $url = url(route('password.reset', [
