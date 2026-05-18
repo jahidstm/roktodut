@@ -74,6 +74,10 @@ class DonationClaimController extends Controller
         $request->validate(['decision' => 'required|in:approve,dispute']);
 
         if ($request->decision === 'approve') {
+            if ($response->verification_status === 'verified') {
+                return back()->with('error', 'এই ডোনেশনটি ইতিমধ্যে ভেরিফাই করা হয়েছে।');
+            }
+
             $response->update([
                 'verification_status' => 'verified',
                 'fulfilled_at'        => now(),
@@ -150,6 +154,10 @@ class DonationClaimController extends Controller
         }
 
         $request->validate(['status' => 'required|in:verified,rejected']);
+
+        if ($response->verification_status === 'verified' && $request->status === 'verified') {
+            return back()->with('error', 'এই ডোনেশনটি ইতিমধ্যে ভেরিফাই করা হয়েছে।');
+        }
 
         if ($request->status === 'verified') {
             $response->update([

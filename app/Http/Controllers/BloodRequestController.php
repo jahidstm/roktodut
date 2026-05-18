@@ -36,7 +36,8 @@ class BloodRequestController extends Controller
                 'requester:id,name',
                 'responses' => fn($q) => $q->where('user_id', $userId),
                 'district:id,name', // 🚀 ইগার লোডিং (পারফরম্যান্স অপ্টিমাইজেশন)
-                'upazila:id,name'
+                'upazila:id,name',
+                'hospital:id,name,name_bn'
             ])
             ->withCount([
                 'responses as accepted_responses_count' => fn($q) => $q->where('status', 'accepted'),
@@ -89,7 +90,7 @@ class BloodRequestController extends Controller
         $hasValidGuestToken = is_string($guestToken) && strlen($guestToken) >= 32 && strlen($guestToken) <= 64;
 
         $query = BloodRequest::query()
-            ->with(['district:id,name', 'upazila:id,name']);
+            ->with(['district:id,name', 'upazila:id,name', 'hospital:id,name,name_bn']);
 
         if ($userId || $hasValidGuestToken) {
             $query->where(function ($q) use ($userId, $guestToken, $hasValidGuestToken) {
@@ -331,6 +332,10 @@ class BloodRequestController extends Controller
     {
         Gate::authorize('markFulfilled', $bloodRequest);
 
+        if ($bloodRequest->status === 'fulfilled') {
+            return back()->with('error', 'এই রিকোয়েস্টটি ইতিমধ্যে সম্পন্ন করা হয়েছে।');
+        }
+
         $bloodRequest->update(['status' => 'fulfilled']);
 
         // ─── সকল accepted ডোনারদের জন্য Event Fire করা ────────────────────
@@ -435,7 +440,8 @@ class BloodRequestController extends Controller
             'requester:id,name',
             'responses.user:id,name,phone',
             'district:id,name',
-            'upazila:id,name'
+            'upazila:id,name',
+            'hospital:id,name,name_bn'
         ]);
 
         $accepted = $bloodRequest->responses->where('status', 'accepted')->values();
