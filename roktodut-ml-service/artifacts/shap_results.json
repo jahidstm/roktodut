@@ -1,0 +1,24 @@
+{
+    "Donor A": {
+        "Base Value": -2.3296506299670643,
+        "Final Output": 2.9445302161602847,
+        "Features": {
+            "distance_km": 1.0559467302706909,
+            "days_since_last_donation": 1.8904926058723464,
+            "temporal_hour": 0.5199645453957468,
+            "is_weekend": -0.016057027554002373,
+            "historical_response_rate": 1.8238339921425673
+        }
+    },
+    "Donor B": {
+        "Base Value": -2.3296506299670643,
+        "Final Output": -5.931924119267986,
+        "Features": {
+            "distance_km": -1.116373585066769,
+            "days_since_last_donation": 0.42292272152774985,
+            "temporal_hour": -2.219687419382699,
+            "is_weekend": 0.10972038566965674,
+            "historical_response_rate": -0.7988555920488605
+        }
+    }
+}
