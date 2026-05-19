@@ -157,7 +157,8 @@ class TelegramPullUpdatesCommand extends Command
         }
 
         $request->update(['status' => 'pending']);
-        \App\Jobs\DispatchEmergencyAlertsJob::dispatch($request);
+        $rankedDonors = app(\App\Services\DonorMatchingService::class)->rankDonors($request)->toArray();
+        \App\Jobs\DispatchEmergencyAlertsJob::dispatch($request->id, $rankedDonors);
         
         $telegramService->send($chatId, "✅ Request #{$requestId} approved and published! Alerts are being dispatched.");
     }
