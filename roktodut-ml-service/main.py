@@ -35,7 +35,7 @@ Your task: extract structured fields from Bengali/English free-text blood reques
 
 Return ONLY valid JSON object with this exact schema:
 {
-  "blood_group": "A+|A-|B+|B-|AB+|AB-|O+|O-",
+  "blood_group": "A+|A-|B+|B-|AB+|AB-|O+|O-|unknown",
   "urgency": "emergency|high|medium",
   "location_text": "string",
   "units_needed": integer >= 1,
@@ -43,16 +43,15 @@ Return ONLY valid JSON object with this exact schema:
 }
 
 Rules:
-1) blood_group must be one of the 8 standard groups. Infer normalized form.
+1) If blood group is NOT explicitly stated, you MUST set `blood_group` to "unknown" and heavily penalize `confidence_score` (e.g., 0.1). DO NOT guess or hallucinate a blood group.
 2) urgency mapping:
    - emergency for phrases like: emergency, urgent now, immediately, tonight critical, এক্ষুনি, ইমারজেন্সি, অতি জরুরি
    - high for: urgent, today, within hours, জরুরি
    - medium for all other or unclear cases.
 3) location_text should be the most specific place string available in input.
 4) units_needed must be integer; if missing assume 1.
-5) confidence_score reflects extraction confidence based on clarity/completeness.
-6) If uncertain, still output best guess with lower confidence.
-7) NEVER output markdown, explanations, comments, or additional keys.
+5) confidence_score reflects extraction confidence based on clarity/completeness. High confidence (>0.8) ONLY if blood group and location are both clearly stated.
+6) NEVER output markdown, explanations, comments, or additional keys.
 """
 
 
@@ -83,7 +82,7 @@ class ParseRequest(BaseModel):
 
 
 class ParsedBloodRequest(BaseModel):
-    blood_group: Literal["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]
+    blood_group: Literal["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "unknown"]
     urgency: Literal["emergency", "high", "medium"]
     location_text: str = Field(..., min_length=2, max_length=255)
     units_needed: int = Field(..., ge=1, le=20)
