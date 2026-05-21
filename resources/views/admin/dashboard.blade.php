@@ -427,7 +427,51 @@
             </div>
         </div>
 
-        {{-- 8) Hospital Name Verification --}}
+        {{-- 🗺️ Live Geo-Spatial Demand Heatmap --}}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+             :class="{'border-teal-200 ring-2 ring-teal-50': activeAccordion === 'heatmap'}">
+            <button @click="activeAccordion = activeAccordion === 'heatmap' ? null : 'heatmap'"
+                    @keydown.enter="activeAccordion = activeAccordion === 'heatmap' ? null : 'heatmap'"
+                    @keydown.space.prevent="activeAccordion = activeAccordion === 'heatmap' ? null : 'heatmap'"
+                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-teal-50/30 transition-colors focus:outline-none">
+                <div class="flex items-center gap-4 text-left">
+                    <div class="w-12 h-12 rounded-xl bg-teal-100 text-teal-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 'heatmap'}">🗺️</div>
+                    <div>
+                        <h3 class="text-lg font-extrabold text-slate-900">Geo-Spatial Demand Heatmap</h3>
+                        <p class="text-sm text-slate-500 font-medium">জেলাভিত্তিক রক্তের চাহিদা, DFI ও Composite Risk Score লাইভ মনিটর করুন</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex flex-wrap gap-2">
+                        <span class="bg-teal-50 text-teal-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-teal-100">🗺️ CRS Map</span>
+                        <span class="bg-blue-50 text-blue-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-blue-100">📊 DFI</span>
+                    </div>
+                    <span class="bg-teal-600 text-white text-xs font-bold px-3 py-1.5 rounded-full">Live</span>
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-teal-100 text-teal-600': activeAccordion === 'heatmap'}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </button>
+            <div x-show="activeAccordion === 'heatmap'" x-collapse style="display: none;">
+                <div class="p-6 border-t border-slate-100 bg-slate-50/50">
+                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">
+                        বাংলাদেশের ৬৪টি জেলার রিয়েল-টাইম রক্তের চাহিদা ও Donor Fatigue Index (DFI) থেকে Composite Risk Score (CRS) ভিজুয়ালাইজ করুন।
+                        Admin view-তে raw metrics সরাসরি tooltip-এ দেখা যায়।
+                    </p>
+                    <div class="flex items-center gap-3">
+                        <a href="{{ route('admin.heatmap.index') }}" class="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
+                            Admin Heatmap খুলুন
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </a>
+                        <a href="{{ route('live-demand.index') }}" target="_blank" class="inline-flex items-center gap-2 bg-white border border-slate-200 hover:border-teal-300 text-slate-700 font-bold px-5 py-3 rounded-xl text-sm transition">
+                            Public View ↗
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
         <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
              :class="{'border-amber-200 ring-2 ring-amber-50': activeAccordion === 8}">
             <button @click="activeAccordion = activeAccordion === 8 ? null : 8"

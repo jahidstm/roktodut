@@ -35,6 +35,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\SpamRadarController;
+use App\Http\Controllers\Admin\AdminHeatmapController;
 use App\Http\Controllers\TelegramController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\HospitalController;
@@ -298,6 +299,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/verification/organization-reviews', [AdminDashboardController::class, 'organizationReviews'])->name('admin.org.reviews');
     Route::get('/admin/analytics', [AnalyticsController::class, 'index'])->name('admin.analytics.index');
     Route::get('/admin/analytics/export', [AnalyticsController::class, 'export'])->name('admin.analytics.export');
+
+    // 🗺️ Geo-Spatial Demand Heatmap (Admin — raw metrics visible)
+    Route::get('/admin/heatmap', [AdminHeatmapController::class, 'index'])->name('admin.heatmap.index');
     Route::get('/admin/audit-logs', [AuditLogController::class, 'index'])->name('admin.audit-logs.index');
     Route::get('/admin/nid/{user}/image', [ProfileController::class, 'viewNidForAdmin'])
         ->middleware('signed')
