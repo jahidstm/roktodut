@@ -164,6 +164,12 @@ Route::post('/donors/{donor}/reveal/verify', [DonorRevealController::class, 'ver
 
 Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard');
 
+// 🗺️ Geo-Spatial Live Demand Heatmap (Public — all users can view)
+Route::get('/live-demand', [\App\Http\Controllers\LiveDemandController::class, 'index'])
+    ->name('live-demand.index');
+
+
+
 Route::get('/gamification-guide', function () {
     return view('pages.gamification-guide');
 })->name('gamification.guide');

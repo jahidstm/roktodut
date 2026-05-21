@@ -35,6 +35,37 @@ class CalculateDonorFatigueCommand extends Command
         });
 
         $this->info('DFI calculation completed successfully.');
+
+        // ─────────────────────────────────────────────────────────────
+        // 📊 PHASE 2: Pre-compute District Average DFI
+        //
+        // ✅ N+1 Fix: Fetch the ENTIRE fatigue ZSET in ONE network call
+        //    BEFORE the groupBy loop. No Redis calls inside the loop.
+        // ─────────────────────────────────────────────────────────────
+        $this->info('Pre-computing District Average DFI...');
+
+        // Single O(N) call — fetches all user scores at once into memory
+        $allScores = \Illuminate\Support\Facades\Redis::zrange('donor_fatigue', 0, -1, ['WITHSCORES' => true]);
+
+        $districtAverages = \App\Models\User::whereNotNull('district_id')
+            ->join('districts', 'users.district_id', '=', 'districts.id')
+            ->selectRaw('districts.name as district_name, users.id as user_id')
+            ->get()
+            ->groupBy('district_name')
+            ->map(function ($users) use ($allScores) {
+                $totalFatigue = 0;
+                foreach ($users as $user) {
+                    // Map from in-memory array — O(1) per lookup, zero Redis calls
+                    $totalFatigue += (float) ($allScores[(string) $user->user_id] ?? 0.0);
+                }
+                return $users->count() > 0 ? $totalFatigue / $users->count() : 0;
+            });
+
+        foreach ($districtAverages as $districtName => $avgScore) {
+            \Illuminate\Support\Facades\Redis::hset('district_avg_dfi', $districtName, round($avgScore, 2));
+        }
+
+        $this->info('District Average DFI pre-computation complete.');
     }
 
     private function calculateForDonor(\App\Models\User $donor)
