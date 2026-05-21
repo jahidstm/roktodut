@@ -302,6 +302,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     // 🗺️ Geo-Spatial Demand Heatmap (Admin — raw metrics visible)
     Route::get('/admin/heatmap', [AdminHeatmapController::class, 'index'])->name('admin.heatmap.index');
+    Route::get('/admin/heatmap/export', [AdminHeatmapController::class, 'exportCsv'])->name('admin.heatmap.export');
     Route::get('/admin/audit-logs', [AuditLogController::class, 'index'])->name('admin.audit-logs.index');
     Route::get('/admin/nid/{user}/image', [ProfileController::class, 'viewNidForAdmin'])
         ->middleware('signed')

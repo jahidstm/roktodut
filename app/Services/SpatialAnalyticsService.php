@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\BloodRequest;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Redis;
@@ -102,26 +103,47 @@ class SpatialAnalyticsService
 
     /**
      * হিটম্যাপের জন্য ডেটা তৈরি করে।
-     * Cache: 15 মিনিট (ভারী কোয়েরি রিপিট করে না)
+     *
+     * @param string $dateRange  'all_time' | 'today' | 'last_7_days' | 'last_30_days'
+     * Public map always uses 'all_time' with 15-min cache.
+     * Admin calls with a specific range bypass cache for fresh data.
      */
-    public function getHeatmapData(): array
+    public function getHeatmapData(string $dateRange = 'all_time'): array
     {
-        return Cache::remember('spatial_heatmap_data', now()->addMinutes(15), function () {
-            return $this->computeHeatmapData();
-        });
+        // Public route: cache the all_time result
+        if ($dateRange === 'all_time') {
+            return Cache::remember('spatial_heatmap_data', now()->addMinutes(15), function () {
+                return $this->computeHeatmapData('all_time');
+            });
+        }
+
+        // Admin filtered views: skip cache — data must be fresh
+        return $this->computeHeatmapData($dateRange);
     }
 
-    private function computeHeatmapData(): array
+    private function computeHeatmapData(string $dateRange = 'all_time'): array
     {
-        // 1. Active emergency demand — district অনুযায়ী গ্রুপ
-        $demands = BloodRequest::whereIn('status', ['pending', 'in_progress'])
+        // 1. Date range filter
+        $from = match ($dateRange) {
+            'today'        => Carbon::today(),
+            'last_7_days'  => Carbon::now()->subDays(7)->startOfDay(),
+            'last_30_days' => Carbon::now()->subDays(30)->startOfDay(),
+            default        => null,   // 'all_time' — no date filter
+        };
+
+        // 2. Active emergency demand — district অনুযায়ী গ্রুপ
+        $query = BloodRequest::whereIn('status', ['pending', 'in_progress'])
             ->join('districts', 'blood_requests.district_id', '=', 'districts.id')
             ->selectRaw('districts.name as district_name, COUNT(*) as demand_count')
-            ->groupBy('districts.name')
-            ->pluck('demand_count', 'district_name')
-            ->toArray();
+            ->groupBy('districts.name');
 
-        // 2. Pre-computed District Avg DFI — O(1) Redis Hash read
+        if ($from) {
+            $query->where('blood_requests.created_at', '>=', $from);
+        }
+
+        $demands = $query->pluck('demand_count', 'district_name')->toArray();
+
+        // 3. Pre-computed District Avg DFI — O(1) Redis Hash read
         try {
             $avgDfiScores = Redis::hgetall('district_avg_dfi');
         } catch (\Exception $e) {
@@ -129,27 +151,24 @@ class SpatialAnalyticsService
             $avgDfiScores = [];
         }
 
-        // 3. Normalization
+        // 4. Normalization
         $maxDemand = max(1, empty($demands) ? 1 : max($demands));
-        $maxDfi    = 100; // DFI always capped at 100
+        $maxDfi    = 100;
 
         $heatmapData = [];
 
-        // GeoJSON-এর সব district কভার করতে DISTRICT_MAP iterate করি
         foreach (self::DISTRICT_MAP as $dbName => $geoJsonName) {
             $demand = (int) ($demands[$dbName] ?? 0);
             $avgDfi = (float) ($avgDfiScores[$dbName] ?? 0.0);
 
-            // ✅ False Warning Fix: demand = 0 হলে CRS সবসময় 0 (Safe Green)
+            // ✅ False Warning Fix: demand = 0 হলে CRS সবসময় 0
             if ($demand === 0) {
                 $crsScore = 0;
             } else {
                 $normDemand = $demand / $maxDemand;
                 $normDfi    = $avgDfi / $maxDfi;
-
-                // CRS Formula: Demand-weighted (0.6) + DFI-weighted (0.4)
-                $crs      = ($normDemand * 0.6) + ($normDfi * 0.4);
-                $crsScore = round($crs * 100, 2);
+                $crs        = ($normDemand * 0.6) + ($normDfi * 0.4);
+                $crsScore   = round($crs * 100, 2);
             }
 
             $heatmapData[$geoJsonName] = [
@@ -160,5 +179,25 @@ class SpatialAnalyticsService
         }
 
         return $heatmapData;
+    }
+
+    /**
+     * Public accessor for DISTRICT_MAP (used by CSV export).
+     */
+    public function getDistrictMap(): array
+    {
+        return self::DISTRICT_MAP;   // BN => EN
+    }
+
+    /**
+     * Human-readable Emergency Level from CRS score.
+     */
+    public function getEmergencyLevel(float $crs, int $demand): string
+    {
+        if ($demand === 0 || $crs === 0) return 'স্বাভাবিক (Safe)';
+        if ($crs > 75)                   return 'সংকট (Critical)';
+        if ($crs > 50)                   return 'জরুরি (High)';
+        if ($crs > 30)                   return 'সতর্কতা (Warning)';
+        return                                  'মনোযোগ (Elevated)';
     }
 }
