@@ -79,7 +79,7 @@
         /* ══ 3-Column BI Layout ══════════════════════════════ */
         .bi-layout {
             display: grid;
-            grid-template-columns: 255px 1fr 255px;
+            grid-template-columns: 290px 1fr 290px;
             height: calc(100vh - 60px);
             overflow: hidden;
         }

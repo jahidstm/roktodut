@@ -73,7 +73,7 @@
         /* ══ Layout ════════════════════════════════════════ */
         .hm-wrap {
             display: grid;
-            grid-template-columns: 255px 1fr 285px;
+            grid-template-columns: 290px 1fr 320px;
             height: calc(100vh - 60px);
             overflow: hidden;
         }
@@ -252,10 +252,11 @@
                 <div class="leg-row"><div class="leg-sw" style="background:#52b788;"></div><span class="leg-tx">স্বাভাবিক (Safe) — CRS = 0</span></div>
             </div>
             <div class="hm-sec">
-                <p class="hm-stitle">CRS ফর্মুলা</p>
-                <div style="font-size:0.67rem;color:#64748b;line-height:1.7;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:0.6rem;">
-                    <strong style="color:#0f172a;">CRS</strong> = (Demand × 0.6) + (DFI × 0.4)<br>
-                    <strong style="color:#0f172a;">DFI</strong> = Donor Fatigue Index (0–100)
+                <p class="hm-stitle">ডেটা পরিচিতি</p>
+                <div style="font-size:0.65rem;color:#475569;line-height:1.6;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:0.6rem;">
+                    <div style="margin-bottom:4px;"><strong style="color:#0f172a;">চাহিদা (D):</strong> বর্তমানে কতটি রক্তের রিকোয়েস্ট আছে।</div>
+                    <div style="margin-bottom:4px;"><strong style="color:#0f172a;">ডোনার সংকট (DFI):</strong> ডোনারদের রক্ত দেওয়ার ক্ষমতা কমার মাত্রা (০-১০০)। স্কোর বেশি মানে ডোনার পাওয়া কঠিন।</div>
+                    <div><strong style="color:#0f172a;">ঝুঁকি স্কোর (CRS):</strong> চাহিদা ও ডোনার সংকটের সমন্বয়ে জেলার আসল ঝুঁকির মাত্রা।</div>
                 </div>
             </div>
             <div class="hm-sec">
@@ -420,9 +421,9 @@
                     <div class="att-card">
                         <div class="att-name">📍 ${bn(en)} <span style="font-size:0.63rem;color:#94a3b8;">(${en})</span></div>
                         <span class="att-badge">🔐 Admin Raw Metrics</span>
-                        <div class="att-row"><span>Demand</span><span>${info.demand} টি</span></div>
-                        <div class="att-row"><span>Avg DFI</span><span>${info.avg_dfi}</span></div>
-                        <div class="att-row"><span>CRS</span><span style="color:${getColor(info.crs)};font-size:0.85rem;font-weight:800;">${info.crs}</span></div>
+                        <div class="att-row"><span>চাহিদা (Demand)</span><span>${info.demand} টি</span></div>
+                        <div class="att-row"><span>ডোনার সংকট (DFI)</span><span>${info.avg_dfi}</span></div>
+                        <div class="att-row"><span>ঝুঁকি (CRS)</span><span style="color:${getColor(info.crs)};font-size:0.85rem;font-weight:800;">${info.crs}</span></div>
                     </div>`, {
                     sticky: true, permanent: false,
                     direction: 'top', className: 'admin-tt', offset: [0, -8],
@@ -448,8 +449,8 @@
             <div class="raw-row">
                 <span class="raw-district" title="${bn(d.en)}">${bn(d.en)}</span>
                 <div class="raw-chips">
-                    <span class="chip chip-d">${d.demand}টি</span>
-                    <span class="chip chip-c">CRS:${d.crs}</span>
+                    <span class="chip chip-d" title="চাহিদা (Demand)">চাহিদা: ${d.demand}টি</span>
+                    <span class="chip chip-c" title="ঝুঁকি স্কোর (CRS)">ঝুঁকি: ${d.crs}</span>
                 </div>
             </div>
         `).join('') || '<p style="font-size:0.73rem;color:#94a3b8;">কোনো সক্রিয় রিকোয়েস্ট নেই।</p>';
@@ -463,9 +464,9 @@
             <div class="raw-row">
                 <span class="raw-district" title="${bn(enName)}">${bn(enName)}</span>
                 <div class="raw-chips">
-                    <span class="chip chip-d">D:${d.demand}</span>
-                    <span class="chip chip-f">DFI:${d.avg_dfi}</span>
-                    <span class="chip chip-c">CRS:${d.crs}</span>
+                    <span class="chip chip-d" title="চাহিদা (Demand)">চাহিদা: ${d.demand}</span>
+                    <span class="chip chip-f" title="ডোনার সংকট (DFI)">সংকট: ${d.avg_dfi}</span>
+                    <span class="chip chip-c" title="ঝুঁকি স্কোর (CRS)">ঝুঁকি: ${d.crs}</span>
                 </div>
             </div>
         `).join('') || '<p style="font-size:0.73rem;color:#94a3b8;">কোনো সক্রিয় রিকোয়েস্ট নেই।</p>';
