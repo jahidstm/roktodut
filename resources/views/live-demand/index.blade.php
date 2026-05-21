@@ -459,13 +459,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Helper: get Bengali name, fallback to English if not mapped
     const toBn = (enName) => EN_TO_BN[enName] || enName;
 
-    // ══ 2. Leaflet map — NO tile layer ════════════════════════
+    // ══ Init Leaflet Map ════════════════════════════════════
     const map = L.map('map', {
         center:             [23.685, 90.356],
         zoom:               7,
-        zoomControl:        true,
+        zoomSnap:           0,
+        zoomDelta:          0.5,
         attributionControl: false,
-        maxBoundsViscosity: 1.0,   // ✅ Hard boundary — no rubber-banding
+        maxBoundsViscosity: 1.0,
     });
 
     // ══ 3. CRS colour ramp ═══════════════════════════════════
@@ -593,9 +594,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     }).addTo(map);
 
     // ✅ Perfect framing — fit Bangladesh and lock minZoom dynamically
-    map.fitBounds(geoLayer.getBounds(), { padding: [20, 20] });
-    map.setMinZoom(map.getZoom());          // Lock: can't zoom out beyond this
-    map.setMaxBounds(geoLayer.getBounds().pad(0.08));
+    function fitMapToBangladesh() {
+        if (!geoLayer) return;
+        map.invalidateSize();
+        map.setMinZoom(1); // Reset temporarily
+        map.fitBounds(geoLayer.getBounds(), { padding: [0, 0] });
+        
+        setTimeout(() => {
+            map.setMinZoom(map.getZoom());
+            map.setMaxBounds(geoLayer.getBounds().pad(0.02));
+        }, 50);
+    }
+    
+    // Call initially with a slight delay to allow layout (fonts/CSS) to settle
+    setTimeout(fitMapToBangladesh, 150);
+    window.addEventListener('resize', fitMapToBangladesh);
 
     // ══ 7. Update sidebar panels ══════════════════════════════
     document.getElementById('stat-total').textContent    = totalDemand;
