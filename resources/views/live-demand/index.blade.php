@@ -373,11 +373,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     L.geoJSON(geojsonData, {
         style: function(feature) {
-            // GeoJSON property key: "properties.name"
-            const name   = feature.properties?.name || '';
-            const info   = heatmapData[name] || { demand: 0, crs: 0 };
-            const color  = getColor(info.crs);
-            const opacity = info.demand > 0 ? 0.75 : 0.25;
+            // ✅ GADM GeoJSON property key: "properties.NAME_2"
+            const name = feature.properties?.NAME_2 || '';
+
+            // ✅ Fallback: If district not in API data, force Safe Green (crs=0, demand=0)
+            const info = (heatmapData[name] !== undefined)
+                ? heatmapData[name]
+                : { demand: 0, crs: 0 };
+
+            const color   = getColor(info.crs);   // crs=0 → '#21b86c' (Safe Green)
+            const opacity = info.demand > 0 ? 0.75 : 0.30;  // 0.30 so fallback is visible, not transparent
 
             return {
                 fillColor:   color,
@@ -388,8 +393,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         },
 
         onEachFeature: function(feature, layer) {
-            const name   = feature.properties?.name || 'Unknown';
-            const info   = heatmapData[name] || { demand: 0, crs: 0 };
+            // ✅ GADM property key: NAME_2
+            const name = feature.properties?.NAME_2 || 'Unknown';
+
+            // ✅ Fallback Safe Green for unmatched districts
+            const info   = (heatmapData[name] !== undefined)
+                ? heatmapData[name]
+                : { demand: 0, crs: 0 };
             const status = getStatusLabel(info.crs, info.demand);
 
             // Track stats
@@ -430,11 +440,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     e.target.bringToFront();
                 },
                 mouseout(e) {
-                    const i = heatmapData[name] || { demand: 0, crs: 0 };
+                    // ✅ Fallback: use same safe green logic on mouseout
+                    const i = (heatmapData[name] !== undefined)
+                        ? heatmapData[name]
+                        : { demand: 0, crs: 0 };
                     e.target.setStyle({
                         weight: 1.5,
                         color: '#1e293b',
-                        fillOpacity: i.demand > 0 ? 0.75 : 0.25
+                        fillOpacity: i.demand > 0 ? 0.75 : 0.30
                     });
                 },
             });

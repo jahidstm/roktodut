@@ -13,25 +13,22 @@ class SpatialAnalyticsService
      * 🗺️ GeoJSON Sanitization Guard
      *
      * আমাদের DB-তে district নামগুলো বাংলায় (যেমন: 'চট্টগ্রাম')।
-     * ifahimreza/bangladesh-geojson এর bangladesh.geojson ফাইলে
-     * properties.name ইংরেজিতে (যেমন: 'Chittagong')।
+     * Source GeoJSON: GADM 4.1 gadm41_BGD_2.json (ADM2 = District level, 64 features)
+     * GeoJSON property key: "properties.NAME_2"
      *
-     * এই ম্যাপটি সেই মিসম্যাচ প্রতিরোধ করে।
-     *
-     * Validated against: ifahimreza/bangladesh-geojson (master/src/data/bangladesh.geojson)
-     * GeoJSON property key: "properties.name"
+     * All 64 values validated against live php inspect_geojson.php output.
      */
     private const DISTRICT_MAP = [
         // Chittagong Division
         'কুমিল্লা'         => 'Comilla',
         'ফেনী'             => 'Feni',
-        'ব্রাহ্মণবাড়িয়া'  => 'Brahmanbaria',
+        'ব্রাহ্মণবাড়িয়া'  => 'Brahamanbaria',   // GADM spelling
         'রাঙ্গামাটি'       => 'Rangamati',
         'নোয়াখালী'        => 'Noakhali',
         'চাঁদপুর'          => 'Chandpur',
         'লক্ষ্মীপুর'       => 'Lakshmipur',
         'চট্টগ্রাম'        => 'Chittagong',
-        'কক্সবাজার'        => 'Cox\'s Bazar',
+        'কক্সবাজার'        => "Cox'SBazar",       // GADM exact spelling
         'খাগড়াছড়ি'       => 'Khagrachhari',
         'বান্দরবান'        => 'Bandarban',
 
@@ -42,7 +39,7 @@ class SpatialAnalyticsService
         'রাজশাহী'          => 'Rajshahi',
         'নাটোর'            => 'Natore',
         'জয়পুরহাট'        => 'Joypurhat',
-        'চাঁপাইনবাবগঞ্জ'   => 'Chapai Nawabganj',
+        'চাঁপাইনবাবগঞ্জ'   => 'Nawabganj',        // GADM uses 'Nawabganj'
         'নওগাঁ'            => 'Naogaon',
 
         // Khulna Division
@@ -67,7 +64,7 @@ class SpatialAnalyticsService
 
         // Sylhet Division
         'সিলেট'            => 'Sylhet',
-        'মৌলভীবাজার'      => 'Moulvibazar',
+        'মৌলভীবাজার'      => 'Maulvibazar',       // GADM uses 'Maulvibazar'
         'হবিগঞ্জ'          => 'Habiganj',
         'সুনামগঞ্জ'        => 'Sunamganj',
 
@@ -100,7 +97,7 @@ class SpatialAnalyticsService
         'শেরপুর'           => 'Sherpur',
         'ময়মনসিংহ'        => 'Mymensingh',
         'জামালপুর'         => 'Jamalpur',
-        'নেত্রকোণা'        => 'Netrokona',
+        'নেত্রকোণা'        => 'Netrakona',         // GADM uses 'Netrakona'
     ];
 
     /**
