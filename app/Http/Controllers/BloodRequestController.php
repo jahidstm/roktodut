@@ -72,7 +72,7 @@ class BloodRequestController extends Controller
             ->orderByRaw("CASE LOWER(urgency) WHEN 'emergency' THEN 1 WHEN 'urgent' THEN 2 WHEN 'normal' THEN 3 ELSE 4 END")
             // প্রায়োরিটি ২: যার ডেডলাইন সবচেয়ে কাছে (Ascending)
             ->orderBy('needed_at', 'asc')
-            ->paginate(10)
+            ->paginate(12)
             ->withQueryString();
 
         return view('requests.index', compact('requests'));
