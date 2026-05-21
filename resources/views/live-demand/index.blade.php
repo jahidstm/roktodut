@@ -13,237 +13,276 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Hind Siliguri', sans-serif;
-            background: #0a0f1e;
-            color: #e2e8f0;
+            font-family: 'Hind Siliguri', 'Inter', sans-serif;
+            background: #f1f5f9;
+            color: #1f2937;
             min-height: 100vh;
         }
 
-        /* ── Header ─────────────────────────── */
+        /* ── Header ──────────────────────────────────────── */
         .heatmap-header {
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
-            border-bottom: 1px solid rgba(99, 102, 241, 0.3);
-            padding: 1.25rem 2rem;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 1.75rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: sticky;
             top: 0;
             z-index: 1000;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
         }
-        .heatmap-header .brand {
+        .brand {
             display: flex;
             align-items: center;
             gap: 0.75rem;
         }
-        .heatmap-header .brand-icon {
-            width: 40px; height: 40px;
+        .brand-icon {
+            width: 38px; height: 38px;
             background: linear-gradient(135deg, #ef4444, #b91c1c);
-            border-radius: 50%;
+            border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.25rem;
-            box-shadow: 0 0 16px rgba(239, 68, 68, 0.4);
+            font-size: 1.1rem;
+            box-shadow: 0 2px 8px rgba(239,68,68,0.3);
         }
-        .heatmap-header h1 {
-            font-size: 1.2rem;
+        .brand-text h1 {
+            font-size: 1rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #c7d2fe, #a5b4fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #111827;
+            line-height: 1.2;
+        }
+        .brand-text p {
+            font-size: 0.7rem;
+            color: #6b7280;
+            font-family: 'Inter', sans-serif;
         }
         .live-badge {
-            display: flex; align-items: center; gap: 0.5rem;
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.4);
+            display: flex; align-items: center; gap: 0.45rem;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
             border-radius: 9999px;
-            padding: 0.35rem 1rem;
-            font-size: 0.78rem;
+            padding: 0.3rem 0.9rem;
+            font-size: 0.75rem;
             font-weight: 600;
-            color: #fca5a5;
+            color: #dc2626;
         }
         .live-dot {
-            width: 8px; height: 8px;
+            width: 7px; height: 7px;
             background: #ef4444;
             border-radius: 50%;
             animation: pulse 1.5s infinite;
         }
         @keyframes pulse {
             0%, 100% { opacity: 1; transform: scale(1); }
-            50%        { opacity: 0.4; transform: scale(0.8); }
+            50%       { opacity: 0.4; transform: scale(0.75); }
         }
 
-        /* ── Main Layout ─────────────────────────── */
+        /* ── Layout ──────────────────────────────────────── */
         .heatmap-layout {
             display: grid;
-            grid-template-columns: 320px 1fr;
-            height: calc(100vh - 73px);
+            grid-template-columns: 300px 1fr;
+            height: calc(100vh - 65px);
         }
 
-        /* ── Sidebar ─────────────────────────── */
+        /* ── Sidebar ──────────────────────────────────────── */
         .sidebar {
-            background: #0f172a;
-            border-right: 1px solid rgba(99, 102, 241, 0.2);
+            background: #ffffff;
+            border-right: 1px solid #e2e8f0;
             overflow-y: auto;
-            padding: 1.5rem;
+            padding: 1.25rem;
         }
         .sidebar::-webkit-scrollbar { width: 4px; }
         .sidebar::-webkit-scrollbar-track { background: transparent; }
-        .sidebar::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.3); border-radius: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
 
-        .sidebar-section { margin-bottom: 2rem; }
+        .sidebar-section { margin-bottom: 1.5rem; }
         .sidebar-title {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 700;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.1em;
             text-transform: uppercase;
-            color: #6366f1;
-            margin-bottom: 1rem;
+            color: #6b7280;
+            margin-bottom: 0.75rem;
+            font-family: 'Inter', sans-serif;
         }
 
         /* Legend */
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.75rem;
+            gap: 0.65rem;
+            margin-bottom: 0.6rem;
         }
-        .legend-dot {
-            width: 14px; height: 14px;
+        .legend-swatch {
+            width: 16px; height: 10px;
             border-radius: 3px;
             flex-shrink: 0;
+            border: 1px solid rgba(0,0,0,0.08);
         }
-        .legend-label { font-size: 0.82rem; color: #cbd5e1; }
+        .legend-label { font-size: 0.78rem; color: #374151; }
 
-        /* Stats */
+        /* Stat Cards */
         .stat-card {
-            background: rgba(99, 102, 241, 0.08);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: 12px;
-            padding: 1rem 1.2rem;
-            margin-bottom: 0.75rem;
-            transition: border-color 0.2s;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0.85rem 1rem;
+            margin-bottom: 0.6rem;
+            transition: box-shadow 0.2s, border-color 0.2s;
         }
-        .stat-card:hover { border-color: rgba(99, 102, 241, 0.5); }
-        .stat-label { font-size: 0.72rem; color: #94a3b8; margin-bottom: 0.25rem; }
-        .stat-value { font-size: 1.5rem; font-weight: 700; color: #e2e8f0; }
-        .stat-sub { font-size: 0.72rem; color: #64748b; margin-top: 0.2rem; }
+        .stat-card:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-color: #cbd5e1;
+        }
+        .stat-label { font-size: 0.68rem; color: #6b7280; margin-bottom: 0.2rem; font-family: 'Inter', sans-serif; }
+        .stat-value { font-size: 1.4rem; font-weight: 700; color: #111827; font-family: 'Inter', sans-serif; }
+        .stat-sub   { font-size: 0.68rem; color: #9ca3af; margin-top: 0.15rem; }
 
-        /* Top Districts */
+        /* District rows */
         .district-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.6rem 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0.55rem 0;
+            border-bottom: 1px solid #f1f5f9;
         }
         .district-row:last-child { border-bottom: none; }
-        .district-name { font-size: 0.82rem; color: #e2e8f0; }
+        .district-name { font-size: 0.8rem; color: #374151; }
         .district-badge {
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             font-weight: 600;
-            padding: 0.2rem 0.6rem;
+            padding: 0.18rem 0.55rem;
             border-radius: 9999px;
+            font-family: 'Inter', sans-serif;
         }
-        .badge-critical { background: rgba(220, 38, 38, 0.2); color: #fca5a5; border: 1px solid rgba(220,38,38,0.4); }
-        .badge-warning  { background: rgba(245, 158, 11, 0.2); color: #fde68a; border: 1px solid rgba(245,158,11,0.4); }
-        .badge-stable   { background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.4); }
+        .badge-critical { background: #fee2e2; color: #dc2626; }
+        .badge-warning  { background: #fef3c7; color: #d97706; }
+        .badge-stable   { background: #d1fae5; color: #059669; }
 
-        /* ── Map ─────────────────────────── */
+        /* ── Map ──────────────────────────────────────── */
         #map {
             width: 100%;
             height: 100%;
-            background: #0a0f1e;
+            /* ✅ Light canvas — NO world tiles */
+            background: #eef2f7;
         }
 
-        /* Leaflet overrides */
+        /* ── Custom Leaflet popup overrides (light) ──── */
         .leaflet-popup-content-wrapper {
-            background: #1e293b;
-            border: 1px solid rgba(99,102,241,0.4);
-            border-radius: 12px;
-            color: #e2e8f0;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            color: #1f2937;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
             padding: 0;
         }
-        .leaflet-popup-content { margin: 0; }
-        .leaflet-popup-tip { background: #1e293b; }
+        .leaflet-popup-content { margin: 0 !important; }
+        .leaflet-popup-tip     { background: #ffffff; }
+        .leaflet-popup-close-button { color: #6b7280 !important; right: 10px !important; top: 10px !important; }
 
-        .popup-inner { padding: 1.2rem 1.4rem; min-width: 220px; }
+        .popup-inner { padding: 1.1rem 1.3rem; min-width: 210px; }
         .popup-district {
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
-            color: #c7d2fe;
-            margin-bottom: 0.8rem;
-            padding-bottom: 0.6rem;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            color: #111827;
+            margin-bottom: 0.65rem;
+            padding-bottom: 0.55rem;
+            border-bottom: 1px solid #f1f5f9;
         }
         .popup-status-badge {
             display: inline-block;
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             font-weight: 700;
-            padding: 0.25rem 0.75rem;
+            padding: 0.2rem 0.65rem;
             border-radius: 9999px;
-            margin-bottom: 0.8rem;
-            letter-spacing: 0.04em;
+            margin-bottom: 0.7rem;
+            letter-spacing: 0.03em;
+            font-family: 'Inter', sans-serif;
         }
         .popup-row {
             display: flex;
             justify-content: space-between;
-            font-size: 0.8rem;
-            color: #94a3b8;
-            margin-bottom: 0.4rem;
+            font-size: 0.78rem;
+            color: #6b7280;
+            margin-bottom: 0.35rem;
         }
-        .popup-row span:last-child { color: #e2e8f0; font-weight: 600; }
+        .popup-row span:last-child { color: #111827; font-weight: 600; }
+        .popup-cta {
+            margin-top: 0.7rem;
+            padding-top: 0.55rem;
+            border-top: 1px solid #f1f5f9;
+            font-size: 0.72rem;
+            color: #6b7280;
+        }
+        .popup-cta a {
+            color: #ef4444;
+            text-decoration: none;
+            font-weight: 600;
+        }
 
-        /* ── Loading Overlay ─────────────────────────── */
+        /* ── Loading Overlay ──────────────────────────── */
         #loading-overlay {
             position: absolute;
             inset: 0;
-            background: rgba(10,15,30,0.9);
+            background: rgba(241,245,249,0.92);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            gap: 1rem;
-            backdrop-filter: blur(4px);
+            gap: 0.75rem;
+            backdrop-filter: blur(3px);
         }
         .spinner {
-            width: 48px; height: 48px;
-            border: 3px solid rgba(99,102,241,0.2);
-            border-top-color: #6366f1;
+            width: 40px; height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #ef4444;
             border-radius: 50%;
-            animation: spin 0.9s linear infinite;
+            animation: spin 0.85s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { font-size: 0.85rem; color: #94a3b8; }
+        .loading-text { font-size: 0.82rem; color: #6b7280; font-family: 'Inter', sans-serif; }
 
-        /* ── Responsive ─────────────────────────── */
+        /* ── Responsive ───────────────────────────────── */
         @media (max-width: 768px) {
             .heatmap-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-            .sidebar { max-height: 220px; overflow-y: auto; }
+            .sidebar { max-height: 200px; }
         }
+
+        /* Hide Leaflet attribution & zoom control styling */
+        .leaflet-control-attribution { display: none !important; }
+        .leaflet-control-zoom a {
+            background: #ffffff !important;
+            color: #374151 !important;
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1) !important;
+        }
+        .leaflet-control-zoom a:hover { background: #f1f5f9 !important; }
     </style>
 </head>
 <body>
 
-{{-- Header --}}
+{{-- ── Header ──────────────────────────────────────── --}}
 <header class="heatmap-header">
     <div class="brand">
         <div class="brand-icon">🩸</div>
-        <h1>লাইভ রক্তের চাহিদা মানচিত্র</h1>
+        <div class="brand-text">
+            <h1>লাইভ রক্তের চাহিদা মানচিত্র</h1>
+            <p>Bangladesh District-Level Emergency Blood Demand</p>
+        </div>
     </div>
     <div class="live-badge">
         <div class="live-dot"></div>
-        রিয়েল-টাইম
+        রিয়েল-টাইম আপডেট
     </div>
 </header>
 
-{{-- Layout --}}
+{{-- ── Main Layout ─────────────────────────────────── --}}
 <div class="heatmap-layout">
 
     {{-- Sidebar --}}
@@ -253,24 +292,24 @@
         <div class="sidebar-section">
             <p class="sidebar-title">রঙের অর্থ</p>
             <div class="legend-item">
-                <div class="legend-dot" style="background:#800026;"></div>
-                <span class="legend-label">⚠️ সংকট — অবিলম্বে ডোনার প্রয়োজন!</span>
+                <div class="legend-swatch" style="background:#800026;"></div>
+                <span class="legend-label">🚨 সংকট — অবিলম্বে ডোনার প্রয়োজন</span>
             </div>
             <div class="legend-item">
-                <div class="legend-dot" style="background:#E31A1C;"></div>
+                <div class="legend-swatch" style="background:#E31A1C;"></div>
                 <span class="legend-label">🔴 জরুরি — চাহিদা তীব্র</span>
             </div>
             <div class="legend-item">
-                <div class="legend-dot" style="background:#FD8D3C;"></div>
+                <div class="legend-swatch" style="background:#FD8D3C;"></div>
                 <span class="legend-label">🟠 সতর্কতা — চাহিদা বাড়ছে</span>
             </div>
             <div class="legend-item">
-                <div class="legend-dot" style="background:#FEB24C;"></div>
+                <div class="legend-swatch" style="background:#FEB24C;"></div>
                 <span class="legend-label">🟡 মনোযোগ প্রয়োজন</span>
             </div>
             <div class="legend-item">
-                <div class="legend-dot" style="background:#21b86c;"></div>
-                <span class="legend-label">🟢 স্বাভাবিক — কোনো জরুরি রিকোয়েস্ট নেই</span>
+                <div class="legend-swatch" style="background:#52b788;"></div>
+                <span class="legend-label">🟢 স্বাভাবিক — কোনো জরুরি অনুরোধ নেই</span>
             </div>
         </div>
 
@@ -284,7 +323,7 @@
             </div>
             <div class="stat-card">
                 <div class="stat-label">সর্বোচ্চ চাহিদার জেলা</div>
-                <div class="stat-value" style="font-size:1rem" id="stat-top-district">—</div>
+                <div class="stat-value" style="font-size:1rem;" id="stat-top-district">—</div>
                 <div class="stat-sub" id="stat-top-district-count">লোড হচ্ছে...</div>
             </div>
         </div>
@@ -293,9 +332,10 @@
         <div class="sidebar-section">
             <p class="sidebar-title">জরুরি জেলাসমূহ</p>
             <div id="top-districts-list">
-                <div style="font-size:0.8rem;color:#64748b;">লোড হচ্ছে...</div>
+                <div style="font-size:0.78rem;color:#9ca3af;">লোড হচ্ছে...</div>
             </div>
         </div>
+
     </aside>
 
     {{-- Map Container --}}
@@ -306,103 +346,98 @@
         </div>
         <div id="map"></div>
     </div>
+
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // ── 1. Initialize Leaflet Map ──────────────────────────────────
+    // ── 1. Initialize Leaflet Map (NO tile layer) ──────────────────
     const map = L.map('map', {
-        center: [23.685, 90.356],
-        zoom: 7,
-        zoomControl: true,
+        center:            [23.685, 90.356],
+        zoom:              7,
+        zoomControl:       true,
         attributionControl: false,
+        // ✅ Restrict interaction to Bangladesh bounds after load
+        minZoom: 6,
+        maxZoom: 10,
     });
 
-    // Dark tile layer
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-    }).addTo(map);
+    // ✅ NO L.tileLayer — we only render GeoJSON polygons on a plain canvas
 
-    // ── 2. Color function using CRS (0-100) ────────────────────────
+    // ── 2. CRS Color Scale (0–100) ─────────────────────────────────
     function getColor(crs) {
-        return crs > 75 ? '#800026' :   // Critical
-               crs > 50 ? '#E31A1C' :   // Emergency
-               crs > 30 ? '#FD8D3C' :   // Warning
-               crs > 0  ? '#FEB24C' :   // Attention
-                          '#21b86c';    // Stable (demand === 0, always green)
+        return crs > 75 ? '#800026' :
+               crs > 50 ? '#E31A1C' :
+               crs > 30 ? '#FD8D3C' :
+               crs > 0  ? '#FEB24C' :
+                          '#52b788';   // Safe Green (demand === 0)
     }
 
-    // ── 3. Status label for tooltip (user-friendly, no raw DFI/CRS) ──
+    // ── 3. User-friendly status labels (NO raw DFI/CRS exposed) ───
     function getStatusLabel(crs, demand) {
         if (demand === 0 || crs === 0) {
-            return { label: '✅ স্বাভাবিক', cls: 'badge-stable', color: '#10b981', bg: 'rgba(16,185,129,0.15)' };
+            return { label: '✅ স্বাভাবিক', color: '#059669', bg: '#d1fae5', cls: 'badge-stable' };
         }
         if (crs > 75) {
-            return { label: '🚨 সংকট: অবিলম্বে ডোনার প্রয়োজন!', cls: 'badge-critical', color: '#ef4444', bg: 'rgba(239,68,68,0.15)' };
+            return { label: '🚨 সংকট: অবিলম্বে ডোনার প্রয়োজন!', color: '#dc2626', bg: '#fee2e2', cls: 'badge-critical' };
         }
         if (crs > 50) {
-            return { label: '🔴 জরুরি: চাহিদা তীব্র', cls: 'badge-critical', color: '#ef4444', bg: 'rgba(239,68,68,0.15)' };
+            return { label: '🔴 জরুরি: চাহিদা তীব্র', color: '#dc2626', bg: '#fee2e2', cls: 'badge-critical' };
         }
         if (crs > 30) {
-            return { label: '⚠️ সতর্কতা: চাহিদা বাড়ছে', cls: 'badge-warning', color: '#f59e0b', bg: 'rgba(245,158,11,0.15)' };
+            return { label: '⚠️ সতর্কতা: চাহিদা বাড়ছে', color: '#d97706', bg: '#fef3c7', cls: 'badge-warning' };
         }
-        return { label: '🟡 মনোযোগ প্রয়োজন', cls: 'badge-warning', color: '#f59e0b', bg: 'rgba(245,158,11,0.15)' };
+        return { label: '🟡 মনোযোগ প্রয়োজন', color: '#d97706', bg: '#fef3c7', cls: 'badge-warning' };
     }
 
-    // ── 4. Fetch data in parallel ──────────────────────────────────
+    // ── 4. Fetch GeoJSON + API in parallel ────────────────────────
     let geojsonData, heatmapData;
     try {
         const [geoRes, apiRes] = await Promise.all([
             fetch('/geojson/bangladesh.geojson'),
             fetch('/api/analytics/spatial-heatmap'),
         ]);
-        geojsonData  = await geoRes.json();
-        heatmapData  = await apiRes.json();
+        geojsonData = await geoRes.json();
+        heatmapData = await apiRes.json();
     } catch (err) {
-        console.error('Failed to load heatmap data:', err);
+        console.error('Heatmap load failed:', err);
         document.getElementById('loading-overlay').innerHTML =
-            '<p style="color:#fca5a5;font-size:0.9rem;">ডেটা লোড করতে সমস্যা হয়েছে। পরে আবার চেষ্টা করুন।</p>';
+            '<p style="color:#dc2626;font-size:0.85rem;font-family:Inter,sans-serif;">ডেটা লোড করতে সমস্যা হয়েছে।<br>পেইজ রিফ্রেশ করুন।</p>';
         return;
     }
 
     // ── 5. Render GeoJSON polygons ────────────────────────────────
     let totalRequests = 0;
-    let topDistrict = { name: '—', demand: 0 };
+    let topDistrict   = { name: '—', demand: 0 };
     const criticalList = [];
 
-    L.geoJSON(geojsonData, {
-        style: function(feature) {
-            // ✅ GADM GeoJSON property key: "properties.NAME_2"
-            const name = feature.properties?.NAME_2 || '';
+    const geojsonLayer = L.geoJSON(geojsonData, {
 
-            // ✅ Fallback: If district not in API data, force Safe Green (crs=0, demand=0)
-            const info = (heatmapData[name] !== undefined)
+        style: function (feature) {
+            // ✅ GADM property key: NAME_2
+            const name  = feature.properties?.NAME_2 || '';
+            // ✅ Fallback: unmatched district → Safe Green (crs=0, demand=0)
+            const info  = (heatmapData[name] !== undefined)
                 ? heatmapData[name]
                 : { demand: 0, crs: 0 };
 
-            const color   = getColor(info.crs);   // crs=0 → '#21b86c' (Safe Green)
-            const opacity = info.demand > 0 ? 0.75 : 0.30;  // 0.30 so fallback is visible, not transparent
-
             return {
-                fillColor:   color,
+                fillColor:   getColor(info.crs),
+                fillOpacity: 0.90,          // ✅ Solid, professional BI look
+                color:       '#ffffff',     // ✅ Clean white borders between districts
                 weight:      1.5,
-                color:       '#1e293b',
-                fillOpacity: opacity,
             };
         },
 
-        onEachFeature: function(feature, layer) {
-            // ✅ GADM property key: NAME_2
-            const name = feature.properties?.NAME_2 || 'Unknown';
-
-            // ✅ Fallback Safe Green for unmatched districts
+        onEachFeature: function (feature, layer) {
+            const name   = feature.properties?.NAME_2 || 'Unknown';
             const info   = (heatmapData[name] !== undefined)
                 ? heatmapData[name]
                 : { demand: 0, crs: 0 };
             const status = getStatusLabel(info.crs, info.demand);
 
-            // Track stats
+            // Accumulate stats
             totalRequests += info.demand;
             if (info.demand > topDistrict.demand) {
                 topDistrict = { name, demand: info.demand };
@@ -411,12 +446,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 criticalList.push({ name, demand: info.demand, crs: info.crs });
             }
 
-            // Tooltip popup (UX-masked — no raw DFI/CRS shown to user)
+            // ── Popup (UX-abstracted — no raw CRS/DFI) ──────────
             const popup = `
                 <div class="popup-inner">
                     <div class="popup-district">📍 ${name}</div>
                     <span class="popup-status-badge"
-                          style="background:${status.bg};color:${status.color};border:1px solid ${status.color}40;">
+                          style="background:${status.bg};color:${status.color};">
                         ${status.label}
                     </span>
                     <div class="popup-row">
@@ -424,49 +459,56 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span>${info.demand} টি</span>
                     </div>
                     ${info.demand > 0 ? `
-                    <div style="margin-top:0.75rem;padding-top:0.6rem;border-top:1px solid rgba(255,255,255,0.06);font-size:0.75rem;color:#64748b;">
+                    <div class="popup-cta">
                         আপনি কি রক্ত দিতে পারবেন?
-                        <a href="/search" style="color:#6366f1;text-decoration:none;font-weight:600;"> এখানে দেখুন →</a>
+                        <a href="/search"> এখানে দেখুন →</a>
                     </div>` : ''}
                 </div>
             `;
+            layer.bindPopup(popup, { maxWidth: 260 });
 
-            layer.bindPopup(popup, { maxWidth: 280 });
-
-            // Hover effects
+            // ── Hover effects ────────────────────────────────────
             layer.on({
                 mouseover(e) {
-                    e.target.setStyle({ weight: 2.5, color: '#6366f1', fillOpacity: 0.9 });
+                    e.target.setStyle({
+                        weight:      2.5,
+                        color:       '#374151',
+                        fillOpacity: 1.0,
+                    });
                     e.target.bringToFront();
                 },
                 mouseout(e) {
-                    // ✅ Fallback: use same safe green logic on mouseout
                     const i = (heatmapData[name] !== undefined)
                         ? heatmapData[name]
                         : { demand: 0, crs: 0 };
                     e.target.setStyle({
-                        weight: 1.5,
-                        color: '#1e293b',
-                        fillOpacity: i.demand > 0 ? 0.75 : 0.30
+                        weight:      1.5,
+                        color:       '#ffffff',
+                        fillOpacity: 0.90,
                     });
                 },
             });
-        }
+        },
+
     }).addTo(map);
 
-    // ── 6. Update sidebar stats ───────────────────────────────────
+    // ✅ Perfect Framing: fit map exactly to Bangladesh bounds, lock movement
+    map.fitBounds(geojsonLayer.getBounds(), { padding: [20, 20] });
+    map.setMaxBounds(geojsonLayer.getBounds().pad(0.15));
+
+    // ── 6. Update sidebar stats ────────────────────────────────────
     document.getElementById('stat-total-requests').textContent = totalRequests;
     document.getElementById('stat-top-district').textContent   = topDistrict.name;
     document.getElementById('stat-top-district-count').textContent =
         topDistrict.demand > 0 ? `${topDistrict.demand}টি সক্রিয় রিকোয়েস্ট` : 'কোনো রিকোয়েস্ট নেই';
 
-    // Top critical districts list
-    const listEl = document.getElementById('top-districts-list');
+    // Top critical districts list (sorted by CRS)
     criticalList.sort((a, b) => b.crs - a.crs);
-    const top5 = criticalList.slice(0, 5);
+    const listEl = document.getElementById('top-districts-list');
+    const top5   = criticalList.slice(0, 5);
 
     if (top5.length === 0) {
-        listEl.innerHTML = '<div style="font-size:0.8rem;color:#64748b;">সারাদেশে কোনো জরুরি রিকোয়েস্ট নেই 🎉</div>';
+        listEl.innerHTML = '<div style="font-size:0.78rem;color:#9ca3af;">সারাদেশে কোনো জরুরি রিকোয়েস্ট নেই 🎉</div>';
     } else {
         listEl.innerHTML = top5.map(d => {
             const s = getStatusLabel(d.crs, d.demand);
@@ -477,7 +519,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).join('');
     }
 
-    // ── 7. Hide loading overlay ───────────────────────────────────
+    // ── 7. Hide loading overlay ────────────────────────────────────
     document.getElementById('loading-overlay').style.display = 'none';
 });
 </script>
