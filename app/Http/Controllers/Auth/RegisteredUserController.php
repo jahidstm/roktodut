@@ -78,6 +78,15 @@ class RegisteredUserController extends Controller
             'is_onboarded' => !$isDonor,
         ]);
 
+        // 🧠 DFI Cold-Start Fix: Initialize fatigue score to 0 for new donors
+        if ($isDonor) {
+            try {
+                \Illuminate\Support\Facades\Redis::zadd('donor_fatigue', 0, $user->id);
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::warning('Redis init failed for new donor: ' . $e->getMessage());
+            }
+        }
+
         if ($referredById) {
             $referrerModel = User::find($referredById);
             if ($referrerModel) {
