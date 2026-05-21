@@ -51,6 +51,19 @@ class BloodRequestResponseController extends Controller
             ->where('user_id', $user->id)
             ->first();
 
+        // 📊 Telemetry Update: Mark as not ignored and calculate latency
+        $telemetryLog = \App\Models\DonorTelemetryLog::where('user_id', $user->id)
+            ->where('blood_request_id', $bloodRequest->id)
+            ->first();
+            
+        if ($telemetryLog && $telemetryLog->ignored) {
+            $latencyMs = now()->diffInMilliseconds($telemetryLog->created_at);
+            $telemetryLog->update([
+                'ignored' => false,
+                'latency_ms' => $latencyMs,
+            ]);
+        }
+
         // ─────────────────────────────────────────────────────────────
         // 🚨 THE UNIDIRECTIONAL PUSH FLOW (is_phone_hidden = true)
         // ─────────────────────────────────────────────────────────────
@@ -157,12 +170,22 @@ class BloodRequestResponseController extends Controller
         );
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($request, $response, $bloodRequest) {
+            // 1. Pessimistic Locking: Lock the blood request row
+            $lockedRequest = \App\Models\BloodRequest::where('id', $bloodRequest->id)
+                ->lockForUpdate()
+                ->first();
+
+            // 2. Race Condition Check
+            if ($request->status === 'accepted' && in_array($lockedRequest->status, ['in_progress', 'completed'])) {
+                abort(409, 'এই রিকোয়েস্টটি ইতিমধ্যে অন্য ডোনারের মাধ্যমে প্রসেসিংয়ে আছে।');
+            }
+
             $response->update([
                 'status' => $request->status,
             ]);
 
             if ($request->status === 'accepted') {
-                $bloodRequest->update([
+                $lockedRequest->update([
                     'status' => 'in_progress',
                 ]);
             }

@@ -200,14 +200,34 @@ class DonorMatchingService
             ? $request->blood_group->value
             : (string) $request->blood_group;
 
-        return User::query()
+        $query = User::query()
             ->where('is_donor', true)
             ->where('blood_group', $bloodGroup)
             ->when(
                 $request->requested_by !== null,
                 fn (Builder $q) => $q->where('id', '!=', $request->requested_by)
             )
-            ->where('is_shadowbanned', false)
+            ->where('is_shadowbanned', false);
+
+        // 🧠 DFI Integration: Filter out burned-out donors unless it's a critical emergency
+        $urgency = $request->urgency instanceof \App\Enums\UrgencyLevel 
+            ? $request->urgency->value 
+            : (string) $request->urgency;
+            
+        if ($urgency !== 'EMERGENCY') {
+            try {
+                // Fetch donors with fatigue score > 80 from Redis
+                $fatiguedIds = \Illuminate\Support\Facades\Redis::zrangebyscore('donor_fatigue', 80, 100);
+                if (!empty($fatiguedIds)) {
+                    $query->whereNotIn('id', $fatiguedIds);
+                }
+            } catch (\Exception $e) {
+                // Redis might be unavailable, fail gracefully
+                Log::warning('Redis unavailable for DFI fetching: ' . $e->getMessage());
+            }
+        }
+
+        return $query
             ->where(function (Builder $q) {
                 $q->whereNull('is_available')->orWhere('is_available', true);
             })
