@@ -6,28 +6,28 @@
 <div class="max-w-7xl mx-auto px-4 py-8">
     
     {{-- 🎯 হেডার --}}
-    <div class="mb-8 border-b border-slate-200 pb-5">
+    <div class="mb-8 border-b border-slate-200 pb-5 scroll-reveal" data-scroll-reveal>
         <h1 class="text-3xl font-extrabold text-slate-900">অ্যাডমিন ড্যাশবোর্ড</h1>
         <p class="text-slate-500 font-medium mt-2">পুরো সিস্টেমের রিয়েল-টাইম ডেটা অ্যানালিটিক্স এবং পেন্ডিং ভেরিফিকেশন ম্যানেজ করুন।</p>
     </div>
 
     {{-- সাকসেস/এরর মেসেজ --}}
     @if(session('success'))
-        <div class="mb-8 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl font-bold flex items-center gap-2">
+        <div class="mb-8 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl font-bold flex items-center gap-2 scroll-reveal" data-scroll-reveal>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             {{ session('success') }}
         </div>
     @endif
 
     @if(session('error'))
-        <div class="mb-8 p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl font-bold flex items-center gap-2">
+        <div class="mb-8 p-4 bg-red-50 border border-red-200 text-red-800 rounded-xl font-bold flex items-center gap-2 scroll-reveal" data-scroll-reveal>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             {{ session('error') }}
         </div>
     @endif
 
     {{-- 📊 ১. গ্লোবাল স্ট্যাটিস্টিকস --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 scroll-reveal" data-scroll-reveal>
         <x-card>
             <div class="text-slate-500 text-sm font-bold uppercase tracking-wider">মোট ইউজার</div>
             <div class="mt-2 text-4xl font-black text-slate-900">{{ $totalUsers }}</div>
@@ -50,13 +50,13 @@
     </div>
 
     {{-- 🧭 ২. Admin Operations Control Center (Priority Panels) --}}
-    <div x-data="{ activeAccordion: null }" class="space-y-4 mb-8">
+    <div x-data="{ activeAccordion: null }" class="space-y-4 mb-8 scroll-reveal" data-scroll-reveal>
         <div class="flex items-center gap-2 mb-4 mt-8">
             <h2 class="text-xl font-extrabold text-slate-900">🧭 অ্যাডমিন অপারেশনস কন্ট্রোল সেন্টার</h2>
         </div>
 
         {{-- 1) Proof Review --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 scroll-reveal"
              :class="{'border-red-200 ring-2 ring-red-50': activeAccordion === 1}">
             <button @click="activeAccordion = activeAccordion === 1 ? null : 1" 
                     @keydown.enter="activeAccordion = activeAccordion === 1 ? null : 1"
@@ -96,7 +96,7 @@
         </div>
 
         {{-- 2) NID Review --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 scroll-reveal"
              :class="{'border-blue-200 ring-2 ring-blue-50': activeAccordion === 2}">
             <button @click="activeAccordion = activeAccordion === 2 ? null : 2" 
                     @keydown.enter="activeAccordion = activeAccordion === 2 ? null : 2"
@@ -135,7 +135,7 @@
         </div>
 
         {{-- 3) Organization Review --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 scroll-reveal"
              :class="{'border-indigo-200 ring-2 ring-indigo-50': activeAccordion === 3}">
             <button @click="activeAccordion = activeAccordion === 3 ? null : 3"
                     @keydown.enter="activeAccordion = activeAccordion === 3 ? null : 3"
@@ -171,7 +171,7 @@
         </div>
 
         {{-- 4) Support Inbox Governance --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 scroll-reveal"
              :class="{'border-blue-200 ring-2 ring-blue-50': activeAccordion === 4}">
             <button @click="activeAccordion = activeAccordion === 4 ? null : 4" 
                     @keydown.enter="activeAccordion = activeAccordion === 4 ? null : 4"
@@ -225,7 +225,7 @@
         </div>
 
         {{-- 5) Blog Governance --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 scroll-reveal"
              :class="{'border-violet-200 ring-2 ring-violet-50': activeAccordion === 5}">
             <button @click="activeAccordion = activeAccordion === 5 ? null : 5"
                     @keydown.enter="activeAccordion = activeAccordion === 5 ? null : 5"
@@ -525,7 +525,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-12">
         {{-- Security Radar Widget --}}
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[400px]">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[400px] scroll-reveal" data-scroll-reveal>
             <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0">
                 <div>
                     <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
@@ -570,7 +570,7 @@
         </div>
 
         {{-- Admin Audit Trail Widget --}}
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[400px]">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col h-[400px] scroll-reveal" data-scroll-reveal>
             <div class="p-6 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center shrink-0">
                 <div>
                     <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
@@ -620,7 +620,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
 
         {{-- Pie Chart: ব্লাড গ্রুপ ডিমান্ড --}}
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-7">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-7 scroll-reveal" data-scroll-reveal>
             <div class="mb-5 border-b border-slate-100 pb-4">
                 <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-sm">🩸</span>
@@ -642,7 +642,7 @@
         </div>
 
         {{-- Bar Chart: জেলা ভিত্তিক ইমার্জেন্সি --}}
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-7">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-7 scroll-reveal" data-scroll-reveal>
             <div class="mb-5 border-b border-slate-100 pb-4">
                 <h3 class="text-lg font-extrabold text-slate-900 flex items-center gap-2">
                     <span class="w-8 h-8 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-sm">📍</span>

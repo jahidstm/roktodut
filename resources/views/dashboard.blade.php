@@ -121,7 +121,7 @@
     </div>
 @endif
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8 scroll-reveal" data-scroll-reveal>
     
     {{-- A) Donor Quick Overview (Merged: Identity + Gamification) --}}
     @php $user = auth()->user(); @endphp
@@ -136,7 +136,7 @@
             $nextDateTop = $user->next_eligible_date;
             $isEffectivelyAvailableTop = $isEligibleTop && $user->is_available;
         @endphp
-        <div class="rounded-[2rem] overflow-hidden bg-slate-900 shadow-xl p-6 sm:p-8 relative">
+        <div class="rounded-[2rem] overflow-hidden bg-slate-900 shadow-xl p-6 sm:p-8 relative scroll-reveal" data-scroll-reveal>
             <div class="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
             
             <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 sm:gap-8">
@@ -284,7 +284,7 @@
     @endphp
 
     @if($isDonor)
-    <div class="bg-white p-6 rounded-3xl border {{ $isEligible ? 'border-emerald-200 shadow-emerald-50' : 'border-amber-200 shadow-amber-50' }} shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
+    <div class="bg-white p-6 rounded-3xl border {{ $isEligible ? 'border-emerald-200 shadow-emerald-50' : 'border-amber-200 shadow-amber-50' }} shadow-lg flex flex-col md:flex-row items-center justify-between gap-6 scroll-reveal" data-scroll-reveal>
         <div class="flex items-center gap-4">
             <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full {{ $isEligible ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600' }}">
                 <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -322,7 +322,7 @@
 
     @else
     {{-- Become a Donor Upgrade CTA --}}
-    <div x-data="{ upgradeModalOpen: {{ $errors->any() ? 'true' : 'false' }} }" class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-3xl border border-red-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
+    <div x-data="{ upgradeModalOpen: {{ $errors->any() ? 'true' : 'false' }} }" class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-3xl border border-red-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 scroll-reveal" data-scroll-reveal>
         <div class="flex items-center gap-4">
             <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white text-red-600 shadow-sm">
                 <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -431,7 +431,7 @@
 {{-- 2. Core Actions (CTA Row) --}}
     <div class="grid grid-cols-1 {{ $isDonor ? 'md:grid-cols-4' : 'md:grid-cols-3' }} gap-5">
         {{-- Action 1: Create Request --}}
-        <a href="{{ route('requests.create') }}" class="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 transition-all shadow-lg shadow-red-100 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px]">
+        <a href="{{ route('requests.create') }}" class="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 transition-all shadow-lg shadow-red-100 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px] scroll-reveal" data-scroll-reveal>
             <div class="absolute -right-4 -top-4 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
             <div class="w-11 h-11 bg-white/20 rounded-2xl flex items-center justify-center text-white border border-white/30 shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
@@ -443,7 +443,7 @@
         </a>
 
         {{-- Action 2: Donate Blood --}}
-        <a href="{{ route('requests.index') }}" class="group relative overflow-hidden p-6 rounded-3xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-emerald-300 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px]">
+        <a href="{{ route('requests.index') }}" class="group relative overflow-hidden p-6 rounded-3xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-emerald-300 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px] scroll-reveal" data-scroll-reveal>
             <div class="absolute -right-4 -bottom-4 w-28 h-28 bg-emerald-50 rounded-full blur-xl pointer-events-none"></div>
             <div class="relative z-10 flex flex-col gap-3">
                 <div class="w-11 h-11 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 border border-emerald-100 shrink-0 group-hover:scale-110 transition-transform">
@@ -457,7 +457,7 @@
         </a>
 
         {{-- Action 3: My Requests --}}
-        <a href="{{ route('requests.my-requests') }}" class="group relative overflow-hidden p-6 rounded-3xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-blue-300 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px]">
+        <a href="{{ route('requests.my-requests') }}" class="group relative overflow-hidden p-6 rounded-3xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-blue-300 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px] scroll-reveal" data-scroll-reveal>
             <div class="absolute -left-4 -bottom-4 w-28 h-28 bg-blue-50 rounded-full blur-xl pointer-events-none"></div>
             <div class="relative z-10 flex flex-col gap-3">
                 <div class="w-11 h-11 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 border border-blue-100 shrink-0 group-hover:scale-110 transition-transform">
@@ -474,7 +474,8 @@
             <button type="button"
                     x-data
                     @click="$dispatch('open-modal', 'offline-donation-claim')"
-                    class="group relative overflow-hidden p-6 rounded-3xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-red-300 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px] text-left">
+                class="group relative overflow-hidden p-6 rounded-3xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-red-300 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px] text-left scroll-reveal"
+                data-scroll-reveal>
                 <div class="absolute -left-4 -top-4 w-28 h-28 bg-red-50 rounded-full blur-xl pointer-events-none"></div>
                 <div class="relative z-10 flex flex-col gap-3">
                     <div class="w-11 h-11 bg-red-50 rounded-2xl flex items-center justify-center text-red-600 border border-red-100 shrink-0 group-hover:scale-110 transition-transform">
@@ -558,7 +559,7 @@
 
     {{-- E) My Commitments (Ongoing) --}}
     @if(isset($ongoingCommitments) && $ongoingCommitments->count() > 0)
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden scroll-reveal" data-scroll-reveal>
         <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
@@ -650,7 +651,7 @@
 
     
     @if(isset($recentRequests))
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden scroll-reveal" data-scroll-reveal>
         <div class="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
             <div class="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
@@ -791,7 +792,7 @@
 
     {{-- 7. Verified Donation History --}}
     <div>
-        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden scroll-reveal" data-scroll-reveal>
             <div class="px-6 py-5 border-b border-slate-100 flex items-center gap-3">
                 <div class="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -854,7 +855,8 @@
          🪪 Digital Smart Card — QR Verified Identity
     ══════════════════════════════════════════ --}}
     @if(false && $user->qr_token && $user->nid_status === 'verified')
-    <div class="mb-10 relative overflow-hidden rounded-3xl border border-slate-700/50 shadow-2xl"
+    <div class="mb-10 relative overflow-hidden rounded-3xl border border-slate-700/50 shadow-2xl scroll-reveal"
+         data-scroll-reveal
          style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #1c0808 100%);">
 
         {{-- Decorative blobs --}}
@@ -1058,7 +1060,8 @@
         $myCode       = $gamification->generateReferralCode(auth()->user());
         $referralLink = url('/register?ref=' . $myCode);
     @endphp
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 p-6 sm:p-8 shadow-xl">
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 p-6 sm:p-8 shadow-xl scroll-reveal"
+         data-scroll-reveal>
         <div class="absolute -top-8 -right-8 w-40 h-40 bg-white/10 rounded-full pointer-events-none"></div>
         <div class="absolute -bottom-10 right-24 w-28 h-28 bg-white/10 rounded-full pointer-events-none"></div>
 

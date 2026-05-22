@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     
-    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 scroll-reveal" data-scroll-reveal>
         <div>
             <h1 class="text-2xl font-extrabold text-slate-900">অর্গানাইজেশন কমান্ড সেন্টার</h1>
             <p class="text-slate-500 font-medium mt-1">আপনার এরিয়ার ডোনারদের ভেরিফিকেশন এবং ম্যানেজমেন্ট ড্যাশবোর্ড।</p>
@@ -20,7 +20,7 @@
     </div>
 
     @if($organization && $organization->status === 'pending')
-    <div class="mb-8 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-center gap-6 relative overflow-hidden">
+    <div class="mb-8 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-center gap-6 relative overflow-hidden scroll-reveal" data-scroll-reveal>
         <div class="absolute right-0 top-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl -z-0"></div>
         <div class="w-14 h-14 bg-white text-amber-600 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-amber-100 z-10">
             <svg class="w-7 h-7 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -36,7 +36,7 @@
 
     <div id="org-command-shell">
     {{-- 🧭 Top Navigation Tabs --}}
-    <div class="mb-8 flex overflow-x-auto bg-white border border-slate-200 rounded-2xl p-2 shadow-sm gap-2 whitespace-nowrap">
+    <div class="mb-8 flex overflow-x-auto bg-white border border-slate-200 rounded-2xl p-2 shadow-sm gap-2 whitespace-nowrap scroll-reveal" data-scroll-reveal>
         <a href="{{ route('org.dashboard') }}" data-org-tab class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all bg-slate-900 text-white shadow-sm">
             👥 মেম্বার ম্যানেজমেন্ট
         </a>
@@ -49,7 +49,7 @@
     </div>
 
     {{-- 📊 Analytics Cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-10 scroll-reveal" data-scroll-reveal>
         <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex flex-col justify-center">
             <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">ভেরিফাইড মেম্বার</p>
             <h3 class="text-3xl font-black text-emerald-600 mt-1">{{ $stats['verified'] ?? 0 }}</h3>
@@ -76,7 +76,7 @@
     
     {{-- District Chart --}}
     @if(isset($districtWiseMembers) && count($districtWiseMembers) > 0)
-    <div class="mb-10 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+    <div class="mb-10 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm scroll-reveal" data-scroll-reveal>
         <h3 class="text-lg font-extrabold text-slate-800 mb-4 flex items-center gap-2">📍 জেলা ভিত্তিক ভেরিফাইড মেম্বার</h3>
         <div class="flex flex-wrap gap-3">
             @foreach($districtWiseMembers as $district => $count)
@@ -90,7 +90,7 @@
     @endif
 
     {{-- 🔍 Filters & Table --}}
-    <div id="org-members-panel" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
+    <div id="org-members-panel" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden scroll-reveal" data-scroll-reveal>
         
         <div class="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>

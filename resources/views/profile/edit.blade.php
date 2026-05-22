@@ -12,7 +12,7 @@
     <div class="max-w-4xl mx-auto space-y-10 relative z-10">
 
         {{-- ১. পেজ হেডার --}}
-        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left mb-6">
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left mb-6 scroll-reveal" data-scroll-reveal>
             <div class="w-16 h-16 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex items-center justify-center shrink-0 relative">
                 <div class="absolute inset-0 bg-red-500/10 rounded-2xl rotate-3 scale-105 -z-10"></div>
                 <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -31,7 +31,7 @@
 
         {{-- Recipient Upgrade Banner --}}
         @if(!$isDonor)
-        <div x-data="{ upgradeModalOpen: false }" class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-3xl border border-red-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 mb-6">
+        <div x-data="{ upgradeModalOpen: false }" class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-3xl border border-red-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 mb-6 scroll-reveal" data-scroll-reveal>
             <div class="flex items-center gap-4">
                 <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white text-red-600 shadow-sm">
                     <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -111,7 +111,7 @@
 
         {{-- Flash Messages (Glass Effect) --}}
         @if(session('status') === 'profile-updated' || session('success_msg'))
-            <div class="p-4 bg-emerald-50/80 backdrop-blur-md border border-emerald-200 text-emerald-800 font-bold rounded-2xl flex items-center gap-3 shadow-sm transform animate-[fadeIn_0.5s_ease-out]">
+            <div class="p-4 bg-emerald-50/80 backdrop-blur-md border border-emerald-200 text-emerald-800 font-bold rounded-2xl flex items-center gap-3 shadow-sm transform animate-[fadeIn_0.5s_ease-out] scroll-reveal" data-scroll-reveal>
                 <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                 </div>
@@ -119,7 +119,7 @@
             </div>
         @endif
         @if(session('status') === 'password-updated')
-            <div class="p-4 bg-emerald-50/80 backdrop-blur-md border border-emerald-200 text-emerald-800 font-bold rounded-2xl flex items-center gap-3 shadow-sm transform animate-[fadeIn_0.5s_ease-out]">
+            <div class="p-4 bg-emerald-50/80 backdrop-blur-md border border-emerald-200 text-emerald-800 font-bold rounded-2xl flex items-center gap-3 shadow-sm transform animate-[fadeIn_0.5s_ease-out] scroll-reveal" data-scroll-reveal>
                 <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center shrink-0">
                     <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                 </div>
@@ -127,20 +127,20 @@
             </div>
         @endif
         @if(session('bonus_msg'))
-            <div class="p-4 bg-amber-50/80 backdrop-blur-md border border-amber-200 text-amber-900 font-bold rounded-2xl flex items-center gap-3 shadow-sm transform animate-[fadeIn_0.5s_ease-out]">
+            <div class="p-4 bg-amber-50/80 backdrop-blur-md border border-amber-200 text-amber-900 font-bold rounded-2xl flex items-center gap-3 shadow-sm transform animate-[fadeIn_0.5s_ease-out] scroll-reveal" data-scroll-reveal>
                 <div class="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center text-xl shrink-0">🏆</div>
                 {{ session('bonus_msg') }}
             </div>
         @endif
         @if(session('status') === 'emergency-updated' || session('emergency_msg'))
-            <div class="p-4 bg-blue-50/80 backdrop-blur-md border border-blue-200 text-blue-800 font-bold rounded-2xl flex items-center gap-3 shadow-sm transform animate-[fadeIn_0.5s_ease-out]">
+            <div class="p-4 bg-blue-50/80 backdrop-blur-md border border-blue-200 text-blue-800 font-bold rounded-2xl flex items-center gap-3 shadow-sm transform animate-[fadeIn_0.5s_ease-out] scroll-reveal" data-scroll-reveal>
                 <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-xl shrink-0">⚡</div>
                 {{ session('emergency_msg') ?? 'স্ট্যাটাস আপডেট হয়েছে!' }}
             </div>
         @endif
 
         @if($isDonor && $completionPercent < 100)
-            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl border border-slate-700/50 shadow-lg mb-10 p-5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 rounded-2xl border border-slate-700/50 shadow-lg mb-10 p-5 sm:p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 scroll-reveal" data-scroll-reveal>
                 <div class="flex-1 w-full">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
                         <div class="flex items-center gap-2">
@@ -168,7 +168,7 @@
             </div>
         @elseif($isDonor)
             {{-- ১০০% সম্পূর্ণ হওয়ার পর সাকসেস ব্যাজ (Sleek Compact UI) --}}
-            <div class="flex justify-center mb-10">
+            <div class="flex justify-center mb-10 scroll-reveal" data-scroll-reveal>
                 <div class="inline-flex items-center gap-3 px-6 py-3 bg-white/80 backdrop-blur-xl border border-emerald-200/60 rounded-2xl shadow-[0_8px_30px_rgb(16,185,129,0.08)] transform transition-all hover:scale-[1.02]">
                     <div class="w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
@@ -181,8 +181,9 @@
         @if($isDonor)
         {{-- ৩. অ্যাভেইলেবল স্ট্যাটাস কার্ড (Premium Alpine.js Toggle) --}}
         <div x-data="emergencyToggle({{ ($user->is_available && $user->is_eligible_to_donate) ? 'true' : 'false' }}, {{ $user->is_eligible_to_donate ? 'false' : 'true' }})" 
-             :class="isAvailable ? 'bg-gradient-to-r from-emerald-50 to-white border-emerald-200 shadow-[0_8px_30px_rgb(16,185,129,0.12)]' : 'bg-gradient-to-r from-slate-50 to-white border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)]'"
-             class="rounded-3xl border p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 transition-all duration-500 relative overflow-hidden group mb-10">
+              :class="isAvailable ? 'bg-gradient-to-r from-emerald-50 to-white border-emerald-200 shadow-[0_8px_30px_rgb(16,185,129,0.12)]' : 'bg-gradient-to-r from-slate-50 to-white border-slate-200 shadow-[0_8px_30px_rgb(0,0,0,0.04)]'"
+             class="rounded-3xl border p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 transition-all duration-500 relative overflow-hidden group mb-10 scroll-reveal"
+             data-scroll-reveal>
             
             <div x-show="isLoading" style="display: none;" class="absolute inset-0 bg-white/60 backdrop-blur-sm z-10 flex items-center justify-center">
                 <div class="flex flex-col items-center gap-3">
@@ -221,7 +222,7 @@
         @endif
 
         {{-- ৪. ব্যক্তিগত তথ্য কার্ড (Glass Card) --}}
-        <div class="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200 hover:border-slate-300 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300">
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200 hover:border-slate-300 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 scroll-reveal" data-scroll-reveal>
             <div class="flex items-center gap-3 mb-8 border-b border-slate-100 pb-5">
                 <div class="w-10 h-10 bg-red-50 text-red-600 rounded-xl flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
@@ -408,7 +409,7 @@
         @endphp
         
         @if($nidStatus !== 'verified')
-        <div class="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200 hover:border-slate-300 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden">
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200 hover:border-slate-300 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden scroll-reveal" data-scroll-reveal>
             
             <div class="absolute right-0 top-0 m-6 sm:m-10">
                 @if($nidStatus === 'unverified' || empty($nidStatus))
@@ -474,7 +475,7 @@
         @endif
         
         {{-- ৬. 🤖 টেলিগ্রাম অ্যালার্ট কানেক্ট কার্ড --}}
-        <div class="bg-white/90 backdrop-blur-xl rounded-3xl border {{ $user->telegram_chat_id ? 'border-blue-200' : 'border-slate-200' }} hover:border-blue-300 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden">
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl border {{ $user->telegram_chat_id ? 'border-blue-200' : 'border-slate-200' }} hover:border-blue-300 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden scroll-reveal" data-scroll-reveal>
             <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px] pointer-events-none"></div>
 
             <div class="flex items-center gap-3 mb-2 relative z-10">
@@ -549,7 +550,8 @@
         </div>
 
         {{-- 🛡️ প্রাইভেসি ও সুরক্ষা কার্ড (ডোনারদের জন্য) --}}
-        <div class="bg-white/90 backdrop-blur-xl rounded-3xl border border-purple-100 hover:border-purple-200 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden"
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl border border-purple-100 hover:border-purple-200 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden scroll-reveal"
+             data-scroll-reveal
              x-data="privacyToggle({{ $user->hide_phone ? 'true' : 'false' }})">
             <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500/5 rounded-full blur-[80px] pointer-events-none"></div>
 
@@ -610,7 +612,7 @@
         @endif
 
         {{-- ৭. পাসওয়ার্ড পরিবর্তন কার্ড --}}
-        <div class="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200 hover:border-slate-300 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300">
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl border border-slate-200 hover:border-slate-300 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 scroll-reveal" data-scroll-reveal>
             <div class="flex items-center gap-3 mb-8 border-b border-slate-100 pb-5">
                 <div class="w-10 h-10 bg-slate-100 text-slate-700 rounded-xl flex items-center justify-center">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
@@ -647,7 +649,7 @@
         </div>
 
         {{-- ৭. অ্যাকাউন্ট ডিলিট (Danger Zone) --}}
-        <div class="bg-gradient-to-br from-white to-red-50/30 rounded-3xl border border-red-100 hover:border-red-200 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden">
+        <div class="bg-gradient-to-br from-white to-red-50/30 rounded-3xl border border-red-100 hover:border-red-200 p-6 sm:p-10 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 relative overflow-hidden scroll-reveal" data-scroll-reveal>
             <div class="absolute top-0 right-0 w-64 h-64 bg-red-500/5 rounded-full blur-[80px] pointer-events-none"></div>
             
             <div class="flex items-center gap-3 mb-3 relative z-10">

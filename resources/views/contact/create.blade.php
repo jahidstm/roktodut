@@ -7,11 +7,11 @@
 {{-- ══════════════════════════════════════════════════════════
      HERO
 ══════════════════════════════════════════════════════════ --}}
-<section class="relative overflow-hidden bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800">
+<section class="relative overflow-hidden bg-gradient-to-br from-slate-800 via-slate-900 to-slate-800 scroll-reveal" data-scroll-reveal>
     <div class="absolute top-0 right-0 w-96 h-96 bg-red-600/10 rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none blur-3xl"></div>
     <div class="absolute bottom-0 left-0 w-72 h-72 bg-red-500/8 rounded-full translate-y-1/2 -translate-x-1/4 pointer-events-none blur-2xl"></div>
 
-    <div class="relative mx-auto max-w-5xl px-4 py-12 sm:py-14">
+    <div class="relative mx-auto max-w-5xl px-4 py-12 sm:py-14 scroll-reveal" data-scroll-reveal>
         <div class="flex items-center gap-3 mb-3">
             <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-xl">✉️</div>
             <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">সাপোর্ট সেন্টার</span>
@@ -35,7 +35,7 @@
         <div class="space-y-7">
 
             {{-- What to write --}}
-            <div>
+            <div class="scroll-reveal" data-scroll-reveal>
                 <h2 class="text-base font-black text-slate-900 mb-4 flex items-center gap-2">
                     <span class="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center text-sm shrink-0">📝</span>
                     কী কী বিষয়ে লিখতে পারেন
@@ -73,7 +73,7 @@
             </div>
 
             {{-- Response Time --}}
-            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm scroll-reveal" data-scroll-reveal>
                 <h3 class="text-sm font-black text-slate-800 mb-4 flex items-center gap-2">
                     <span class="text-base">⏱️</span> সম্ভাব্য রেসপন্স সময়
                 </h3>
@@ -97,7 +97,7 @@
             </div>
 
             {{-- Emergency notice --}}
-            <div class="rounded-2xl border border-red-200 bg-red-50 p-5">
+            <div class="rounded-2xl border border-red-200 bg-red-50 p-5 scroll-reveal" data-scroll-reveal>
                 <p class="text-sm font-black text-red-800 mb-2 flex items-center gap-2">
                     <span>🚨</span> জরুরি অবস্থায় কী করবেন?
                 </p>
@@ -118,8 +118,9 @@
              RIGHT — Form Card
         ════════════════════════════════════════════════ --}}
         <div>
-            <div class="rounded-2xl border border-slate-200 bg-white shadow-md overflow-hidden"
-                 x-data="{
+            <div class="rounded-2xl border border-slate-200 bg-white shadow-md overflow-hidden scroll-reveal"
+                 data-scroll-reveal
+                  x-data="{
                      loading:   false,
                      charCount: {{ strlen(old('message', '')) }},
                      maxChars:  2000,
@@ -315,7 +316,7 @@
             </div>
 
             {{-- Quick info strip --}}
-            <div class="mt-4 grid grid-cols-2 gap-3">
+            <div class="mt-4 grid grid-cols-2 gap-3 scroll-reveal" data-scroll-reveal>
                 <a href="mailto:support@roktodut.com"
                    class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 hover:border-red-200 hover:bg-red-50/30 transition-colors shadow-sm group">
                     <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-sm shrink-0 group-hover:bg-red-200 transition-colors">✉️</div>
