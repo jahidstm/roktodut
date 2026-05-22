@@ -468,15 +468,15 @@
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const autoTargets = document.querySelectorAll('section');
+        window.initScrollReveal = function(root = document) {
+            const autoTargets = root.querySelectorAll('section');
             autoTargets.forEach((el) => {
                 if (!el.hasAttribute('data-scroll-reveal')) {
                     el.setAttribute('data-scroll-reveal', '');
                     el.classList.add('scroll-reveal');
                 }
             });
-            const revealItems = document.querySelectorAll('[data-scroll-reveal]');
+            const revealItems = root.querySelectorAll('[data-scroll-reveal]');
             if (!revealItems.length) return;
             const revealObserver = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
@@ -487,6 +487,10 @@
                 });
             }, { threshold: 0.2, rootMargin: '0px 0px -10% 0px' });
             revealItems.forEach(item => revealObserver.observe(item));
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            window.initScrollReveal();
         });
     </script>
 

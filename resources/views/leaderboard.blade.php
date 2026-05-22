@@ -477,6 +477,9 @@
             if (window.Alpine && typeof window.Alpine.initTree === 'function') {
                 window.Alpine.initTree(root);
             }
+            if (typeof window.initScrollReveal === 'function') {
+                window.initScrollReveal(root);
+            }
         } catch (error) {
             window.location.href = url;
         }
