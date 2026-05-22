@@ -20,25 +20,25 @@
     <div class="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center pt-8 pb-10">
 
         {{-- Badge --}}
-        <div class="inline-flex items-center gap-2.5 bg-white border border-red-100 text-red-600 shadow-sm text-xs font-bold px-4 py-2 rounded-full mb-6">
+        <div class="inline-flex items-center gap-2.5 bg-white border border-red-100 text-red-600 shadow-sm text-xs font-bold px-4 py-2 rounded-full mb-6 scroll-reveal" data-scroll-reveal>
             <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0"></span>
             বাংলাদেশের সবচেয়ে বড় ভেরিফাইড ব্লাড ডোনার নেটওয়ার্ক
         </div>
 
         {{-- Headline --}}
-        <h1 class="text-4xl sm:text-5xl lg:text-[54px] font-black text-slate-900 leading-[1.15] mb-5 tracking-tight">
+        <h1 class="text-4xl sm:text-5xl lg:text-[54px] font-black text-slate-900 leading-[1.15] mb-5 tracking-tight scroll-reveal" data-scroll-reveal>
             জরুরি মুহূর্তে রক্তের সন্ধানে—<br>
             <span class="text-red-600">আমরা আছি আপনার পাশে</span>
         </h1>
 
         {{-- Subtitle --}}
-        <p class="text-base sm:text-lg text-slate-500 mb-8 max-w-2xl mx-auto leading-relaxed font-medium">
+        <p class="text-base sm:text-lg text-slate-500 mb-8 max-w-2xl mx-auto leading-relaxed font-medium scroll-reveal" data-scroll-reveal>
             NID-ভেরিফাইড ডোনার নেটওয়ার্ক — জরুরি মুহূর্তে সঠিক রক্ত, সঠিক সময়ে।
             ৬৪ জেলায় সক্রিয়, সম্পূর্ণ বিনামূল্যে।
         </p>
 
         {{-- CTAs --}}
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 scroll-reveal" data-scroll-reveal>
             <a href="{{ route('search') }}"
                class="inline-flex items-center gap-2.5 bg-red-600 hover:bg-red-700 text-white px-7 py-3.5 rounded-2xl font-black text-sm sm:text-base shadow-[0_10px_25px_rgba(239,68,68,0.3)] hover:shadow-[0_15px_35px_rgba(239,68,68,0.4)] transition-all duration-300 hover:-translate-y-0.5">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -52,7 +52,7 @@
         </div>
 
         {{-- Trust pills --}}
-        <div class="flex flex-wrap justify-center gap-2.5 mb-4">
+        <div class="flex flex-wrap justify-center gap-2.5 mb-4 scroll-reveal" data-scroll-reveal>
             @foreach(['🔒 ফোন নম্বর সর্বদা গোপন', '💳 NID ভেরিফাইড ডোনার', '📍 ৬৪ জেলায় সক্রিয়', '✅ সম্পূর্ণ বিনামূল্যে'] as $pill)
             <span class="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 text-slate-600 text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-full">{{ $pill }}</span>
             @endforeach
@@ -86,7 +86,7 @@
         }
     }">
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pb-16">
-            <div class="bg-white border border-slate-100 rounded-[2rem] p-6 sm:p-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)]">
+            <div class="bg-white border border-slate-100 rounded-[2rem] p-6 sm:p-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] scroll-reveal" data-scroll-reveal>
 
                 <div class="flex items-center gap-3 mb-6">
                     <div class="w-10 h-10 rounded-full bg-red-50 border border-red-100 flex items-center justify-center text-red-500 flex-shrink-0">
@@ -156,19 +156,19 @@
 <section class="bg-[#18181b] py-16 sm:py-20 border-t border-[#2a2a30]">
     <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
-            <div class="text-center px-8 py-6 sm:py-0">
+            <div class="text-center px-8 py-6 sm:py-0 scroll-reveal" data-scroll-reveal>
                 <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">
                     <span class="counter" data-target="{{ $totalDonors }}">0</span><span class="text-[#e11d48]">+</span>
                 </div>
                 <div class="text-sm sm:text-[15px] font-bold text-slate-400">নিবন্ধিত ডোনার</div>
             </div>
-            <div class="text-center px-8 py-6 sm:py-0">
+            <div class="text-center px-8 py-6 sm:py-0 scroll-reveal" data-scroll-reveal>
                 <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">
                     <span class="counter" data-target="{{ $verifiedDonors }}">0</span><span class="text-[#e11d48]">+</span>
                 </div>
                 <div class="text-sm sm:text-[15px] font-bold text-slate-400">ভেরিফাইড ডোনার</div>
             </div>
-            <div class="text-center px-8 py-6 sm:py-0">
+            <div class="text-center px-8 py-6 sm:py-0 scroll-reveal" data-scroll-reveal>
                 <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">
                     <span class="counter" data-target="{{ $totalDonations }}">0</span><span class="text-[#e11d48]">+</span>
                 </div>
@@ -186,9 +186,9 @@
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
-            <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-xs font-bold px-5 py-2 rounded-full mb-6 shadow-sm">✦ কেন রক্তদূত?</div>
-            <h2 class="text-4xl lg:text-5xl font-black text-white mb-5 tracking-tight">একটি প্ল্যাটফর্ম, <span class="text-white/90">অসংখ্য সুবিধা</span></h2>
-            <p class="text-white/80 font-medium max-w-xl mx-auto text-lg">রক্তদূত শুধু একটি ওয়েবসাইট নয় — এটি বাংলাদেশের সবচেয়ে নির্ভরযোগ্য জীবনরক্ষা নেটওয়ার্ক।</p>
+            <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-xs font-bold px-5 py-2 rounded-full mb-6 shadow-sm scroll-reveal" data-scroll-reveal>✦ কেন রক্তদূত?</div>
+            <h2 class="text-4xl lg:text-5xl font-black text-white mb-5 tracking-tight scroll-reveal" data-scroll-reveal>একটি প্ল্যাটফর্ম, <span class="text-white/90">অসংখ্য সুবিধা</span></h2>
+            <p class="text-white/80 font-medium max-w-xl mx-auto text-lg scroll-reveal" data-scroll-reveal>রক্তদূত শুধু একটি ওয়েবসাইট নয় — এটি বাংলাদেশের সবচেয়ে নির্ভরযোগ্য জীবনরক্ষা নেটওয়ার্ক।</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -201,7 +201,7 @@
             ];
             @endphp
             @foreach($features as $f)
-            <div class="bg-white/5 border border-white/10 rounded-2xl p-7 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group cursor-default shadow-sm hover:shadow-md">
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-7 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group cursor-default shadow-sm hover:shadow-md scroll-reveal" data-scroll-reveal>
                 <div class="w-14 h-14 rounded-2xl {{ $f['glow'] }} ring-1 {{ $f['ring'] }} flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
                     {{ $f['icon'] }}
                 </div>
@@ -221,14 +221,14 @@
 
         <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-14">
             <div>
-                <div class="inline-flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-xs font-bold px-4 py-1.5 rounded-full mb-5">
+                <div class="inline-flex items-center gap-2 bg-red-50 border border-red-100 text-red-600 text-xs font-bold px-4 py-1.5 rounded-full mb-5 scroll-reveal" data-scroll-reveal>
                     <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse flex-shrink-0"></span>
                     লাইভ আপডেট
                 </div>
-                <h2 class="text-4xl font-black text-slate-900 tracking-tight">জরুরি রক্তের অনুরোধ</h2>
-                <p class="text-slate-500 font-medium mt-2 max-w-lg">এই মুহূর্তে যারা জরুরি ভিত্তিতে রক্তের প্রয়োজনে আছেন। আপনার একটু সাহায্য একটি জীবন বাঁচাতে পারে।</p>
+                <h2 class="text-4xl font-black text-slate-900 tracking-tight scroll-reveal" data-scroll-reveal>জরুরি রক্তের অনুরোধ</h2>
+                <p class="text-slate-500 font-medium mt-2 max-w-lg scroll-reveal" data-scroll-reveal>এই মুহূর্তে যারা জরুরি ভিত্তিতে রক্তের প্রয়োজনে আছেন। আপনার একটু সাহায্য একটি জীবন বাঁচাতে পারে।</p>
             </div>
-            <a href="{{ route('public.requests.index') }}" class="shrink-0 inline-flex items-center gap-2 border border-slate-200 hover:border-red-200 hover:text-red-600 text-slate-600 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors">
+            <a href="{{ route('public.requests.index') }}" class="shrink-0 inline-flex items-center gap-2 border border-slate-200 hover:border-red-200 hover:text-red-600 text-slate-600 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors scroll-reveal" data-scroll-reveal>
                 সব দেখুন <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </a>
         </div>
@@ -259,7 +259,7 @@
                             default => ['চলমান', 'bg-sky-50 text-sky-700 border-sky-200'],
                         };
                     @endphp
-                    <div class="group bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-[0_8px_30px_rgba(0,0,0,0.09)] hover:border-slate-200 transition-all duration-300 hover:-translate-y-0.5 flex flex-col">
+                    <div class="group bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-[0_8px_30px_rgba(0,0,0,0.09)] hover:border-slate-200 transition-all duration-300 hover:-translate-y-0.5 flex flex-col scroll-reveal" data-scroll-reveal>
 
                         <div class="relative h-28 bg-gradient-to-br from-slate-50 to-red-50/40 flex items-center justify-center overflow-hidden">
                             <div class="text-[6.5rem] font-black text-red-100/80 select-none leading-none">{{ $bgGroup }}</div>
@@ -444,18 +444,18 @@
 <section class="bg-[#c82128] py-14 relative overflow-hidden">
     <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 text-3xl mb-6">🗺️</div>
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 text-3xl mb-6 scroll-reveal" data-scroll-reveal>🗺️</div>
         
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4 tracking-tight">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4 tracking-tight scroll-reveal" data-scroll-reveal>
             লাইভ রক্তের চাহিদা মানচিত্র
         </h2>
         
-        <p class="text-white/90 text-sm sm:text-base font-medium max-w-2xl mx-auto mb-8 leading-relaxed">
+        <p class="text-white/90 text-sm sm:text-base font-medium max-w-2xl mx-auto mb-8 leading-relaxed scroll-reveal" data-scroll-reveal>
             কোন জেলায় রক্তের সংকট সবচেয়ে বেশি? রিয়েল-টাইম হিটম্যাপে দেখুন এবং সবচেয়ে প্রয়োজনীয় জায়গায় রক্তদান করুন।
         </p>
         
         <a href="{{ route('live-demand.index') }}"
-           class="inline-flex items-center justify-center gap-2 bg-white text-slate-800 px-8 py-3.5 rounded-full font-black text-sm sm:text-base shadow-lg hover:bg-slate-50 transition-all duration-300 hover:-translate-y-0.5">
+           class="inline-flex items-center justify-center gap-2 bg-white text-slate-800 px-8 py-3.5 rounded-full font-black text-sm sm:text-base shadow-lg hover:bg-slate-50 transition-all duration-300 hover:-translate-y-0.5 scroll-reveal" data-scroll-reveal>
             লাইভ ম্যাপ দেখুন
             <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
@@ -470,9 +470,9 @@
     <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 
         <div class="text-center mb-16">
-            <div class="inline-flex items-center gap-2 bg-amber-50 border border-amber-100 text-amber-600 text-xs font-bold px-4 py-2 rounded-full mb-5">🦸 রিয়েল লাইফ সুপারহিরো</div>
-            <h2 class="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-4">আমাদের সেরা রক্তদাতাগণ</h2>
-            <p class="text-slate-500 font-medium max-w-xl mx-auto">যারা সবচেয়ে বেশি মানুষের জীবন বাঁচিয়েছেন, তাদের প্রতি আমাদের কৃতজ্ঞতা।</p>
+            <div class="inline-flex items-center gap-2 bg-amber-50 border border-amber-100 text-amber-600 text-xs font-bold px-4 py-2 rounded-full mb-5 scroll-reveal" data-scroll-reveal>🦸 রিয়েল লাইফ সুপারহিরো</div>
+            <h2 class="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-4 scroll-reveal" data-scroll-reveal>আমাদের সেরা রক্তদাতাগণ</h2>
+            <p class="text-slate-500 font-medium max-w-xl mx-auto scroll-reveal" data-scroll-reveal>যারা সবচেয়ে বেশি মানুষের জীবন বাঁচিয়েছেন, তাদের প্রতি আমাদের কৃতজ্ঞতা।</p>
         </div>
 
         @if($topDonors->isNotEmpty())
@@ -496,7 +496,7 @@
                         $avatarRing = match($rank) { 1=>"ring-4 ring-amber-100 border-amber-300", 2=>"border-slate-200", 3=>"border-orange-200", default=>"border-slate-100" };
                     @endphp
 
-                    <div class="bg-white rounded-3xl px-6 w-full max-w-xs mx-auto lg:mx-0 flex flex-col items-center relative border-2 {{ $cardClasses }} transition-all duration-300 hover:-translate-y-2">
+                    <div class="bg-white rounded-3xl px-6 w-full max-w-xs mx-auto lg:mx-0 flex flex-col items-center relative border-2 {{ $cardClasses }} transition-all duration-300 hover:-translate-y-2 scroll-reveal" data-scroll-reveal>
                         <div class="absolute -top-5 bg-slate-900 text-white text-xs font-black px-5 py-2 rounded-full flex items-center gap-1.5 shadow-lg">
                             {{ $item['emoji'] }} {{ $item['label'] }}
                         </div>
@@ -531,7 +531,7 @@
                 @endforeach
             </div>
 
-            <div class="mt-16 text-center">
+            <div class="mt-16 text-center scroll-reveal" data-scroll-reveal>
                 <a href="{{ route('leaderboard') }}" class="inline-flex items-center gap-2 border border-slate-200 hover:border-slate-300 text-slate-700 px-8 py-4 rounded-2xl font-black transition-all duration-200 hover:shadow-sm">
                     সম্পূর্ণ লিডারবোর্ড দেখুন
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
@@ -549,10 +549,10 @@
 
         <div class="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6 mb-14">
             <div>
-                <div class="inline-flex items-center gap-2 bg-sky-50 border border-sky-100 text-sky-600 text-xs font-bold px-4 py-1.5 rounded-full mb-5">সংবাদ ও নিবন্ধ</div>
-                <h2 class="text-4xl font-black text-slate-900 tracking-tight">সর্বশেষ ব্লগ পোস্ট</h2>
+                <div class="inline-flex items-center gap-2 bg-sky-50 border border-sky-100 text-sky-600 text-xs font-bold px-4 py-1.5 rounded-full mb-5 scroll-reveal" data-scroll-reveal>সংবাদ ও নিবন্ধ</div>
+                <h2 class="text-4xl font-black text-slate-900 tracking-tight scroll-reveal" data-scroll-reveal>সর্বশেষ ব্লগ পোস্ট</h2>
             </div>
-            <a href="{{ route('blog.index') }}" class="shrink-0 inline-flex items-center gap-2 border border-slate-200 hover:border-slate-300 text-slate-600 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors">
+            <a href="{{ route('blog.index') }}" class="shrink-0 inline-flex items-center gap-2 border border-slate-200 hover:border-slate-300 text-slate-600 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors scroll-reveal" data-scroll-reveal>
                 সব পোস্ট <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </a>
         </div>
@@ -577,7 +577,7 @@
                         }
                     @endphp
 
-                    <article class="group bg-white rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.07)] transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-0.5">
+                    <article class="group bg-white rounded-2xl border border-slate-100 hover:border-slate-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.07)] transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-0.5 scroll-reveal" data-scroll-reveal>
                         <a href="{{ route('blog.show', $post->slug) }}" class="block relative overflow-hidden shrink-0 aspect-video bg-gradient-to-br {{ $isStory ? 'from-rose-100 to-pink-50' : 'from-sky-100 to-blue-50' }}">
                             @if($post->cover_image)
                                 <img src="{{ asset('storage/' . $post->cover_image) }}" alt="{{ $post->title }}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
@@ -644,15 +644,15 @@
 <section class="bg-[#c82128] py-14 relative overflow-hidden">
     <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4 tracking-tight">
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4 tracking-tight scroll-reveal" data-scroll-reveal>
             আজই একটি জীবন বাঁচান
         </h2>
         
-        <p class="text-white/90 text-sm sm:text-base font-medium max-w-2xl mx-auto mb-8 leading-relaxed">
+        <p class="text-white/90 text-sm sm:text-base font-medium max-w-2xl mx-auto mb-8 leading-relaxed scroll-reveal" data-scroll-reveal>
             আপনার একটি রক্তদান তিনটি প্রাণ বাঁচাতে পারে। বাংলাদেশের সবচেয়ে নির্ভরযোগ্য ভেরিফাইড ডোনার নেটওয়ার্কে এখনই যোগ দিন।
         </p>
 
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 scroll-reveal" data-scroll-reveal>
             <a href="{{ route('requests.create') }}"
                class="inline-flex items-center justify-center gap-2 bg-white text-slate-800 px-8 py-3.5 rounded-full font-black text-sm sm:text-base shadow-lg hover:bg-slate-50 transition-all duration-300 hover:-translate-y-0.5">
                 রক্তের রিকোয়েস্ট করুন
@@ -664,7 +664,7 @@
             </a>
         </div>
 
-        <div class="flex flex-col items-center justify-center gap-2">
+        <div class="flex flex-col items-center justify-center gap-2 scroll-reveal" data-scroll-reveal>
             <div class="flex items-center justify-center gap-2 text-white font-bold text-xs sm:text-sm">
                 <svg class="w-3.5 h-3.5 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C9.243 2 7 4.243 7 7v3H6a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2v-8a2 2 0 00-2-2h-1V7c0-2.757-2.243-5-5-5zm-3 5c0-1.654 1.346-3 3-3s3 1.346 3 3v3H9V7z"/></svg>
                 মোবাইল নম্বর কখনো পাবলিক করা হয় না।
