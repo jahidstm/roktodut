@@ -153,60 +153,6 @@
         </div>
     </div>
 
-    {{-- ══════════════════════════════════════════
-         Current User Highlights (IELTSly Style)
-    ══════════════════════════════════════════ --}}
-    @auth
-        @php
-            $authId = Auth::id();
-            $myRankLabel = $myRank ? '#'.$myRank : 'N/A';
-            $myPts = $time === 'month' ? (Auth::user()->monthly_points ?? 0) : (Auth::user()->points ?? 0);
-            $myDons = Auth::user()->total_verified_donations ?? 0;
-            $hasActivity = $myPts > 0 || $myDons > 0;
-        @endphp
-        @if($hasActivity)
-        <div class="bg-white rounded-[2rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-slate-100 p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 mb-12 relative overflow-hidden">
-            {{-- Background glow --}}
-            <div class="absolute top-1/2 left-12 w-32 h-32 bg-red-100/50 rounded-full blur-3xl -translate-y-1/2 pointer-events-none"></div>
-
-            {{-- Rank Circle --}}
-            <div class="relative z-10 w-24 h-24 shrink-0 rounded-full border-[3px] border-red-500 bg-white flex flex-col items-center justify-center shadow-lg text-red-600">
-                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Rank</span>
-                <span class="text-2xl font-black leading-none">{{ $myRankLabel }}</span>
-            </div>
-
-            {{-- Info --}}
-            <div class="flex-1 text-center sm:text-left z-10">
-                <h2 class="text-2xl font-black text-slate-900 mb-2">{{ Auth::user()->name }}</h2>
-                <div class="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
-                    <span class="bg-red-50 text-red-600 font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
-                        Top Donor
-                    </span>
-                    @foreach(Auth::user()->badges->take(2) as $badge)
-                        @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
-                        <span class="bg-amber-50 text-amber-700 border border-amber-200 font-bold text-xs px-3 py-1 rounded-full flex items-center gap-1">
-                            {{ $bd['emoji'] }} {{ $badge->bn_name ?? $badge->name }}
-                        </span>
-                    @endforeach
-                </div>
-            </div>
-
-            {{-- Stats --}}
-            <div class="flex items-center gap-8 z-10 shrink-0 mt-4 sm:mt-0">
-                <div class="text-center">
-                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">রক্তদান</div>
-                    <div class="text-2xl font-black text-slate-800">{{ $myDons }}</div>
-                </div>
-                <div class="text-center">
-                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">{{ $pointsLabel }}</div>
-                    <div class="text-2xl font-black text-slate-800 flex items-center gap-1">
-                        {{ number_format($myPts) }} <span class="text-red-500 text-lg">🔥</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endif
-    @endauth
 
     {{-- ══════════════════════════════════════════
          Top 3 Podium (Home Page Style)
@@ -347,7 +293,7 @@
                     <div>
                         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{{ $pointsLabel }}</div>
                         <div class="font-bold text-amber-600 text-sm flex items-center gap-1 justify-end">
-                            {{ number_format($displayPts) }} <span class="text-orange-500 text-base leading-none">🔥</span>
+                            {{ number_format($displayPts) }}
                         </div>
                     </div>
                 </div>
@@ -362,10 +308,69 @@
             </div>
         @endforelse
 
+        {{-- ── Current User Preview Row ── --}}
+        @auth
+            @php
+                $myPts       = $time === 'month' ? (Auth::user()->monthly_points ?? 0) : (Auth::user()->points ?? 0);
+                $myDons      = Auth::user()->total_verified_donations ?? 0;
+                $hasActivity = $myPts > 0 || $myDons > 0;
+                $isOutsideTop10 = $myRank === null || $myRank > 10;
+                $isInTop50 = $myRank !== null && $myRank <= 50;
+            @endphp
+            @if($isOutsideTop10 && $hasActivity)
+                <div @if($isInTop50) x-show="!showAll" x-cloak @endif class="flex items-center gap-4 px-6 py-4 bg-red-50/90 border-t border-red-100 transition-all duration-300">
+                    {{-- Rank badge --}}
+                    <div class="flex-shrink-0 w-10 text-center">
+                        <span class="text-sm font-bold text-slate-400">#{{ $myRank ?? 'N/A' }}</span>
+                    </div>
+
+                    {{-- Avatar --}}
+                    <div class="flex-shrink-0 w-12 h-12 rounded-full border border-red-200 bg-white flex items-center justify-center overflow-hidden">
+                        @if(Auth::user()->profile_image)
+                            <img src="{{ asset('storage/' . Auth::user()->profile_image) }}" class="w-full h-full object-cover">
+                        @else
+                            <span class="text-red-600 font-black text-sm">{{ mb_substr(Auth::user()->name, 0, 1) }}</span>
+                        @endif
+                    </div>
+
+                    {{-- Name & Badges --}}
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-slate-800 text-base truncate">{{ Auth::user()->name }}</span>
+                            <span class="text-[10px] font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded uppercase tracking-wider">You</span>
+                        </div>
+                        <div class="flex items-center gap-1.5 mt-1">
+                            <p class="text-[11px] text-slate-500 font-semibold truncate">
+                                @if($myRank && $myRank > 50)
+                                    আরো {{ max(0, $myRank - 50) }} ধাপ এগিয়ে শীর্ষ ৫০-এ আসুন!
+                                @else
+                                    শীর্ষ ১০-এ আসতে রক্তদান করুন!
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+
+                    {{-- Stats --}}
+                    <div class="flex items-center gap-6 text-right pr-2">
+                        <div class="hidden sm:block">
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">রক্তদান</div>
+                            <div class="font-bold text-blue-600 text-sm">{{ $myDons }}</div>
+                        </div>
+                        <div>
+                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{{ $pointsLabel }}</div>
+                            <div class="font-bold text-amber-600 text-sm flex items-center gap-1 justify-end">
+                                {{ number_format($myPts) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endauth
+
         @if($donors->count() > 10)
             <div x-show="!showAll" class="p-4 text-center border-t border-slate-50 bg-slate-50/50">
                 <button @click="showAll = true" type="button" class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors">
-                    View Full List (Top {{ $donors->count() }}) ⬇️
+                    View Full List ⬇️
                 </button>
             </div>
         @endif
