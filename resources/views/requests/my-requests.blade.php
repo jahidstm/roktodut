@@ -16,7 +16,7 @@
         </div>
     @endif
 
-    <div class="flex items-start justify-between gap-4 mb-8">
+    <div class="flex items-start justify-between gap-4 mb-8 scroll-reveal" data-scroll-reveal>
         <div>
             <h1 class="text-2xl font-extrabold tracking-tight">আমার রিকোয়েস্ট</h1>
             <p class="text-slate-500 font-medium mt-1">আপনার তৈরি করা সকল রিকোয়েস্ট (Expired সহ)</p>
@@ -29,7 +29,7 @@
     </div>
 
     @if($requests->isEmpty())
-        <div class="rounded-2xl border border-slate-200 bg-white p-10 text-center">
+        <div class="rounded-2xl border border-slate-200 bg-white p-10 text-center scroll-reveal" data-scroll-reveal>
             <div class="text-slate-900 font-extrabold text-lg">আপনার কোনো রিকোয়েস্ট পাওয়া যায়নি</div>
             <div class="text-slate-500 text-sm mt-2 font-medium">রিকোয়েস্ট তৈরি করলে এখানে দেখতে পাবেন।</div>
         </div>
@@ -52,7 +52,7 @@
                     $statusInfo = $statusMap[$currentStatus] ?? ['label' => strtoupper((string) $req->status), 'cls' => 'bg-slate-100 text-slate-700 border-slate-200'];
                 @endphp
 
-                <article x-data="{ renewOpen: false }" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <article x-data="{ renewOpen: false }" class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm scroll-reveal" data-scroll-reveal>
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                             <h3 class="text-lg font-black tracking-tight text-slate-900 truncate">

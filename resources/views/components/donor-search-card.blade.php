@@ -22,7 +22,8 @@
     $canRequest = auth()->check() && ((auth()->user()->role?->value ?? auth()->user()->role) === 'recipient');
 @endphp
 
-<article class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-red-200 hover:shadow-lg"
+<article class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-red-200 hover:shadow-lg scroll-reveal"
+         data-scroll-reveal
          data-donor-card
          data-donor-id="{{ $donor->id }}"
          data-reveal-start-url="{{ route('donors.reveal.start', $donor->id) }}"

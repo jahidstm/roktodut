@@ -47,7 +47,8 @@
     $myResponse = (!$isPublic && isset($request->responses)) ? $request->responses->first() : null;
 @endphp
 
-<article class="group flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+<article class="group flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg scroll-reveal"
+         data-scroll-reveal>
     <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
             <div class="flex flex-col gap-2">

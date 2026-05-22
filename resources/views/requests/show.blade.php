@@ -7,7 +7,7 @@
 
 
     {{-- Header Section --}}
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 scroll-reveal" data-scroll-reveal>
         <div>
             <h1 class="text-3xl font-black text-slate-900 tracking-tight">রিকোয়েস্ট ডিটেইলস</h1>
             <p class="text-slate-500 font-medium mt-1">Accepted ডোনার লিস্ট এবং স্ট্যাটাস</p>
@@ -19,7 +19,7 @@
     </div>
 
     {{-- রিকোয়েস্ট কার্ড --}}
-    <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm scroll-reveal" data-scroll-reveal>
         <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
                 <div class="text-lg font-extrabold truncate">{{ $bloodRequest->patient_name ?? 'রোগী' }}</div>
@@ -127,7 +127,7 @@
         $canRenew = $isOwner && ($isExpiredStatus || ($isPastNeededAt && $isPendingLikeStatus));
     @endphp
 
-    <div x-data="{ renewOpen: {{ ($errors->has('needed_at') || $errors->has('urgency')) ? 'true' : 'false' }} }" class="mt-6 mb-6 p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+    <div x-data="{ renewOpen: {{ ($errors->has('needed_at') || $errors->has('urgency')) ? 'true' : 'false' }} }" class="mt-6 mb-6 p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col md:flex-row gap-4 items-start md:items-center justify-between scroll-reveal" data-scroll-reveal>
         <div>
             <h3 class="text-base font-black text-slate-800">আপনার সিদ্ধান্ত (Action)</h3>
             <p class="text-sm text-slate-500 font-medium">এই রিকোয়েস্টের জন্য আপনার সাড়া দিন</p>

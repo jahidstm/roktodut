@@ -6,7 +6,7 @@
 {{-- 🎯 THE FIX: এই মেইন কন্টেইনার ডিভটি পুরো কন্টেন্টকে র‍্যাপ করে মাঝখানে রাখবে --}}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <div class="flex items-start justify-between gap-4 mb-8">
+    <div class="flex items-start justify-between gap-4 mb-8 scroll-reveal" data-scroll-reveal>
         <div>
             <h1 class="text-2xl font-extrabold tracking-tight">রক্তের রিকোয়েস্ট ফিড</h1>
             <p class="text-slate-500 font-medium mt-1">সাম্প্রতিক পেন্ডিং রিকোয়েস্টগুলো</p>
@@ -25,7 +25,7 @@
     </div>
 
     {{-- 🎯 Advanced Filter Section (Server-side Divisions + AJAX Cascade) --}}
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8">
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8 scroll-reveal" data-scroll-reveal>
         <form action="{{ route('requests.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
             
             <div>
@@ -92,7 +92,7 @@
      </div>
 
     @if ($requests->isEmpty())
-        <div class="rounded-2xl border border-slate-200 bg-white p-10 text-center">
+        <div class="rounded-2xl border border-slate-200 bg-white p-10 text-center scroll-reveal" data-scroll-reveal>
             <div class="text-slate-900 font-extrabold text-lg">কোনো পেন্ডিং রিকোয়েস্ট পাওয়া যায়নি</div>
             <div class="text-slate-500 text-sm mt-2 font-medium">নতুন রিকোয়েস্ট তৈরি হলে এখানে দেখাবে। অথবা আপনার ফিল্টার পরিবর্তন করে দেখতে পারেন।</div>
         </div>

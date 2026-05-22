@@ -45,6 +45,36 @@
         .input-modern::placeholder {
             color: rgb(148 163 184); /* slate-400 */
         }
+
+        .scroll-reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+            will-change: opacity, transform;
+        }
+        .scroll-reveal--left {
+            transform: translateX(-24px);
+        }
+        .scroll-reveal--right {
+            transform: translateX(24px);
+        }
+        .scroll-reveal.is-visible,
+        [data-scroll-reveal].is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .scroll-reveal--left.is-visible,
+        .scroll-reveal--right.is-visible {
+            transform: translateX(0);
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .scroll-reveal,
+            [data-scroll-reveal] {
+                opacity: 1 !important;
+                transform: none !important;
+                transition: none !important;
+            }
+        }
     </style>
 </head>
 <body class="font-sans text-slate-800 antialiased bg-slate-50 min-h-screen selection:bg-red-200 selection:text-red-900">
@@ -102,10 +132,26 @@
                 <h2 class="text-2xl font-bold text-slate-800">রক্তদূত</h2>
             </div>
             
-            <div class="w-full {{ $maxWidth ?? 'max-w-[28rem]' }} relative z-10 glass-card rounded-3xl p-8 sm:p-10 shadow-xl shadow-slate-200">
+            <div class="w-full {{ $maxWidth ?? 'max-w-[28rem]' }} relative z-10 glass-card rounded-3xl p-8 sm:p-10 shadow-xl shadow-slate-200 scroll-reveal"
+                 data-scroll-reveal>
                 {{ $slot }}
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const revealItems = document.querySelectorAll('[data-scroll-reveal]');
+            if (!revealItems.length) return;
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        revealObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.2, rootMargin: '0px 0px -10% 0px' });
+            revealItems.forEach(item => revealObserver.observe(item));
+        });
+    </script>
 </body>
 </html>

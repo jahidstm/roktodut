@@ -13,7 +13,7 @@
 <div class="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-12 lg:py-14">
 
     {{-- ── Hero Banner (Centered & Rounded Leaderboard Style) ──────────────── --}}
-    <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-red-600 via-red-700 to-[#D32F2F] text-center px-6 py-16 sm:py-20 lg:py-24 mb-8 sm:mb-12 shadow-2xl">
+    <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-red-600 via-red-700 to-[#D32F2F] text-center px-6 py-16 sm:py-20 lg:py-24 mb-8 sm:mb-12 shadow-2xl scroll-reveal" data-scroll-reveal>
         {{-- Decorative blobs --}}
         <div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px); background-size: 28px 28px;"></div>
         <div class="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -21,21 +21,21 @@
 
         <div class="relative z-10 mx-auto max-w-4xl flex flex-col items-center">
             
-            <span class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white text-xs font-extrabold tracking-widest uppercase px-4 py-1.5 rounded-full mb-5">
+            <span class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white text-xs font-extrabold tracking-widest uppercase px-4 py-1.5 rounded-full mb-5 scroll-reveal" data-scroll-reveal>
                 🩸 রক্তদূত স্বাস্থ্যবার্তা
             </span>
             
-            <h1 class="text-4xl sm:text-5xl lg:text-[4rem] font-black text-white leading-[1.15] mb-6 tracking-tight drop-shadow-sm">
+            <h1 class="text-4xl sm:text-5xl lg:text-[4rem] font-black text-white leading-[1.15] mb-6 tracking-tight drop-shadow-sm scroll-reveal" data-scroll-reveal>
                 স্বাস্থ্য তথ্য ও <span class="text-yellow-300">সাফল্যের গল্প</span>
             </h1>
             
-            <p class="text-lg text-white/90 mb-10 font-medium max-w-2xl mx-auto leading-relaxed">
+            <p class="text-lg text-white/90 mb-10 font-medium max-w-2xl mx-auto leading-relaxed scroll-reveal" data-scroll-reveal>
                 রক্তদানের অভিজ্ঞতা, চিকিৎসা পরামর্শ এবং আমাদের ডোনারদের অনুপ্রেরণামূলক গল্প পড়ুন।
             </p>
 
             <div class="flex flex-col items-center w-full">
                 @auth
-                <div class="mb-8">
+                <div class="mb-8 scroll-reveal" data-scroll-reveal>
                     <a href="{{ route('blog.create') }}" class="inline-flex items-center gap-2 bg-white text-slate-800 font-extrabold px-6 py-3 rounded-full shadow-lg hover:bg-slate-50 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200">
                         <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
                         নতুন পোস্ট লিখুন
@@ -44,7 +44,7 @@
                 @endauth
 
                 {{-- Category Filter Pills --}}
-                <div class="flex flex-wrap justify-center gap-3 w-full">
+                <div class="flex flex-wrap justify-center gap-3 w-full scroll-reveal" data-scroll-reveal>
                     <a href="{{ route('blog.index') }}"
                        class="{{ !request('type') ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }} inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-200">
                         📋 সব পোস্ট
@@ -71,7 +71,7 @@
         <main class="flex-1 min-w-0" id="blog-post-grid" aria-label="ব্লগ পোস্ট তালিকা">
 
             {{-- ── Section Header ─── --}}
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-6 scroll-reveal" data-scroll-reveal>
                 <div>
                     <h2 class="text-xl font-extrabold text-slate-900">
                         @if(request('type') === 'health')
@@ -129,7 +129,8 @@
 
                         <article
                             id="post-card-{{ $post->id }}"
-                            class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-0.5">
+                            class="group bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col hover:-translate-y-0.5 scroll-reveal"
+                            data-scroll-reveal>
 
                             {{-- Cover Image --}}
                             <a href="{{ route('blog.show', $post->slug) }}" class="block relative overflow-hidden shrink-0 aspect-video bg-gradient-to-br

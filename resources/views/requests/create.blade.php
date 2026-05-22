@@ -15,8 +15,8 @@
 {{-- 🎯 THE FIX: ফর্মটি মাঝখানে রাখতে এবং উপরে-নিচে পর্যাপ্ত শ্বাস নেওয়ার জায়গা (Breathing Space) দিতে px-4 sm:px-6 lg:px-8 py-10 যোগ করা হলো --}}
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <h1 class="text-2xl font-extrabold tracking-tight text-slate-900">নতুন রক্তের রিকোয়েস্ট</h1>
-    <p class="text-slate-500 font-medium mt-1">সঠিক তথ্য দিলে দ্রুত ডোনার রেসপন্স পাবে।</p>
+    <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 scroll-reveal" data-scroll-reveal>নতুন রক্তের রিকোয়েস্ট</h1>
+    <p class="text-slate-500 font-medium mt-1 scroll-reveal" data-scroll-reveal>সঠিক তথ্য দিলে দ্রুত ডোনার রেসপন্স পাবে।</p>
 
     @if(session('existing_request_url'))
         <div class="mt-4">
@@ -27,7 +27,7 @@
         </div>
     @endif
 
-    <div class="mt-8 rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm relative overflow-hidden">
+    <div class="mt-8 rounded-3xl border border-slate-200 bg-white p-6 md:p-8 shadow-sm relative overflow-hidden scroll-reveal" data-scroll-reveal>
         <div class="absolute top-0 left-0 w-2 h-full bg-red-600"></div>
         
         {{-- 🎯 ফর্মের সাথে Alpine.js x-data যোগ করা হলো --}}

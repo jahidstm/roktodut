@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-4xl mx-auto py-10 px-4">
     
-    <div class="text-center mb-10">
+    <div class="text-center mb-10 scroll-reveal" data-scroll-reveal>
         <span class="bg-red-50 text-red-600 font-extrabold px-4 py-1.5 rounded-full text-sm tracking-widest uppercase">পার্টনার প্রোগ্রাম</span>
         <h1 class="text-3xl md:text-4xl font-black text-slate-900 mt-4">আপনার অর্গানাইজেশন যুক্ত করুন</h1>
         <p class="text-slate-500 font-medium mt-3 max-w-2xl mx-auto">রক্তদূত নেটওয়ার্কে যুক্ত হয়ে আপনার ব্লাড ব্যাংক, হাসপাতাল বা স্বেচ্ছাসেবী সংগঠনের কার্যক্রমকে আরও প্রসারিত করুন।</p>
@@ -13,7 +13,7 @@
 
     {{-- 🚀 Error Message Design Update --}}
     @if(session('error'))
-        <div class="mb-8 p-5 bg-red-50 border border-red-200 text-red-700 font-bold rounded-xl flex items-start gap-3 shadow-sm">
+        <div class="mb-8 p-5 bg-red-50 border border-red-200 text-red-700 font-bold rounded-xl flex items-start gap-3 shadow-sm scroll-reveal" data-scroll-reveal>
             <svg class="w-6 h-6 shrink-0 text-red-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
             <div>
                 <h3 class="text-lg font-black">রেজিস্ট্রেশন ব্যর্থ হয়েছে</h3>
@@ -26,7 +26,7 @@
         @csrf
 
         {{-- 🏢 ধাপ ১: প্রাথমিক তথ্য --}}
-        <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm">
+        <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm scroll-reveal" data-scroll-reveal>
             <h2 class="text-xl font-extrabold text-slate-900 mb-6 border-b border-slate-100 pb-3">১. প্রাথমিক তথ্য</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -58,7 +58,7 @@
         </div>
 
         {{-- 📞 ধাপ ২: যোগাযোগের তথ্য --}}
-        <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm">
+        <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm scroll-reveal" data-scroll-reveal>
             <h2 class="text-xl font-extrabold text-slate-900 mb-6 border-b border-slate-100 pb-3">২. যোগাযোগের তথ্য</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
@@ -87,7 +87,7 @@
         </div>
 
         {{-- 👤 ধাপ ৩: অ্যাডমিন ইনফো --}}
-        <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm">
+        <div class="bg-white p-6 md:p-8 rounded-3xl border border-slate-200 shadow-sm scroll-reveal" data-scroll-reveal>
             <h2 class="text-xl font-extrabold text-slate-900 mb-6 border-b border-slate-100 pb-3">৩. অথোরাইজড পারসন (অ্যাডমিন)</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -116,7 +116,7 @@
         </div>
 
         {{-- 📄 ধাপ ৪: ভেরিফিকেশন ডকুমেন্টস --}}
-        <div class="bg-red-50 p-6 md:p-8 rounded-3xl border border-red-100 shadow-sm">
+        <div class="bg-red-50 p-6 md:p-8 rounded-3xl border border-red-100 shadow-sm scroll-reveal" data-scroll-reveal>
             <h2 class="text-xl font-extrabold text-red-900 mb-6 border-b border-red-200 pb-3">৪. ভেরিফিকেশন ডকুমেন্টস</h2>
             <p class="text-sm font-semibold text-red-700 mb-6">প্ল্যাটফর্মের নিরাপত্তা বজায় রাখতে সঠিক ডকুমেন্ট আপলোড করা বাধ্যতামূলক।</p>
             
@@ -136,7 +136,7 @@
         </div>
 
         {{-- 🚀 Button UI Update --}}
-        <div class="flex justify-center pt-8 mb-10">
+        <div class="flex justify-center pt-8 mb-10 scroll-reveal" data-scroll-reveal>
             <button type="submit" class="w-full md:w-auto inline-flex items-center justify-center px-12 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-extrabold text-lg shadow-sm transition-all focus:ring-4 focus:ring-red-200">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 রেজিস্ট্রেশন সাবমিট করুন

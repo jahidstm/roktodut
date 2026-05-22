@@ -5,7 +5,7 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     
-    <div class="flex items-start justify-between gap-4 mb-8">
+    <div class="flex items-start justify-between gap-4 mb-8 scroll-reveal" data-scroll-reveal>
         <div>
             <h1 class="text-2xl font-extrabold tracking-tight">রক্তদাতা খুঁজুন</h1>
             <p class="text-slate-500 font-medium mt-1">লোকেশন ও গ্রুপের ভিত্তিতে ডোনার সার্চ করুন</p>
@@ -40,7 +40,7 @@
         </div>
     @endif
 
-    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8">
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8 scroll-reveal" data-scroll-reveal>
         <form method="GET" action="{{ route('search') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1">রক্তের গ্রুপ</label>
@@ -103,7 +103,7 @@
             </form>
     </div>
 
-    <div class="mb-5">
+    <div class="mb-5 scroll-reveal" data-scroll-reveal>
         <div class="flex items-center justify-between gap-3">
             <h2 class="text-lg font-black text-slate-800">সার্চ ফলাফল</h2>
             <span class="text-sm font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-full">
@@ -127,7 +127,7 @@
     </div>
 
     @if($donors->isEmpty())
-        <x-card paddings="p-10" class="text-center">
+        <x-card paddings="p-10" class="text-center scroll-reveal" data-scroll-reveal>
             <div class="mx-auto mb-4 h-14 w-14 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center">
                 <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 15.75 18 18m-9.75-5.25h.008v.008H8.25V12.5Zm3.75 0h.008v.008H12V12.5Zm3.75 0h.008v.008h-.008V12.5ZM3 10.5h18m-1.5 9h-15A1.5 1.5 0 0 1 3 18V7.5A1.5 1.5 0 0 1 4.5 6h15A1.5 1.5 0 0 1 21 7.5V18a1.5 1.5 0 0 1-1.5 1.5Z"/>

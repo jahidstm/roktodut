@@ -12,7 +12,7 @@
 
 @else
     {{-- Empty State --}}
-    <div class="text-center py-20 bg-white rounded-xl border border-slate-100 shadow-sm max-w-xl mx-auto">
+    <div class="text-center py-20 bg-white rounded-xl border border-slate-100 shadow-sm max-w-xl mx-auto scroll-reveal" data-scroll-reveal>
         <div class="w-16 h-16 bg-slate-50 text-slate-300 rounded-full flex items-center justify-center mx-auto mb-5">
             <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>

@@ -7,14 +7,14 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
         {{-- Page Title (matching Smart Donor Search style) --}}
-        <div class="mb-8">
+        <div class="mb-8 scroll-reveal" data-scroll-reveal>
             <h1 class="text-2xl sm:text-3xl font-black text-slate-900 border-l-4 border-red-600 pl-4">
                 জরুরি রক্তের অনুরোধ
             </h1>
         </div>
 
         {{-- Filter Section (matching Smart Donor Search filter card style) --}}
-        <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-8 shadow-sm"
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 mb-8 shadow-sm scroll-reveal" data-scroll-reveal
              x-data="{
                 loading: false,
                 search: new URLSearchParams(location.search).get('search') || '',
@@ -133,7 +133,7 @@
 
         {{-- Flash message --}}
         @if(session('login_required'))
-            <div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3">
+            <div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3 scroll-reveal" data-scroll-reveal>
                 <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
@@ -142,7 +142,7 @@
         @endif
 
         {{-- Results header --}}
-        <div class="flex items-center justify-between mb-5">
+        <div class="flex items-center justify-between mb-5 scroll-reveal" data-scroll-reveal>
             <h2 class="text-lg font-black text-slate-800">সার্চ ফলাফল</h2>
             <span class="text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
                 মোট: {{ $requests->total() }} টি অনুরোধ

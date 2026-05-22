@@ -28,6 +28,61 @@
             </div>
         </div>
 
+        <style>
+            .scroll-reveal {
+                opacity: 0;
+                transform: translateY(24px);
+                transition: opacity 0.8s ease, transform 0.8s ease;
+                will-change: opacity, transform;
+            }
+            .scroll-reveal--left {
+                transform: translateX(-24px);
+            }
+            .scroll-reveal--right {
+                transform: translateX(24px);
+            }
+            .scroll-reveal.is-visible,
+            [data-scroll-reveal].is-visible {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            .scroll-reveal--left.is-visible,
+            .scroll-reveal--right.is-visible {
+                transform: translateX(0);
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .scroll-reveal,
+                [data-scroll-reveal] {
+                    opacity: 1 !important;
+                    transform: none !important;
+                    transition: none !important;
+                }
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const autoTargets = document.querySelectorAll('section');
+                autoTargets.forEach((el) => {
+                    if (!el.hasAttribute('data-scroll-reveal')) {
+                        el.setAttribute('data-scroll-reveal', '');
+                        el.classList.add('scroll-reveal');
+                    }
+                });
+                const revealItems = document.querySelectorAll('[data-scroll-reveal]');
+                if (!revealItems.length) return;
+                const revealObserver = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('is-visible');
+                            revealObserver.unobserve(entry.target);
+                        }
+                    });
+                }, { threshold: 0.2, rootMargin: '0px 0px -10% 0px' });
+                revealItems.forEach(item => revealObserver.observe(item));
+            });
+        </script>
+
         {{-- Lenis smooth scrolling --}}
         <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/bundled/lenis.min.js"></script>
         <script>

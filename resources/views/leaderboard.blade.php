@@ -43,7 +43,7 @@
     {{-- ══════════════════════════════════════════
          Hero Section — dynamic based on filters
     ══════════════════════════════════════════ --}}
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-600 via-red-700 to-red-900 p-8 sm:p-12 mb-6 shadow-2xl">
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-600 via-red-700 to-red-900 p-8 sm:p-12 mb-6 shadow-2xl scroll-reveal" data-scroll-reveal>
         {{-- Decorative blobs --}}
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
         <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4 pointer-events-none"></div>
@@ -105,7 +105,7 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
 
         {{-- ── Card A: সময়কাল ────────────────────────────────────────────── --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 scroll-reveal" data-scroll-reveal>
             <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                 <span>⏱</span> সময়কাল
             </p>
@@ -137,7 +137,7 @@
         </div>
 
         {{-- ── Card B: অঞ্চল ──────────────────────────────────────────────── --}}
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 scroll-reveal" data-scroll-reveal>
             <p class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-1.5">
                 <span>📍</span> অঞ্চল
             </p>
@@ -213,7 +213,7 @@
                 $avatarRing = match($rank) { 1=>"ring-4 ring-amber-100 border-amber-300", 2=>"border-slate-200", 3=>"border-orange-200", default=>"border-slate-100" };
             @endphp
 
-            <div class="bg-white rounded-3xl px-6 w-full max-w-xs mx-auto sm:mx-0 flex flex-col items-center relative border-2 {{ $cardClasses }} transition-all duration-300 hover:-translate-y-2">
+            <div class="bg-white rounded-3xl px-6 w-full max-w-xs mx-auto sm:mx-0 flex flex-col items-center relative border-2 {{ $cardClasses }} transition-all duration-300 hover:-translate-y-2 scroll-reveal" data-scroll-reveal>
                 <div class="absolute -top-5 bg-slate-900 text-white text-xs font-black px-5 py-2 rounded-full flex items-center gap-1.5 shadow-lg">
                     {{ $item['emoji'] }} {{ $item['label'] }}
                 </div>
@@ -263,7 +263,7 @@
     {{-- ══════════════════════════════════════════
          Full Rankings List (IELTSly Style)
     ══════════════════════════════════════════ --}}
-    <div class="mb-4 flex items-center justify-between">
+    <div class="mb-4 flex items-center justify-between scroll-reveal" data-scroll-reveal>
         <div class="flex items-center gap-2">
             <span class="text-2xl drop-shadow-sm">🏆</span>
             <h2 class="text-xl font-black text-slate-800">Top Performers</h2>
@@ -273,7 +273,7 @@
         </div>
     </div>
 
-    <div x-data="{ showAll: false }" class="bg-white rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-slate-100 overflow-hidden mb-8">
+    <div x-data="{ showAll: false }" class="bg-white rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-slate-100 overflow-hidden mb-8 scroll-reveal" data-scroll-reveal>
         @forelse($donors as $index => $donor)
             @php
                 $rank       = $index + 1;
@@ -282,8 +282,9 @@
                 $displayPts = $time === 'month' ? ($donor->monthly_points ?? 0) : ($donor->points ?? 0);
             @endphp
             <div @if($index >= 10) x-show="showAll" x-cloak style="display: none;" @endif 
-                 class="flex items-center gap-4 px-6 py-4 border-b border-slate-50 transition-colors duration-200
-                        {{ $isMe ? 'bg-red-50/30' : 'hover:bg-slate-50/60' }}">
+                 class="flex items-center gap-4 px-6 py-4 border-b border-slate-50 transition-colors duration-200 scroll-reveal
+                        {{ $isMe ? 'bg-red-50/30' : 'hover:bg-slate-50/60' }}"
+                 data-scroll-reveal>
 
                 {{-- Rank badge --}}
                 <div class="flex-shrink-0 w-10 text-center">

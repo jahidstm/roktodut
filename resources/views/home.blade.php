@@ -642,44 +642,7 @@
     });
 </script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const revealItems = document.querySelectorAll('[data-scroll-reveal]');
-        if (!revealItems.length) return;
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    revealObserver.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.2, rootMargin: '0px 0px -10% 0px' });
-        revealItems.forEach(item => revealObserver.observe(item));
-    });
-</script>
-
 <style>
-    .scroll-reveal {
-        opacity: 0;
-        transform: translateY(24px);
-        transition: opacity 0.8s ease, transform 0.8s ease;
-        will-change: opacity, transform;
-    }
-    .scroll-reveal--left {
-        transform: translateX(-24px);
-    }
-    .scroll-reveal--right {
-        transform: translateX(24px);
-    }
-    .scroll-reveal.is-visible,
-    [data-scroll-reveal].is-visible {
-        opacity: 1;
-        transform: translateY(0);
-    }
-    .scroll-reveal--left.is-visible,
-    .scroll-reveal--right.is-visible {
-        transform: translateX(0);
-    }
     @keyframes marquee {
         from { transform: translateX(0); }
         to   { transform: translateX(-33.333%); }
