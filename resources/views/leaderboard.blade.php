@@ -172,7 +172,6 @@
                         <input type="hidden" name="time"  value="{{ $time }}">
                         <select name="district_id"
                                 id="district-select"
-                                onchange="this.form.submit()"
                                 class="w-full text-sm font-semibold border border-slate-200 rounded-xl px-4 py-2.5
                                        bg-white text-slate-700 focus:ring-2 focus:ring-red-500 focus:border-transparent cursor-pointer">
                             <option value="">— জেলা বেছে নিন —</option>
