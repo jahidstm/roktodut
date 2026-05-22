@@ -122,21 +122,42 @@
 
         /* ══ Map ════════════════════════════════════════════ */
         #admin-map {
-            width: 100%; height: 100%;
+            width: calc(100% - 24px);
+            height: calc(100% - 24px);
+            margin: 12px;
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 14px 36px rgba(15, 23, 42, 0.10);
             background-color: #eef2f7;
             background-image: radial-gradient(#c8d6e5 1px, transparent 1px);
             background-size: 22px 22px;
+            overflow: hidden;
         }
-        .map-col { position: relative; display: flex; flex-direction: column; }
+        .map-col {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+        }
         .map-col .range-toolbar { flex-shrink: 0; }
+        .map-frame { flex: 1; position: relative; }
+        .map-frame::after {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border-radius: 18px;
+            box-shadow: inset 0 0 40px rgba(15, 23, 42, 0.06);
+            pointer-events: none;
+        }
 
         /* ══ Loading overlay ════════════════════════════════ */
         #map-loading {
-            position: absolute; inset: 0; z-index: 9999;
+            position: absolute; inset: 12px; z-index: 9999;
             background: rgba(238,242,247,0.88);
             display: flex; flex-direction: column;
             align-items: center; justify-content: center; gap: 0.65rem;
             backdrop-filter: blur(4px);
+            border-radius: 18px;
         }
         .spinner {
             width: 32px; height: 32px;
@@ -278,7 +299,7 @@
                 <span id="range-label" style="margin-left:auto;font-size:0.68rem;color:#94a3b8;font-weight:600;align-self:center;"></span>
             </div>
 
-            <div style="flex:1;position:relative;">
+            <div class="map-frame">
                 <div id="map-loading">
                     <div class="spinner"></div>
                     <p class="ld-txt">মানচিত্র লোড হচ্ছে...</p>

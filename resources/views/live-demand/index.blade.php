@@ -145,24 +145,43 @@
         .badge-stable   { background: #dcfce7; color: #16a34a; }
 
         /* ══ Map Container ══════════════════════════════════ */
-        .map-wrapper { position: relative; }
+        .map-wrapper {
+            position: relative;
+            background: linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
+        }
 
         /* ✅ Dotted-grid background — professional BI dashboard feel */
         #map {
-            width: 100%; height: 100%;
+            width: calc(100% - 24px);
+            height: calc(100% - 24px);
+            margin: 12px;
+            border-radius: 18px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 14px 36px rgba(15, 23, 42, 0.10);
             background-color: #eef2f7;
             background-image: radial-gradient(#c8d6e5 1px, transparent 1px);
             background-size: 22px 22px;
+            overflow: hidden;
+        }
+
+        .map-wrapper::after {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border-radius: 18px;
+            box-shadow: inset 0 0 40px rgba(15, 23, 42, 0.06);
+            pointer-events: none;
         }
 
         /* ══ Loading Overlay ══════════════════════════════════ */
         #loading-overlay {
-            position: absolute; inset: 0;
+            position: absolute; inset: 12px;
             background: rgba(238,242,247,0.92);
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             gap: 0.75rem; z-index: 9999;
             backdrop-filter: blur(4px);
+            border-radius: 18px;
         }
         .spinner {
             width: 36px; height: 36px;
