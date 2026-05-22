@@ -101,7 +101,7 @@
                 <form action="{{ route('search') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
 
                     <div class="lg:col-span-1">
-                        <select name="blood_group" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all appearance-none cursor-pointer" style="background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\");background-repeat:no-repeat;background-position:right 0.75rem center;background-size:1.25em;">
+                        <select name="blood_group" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all cursor-pointer">
                             <option value="" class="text-slate-500">রক্তের গ্রুপ</option>
                             @foreach(\App\Enums\BloodGroup::cases() as $bg)
                                 <option value="{{ $bg->value }}" class="text-slate-900">{{ $bg->value }}</option>
@@ -110,7 +110,7 @@
                     </div>
 
                     <div class="lg:col-span-1">
-                        <select name="division_id" @change="fetchDistricts($event.target.value)" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all appearance-none cursor-pointer" style="background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\");background-repeat:no-repeat;background-position:right 0.75rem center;background-size:1.25em;">
+                        <select name="division_id" @change="fetchDistricts($event.target.value)" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all cursor-pointer">
                             <option value="" class="text-slate-500">বিভাগ নির্বাচন</option>
                             @foreach($divisions as $div)
                                 <option value="{{ $div->id }}" class="text-slate-900">{{ $div->name }}</option>
@@ -119,7 +119,7 @@
                     </div>
 
                     <div class="lg:col-span-1">
-                        <select name="district_id" @change="fetchUpazilas($event.target.value)" :disabled="districts.length === 0" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" style="background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\");background-repeat:no-repeat;background-position:right 0.75rem center;background-size:1.25em;">
+                        <select name="district_id" @change="fetchUpazilas($event.target.value)" :disabled="districts.length === 0" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                             <option value="" x-text="loadingDistricts ? 'লোড হচ্ছে...' : (districts.length === 0 ? 'জেলা নির্বাচন' : 'সব জেলা')" class="text-slate-500"></option>
                             <template x-for="d in districts" :key="d.id">
                                 <option :value="d.id" x-text="d.name" class="text-slate-900"></option>
@@ -128,7 +128,7 @@
                     </div>
 
                     <div class="lg:col-span-1">
-                        <select name="upazila_id" :disabled="upazilas.length === 0" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all appearance-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed" style="background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2364748b' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e\");background-repeat:no-repeat;background-position:right 0.75rem center;background-size:1.25em;">
+                        <select name="upazila_id" :disabled="upazilas.length === 0" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                             <option value="" x-text="loadingUpazilas ? 'লোড হচ্ছে...' : (upazilas.length === 0 ? 'উপজেলা / এরিয়া' : 'সব উপজেলা')" class="text-slate-500"></option>
                             <template x-for="u in upazilas" :key="u.id">
                                 <option :value="u.id" x-text="u.name" class="text-slate-900"></option>
