@@ -153,26 +153,26 @@
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 3 — STATS COUNTER
 ═══════════════════════════════════════════════════════════════ --}}
-<section class="bg-white py-20">
-    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 sm:grid-cols-3 rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-            <div class="bg-white text-center px-8 py-14 border-b sm:border-b-0 sm:border-r border-slate-100">
-                <div class="text-5xl lg:text-6xl font-black text-slate-900 mb-3 tabular-nums">
-                    <span class="counter" data-target="{{ $totalDonors }}">0</span><span class="text-red-500">+</span>
+<section class="bg-[#18181b] py-16 sm:py-20 border-t border-[#2a2a30]">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
+            <div class="text-center px-8 py-6 sm:py-0">
+                <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">
+                    <span class="counter" data-target="{{ $totalDonors }}">0</span><span class="text-[#e11d48]">+</span>
                 </div>
-                <div class="text-xs font-bold text-slate-400 uppercase tracking-[0.15em]">নিবন্ধিত ডোনার</div>
+                <div class="text-sm sm:text-[15px] font-bold text-slate-400">নিবন্ধিত ডোনার</div>
             </div>
-            <div class="bg-white text-center px-8 py-14 border-b sm:border-b-0 sm:border-r border-slate-100">
-                <div class="text-5xl lg:text-6xl font-black text-slate-900 mb-3 tabular-nums">
-                    <span class="counter" data-target="{{ $verifiedDonors }}">0</span><span class="text-red-500">+</span>
+            <div class="text-center px-8 py-6 sm:py-0">
+                <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">
+                    <span class="counter" data-target="{{ $verifiedDonors }}">0</span><span class="text-[#e11d48]">+</span>
                 </div>
-                <div class="text-xs font-bold text-slate-400 uppercase tracking-[0.15em]">ভেরিফাইড ডোনার</div>
+                <div class="text-sm sm:text-[15px] font-bold text-slate-400">ভেরিফাইড ডোনার</div>
             </div>
-            <div class="bg-white text-center px-8 py-14">
-                <div class="text-5xl lg:text-6xl font-black text-slate-900 mb-3 tabular-nums">
-                    <span class="counter" data-target="{{ $totalDonations }}">0</span><span class="text-red-500">+</span>
+            <div class="text-center px-8 py-6 sm:py-0">
+                <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">
+                    <span class="counter" data-target="{{ $totalDonations }}">0</span><span class="text-[#e11d48]">+</span>
                 </div>
-                <div class="text-xs font-bold text-slate-400 uppercase tracking-[0.15em]">সফল রক্তদান</div>
+                <div class="text-sm sm:text-[15px] font-bold text-slate-400">সফল রক্তদান</div>
             </div>
         </div>
     </div>
