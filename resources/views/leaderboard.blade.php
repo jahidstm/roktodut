@@ -3,6 +3,41 @@
 @section('title', 'সেরা রক্তদাতা – রক্তদূত')
 
 @section('content')
+@php
+    if (!function_exists('getAvatarInitials')) {
+        function getAvatarInitials($name) {
+            $name = trim($name);
+            if (preg_match('/[a-zA-Z]/', $name)) {
+                $words = explode(' ', $name);
+                $initials = '';
+                foreach ($words as $w) {
+                    if (!empty($w)) $initials .= mb_substr($w, 0, 1);
+                }
+                return mb_strtoupper(mb_substr($initials, 0, 2));
+            }
+            return mb_substr($name, 0, 1);
+        }
+    }
+
+    if (!function_exists('getAvatarColor')) {
+        function getAvatarColor($name) {
+            $colors = [
+                'bg-blue-100 text-blue-700',
+                'bg-emerald-100 text-emerald-700',
+                'bg-amber-100 text-amber-700',
+                'bg-purple-100 text-purple-700',
+                'bg-pink-100 text-pink-700',
+                'bg-indigo-100 text-indigo-700',
+                'bg-rose-100 text-rose-700',
+                'bg-teal-100 text-teal-700',
+                'bg-cyan-100 text-cyan-700',
+                'bg-fuchsia-100 text-fuchsia-700',
+            ];
+            $index = abs(crc32($name)) % count($colors);
+            return $colors[$index];
+        }
+    }
+@endphp
 <div id="leaderboard-root" class="max-w-5xl mx-auto px-4 py-8 sm:py-12">
 
     {{-- ══════════════════════════════════════════
@@ -182,11 +217,16 @@
                 <div class="absolute -top-5 bg-slate-900 text-white text-xs font-black px-5 py-2 rounded-full flex items-center gap-1.5 shadow-lg">
                     {{ $item['emoji'] }} {{ $item['label'] }}
                 </div>
-                <div class="w-20 h-20 rounded-full border-[3px] {{ $avatarRing }} flex items-center justify-center text-3xl font-black mb-5 bg-gradient-to-br from-red-50 to-rose-100 text-red-600 overflow-hidden">
+                <div class="w-20 h-20 rounded-full border-[3px] {{ $avatarRing }} flex items-center justify-center text-3xl font-black mb-5 overflow-hidden relative">
+                    @php
+                        $init = getAvatarInitials($d->name);
+                        $color = getAvatarColor($d->name);
+                    @endphp
                     @if($d->profile_image)
-                        <img src="{{ asset('storage/' . $d->profile_image) }}" class="w-full h-full object-cover">
+                        <img src="{{ route('profile.avatar', $d) }}" class="w-full h-full object-cover z-10" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <span class="w-full h-full hidden items-center justify-center {{ $color }}">{{ $init }}</span>
                     @else
-                        {{ $initial }}
+                        <span class="w-full h-full flex items-center justify-center {{ $color }}">{{ $init }}</span>
                     @endif
                 </div>
                 <h3 class="text-lg font-black text-slate-900 text-center mb-2 truncate w-full">{{ $d->name }}</h3>
@@ -255,11 +295,16 @@
                 </div>
 
                 {{-- Avatar --}}
-                <div class="flex-shrink-0 w-12 h-12 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden">
+                <div class="flex-shrink-0 w-12 h-12 rounded-full border border-slate-200 flex items-center justify-center overflow-hidden relative">
+                    @php
+                        $init = getAvatarInitials($donor->name);
+                        $color = getAvatarColor($donor->name);
+                    @endphp
                     @if($donor->profile_image)
-                        <img src="{{ asset('storage/' . $donor->profile_image) }}" class="w-full h-full object-cover" alt="{{ $donor->name }}">
+                        <img src="{{ route('profile.avatar', $donor) }}" class="w-full h-full object-cover z-10" alt="{{ $donor->name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <span class="w-full h-full hidden items-center justify-center font-black text-sm {{ $color }}">{{ $init }}</span>
                     @else
-                        <span class="text-slate-600 font-black text-sm">{{ mb_substr($donor->name, 0, 1) }}</span>
+                        <span class="w-full h-full flex items-center justify-center font-black text-sm {{ $color }}">{{ $init }}</span>
                     @endif
                 </div>
 
@@ -325,11 +370,16 @@
                     </div>
 
                     {{-- Avatar --}}
-                    <div class="flex-shrink-0 w-12 h-12 rounded-full border border-red-200 bg-white flex items-center justify-center overflow-hidden">
+                    <div class="flex-shrink-0 w-12 h-12 rounded-full border border-red-200 flex items-center justify-center overflow-hidden relative">
+                        @php
+                            $init = getAvatarInitials(Auth::user()->name);
+                            $color = getAvatarColor(Auth::user()->name);
+                        @endphp
                         @if(Auth::user()->profile_image)
-                            <img src="{{ asset('storage/' . Auth::user()->profile_image) }}" class="w-full h-full object-cover">
+                            <img src="{{ route('profile.avatar', Auth::user()) }}" class="w-full h-full object-cover z-10" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <span class="w-full h-full hidden items-center justify-center font-black text-sm {{ $color }}">{{ $init }}</span>
                         @else
-                            <span class="text-red-600 font-black text-sm">{{ mb_substr(Auth::user()->name, 0, 1) }}</span>
+                            <span class="w-full h-full flex items-center justify-center font-black text-sm {{ $color }}">{{ $init }}</span>
                         @endif
                     </div>
 
