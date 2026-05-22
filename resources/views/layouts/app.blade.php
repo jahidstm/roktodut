@@ -115,6 +115,16 @@
                                  : 'text-slate-600 hover:text-slate-900' }}">
                         স্বাস্থ্যবার্তা
                     </a>
+
+                    {{-- 5. লাইভ ম্যাপ --}}
+                    <a href="{{ route('live-demand.index') }}"
+                       @mouseenter="left = $el.offsetLeft; width = $el.offsetWidth; opacity = 1"
+                       class="relative z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors duration-300 ease-out
+                              {{ request()->routeIs('live-demand.*') || request()->routeIs('live-demand.index')
+                                 ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
+                                 : 'text-slate-600 hover:text-slate-900' }}">
+                        লাইভ ম্যাপ
+                    </a>
                 </div>
             </div>
 
@@ -375,6 +385,9 @@
                 </a>
                 <a href="{{ route('blog.index') }}" class="flex items-center px-4 py-3 rounded-xl font-bold transition-colors {{ request()->routeIs('blog.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
                     স্বাস্থ্যবার্তা
+                </a>
+                <a href="{{ route('live-demand.index') }}" class="flex items-center px-4 py-3 rounded-xl font-bold transition-colors {{ request()->routeIs('live-demand.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
+                    লাইভ ম্যাপ
                 </a>
             </div>
             

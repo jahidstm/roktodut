@@ -321,6 +321,28 @@
 </section>
 
 {{-- ═══════════════════════════════════════════════════════════════
+     SECTION 3.5 — LIVE MAP CTA
+═══════════════════════════════════════════════════════════════ --}}
+<section class="py-24 bg-white relative overflow-hidden border-t border-slate-100">
+    <div class="absolute inset-0 bg-[radial-gradient(#f87171_1px,transparent_1px)] [background-size:20px_20px] opacity-[0.03]"></div>
+    
+    <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-red-50 text-red-600 mb-6 shadow-sm border border-red-100">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+        </div>
+        
+        <h2 class="text-3xl lg:text-5xl font-black text-slate-900 mb-6 tracking-tight">লাইভ রক্তের চাহিদা মানচিত্র</h2>
+        <p class="text-lg font-medium text-slate-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+            কোন জেলায় রক্তের সংকট সবচেয়ে বেশি? আমাদের রিয়েল-টাইম হিটম্যাপের মাধ্যমে দেশের বর্তমান পরিস্থিতি সম্পর্কে জানুন এবং যেখানে সবচেয়ে বেশি প্রয়োজন, সেখানে রক্তদান করে জীবন বাঁচান।
+        </p>
+        
+        <x-primary-button href="{{ route('live-demand.index') }}" class="px-10 py-5 text-lg shadow-xl shadow-red-500/20">
+            🗺️ লাইভ ম্যাপ দেখুন
+        </x-primary-button>
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════
      SECTION 4 — HOW IT WORKS (Listygo "Explore" style split view)
 ═══════════════════════════════════════════════════════════════ --}}
 <section class="py-24 bg-slate-50 overflow-hidden relative">

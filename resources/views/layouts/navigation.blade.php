@@ -59,6 +59,13 @@
                                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
                         স্বাস্থ্যবার্তা
                     </a>
+                    <a href="{{ route('live-demand.index') }}"
+                       class="relative px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ease-out
+                              {{ request()->routeIs('live-demand.*') 
+                                 ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
+                                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60' }}">
+                        লাইভ ম্যাপ
+                    </a>
                 </div>
             </div>
 
@@ -187,6 +194,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('blog.index')" :active="request()->routeIs('blog.*')" class="font-bold">
                 স্বাস্থ্যবার্তা
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('live-demand.index')" :active="request()->routeIs('live-demand.*')" class="font-bold">
+                লাইভ ম্যাপ
             </x-responsive-nav-link>
         </div>
         <div class="pt-4 pb-1 border-t border-slate-100">
