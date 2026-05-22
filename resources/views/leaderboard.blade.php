@@ -154,89 +154,140 @@
     </div>
 
     {{-- ══════════════════════════════════════════
-         Top 3 Podium
+         Current User Highlights (IELTSly Style)
+    ══════════════════════════════════════════ --}}
+    @auth
+        @php
+            $authId = Auth::id();
+            $myRankLabel = $myRank ? '#'.$myRank : 'N/A';
+            $myPts = $time === 'month' ? (Auth::user()->monthly_points ?? 0) : (Auth::user()->points ?? 0);
+            $myDons = Auth::user()->total_verified_donations ?? 0;
+            $hasActivity = $myPts > 0 || $myDons > 0;
+        @endphp
+        @if($hasActivity)
+        <div class="bg-white rounded-[2rem] shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-slate-100 p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6 mb-12 relative overflow-hidden">
+            {{-- Background glow --}}
+            <div class="absolute top-1/2 left-12 w-32 h-32 bg-red-100/50 rounded-full blur-3xl -translate-y-1/2 pointer-events-none"></div>
+
+            {{-- Rank Circle --}}
+            <div class="relative z-10 w-24 h-24 shrink-0 rounded-full border-[3px] border-red-500 bg-white flex flex-col items-center justify-center shadow-lg text-red-600">
+                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-0.5">Rank</span>
+                <span class="text-2xl font-black leading-none">{{ $myRankLabel }}</span>
+            </div>
+
+            {{-- Info --}}
+            <div class="flex-1 text-center sm:text-left z-10">
+                <h2 class="text-2xl font-black text-slate-900 mb-2">{{ Auth::user()->name }}</h2>
+                <div class="flex items-center justify-center sm:justify-start gap-2 flex-wrap">
+                    <span class="bg-red-50 text-red-600 font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider">
+                        Top Donor
+                    </span>
+                    @foreach(Auth::user()->badges->take(2) as $badge)
+                        @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
+                        <span class="bg-amber-50 text-amber-700 border border-amber-200 font-bold text-xs px-3 py-1 rounded-full flex items-center gap-1">
+                            {{ $bd['emoji'] }} {{ $badge->bn_name ?? $badge->name }}
+                        </span>
+                    @endforeach
+                </div>
+            </div>
+
+            {{-- Stats --}}
+            <div class="flex items-center gap-8 z-10 shrink-0 mt-4 sm:mt-0">
+                <div class="text-center">
+                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">রক্তদান</div>
+                    <div class="text-2xl font-black text-slate-800">{{ $myDons }}</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">{{ $pointsLabel }}</div>
+                    <div class="text-2xl font-black text-slate-800 flex items-center gap-1">
+                        {{ number_format($myPts) }} <span class="text-red-500 text-lg">🔥</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+    @endauth
+
+    {{-- ══════════════════════════════════════════
+         Top 3 Podium (Home Page Style)
     ══════════════════════════════════════════ --}}
     @if($top3->count() >= 3)
     @php
-        $podiumConfig = [
-            0 => ['crown' => '👑', 'bg' => 'from-yellow-400 to-amber-500', 'border' => 'border-yellow-300', 'height' => 'h-36 sm:h-44', 'order' => 'sm:order-2 order-1'],
-            1 => ['crown' => '🥈', 'bg' => 'from-slate-400 to-slate-500', 'border' => 'border-slate-300', 'height' => 'h-28 sm:h-36', 'order' => 'sm:order-1 order-2'],
-            2 => ['crown' => '🥉', 'bg' => 'from-amber-600 to-amber-700', 'border' => 'border-amber-400', 'height' => 'h-24 sm:h-32', 'order' => 'sm:order-3 order-3'],
-        ];
-        $podiumList = $top3->values();
-        // Display order: 2nd (left), 1st (center), 3rd (right)
-        $podiumDisplay = [1, 0, 2];
+        $orderedDonors = collect();
+        if($top3->has(1)) $orderedDonors->push(['donor'=>$top3[1],'rank'=>2,'emoji'=>'🥈','label'=>'২য় স্থান']);
+        if($top3->has(0)) $orderedDonors->push(['donor'=>$top3[0],'rank'=>1,'emoji'=>'🥇','label'=>'১ম স্থান']);
+        if($top3->has(2)) $orderedDonors->push(['donor'=>$top3[2],'rank'=>3,'emoji'=>'🥉','label'=>'৩য় স্থান']);
     @endphp
 
-    <div class="mb-6">
-        <div class="flex sm:grid sm:grid-cols-3 flex-col sm:flex-row gap-4 items-end sm:items-end">
-            @foreach($podiumDisplay as $displayIndex)
-                @if(isset($podiumList[$displayIndex]))
-                @php $d = $podiumList[$displayIndex]; $cfg = $podiumConfig[$displayIndex]; @endphp
-                <div class="flex flex-col items-center group {{ $cfg['order'] }} sm:w-auto w-full">
-                    {{-- Avatar --}}
-                    <div class="relative mb-3">
-                        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-br {{ $cfg['bg'] }} flex items-center justify-center text-white font-black text-2xl shadow-lg border-2 {{ $cfg['border'] }} group-hover:scale-110 transition-transform duration-300 overflow-hidden">
-                            @if($d->profile_image)
-                                <img src="{{ asset('storage/' . $d->profile_image) }}" class="w-full h-full object-cover" alt="{{ $d->name }}">
-                            @else
-                                {{ mb_substr($d->name, 0, 1) }}
-                            @endif
-                        </div>
-                        <div class="absolute -top-3 -right-2 text-xl drop-shadow">{{ $cfg['crown'] }}</div>
-                    </div>
+    <div class="flex flex-col sm:flex-row items-end justify-center gap-5 mb-16 mt-6">
+        @foreach($orderedDonors as $item)
+            @php
+                $d = $item['donor'];
+                $rank = $item['rank'];
+                $initial = mb_strtoupper(mb_substr($d->name, 0, 1));
+                $isFirst = $rank === 1;
+                $cardClasses = $isFirst
+                    ? "border-amber-200 shadow-[0_20px_60px_rgba(251,191,36,0.12)] sm:scale-110 pb-8 pt-12 z-10"
+                    : "border-slate-100 shadow-sm pb-6 pt-10 mt-0 sm:mt-8";
+                $avatarRing = match($rank) { 1=>"ring-4 ring-amber-100 border-amber-300", 2=>"border-slate-200", 3=>"border-orange-200", default=>"border-slate-100" };
+            @endphp
 
-                    {{-- Name & info --}}
-                    <div class="text-center mb-2 w-full px-2">
-                        <div class="font-black text-slate-800 text-xs sm:text-sm truncate">{{ explode(' ', $d->name)[0] }}</div>
-                        <div class="text-xs text-slate-500 font-semibold">
-                            {{ $d->blood_group?->value ?? $d->blood_group ?? 'N/A' }}
-                        </div>
-                        @if($d->badges->count() > 0)
-                            <div class="flex justify-center gap-0.5 mt-1 flex-wrap">
-                                @foreach($d->badges->take(3) as $badge)
-                                    <span class="text-xs" title="{{ $badge->bn_name ?? $badge->name }}">{{ $badge->emoji ?? $badge->icon }}</span>
-                                @endforeach
-                            </div>
-                        @endif
+            <div class="bg-white rounded-3xl px-6 w-full max-w-xs mx-auto sm:mx-0 flex flex-col items-center relative border-2 {{ $cardClasses }} transition-all duration-300 hover:-translate-y-2">
+                <div class="absolute -top-5 bg-slate-900 text-white text-xs font-black px-5 py-2 rounded-full flex items-center gap-1.5 shadow-lg">
+                    {{ $item['emoji'] }} {{ $item['label'] }}
+                </div>
+                <div class="w-20 h-20 rounded-full border-[3px] {{ $avatarRing }} flex items-center justify-center text-3xl font-black mb-5 bg-gradient-to-br from-red-50 to-rose-100 text-red-600 overflow-hidden">
+                    @if($d->profile_image)
+                        <img src="{{ asset('storage/' . $d->profile_image) }}" class="w-full h-full object-cover">
+                    @else
+                        {{ $initial }}
+                    @endif
+                </div>
+                <h3 class="text-lg font-black text-slate-900 text-center mb-2 truncate w-full">{{ $d->name }}</h3>
+                @if($d->blood_group)
+                <div class="bg-red-50 text-red-600 font-bold text-[10px] px-3 py-1 rounded-lg mb-5 uppercase tracking-widest border border-red-100">{{ $d->blood_group?->value ?? $d->blood_group }} ডোনার</div>
+                @else
+                <div class="h-6 mb-5"></div>
+                @endif
+                <div class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-center divide-x divide-slate-200 mb-5">
+                    <div class="flex-1 text-center pr-4">
+                        <div class="text-2xl font-black text-slate-900">{{ $d->total_verified_donations ?? 0 }}</div>
+                        <div class="text-[10px] font-bold text-slate-400 mt-1">রক্তদান</div>
                     </div>
-
-                    {{-- Podium platform --}}
-                    <div class="{{ $cfg['height'] }} w-full rounded-t-2xl bg-gradient-to-b {{ $cfg['bg'] }} flex flex-col items-center justify-start pt-3 shadow-lg">
-                        <div class="text-white font-black text-lg sm:text-xl">
-                            {{ $time === 'month' ? number_format($d->monthly_points ?? 0) : number_format($d->points ?? 0) }}
-                        </div>
-                        <div class="text-white/80 text-[10px] sm:text-xs font-semibold">{{ $pointsLabel }}</div>
-                        <div class="text-white/70 text-[10px] font-bold mt-1">{{ $d->total_verified_donations ?? 0 }} রক্তদান</div>
+                    <div class="flex-1 text-center pl-4">
+                        <div class="text-2xl font-black text-slate-900">{{ number_format($time === 'month' ? ($d->monthly_points ?? 0) : ($d->points ?? 0)) }}</div>
+                        <div class="text-[10px] font-bold text-slate-400 mt-1">পয়েন্ট</div>
                     </div>
                 </div>
-                @endif
-            @endforeach
-        </div>
+                <div class="flex gap-2 justify-center">
+                    @if($d->badges->isNotEmpty())
+                        @foreach($d->badges->take(3) as $badge)
+                            @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
+                            <span class="text-xl drop-shadow-sm hover:scale-125 transition-transform cursor-help" title="{{ $bd['bn'] }}">{{ $bd['emoji'] }}</span>
+                        @endforeach
+                    @else
+                        <span class="text-xl opacity-20 grayscale">🎖️</span><span class="text-xl opacity-20 grayscale">🎖️</span><span class="text-xl opacity-20 grayscale">🎖️</span>
+                    @endif
+                </div>
+            </div>
+        @endforeach
     </div>
     @endif
 
     {{-- ══════════════════════════════════════════
-         Full Rankings List — Top 50
+         Full Rankings List (IELTSly Style)
     ══════════════════════════════════════════ --}}
-    <div x-data="{ showAll: false }" class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-        {{-- List header --}}
-        <div class="px-5 py-4 border-b border-slate-100 bg-slate-50/60 ">
-            <h2 class="font-black text-slate-800 flex items-center gap-2 text-sm sm:text-base">
-                <span>📋</span>
-                শীর্ষ ১০ তালিকা
-                <span class="text-xs font-semibold text-slate-500 ">—</span>
-                <span class="text-xs font-semibold text-slate-500 ">
-                    {{ $time === 'month' ? 'মাসিক পয়েন্ট' : 'সর্বকালীন' }}
-                    •
-                    {{ $scope === 'district' && $selectedDistrict ? $selectedDistrict->name : 'বাংলাদেশ' }}
-                </span>
-                <span class="ml-auto text-xs font-semibold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-full">
-                    {{ $donors->count() }} জন
-                </span>
-            </h2>
+    <div class="mb-4 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl drop-shadow-sm">🏆</span>
+            <h2 class="text-xl font-black text-slate-800">Top Performers</h2>
         </div>
+        <div class="text-xs font-bold text-slate-400 bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
+            {{ $donors->count() }} জন ডোনার
+        </div>
+    </div>
 
+    <div x-data="{ showAll: false }" class="bg-white rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.04)] border border-slate-100 overflow-hidden mb-8">
         @forelse($donors as $index => $donor)
             @php
                 $rank       = $index + 1;
@@ -245,160 +296,79 @@
                 $displayPts = $time === 'month' ? ($donor->monthly_points ?? 0) : ($donor->points ?? 0);
             @endphp
             <div @if($index >= 10) x-show="showAll" x-cloak style="display: none;" @endif 
-                 class="flex items-center gap-3 sm:gap-4 px-4 sm:px-5 py-3.5 border-b border-slate-50 transition-colors duration-200
-                        {{ $isMe       ? 'bg-blue-50/70 border-l-4 border-l-blue-400' : 'hover:bg-slate-50/60' }}
-                        {{ $isPlatinum && !$isMe ? 'bg-purple-50/20 ' : '' }}">
+                 class="flex items-center gap-4 px-6 py-4 border-b border-slate-50 transition-colors duration-200
+                        {{ $isMe ? 'bg-red-50/30' : 'hover:bg-slate-50/60' }}">
 
                 {{-- Rank badge --}}
-                <div class="flex-shrink-0 w-8 text-center">
-                    @if($rank === 1)     <span class="text-xl leading-none">🥇</span>
-                    @elseif($rank === 2) <span class="text-xl leading-none">🥈</span>
-                    @elseif($rank === 3) <span class="text-xl leading-none">🥉</span>
-                    @else <span class="text-sm font-black text-slate-400 ">#{{ $rank }}</span>
+                <div class="flex-shrink-0 w-10 text-center">
+                    @if($rank === 1)     <span class="text-3xl drop-shadow-sm">🥇</span>
+                    @elseif($rank === 2) <span class="text-3xl drop-shadow-sm">🥈</span>
+                    @elseif($rank === 3) <span class="text-3xl drop-shadow-sm">🥉</span>
+                    @else <span class="text-sm font-bold text-slate-400">#{{ $rank }}</span>
                     @endif
                 </div>
 
                 {{-- Avatar --}}
-                <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-red-100 to-red-200  flex items-center justify-center overflow-hidden
-                            {{ $isPlatinum ? 'ring-2 ring-purple-300 ring-offset-1' : '' }}
-                            {{ $isMe ? 'ring-2 ring-blue-400 ring-offset-1' : '' }}">
+                <div class="flex-shrink-0 w-12 h-12 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center overflow-hidden">
                     @if($donor->profile_image)
                         <img src="{{ asset('storage/' . $donor->profile_image) }}" class="w-full h-full object-cover" alt="{{ $donor->name }}">
                     @else
-                        <span class="text-red-700 font-black text-sm">{{ mb_substr($donor->name, 0, 1) }}</span>
+                        <span class="text-slate-600 font-black text-sm">{{ mb_substr($donor->name, 0, 1) }}</span>
                     @endif
                 </div>
 
-                {{-- Name, blood group, badges, district --}}
+                {{-- Name & Badges --}}
                 <div class="flex-1 min-w-0">
-                    <div class="flex items-center gap-1.5 flex-wrap">
-                        <span class="font-black text-slate-800 text-sm truncate {{ $isPlatinum ? 'text-purple-800 ' : '' }}">
-                            {{ $donor->name }}
-                        </span>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800 text-base truncate">{{ $donor->name }}</span>
                         @if($isMe)
-                            <span class="inline-flex items-center text-[10px] font-black text-blue-700 bg-blue-100 border border-blue-200 rounded-full px-1.5 py-0.5">
-                                আপনি
-                            </span>
-                        @endif
-                        @if($isPlatinum)
-                            <span class="inline-flex items-center text-[10px] font-black text-purple-700 bg-purple-100 border border-purple-200 rounded-full px-1.5 py-0.5">
-                                ✨ প্লাটিনাম
-                            </span>
+                            <span class="text-[10px] font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded uppercase tracking-wider">You</span>
                         @endif
                     </div>
-                    <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                        {{-- Blood group chip --}}
-                        <span class="text-[10px] font-black text-red-700 bg-red-50 border border-red-100 rounded-full px-2 py-0.5">
-                            {{ $donor->blood_group?->value ?? $donor->blood_group ?? 'N/A' }}
-                        </span>
-                        @if($donor->district)
-                            <span class="text-[10px] text-slate-500 font-semibold flex items-center gap-0.5">
-                                📍 {{ $donor->district->name }}
-                            </span>
-                        @endif
-                        @foreach($donor->badges->take(3) as $badge)
+                    <div class="flex items-center gap-1.5 mt-1">
+                        @foreach($donor->badges->take(1) as $badge)
                             @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
-                            <span class="hidden sm:inline-flex items-center gap-0.5 text-[10px] font-bold {{ $bd['color'] }} border rounded-full px-1.5 py-0.5"
-                                  title="{{ $badge->bn_name ?? $badge->name }}">
+                            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded px-1.5 py-0.5">
                                 {{ $bd['emoji'] }} {{ $badge->bn_name ?? $badge->name }}
                             </span>
                         @endforeach
+                        @if($donor->badges->isEmpty())
+                            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 rounded px-1.5 py-0.5">রক্তদাতা</span>
+                        @endif
                     </div>
                 </div>
 
-                {{-- Points & donations --}}
-                <div class="flex-shrink-0 text-right">
-                    <div class="font-black text-slate-800 text-base tabular-nums">
-                        {{ number_format($displayPts) }}
+                {{-- Stats (রক্তদান & পয়েন্ট) --}}
+                <div class="flex items-center gap-6 text-right pr-2">
+                    <div class="hidden sm:block">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">রক্তদান</div>
+                        <div class="font-bold text-blue-600 text-sm">{{ $donor->total_verified_donations ?? 0 }}</div>
                     </div>
-                    <div class="text-[10px] text-slate-400 font-semibold">{{ $pointsLabel }}</div>
-                    <div class="text-[10px] text-slate-400 mt-0.5">
-                        {{ $donor->total_verified_donations ?? 0 }} রক্তদান
+                    <div>
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{{ $pointsLabel }}</div>
+                        <div class="font-bold text-amber-600 text-sm flex items-center gap-1 justify-end">
+                            {{ number_format($displayPts) }} <span class="text-orange-500 text-base leading-none">🔥</span>
+                        </div>
                     </div>
                 </div>
             </div>
 
         @empty
-            {{-- Empty state — differentiated by mode --}}
+            {{-- Empty state --}}
             <div class="py-16 text-center px-6">
-                <div class="text-5xl mb-4">
-                    @if($scope === 'district' && !$districtId)
-                        🗺️
-                    @elseif($time === 'month')
-                        📅
-                    @else
-                        🩸
-                    @endif
-                </div>
-                @if($scope === 'district' && !$districtId)
-                    <p class="text-slate-600 font-bold text-lg">জেলা বেছে নিন</p>
-                    <p class="text-slate-400 text-sm mt-1">উপরের ড্রপডাউন থেকে একটি জেলা সিলেক্ট করুন।</p>
-                @elseif($time === 'month' && $scope === 'district')
-                    <p class="text-slate-600 font-bold text-lg">এই মাসে এখনো কেউ নেই</p>
-                    <p class="text-slate-400 text-sm mt-1">
-                        {{ $selectedDistrict ? $selectedDistrict->name . ' জেলায়' : 'এই জেলায়' }} এই মাসে এখনো কোনো রক্তদান লগ হয়নি।
-                    </p>
-                @elseif($time === 'month')
-                    <p class="text-slate-600 font-bold text-lg">এই মাসে এখনো কোনো তথ্য নেই</p>
-                    <p class="text-slate-400 text-sm mt-1">{{ $currentMonth }} মাসে রক্তদান করুন এবং প্রথম হোন!</p>
-                @else
-                    <p class="text-slate-600 font-bold text-lg">এখনো কোনো তথ্য নেই</p>
-                    <p class="text-slate-400 text-sm mt-1">রক্তদান করুন এবং তালিকায় আপনার নাম যুক্ত করুন!</p>
-                @endif
+                <div class="text-5xl mb-4">🩸</div>
+                <p class="text-slate-600 font-bold text-lg">এখনো কোনো তথ্য নেই</p>
+                <p class="text-slate-400 text-sm mt-1">রক্তদান করুন এবং তালিকায় আপনার নাম যুক্ত করুন!</p>
             </div>
         @endforelse
 
         @if($donors->count() > 10)
-            <div x-show="!showAll" class="p-4 text-center border-b border-slate-50">
-                <button @click="showAll = true" type="button" class="inline-flex items-center gap-2 text-sm font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 transition-colors rounded-full px-5 py-2.5">
-                    ⬇️ আরো দেখুন (Top 50)
+            <div x-show="!showAll" class="p-4 text-center border-t border-slate-50 bg-slate-50/50">
+                <button @click="showAll = true" type="button" class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors">
+                    View Full List (Top {{ $donors->count() }}) ⬇️
                 </button>
             </div>
         @endif
-
-        {{-- ── "আপনার অবস্থান" sticky row — লগইন ইউজার top 50-এ না থাকলে ── --}}
-        @auth
-            @php
-                $authId      = Auth::id();
-                $inTopList   = $donors->contains('id', $authId);
-                $hasActivity = (Auth::user()->points ?? 0) > 0 || (Auth::user()->total_verified_donations ?? 0) > 0;
-            @endphp
-            @if(!$inTopList && $hasActivity && $myRank !== null)
-                <div class="flex items-center gap-3 px-5 py-2 bg-slate-100 ">
-                    <div class="flex-1 h-px bg-slate-300 "></div>
-                    <span class="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest whitespace-nowrap">আপনার অবস্থান</span>
-                    <div class="flex-1 h-px bg-slate-300 "></div>
-                </div>
-
-                <div class="flex items-center gap-4 px-5 py-4 bg-gradient-to-r from-blue-50 to-indigo-50  border-l-4 border-l-blue-500 sticky bottom-0">
-                    <div class="flex-shrink-0 w-8 text-center">
-                        <span class="text-sm font-black text-blue-600 ">#{{ $myRank }}</span>
-                    </div>
-                    <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center overflow-hidden ring-2 ring-blue-400 ring-offset-1">
-                        @if(Auth::user()->profile_image)
-                            <img src="{{ asset('storage/' . Auth::user()->profile_image) }}" class="w-full h-full object-cover" alt="{{ Auth::user()->name }}">
-                        @else
-                            <span class="text-blue-700 font-black text-sm">{{ mb_substr(Auth::user()->name, 0, 1) }}</span>
-                        @endif
-                    </div>
-                    <div class="flex-1 min-w-0">
-                        <div class="flex items-center gap-2">
-                            <span class="font-black text-blue-900 text-sm truncate">{{ Auth::user()->name }}</span>
-                            <span class="text-[10px] font-black text-blue-600 bg-blue-100 border border-blue-200 rounded-full px-1.5 py-0.5">আপনি</span>
-                        </div>
-                        <p class="text-[11px] text-blue-600 font-semibold mt-0.5">
-                            আরো {{ max(0, $myRank - 50) }} ধাপ এগিয়ে শীর্ষ ৫০-এ আসুন!
-                        </p>
-                    </div>
-                    <div class="flex-shrink-0 text-right">
-                        <div class="font-black text-blue-800 text-base tabular-nums">
-                            {{ number_format($myPoints ?? 0) }}
-                        </div>
-                        <div class="text-[10px] text-blue-500 font-semibold">{{ $pointsLabel }}</div>
-                    </div>
-                </div>
-            @endif
-        @endauth
     </div>
 
     {{-- ══════════════════════════════════════════
