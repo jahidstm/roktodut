@@ -148,17 +148,7 @@
     </div>
 </section>
 
-{{-- ═══════════════════════════════════════════════════════════════
-     SECTION 2 — ANIMATED MARQUEE STRIP
-═══════════════════════════════════════════════════════════════ --}}
-<section class="bg-white border-b border-slate-100 overflow-hidden py-4">
-    <div class="flex gap-10 marquee-strip whitespace-nowrap">
-        @php $strips = ['🩸 সক্রিয় ডোনার নেটওয়ার্ক', '🏥 ৬৪ জেলায় সক্রিয়', '✅ NID ভেরিফাইড', '🔒 ফোন নম্বর সম্পূর্ণ গোপন', '⚡ দ্রুত ডোনার ম্যাচিং', '❤️ সম্পূর্ণ বিনামূল্যে', '🗺️ লাইভ ডিমান্ড ম্যাপ', '🎯 স্মার্ট ব্লাড ম্যাচিং']; @endphp
-        @foreach(array_merge($strips, $strips, $strips) as $s)
-            <span class="inline-flex items-center gap-2 text-sm font-bold text-slate-400">{{ $s }}<span class="text-red-200 ml-2">✦</span></span>
-        @endforeach
-    </div>
-</section>
+
 
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 3 — STATS COUNTER
@@ -189,40 +179,38 @@
 </section>
 
 {{-- ═══════════════════════════════════════════════════════════════
-     SECTION 4 — FEATURES (Dark)
+     SECTION 4 — FEATURES (Red)
 ═══════════════════════════════════════════════════════════════ --}}
-<section class="bg-[#0b0b0e] py-24 relative overflow-hidden">
-    <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-red-500/30 to-transparent"></div>
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(211,47,47,0.07),transparent)] pointer-events-none"></div>
+<section class="bg-[#c82128] py-24 relative overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_0%,rgba(255,255,255,0.07),transparent)] pointer-events-none"></div>
 
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div class="text-center mb-16">
-            <div class="inline-flex items-center gap-2 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold px-5 py-2 rounded-full mb-6">✦ কেন রক্তদূত?</div>
-            <h2 class="text-4xl lg:text-5xl font-black text-white mb-5 tracking-tight">একটি প্ল্যাটফর্ম, <span class="text-red-400">অসংখ্য সুবিধা</span></h2>
-            <p class="text-white/40 font-medium max-w-xl mx-auto text-lg">রক্তদূত শুধু একটি ওয়েবসাইট নয় — এটি বাংলাদেশের সবচেয়ে নির্ভরযোগ্য জীবনরক্ষা নেটওয়ার্ক।</p>
+            <div class="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-xs font-bold px-5 py-2 rounded-full mb-6 shadow-sm">✦ কেন রক্তদূত?</div>
+            <h2 class="text-4xl lg:text-5xl font-black text-white mb-5 tracking-tight">একটি প্ল্যাটফর্ম, <span class="text-white/90">অসংখ্য সুবিধা</span></h2>
+            <p class="text-white/80 font-medium max-w-xl mx-auto text-lg">রক্তদূত শুধু একটি ওয়েবসাইট নয় — এটি বাংলাদেশের সবচেয়ে নির্ভরযোগ্য জীবনরক্ষা নেটওয়ার্ক।</p>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             @php
             $features = [
-                ['icon'=>'🔒','title'=>'সম্পূর্ণ গোপনীয়','desc'=>'ডোনারের ফোন নম্বর কখনো পাবলিক করা হয় না। OTP সিস্টেমে সুরক্ষিত যোগাযোগ।','ring'=>'ring-violet-500/20','glow'=>'bg-violet-500/10'],
-                ['icon'=>'💳','title'=>'NID ভেরিফিকেশন','desc'=>'জাতীয় পরিচয়পত্র দিয়ে যাচাইকৃত ডোনার। ভুয়া ডোনার শূন্য।','ring'=>'ring-emerald-500/20','glow'=>'bg-emerald-500/10'],
-                ['icon'=>'⚡','title'=>'স্মার্ট ম্যাচিং','desc'=>'সবচেয়ে কাছের ও উপযুক্ত ডোনার খুঁজে দেয় মুহূর্তের মধ্যে।','ring'=>'ring-amber-500/20','glow'=>'bg-amber-500/10'],
-                ['icon'=>'🗺️','title'=>'লাইভ ডিমান্ড ম্যাপ','desc'=>'রিয়েল-টাইম হিটম্যাপে দেখুন কোন জেলায় রক্তের চাহিদা সবচেয়ে বেশি।','ring'=>'ring-sky-500/20','glow'=>'bg-sky-500/10'],
+                ['icon'=>'🔒','title'=>'সম্পূর্ণ গোপনীয়','desc'=>'ডোনারের ফোন নম্বর কখনো পাবলিক করা হয় না। OTP সিস্টেমে সুরক্ষিত যোগাযোগ।','ring'=>'ring-white/20','glow'=>'bg-white/10'],
+                ['icon'=>'💳','title'=>'NID ভেরিফিকেশন','desc'=>'জাতীয় পরিচয়পত্র দিয়ে যাচাইকৃত ডোনার। ভুয়া ডোনার শূন্য।','ring'=>'ring-white/20','glow'=>'bg-white/10'],
+                ['icon'=>'⚡','title'=>'স্মার্ট ম্যাচিং','desc'=>'সবচেয়ে কাছের ও উপযুক্ত ডোনার খুঁজে দেয় মুহূর্তের মধ্যে।','ring'=>'ring-white/20','glow'=>'bg-white/10'],
+                ['icon'=>'🗺️','title'=>'লাইভ ডিমান্ড ম্যাপ','desc'=>'রিয়েল-টাইম হিটম্যাপে দেখুন কোন জেলায় রক্তের চাহিদা সবচেয়ে বেশি।','ring'=>'ring-white/20','glow'=>'bg-white/10'],
             ];
             @endphp
             @foreach($features as $f)
-            <div class="bg-white/[0.04] border border-white/[0.07] rounded-2xl p-7 hover:bg-white/[0.07] hover:border-white/[0.12] transition-all duration-300 group cursor-default">
-                <div class="w-13 h-13 w-14 h-14 rounded-2xl {{ $f['glow'] }} ring-1 {{ $f['ring'] }} flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
+            <div class="bg-white/5 border border-white/10 rounded-2xl p-7 hover:bg-white/10 hover:border-white/20 transition-all duration-300 group cursor-default shadow-sm hover:shadow-md">
+                <div class="w-14 h-14 rounded-2xl {{ $f['glow'] }} ring-1 {{ $f['ring'] }} flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform duration-300">
                     {{ $f['icon'] }}
                 </div>
                 <h3 class="text-white font-black text-lg mb-3">{{ $f['title'] }}</h3>
-                <p class="text-white/35 text-sm leading-relaxed font-medium">{{ $f['desc'] }}</p>
+                <p class="text-white/80 text-sm leading-relaxed font-medium">{{ $f['desc'] }}</p>
             </div>
             @endforeach
         </div>
     </div>
-    <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/5 to-transparent"></div>
 </section>
 
 {{-- ═══════════════════════════════════════════════════════════════
