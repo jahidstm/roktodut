@@ -47,19 +47,23 @@
     $myResponse = (!$isPublic && isset($request->responses)) ? $request->responses->first() : null;
 @endphp
 
-<article class="group rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
+<article class="group flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg">
     <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
-            <div class="flex flex-wrap items-center gap-2">
-                <h3 class="text-lg font-black tracking-tight text-slate-900">
-                    {{ $bloodGroup }} রক্ত প্রয়োজন
-                </h3>
-                <span class="inline-flex h-7 items-center rounded-full border border-violet-200 bg-violet-50 px-3 text-xs font-extrabold text-violet-700">
-                    {{ $componentLabel }}
-                </span>
-                <span class="inline-flex h-7 items-center rounded-full border px-3 text-xs font-extrabold {{ $urgencyInfo['cls'] }}">
-                    {{ $urgencyInfo['label'] }}
-                </span>
+            <div class="flex flex-col gap-2">
+                <div class="flex flex-wrap items-center gap-2">
+                    <h3 class="text-lg font-black tracking-tight text-slate-900">
+                        {{ $bloodGroup }} রক্ত প্রয়োজন
+                    </h3>
+                    <span class="inline-flex h-7 items-center rounded-full border border-violet-200 bg-violet-50 px-3 text-xs font-extrabold text-violet-700">
+                        {{ $componentLabel }}
+                    </span>
+                </div>
+                <div>
+                    <span class="inline-flex h-7 items-center rounded-full border px-3 text-xs font-extrabold {{ $urgencyInfo['cls'] }}">
+                        {{ $urgencyInfo['label'] }}
+                    </span>
+                </div>
             </div>
         </div>
         <span class="inline-flex h-7 shrink-0 items-center rounded-full border border-slate-200 bg-slate-50 px-3 text-xs font-bold text-slate-700">
@@ -67,7 +71,7 @@
         </span>
     </div>
 
-    <div class="mt-3 space-y-1.5">
+    <div class="mt-3 space-y-1.5 flex-1">
         <p class="truncate text-sm font-semibold text-slate-800">
             {{ $request->hospital?->display_name ?: 'হাসপাতাল উল্লেখ নেই' }}
         </p>

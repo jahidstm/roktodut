@@ -137,7 +137,7 @@
                     </div>
 
                     <div class="lg:col-span-1">
-                        <button type="submit" class="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-3.5 rounded-xl font-black transition-all duration-200 shadow-[0_5px_15px_rgba(239,68,68,0.25)] hover:shadow-[0_8px_20px_rgba(239,68,68,0.35)] hover:-translate-y-0.5 h-[52px]">
+                        <button type="submit" class="w-full flex items-center justify-center gap-2.5 bg-red-600 hover:bg-red-700 text-white px-4 py-3.5 rounded-xl font-black text-sm sm:text-base shadow-[0_10px_25px_rgba(239,68,68,0.3)] hover:shadow-[0_15px_35px_rgba(239,68,68,0.4)] transition-all duration-300 hover:-translate-y-0.5 h-[52px]">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             সার্চ করুন
                         </button>
@@ -228,7 +228,7 @@
                 <h2 class="text-4xl font-black text-slate-900 tracking-tight scroll-reveal" data-scroll-reveal>জরুরি রক্তের অনুরোধ</h2>
                 <p class="text-slate-500 font-medium mt-2 max-w-lg scroll-reveal" data-scroll-reveal>এই মুহূর্তে যারা জরুরি ভিত্তিতে রক্তের প্রয়োজনে আছেন। আপনার একটু সাহায্য একটি জীবন বাঁচাতে পারে।</p>
             </div>
-            <a href="{{ route('public.requests.index') }}" class="shrink-0 inline-flex items-center gap-2 border border-slate-200 hover:border-red-200 hover:text-red-600 text-slate-600 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors scroll-reveal" data-scroll-reveal>
+            <a href="{{ route('public.requests.index') }}" class="shrink-0 inline-flex items-center gap-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 px-5 py-2.5 rounded-xl font-black text-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 scroll-reveal" data-scroll-reveal>
                 সব দেখুন <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </a>
         </div>
@@ -236,70 +236,8 @@
         @if($homeRequests->isNotEmpty())
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach($homeRequests as $req)
-                    @php
-                        $urgencyVal   = $req->urgency?->value ?? 'normal';
-                        $urgencyLabel = match($urgencyVal) { 'emergency' => 'অতি জরুরি', 'urgent' => 'জরুরি', default => 'সাধারণ' };
-                        $urgencyBg = match($urgencyVal) {
-                            'emergency' => 'bg-red-600 text-white',
-                            'urgent'    => 'bg-amber-500 text-white',
-                            default     => 'bg-slate-700 text-white',
-                        };
-                        $bgGroup  = $req->blood_group?->value ?? '?';
-                        $bagsNeeded = max((int) ($req->bags_needed ?? 1), 1);
-                        $acceptedCount = (int) ($req->accepted_responses_count ?? 0);
-                        $claimedCount = (int) ($req->claimed_verifications_count ?? 0);
-                        $verifiedCount = (int) ($req->verified_verifications_count ?? 0);
-                        $requestStatus = strtolower((string) ($req->status ?? 'pending'));
-
-                        [$statusLabel, $statusCls] = match (true) {
-                            $requestStatus === 'expired' => ['বাতিল', 'bg-red-50 text-red-700 border-red-200'],
-                            $verifiedCount > 0 || $requestStatus === 'fulfilled' => ['সফল (যাচাইকৃত)', 'bg-emerald-50 text-emerald-700 border-emerald-200'],
-                            $claimedCount > 0 => ['ক্লেইম রিভিউতে', 'bg-amber-50 text-amber-700 border-amber-200'],
-                            $acceptedCount > 0 => ['ডোনার পাওয়া গেছে', 'bg-indigo-50 text-indigo-700 border-indigo-200'],
-                            default => ['চলমান', 'bg-sky-50 text-sky-700 border-sky-200'],
-                        };
-                    @endphp
-                    <div class="group bg-white border border-slate-100 rounded-2xl overflow-hidden hover:shadow-[0_8px_30px_rgba(0,0,0,0.09)] hover:border-slate-200 transition-all duration-300 hover:-translate-y-0.5 flex flex-col scroll-reveal" data-scroll-reveal>
-
-                        <div class="relative h-28 bg-gradient-to-br from-slate-50 to-red-50/40 flex items-center justify-center overflow-hidden">
-                            <div class="text-[6.5rem] font-black text-red-100/80 select-none leading-none">{{ $bgGroup }}</div>
-                            <div class="absolute inset-0 flex items-center justify-between p-5">
-                                <span class="{{ $urgencyBg }} text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 shadow-sm">
-                                    @if($urgencyVal === 'emergency')<span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>@endif
-                                    {{ $urgencyLabel }}
-                                </span>
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-white/90 text-slate-600 text-xs font-bold px-2.5 py-1.5 rounded-lg border border-slate-100 shadow-sm">{{ \App\Support\BanglaDate::digits((string) $bagsNeeded) }} ব্যাগ</span>
-                                    <span class="bg-white text-red-600 font-black text-sm px-3 py-1.5 rounded-lg shadow-sm border border-red-100">{{ $bgGroup }}</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="p-6 flex-1 flex flex-col">
-                            <h3 class="text-lg font-black text-slate-900 mb-4 group-hover:text-red-600 transition-colors truncate">{{ $req->patient_name ?? 'রোগী' }}</h3>
-
-                            <div class="space-y-2.5 flex-1 mb-5">
-                                <div class="flex items-center gap-2.5 text-sm text-slate-500 font-medium">
-                                    <svg class="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/></svg>
-                                    <span class="truncate">{{ $req->hospital?->display_name ?? 'হাসপাতাল উল্লেখ নেই' }}</span>
-                                </div>
-                                <div class="flex items-center gap-2.5 text-sm text-slate-500 font-medium">
-                                    <svg class="w-4 h-4 text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg>
-                                    <span>{{ $req->district?->name ?? '' }}{{ $req->upazila?->name ? ', '.$req->upazila->name : '' }}</span>
-                                </div>
-                                <div class="flex items-center gap-2.5 text-sm font-bold text-slate-700">
-                                    <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                    {{ \App\Support\BanglaDate::absolute($req->needed_at) }}
-                                </div>
-                            </div>
-
-                            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
-                                <span class="inline-flex h-6 items-center rounded-lg border px-2.5 text-xs font-bold {{ $statusCls }}">{{ $statusLabel }}</span>
-                                <a href="{{ route('requests.show', $req) }}" class="text-sm font-black text-red-600 hover:text-white border border-red-200 hover:bg-red-600 hover:border-red-600 px-4 py-1.5 rounded-lg transition-all duration-200 flex items-center gap-1">
-                                    বিস্তারিত <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                                </a>
-                            </div>
-                        </div>
+                    <div class="scroll-reveal" data-scroll-reveal>
+                        <x-request-feed-card :request="$req" :show-requester="true" />
                     </div>
                 @endforeach
             </div>
@@ -430,7 +368,7 @@
         </div>
 
         <div class="mt-14 flex justify-center scroll-reveal" data-scroll-reveal>
-            <a href="{{ route('register') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-7 py-4 rounded-2xl font-black text-sm transition-all duration-200 hover:-translate-y-0.5 shadow-lg">
+            <a href="{{ route('register') }}" class="inline-flex items-center gap-2.5 bg-red-600 hover:bg-red-700 text-white px-7 py-3.5 rounded-2xl font-black text-sm sm:text-base shadow-[0_10px_25px_rgba(239,68,68,0.3)] hover:shadow-[0_15px_35px_rgba(239,68,68,0.4)] transition-all duration-300 hover:-translate-y-0.5">
                 আজই যুক্ত হোন
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
             </a>
@@ -455,7 +393,7 @@
         </p>
         
         <a href="{{ route('live-demand.index') }}"
-           class="inline-flex items-center justify-center gap-2 bg-white text-slate-800 px-8 py-3.5 rounded-full font-black text-sm sm:text-base shadow-lg hover:bg-slate-50 transition-all duration-300 hover:-translate-y-0.5 scroll-reveal" data-scroll-reveal>
+           class="inline-flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 text-slate-800 px-7 py-3.5 rounded-2xl font-black text-sm sm:text-base shadow-[0_10px_25px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.15)] transition-all duration-300 hover:-translate-y-0.5 scroll-reveal" data-scroll-reveal>
             লাইভ ম্যাপ দেখুন
             <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
@@ -532,7 +470,7 @@
             </div>
 
             <div class="mt-16 text-center scroll-reveal" data-scroll-reveal>
-                <a href="{{ route('leaderboard') }}" class="inline-flex items-center gap-2 border border-slate-200 hover:border-slate-300 text-slate-700 px-8 py-4 rounded-2xl font-black transition-all duration-200 hover:shadow-sm">
+                <a href="{{ route('leaderboard') }}" class="inline-flex items-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 px-7 py-3.5 rounded-2xl font-black text-sm sm:text-base shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
                     সম্পূর্ণ লিডারবোর্ড দেখুন
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                 </a>
@@ -552,7 +490,7 @@
                 <div class="inline-flex items-center gap-2 bg-sky-50 border border-sky-100 text-sky-600 text-xs font-bold px-4 py-1.5 rounded-full mb-5 scroll-reveal" data-scroll-reveal>সংবাদ ও নিবন্ধ</div>
                 <h2 class="text-4xl font-black text-slate-900 tracking-tight scroll-reveal" data-scroll-reveal>সর্বশেষ ব্লগ পোস্ট</h2>
             </div>
-            <a href="{{ route('blog.index') }}" class="shrink-0 inline-flex items-center gap-2 border border-slate-200 hover:border-slate-300 text-slate-600 px-5 py-2.5 rounded-xl font-bold text-sm transition-colors scroll-reveal" data-scroll-reveal>
+            <a href="{{ route('blog.index') }}" class="shrink-0 inline-flex items-center gap-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 px-5 py-2.5 rounded-xl font-black text-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 scroll-reveal" data-scroll-reveal>
                 সব পোস্ট <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </a>
         </div>
@@ -654,12 +592,12 @@
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 scroll-reveal" data-scroll-reveal>
             <a href="{{ route('requests.create') }}"
-               class="inline-flex items-center justify-center gap-2 bg-white text-slate-800 px-8 py-3.5 rounded-full font-black text-sm sm:text-base shadow-lg hover:bg-slate-50 transition-all duration-300 hover:-translate-y-0.5">
+               class="inline-flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 text-slate-800 px-7 py-3.5 rounded-2xl font-black text-sm sm:text-base shadow-[0_10px_25px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.15)] transition-all duration-300 hover:-translate-y-0.5">
                 রক্তের রিকোয়েস্ট করুন
                 <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
             </a>
             <a href="{{ route('search') }}"
-               class="inline-flex items-center justify-center gap-2 bg-transparent border border-white/40 hover:border-white text-white px-8 py-3.5 rounded-full font-bold text-sm sm:text-base transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10">
+               class="inline-flex items-center justify-center gap-2.5 bg-transparent border border-white/30 hover:border-white text-white px-7 py-3.5 rounded-2xl font-black text-sm sm:text-base shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/5">
                 ডোনার সার্চ করুন
             </a>
         </div>
