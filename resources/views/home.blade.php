@@ -7,7 +7,7 @@
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 1 — LIGHT HERO (Premium Aesthetic)
 ═══════════════════════════════════════════════════════════════ --}}
-<section class="relative bg-white flex flex-col items-center justify-center overflow-hidden pb-0 pt-4 sm:pt-8" aria-label="হিরো সেকশন">
+<section class="relative bg-white flex flex-col items-center justify-center overflow-hidden pb-0 pt-16 sm:pt-24" aria-label="হিরো সেকশন">
 
     {{-- Background glows --}}
     <div class="absolute top-[-100px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-red-100/60 rounded-full blur-[130px] pointer-events-none"></div>
@@ -17,7 +17,7 @@
     <div class="absolute inset-0 opacity-[0.4] pointer-events-none" style="background-image: linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 64px 64px;"></div>
 
     {{-- Hero content --}}
-    <div class="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center pt-8 pb-6">
+    <div class="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center pt-8 pb-10">
 
         {{-- Badge --}}
         <div class="inline-flex items-center gap-2.5 bg-white border border-red-100 text-red-600 shadow-sm text-xs font-bold px-4 py-2 rounded-full mb-6">
@@ -26,13 +26,13 @@
         </div>
 
         {{-- Headline --}}
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-[1.1] mb-4 tracking-tight">
-            জরুরি মুহূর্তে রক্তের<br>
-            সন্ধানে—<span class="text-red-600">আমরা আছি</span>
+        <h1 class="text-4xl sm:text-5xl lg:text-[54px] font-black text-slate-900 leading-[1.15] mb-5 tracking-tight">
+            জরুরি মুহূর্তে রক্তের সন্ধানে—<br>
+            <span class="text-red-600">আমরা আছি আপনার পাশে</span>
         </h1>
 
         {{-- Subtitle --}}
-        <p class="text-base sm:text-lg text-slate-500 mb-6 max-w-2xl mx-auto leading-relaxed font-medium">
+        <p class="text-base sm:text-lg text-slate-500 mb-8 max-w-2xl mx-auto leading-relaxed font-medium">
             NID-ভেরিফাইড ডোনার নেটওয়ার্ক — জরুরি মুহূর্তে সঠিক রক্ত, সঠিক সময়ে।
             ৬৪ জেলায় সক্রিয়, সম্পূর্ণ বিনামূল্যে।
         </p>
@@ -52,7 +52,7 @@
         </div>
 
         {{-- Trust pills --}}
-        <div class="flex flex-wrap justify-center gap-2.5 mb-2">
+        <div class="flex flex-wrap justify-center gap-2.5 mb-4">
             @foreach(['🔒 ফোন নম্বর সর্বদা গোপন', '💳 NID ভেরিফাইড ডোনার', '📍 ৬৪ জেলায় সক্রিয়', '✅ সম্পূর্ণ বিনামূল্যে'] as $pill)
             <span class="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 text-slate-600 text-[11px] sm:text-xs font-semibold px-3 py-1.5 rounded-full">{{ $pill }}</span>
             @endforeach
@@ -85,7 +85,7 @@
                 .catch(() => { this.loadingUpazilas = false; });
         }
     }">
-        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pb-8">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pb-16">
             <div class="bg-white border border-slate-100 rounded-[2rem] p-6 sm:p-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)]">
 
                 <div class="flex items-center gap-3 mb-6">
