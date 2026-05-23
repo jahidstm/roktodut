@@ -22,7 +22,7 @@
         <!-- Email Address -->
         <div>
             <label for="email" class="block text-sm font-medium text-slate-700 mb-1">ইমেইল ঠিকানা <span class="text-red-500">*</span></label>
-            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="আপনার নিবন্ধিত ইমেইল" autocomplete="email" class="input-modern" />
+            <input id="email" type="email" name="email" value="{{ old('email') }}" required autofocus placeholder="আপনার রেজিস্টার্ড ইমেইল" autocomplete="email" class="input-modern" />
             <x-input-error :messages="$errors->get('email')" class="mt-1 text-sm text-red-600" />
         </div>
 

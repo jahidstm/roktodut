@@ -166,7 +166,7 @@
                 <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">
                     <span class="counter" data-target="{{ $totalDonors }}">0</span><span class="text-[#e11d48]">+</span>
                 </div>
-                <div class="text-sm sm:text-[15px] font-bold text-slate-400">নিবন্ধিত ডোনার</div>
+                <div class="text-sm sm:text-[15px] font-bold text-slate-400">রেজিস্টার্ড ডোনার</div>
             </div>
             <div class="text-center px-8 py-6 sm:py-0 scroll-reveal" data-scroll-reveal>
                 <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">

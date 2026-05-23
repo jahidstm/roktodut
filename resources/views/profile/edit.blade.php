@@ -659,7 +659,7 @@
                 <h2 class="text-2xl font-bold text-red-600">ডেঞ্জার জোন: অ্যাকাউন্ট মুছুন</h2>
             </div>
             
-            <p class="text-sm font-semibold text-red-800/70 mb-8 max-w-2xl relative z-10">স্থায়ীভাবে আপনার অ্যাকাউন্ট মুছে ফেলতে চান? এটি করার পর আপনার সমস্ত ডেটা, রেকর্ড এবং ব্যাজ চিরতরে ডিলিট হয়ে যাবে এবং আর ফিরে পাওয়া সম্ভব নয়।</p>
+            <p class="text-sm font-semibold text-red-800/70 mb-8 max-w-2xl relative z-10">স্থায়ীভাবে আপনার অ্যাকাউন্ট ডিলিট করতে চান? এটি করার পর আপনার সমস্ত ডেটা, রেকর্ড এবং ব্যাজ চিরতরে ডিলিট হয়ে যাবে এবং আর ফিরে পাওয়া সম্ভব নয়।</p>
             
             <form method="post" action="{{ route('profile.destroy') }}" class="max-w-xl relative z-10">
                 @csrf
@@ -669,9 +669,9 @@
                     <input name="password" type="password" placeholder="••••••••" required class="w-full rounded-xl border border-red-200 bg-white focus:bg-white focus:border-red-500 focus:ring-4 focus:ring-red-500/20 px-4 py-3 text-slate-800 font-medium transition-all outline-none tracking-widest">
                     @error('password', 'userDeletion') <span class="text-red-500 text-xs font-bold mt-1 block">{{ $message }}</span> @enderror
                 </div>
-                <button type="submit" onclick="return confirm('আপনি কি নিশ্চিত যে আপনার অ্যাকাউন্ট মুছে ফেলতে চান? এটি আর ফিরিয়ে আনা সম্ভব নয়।')" class="bg-red-600 hover:bg-red-700 text-white font-bold text-base px-8 py-3.5 rounded-xl shadow-[0_8px_20px_-6px_rgba(220,38,38,0.5)] transition-all hover:-translate-y-1 active:scale-95 inline-flex items-center gap-2">
+                <button type="submit" onclick="return confirm('আপনি কি নিশ্চিত যে আপনার অ্যাকাউন্ট ডিলিট করতে চান? এটি আর ফিরিয়ে আনা সম্ভব নয়।')" class="bg-red-600 hover:bg-red-700 text-white font-bold text-base px-8 py-3.5 rounded-xl shadow-[0_8px_20px_-6px_rgba(220,38,38,0.5)] transition-all hover:-translate-y-1 active:scale-95 inline-flex items-center gap-2">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                    স্থায়ীভাবে অ্যাকাউন্ট মুছে ফেলুন
+                    স্থায়ীভাবে ডিলিট করুন
                 </button>
             </form>
         </div>

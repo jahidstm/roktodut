@@ -214,7 +214,7 @@
                  style="display: none;">
                 <div class="p-6 border-t border-slate-100 bg-slate-50/50">
                     <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">
-                        আমাদের প্ল্যাটফর্ম ব্যবহারকারীদের ফিডব্যাক এবং সমস্যাগুলি নিরীক্ষণ করুন। দ্রুত উত্তর প্রদানের মাধ্যমে ইউজারদের সুন্দর একটি অভিজ্ঞতা উপহার দিন।
+                        আমাদের প্ল্যাটফর্ম ইউজারদের ফিডব্যাক এবং সমস্যাগুলি নিরীক্ষণ করুন। দ্রুত উত্তর প্রদানের মাধ্যমে ইউজারদের সুন্দর একটি অভিজ্ঞতা উপহার দিন।
                     </p>
                     <a href="{{ route('admin.support.messages.index') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
                         ইনবক্স খুলুন

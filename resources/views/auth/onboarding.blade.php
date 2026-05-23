@@ -2,7 +2,7 @@
     @section('title', 'অ্যাকাউন্ট সেটআপ')
     
     <div class="mb-8 text-center sm:px-6">
-        <h2 class="text-3xl font-extrabold text-slate-800 mb-2">স্বাগতম, {{ auth()->user() ? auth()->user()->name : 'ব্যবহারকারী' }}!</h2>
+        <h2 class="text-3xl font-extrabold text-slate-800 mb-2">স্বাগতম, {{ auth()->user() ? auth()->user()->name : 'ইউজার' }}!</h2>
         <p class="text-slate-500 font-medium leading-relaxed">আপনার প্রোফাইলটি সম্পূর্ণ করতে নিচের তথ্যগুলো প্রদান করুন।</p>
     </div>
 

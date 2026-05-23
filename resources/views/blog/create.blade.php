@@ -508,7 +508,7 @@
                           bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-base
                           focus:outline-none focus:ring-2 focus:ring-slate-300 focus:ring-offset-2
                           transition-all duration-200">
-                    বাতিল করুন
+                    ক্যানসেল
                 </a>
             </div>
         </div>{{-- /section-4 --}}
@@ -676,7 +676,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 </div>
                 <input type="url" name="sources[${sourceIndex}][url]" value="${url}" placeholder="লিংক (URL) - ঐচ্ছিক" class="w-full pl-9 pr-4 py-2.5 text-sm font-medium rounded-lg border border-slate-200 focus:ring-2 focus:ring-sky-400 focus:outline-none placeholder:text-slate-400 transition-colors">
             </div>
-            <button type="button" class="remove-source-btn text-slate-300 hover:text-rose-500 p-2.5 sm:mt-0 transition-colors" title="মুছে ফেলুন">
+            <button type="button" class="remove-source-btn text-slate-300 hover:text-rose-500 p-2.5 sm:mt-0 transition-colors" title="ডিলিট করুন">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
         `;

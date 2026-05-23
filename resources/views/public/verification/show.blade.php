@@ -378,7 +378,7 @@
                 @endforeach
 
                 @if($badges->isEmpty())
-                    <span class="chip" role="listitem">🩸 নিবন্ধিত ডোনার</span>
+                    <span class="chip" role="listitem">🩸 রেজিস্টার্ড ডোনার</span>
                 @endif
             </div>
         </div>

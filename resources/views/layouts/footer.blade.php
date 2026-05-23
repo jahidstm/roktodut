@@ -113,7 +113,7 @@
                     </li>
                     <li>
                         <a href="{{ route('contact.create') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
-                            যোগাযোগ করুন
+                            কন্টাক্ট করুন
                         </a>
                     </li>
                     <li>

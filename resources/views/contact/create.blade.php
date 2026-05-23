@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'যোগাযোগ করুন — রক্তদূত')
+@section('title', 'কন্টাক্ট করুন — রক্তদূত')
 
 @section('content')
 
@@ -16,7 +16,7 @@
             <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-xl">✉️</div>
             <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">সাপোর্ট সেন্টার</span>
         </div>
-        <h1 class="text-2xl sm:text-3xl font-black text-white leading-tight">যোগাযোগ করুন</h1>
+        <h1 class="text-2xl sm:text-3xl font-black text-white leading-tight">কন্টাক্ট করুন</h1>
         <p class="mt-2 text-slate-400 text-sm font-medium max-w-xl leading-relaxed">
             প্রশ্ন, পরামর্শ বা প্রযুক্তিগত সমস্যা — আমাদের দল সবসময় আপনার পাশে আছে।
         </p>
@@ -133,7 +133,7 @@
                 {{-- Card header --}}
                 <div class="bg-gradient-to-r from-red-600 to-rose-600 px-6 py-5">
                     <p class="text-white font-black text-base flex items-center gap-2">
-                        📬 বার্তা পাঠান
+                        📬 ম্যাসেজ পাঠান
                     </p>
                     <p class="text-red-100 text-xs mt-0.5 font-medium">
                         তারকা (<span class="font-black">*</span>) চিহ্নিত ঘরগুলো পূরণ বাধ্যতামূলক।
@@ -268,12 +268,12 @@
                         {{-- ── Message textarea ── --}}
                         <div>
                             <label for="c-message" class="cf-label">
-                                বার্তা <span class="text-red-500">*</span>
+                                ম্যাসেজ <span class="text-red-500">*</span>
                             </label>
                             <textarea id="c-message" name="message"
                                       rows="5"
                                       maxlength="2000"
-                                      placeholder="আপনার সমস্যা বা বার্তা বিস্তারিত লিখুন... (কমপক্ষে ২০ অক্ষর)"
+                                      placeholder="আপনার সমস্যা বা ম্যাসেজ বিস্তারিত লিখুন... (কমপক্ষে ২০ অক্ষর)"
                                       @input="charCount = $event.target.value.length"
                                       class="cf-input resize-none @error('message') cf-error @enderror">{{ old('message') }}</textarea>
                             <div class="flex items-center justify-between mt-1.5">
@@ -303,11 +303,11 @@
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
                             </svg>
-                            <span x-text="loading ? 'পাঠানো হচ্ছে...' : '📬 বার্তা পাঠান'">📬 বার্তা পাঠান</span>
+                            <span x-text="loading ? 'পাঠানো হচ্ছে...' : '📬 ম্যাসেজ পাঠান'">📬 ম্যাসেজ পাঠান</span>
                         </button>
 
                         <p class="text-center text-xs text-slate-400 font-medium leading-relaxed">
-                            বার্তা পাঠিয়ে আপনি আমাদের
+                            ম্যাসেজ পাঠিয়ে আপনি আমাদের
                             <a href="{{ route('privacy') }}" class="underline hover:text-red-600 transition-colors">প্রাইভেসি পলিসি</a>-তে সম্মত হচ্ছেন।
                         </p>
                     </form>
