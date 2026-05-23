@@ -7,20 +7,18 @@
 {{-- ══════════════════════════════════════════════════════════
      HERO
 ══════════════════════════════════════════════════════════ --}}
-<section class="relative overflow-hidden bg-gradient-to-br from-red-700 via-rose-600 to-red-800">
-    {{-- decorative blobs --}}
-    <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
-    <div class="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4 pointer-events-none"></div>
-
-    <div class="relative mx-auto max-w-4xl px-4 py-16 sm:py-20 text-center">
-        <span class="inline-flex items-center gap-2 bg-white/15 backdrop-blur border border-white/20 text-white text-xs font-bold px-4 py-1.5 rounded-full mb-5">
-            🩸 রক্তদূত প্ল্যাটফর্ম
-        </span>
-        <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight">
-            আমরা রক্ত এবং মানুষের<br class="hidden sm:block"> মধ্যে সেতু তৈরি করি
-        </h1>
-        <p class="mt-4 text-red-100 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed font-medium">
-            রক্তদূত বাংলাদেশের একটি স্বেচ্ছাসেবী ভিত্তিক রক্তদান সমন্বয় প্ল্যাটফর্ম — যেখানে ডোনারের পরিচয় ম্যানুয়ালি যাচাইযোগ্য, রক্তের অনুরোধ দ্রুত ও নিরাপদ।
+<section class="bg-gradient-to-br from-slate-800 to-slate-900">
+    <div class="mx-auto max-w-5xl px-4 py-12 sm:py-14">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-xl">🩸</div>
+            <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">রক্তদূত প্ল্যাটফর্ম</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-black text-white leading-tight">আমাদের সম্পর্কে</h1>
+        <p class="mt-2 text-slate-400 text-sm font-medium max-w-2xl">
+            আমরা রক্ত ও মানুষের মধ্যে একটি নিরাপদ, দ্রুত এবং বিশ্বস্ত সেতু তৈরি করি — যাতে জরুরি মুহূর্তে সঠিক ডোনার ঠিক সময়ে পাওয়া যায়।
+        </p>
+        <p class="mt-1 text-slate-500 text-xs font-medium max-w-2xl">
+            রক্তদূত বাংলাদেশের একটি স্বেচ্ছাসেবী রক্তদান সমন্বয় প্ল্যাটফর্ম।
         </p>
     </div>
 </section>
@@ -29,7 +27,7 @@
      MEDICAL DISCLAIMER NOTICE
 ══════════════════════════════════════════════════════════ --}}
 <div class="bg-amber-50 border-b border-amber-200">
-    <div class="mx-auto max-w-4xl px-4 py-3 flex items-start gap-3">
+    <div class="mx-auto max-w-5xl px-4 py-3 flex items-start gap-3">
         <span class="text-amber-500 text-base shrink-0 mt-0.5">⚠️</span>
         <p class="text-xs text-amber-800 font-semibold leading-relaxed">
             <strong>গুরুত্বপূর্ণ ডিসক্লেইমার:</strong> রক্তদূত একটি স্বেচ্ছাসেবী সংযোগ প্ল্যাটফর্ম। এটি কোনো চিকিৎসা পরামর্শ, রোগ নির্ণয় বা চিকিৎসা সেবা প্রদান করে না। রক্তগ্রহণের আগে অবশ্যই রেজিস্টার্ড চিকিৎসক বা হাসপাতালের পরামর্শ নিন এবং প্রয়োজনীয় ক্রস-ম্যাচিং ও স্ক্রিনিং নিশ্চিত করুন।
@@ -41,7 +39,7 @@
      STATS STRIP
 ══════════════════════════════════════════════════════════ --}}
 <section class="bg-white border-b border-slate-100">
-    <div class="mx-auto max-w-4xl px-4 py-8 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
+    <div class="mx-auto max-w-5xl px-4 py-8 grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
         @php
         $stats = [
             ['value' => '৫,০০০+', 'label' => 'নিবন্ধিত ডোনার',       'icon' => '🛡️'],
@@ -63,7 +61,7 @@
 {{-- ══════════════════════════════════════════════════════════
      MISSION & STORY
 ══════════════════════════════════════════════════════════ --}}
-<section class="mx-auto max-w-4xl px-4 py-14">
+<section class="mx-auto max-w-5xl px-4 py-14">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
 
         {{-- Text --}}
@@ -108,7 +106,7 @@
      HOW ROKTODUT IS DIFFERENT
 ══════════════════════════════════════════════════════════ --}}
 <section class="bg-slate-50 border-y border-slate-100">
-    <div class="mx-auto max-w-4xl px-4 py-14">
+    <div class="mx-auto max-w-5xl px-4 py-14">
         <div class="text-center mb-10">
             <span class="inline-block text-xs font-black text-red-600 uppercase tracking-widest mb-2">আমাদের বৈশিষ্ট্য</span>
             <h2 class="text-2xl sm:text-3xl font-black text-slate-900">রক্তদূত কেন আলাদা</h2>
@@ -161,7 +159,7 @@
 {{-- ══════════════════════════════════════════════════════════
      HOW IT WORKS
 ══════════════════════════════════════════════════════════ --}}
-<section class="mx-auto max-w-4xl px-4 py-14">
+<section class="mx-auto max-w-5xl px-4 py-14">
     <div class="text-center mb-10">
         <span class="inline-block text-xs font-black text-red-600 uppercase tracking-widest mb-2">কার্যক্রম</span>
         <h2 class="text-2xl sm:text-3xl font-black text-slate-900">আমরা যেভাবে কাজ করি</h2>
@@ -194,7 +192,7 @@
      VALUES
 ══════════════════════════════════════════════════════════ --}}
 <section class="bg-slate-50 border-t border-slate-100">
-    <div class="mx-auto max-w-4xl px-4 py-14">
+    <div class="mx-auto max-w-5xl px-4 py-14">
         <div class="text-center mb-10">
             <span class="inline-block text-xs font-black text-red-600 uppercase tracking-widest mb-2">আমাদের মূল্যবোধ</span>
             <h2 class="text-2xl sm:text-3xl font-black text-slate-900">আমরা যা বিশ্বাস করি</h2>
@@ -221,7 +219,7 @@
 {{-- ══════════════════════════════════════════════════════════
      TEAM
 ══════════════════════════════════════════════════════════ --}}
-<section class="mx-auto max-w-4xl px-4 py-14">
+<section class="mx-auto max-w-5xl px-4 py-14">
     <div class="text-center mb-10">
         <span class="inline-block text-xs font-black text-red-600 uppercase tracking-widest mb-2">আমাদের দল</span>
         <h2 class="text-2xl sm:text-3xl font-black text-slate-900">যারা তৈরি করেছেন রক্তদূত</h2>
@@ -255,7 +253,7 @@
      MEDICAL DISCLAIMER (FULL)
 ══════════════════════════════════════════════════════════ --}}
 <section class="bg-amber-50 border-y border-amber-200">
-    <div class="mx-auto max-w-4xl px-4 py-8">
+    <div class="mx-auto max-w-5xl px-4 py-8">
         <div class="flex gap-4 items-start">
             <div class="shrink-0 w-10 h-10 rounded-xl bg-amber-100 border border-amber-200 flex items-center justify-center text-xl">⚕️</div>
             <div>
@@ -274,7 +272,7 @@
      CTA
 ══════════════════════════════════════════════════════════ --}}
 <section class="bg-gradient-to-r from-slate-900 to-slate-800">
-    <div class="mx-auto max-w-4xl px-4 py-12 text-center">
+    <div class="mx-auto max-w-5xl px-4 py-12 text-center">
         <h2 class="text-xl sm:text-2xl font-black text-white mb-2">আপনিও হন রক্তদূতের অংশ</h2>
         <p class="text-slate-400 text-sm mb-6 font-medium">আজই রেজিস্ট্রেশন করুন এবং একটি জীবন বাঁচানোর সুযোগ নিন।</p>
         <div class="flex flex-col sm:flex-row gap-3 justify-center">
