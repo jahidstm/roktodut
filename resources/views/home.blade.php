@@ -13,7 +13,7 @@
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 1 — LIGHT HERO (Premium Aesthetic)
 ═══════════════════════════════════════════════════════════════ --}}
-<section class="relative bg-white flex flex-col items-center justify-center overflow-hidden pb-0 pt-16 sm:pt-24" aria-label="হিরো সেকশন">
+<section class="relative bg-white flex flex-col items-center justify-center overflow-hidden pb-0 pt-8 sm:pt-24" aria-label="হিরো সেকশন">
 
     {{-- Background glows --}}
     <div class="absolute top-[-100px] left-1/2 -translate-x-1/2 w-[700px] h-[500px] bg-red-100/60 rounded-full blur-[130px] pointer-events-none"></div>
@@ -23,7 +23,7 @@
     <div class="absolute inset-0 opacity-[0.4] pointer-events-none" style="background-image: linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px); background-size: 64px 64px;"></div>
 
     {{-- Hero content --}}
-    <div class="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center pt-8 pb-10">
+    <div class="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center pt-4 sm:pt-8 pb-10">
 
         {{-- Badge --}}
         <div class="inline-flex items-center gap-2.5 bg-white border border-red-100 text-red-600 shadow-sm text-xs font-bold px-4 py-2 rounded-full mb-6 scroll-reveal" data-scroll-reveal>
