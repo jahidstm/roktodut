@@ -264,11 +264,11 @@
 
             <x-captcha-field :captcha-question="$captchaQuestion" />
 
-            <div class="flex items-center gap-4 pt-4 border-t border-slate-100">
+            <div class="flex items-center gap-2 sm:gap-4 pt-6 border-t border-slate-100">
                 {{-- 🎯 ডাইনামিক সাবমিট বাটন --}}
                 <button type="submit" 
                         :disabled="isSubmitting"
-                        class="bg-red-600 hover:bg-red-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white px-8 py-3.5 rounded-xl text-sm font-black transition-all shadow-sm shadow-red-200 flex items-center justify-center min-w-[200px]">
+                        class="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white px-3 sm:px-8 py-3.5 rounded-xl text-[13px] sm:text-sm font-black transition-all shadow-sm shadow-red-200 flex items-center justify-center whitespace-nowrap">
                     
                     <span x-show="!isSubmitting" class="flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
@@ -284,7 +284,7 @@
                     </span>
                 </button>
                 
-                <a href="{{ route('requests.index') }}" class="px-6 py-3.5 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition">
+                <a href="{{ route('requests.index') }}" class="px-4 sm:px-6 py-3.5 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition whitespace-nowrap text-[13px] sm:text-sm">
                     বাতিল
                 </a>
             </div>

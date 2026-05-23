@@ -722,133 +722,130 @@
             </div>
         </div>
 
-        <div class="flex flex-col">
-            @forelse($recentRequests as $req)
-                @php
-                    $isOwner = ((int) ($req->requested_by ?? 0) === (int) auth()->id());
-                    $currentStatus = strtolower((string) $req->status);
-                    $isExpiredStatus = $currentStatus === 'expired';
-                    $isPendingLikeStatus = in_array($currentStatus, ['pending', 'in_progress'], true);
-                    $isPastNeededAt = $req->needed_at && \Carbon\Carbon::parse($req->needed_at)->isPast();
-                    $canRenew = $isOwner && ($isExpiredStatus || ($isPastNeededAt && $isPendingLikeStatus));
-                @endphp
-                <div class="group flex flex-col lg:flex-row lg:items-center justify-between gap-4 p-5 lg:p-6 bg-white border-b border-slate-100 hover:bg-slate-50 transition-colors {{ $loop->last ? 'border-b-0' : '' }}">
-                    
-                    {{-- 1. Patient & Info --}}
-                    <div class="flex items-start lg:items-center gap-4 flex-1">
-                        <div class="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center font-black text-lg border border-red-100 shrink-0">
-                            {{ $req->blood_group?->value ?? (string) $req->blood_group }}
-                        </div>
-                        <div>
-                            <div class="font-black text-slate-900 text-base leading-tight">{{ $req->patient_name ?? 'রোগী' }}</div>
-                            <div class="text-xs font-bold text-slate-500 mt-1 flex items-center gap-1.5 flex-wrap">
-                                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg> {{ $req->needed_at?->format('d M, Y') ?? 'যত দ্রুত সম্ভব' }}</span>
-                                <span class="text-slate-300">•</span> 
-                                <span class="flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> {{ $req->needed_at?->format('h:i A') ?? '' }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- 2. Status & Responses --}}
-                    <div class="flex items-center justify-between lg:justify-end gap-6 bg-slate-50/70 lg:bg-transparent p-3 lg:p-0 rounded-xl lg:rounded-none">
-                        <div>
-                            @if(strtolower($req->status) === 'fulfilled')
-                                <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-black bg-emerald-100 text-emerald-800 uppercase tracking-wider">
-                                    সম্পন্ন
-                                </span>
-                            @else
-                                <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-black bg-amber-100 text-amber-800 uppercase tracking-wider">
-                                    {{ $req->status }}
-                                </span>
-                            @endif
-                        </div>
-                        
-                        <div class="text-right">
-                            <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">সাড়া (গৃহীত)</div>
-                            <div class="flex items-center justify-end gap-1 font-bold text-sm">
-                                <span class="text-emerald-600">{{ $req->accepted_responses ?? 0 }}</span>
-                                <span class="text-slate-300">/</span>
-                                <span class="text-slate-600">{{ $req->total_responses ?? 0 }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- 3. Actions --}}
-                    <div x-data="{ renewOpen: false }" class="flex items-center justify-end gap-2 mt-2 lg:mt-0 pt-4 lg:pt-0 border-t border-slate-100 lg:border-none shrink-0 w-full lg:w-auto">
-                        @if($canRenew)
-                            <button type="button"
-                                    @click="renewOpen = true"
-                                    class="flex-1 lg:flex-none inline-flex items-center justify-center px-4 py-2.5 rounded-xl text-xs font-black bg-red-600 text-white hover:bg-red-700 transition whitespace-nowrap shadow-sm shadow-red-200">
-                                রিনিউ করুন
-                            </button>
-                        @endif
-
-                        <a href="{{ route('requests.show', $req->id) }}" class="flex-1 lg:flex-none inline-flex items-center justify-center px-4 py-2.5 border-2 border-slate-200 rounded-xl text-xs font-black text-slate-700 hover:bg-slate-100 hover:border-slate-300 hover:text-red-600 transition whitespace-nowrap">
-                            ডিটেইলস
-                        </a>
-
-                        @if($canRenew)
-                            <div x-show="renewOpen"
-                                 style="display:none;"
-                                 class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/55 backdrop-blur-sm p-4"
-                                 x-transition.opacity>
-                                <div @click.away="renewOpen = false" class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 text-left">
-                                    <div class="mb-4">
-                                        <h3 class="text-lg font-black text-slate-900">রিকোয়েস্ট রিনিউ করুন</h3>
-                                        <p class="mt-1 text-xs font-semibold text-slate-500">নতুন সময় ও জরুরিতা সেট করলে রিকোয়েস্ট আবার ফিডে যাবে।</p>
-                                    </div>
-
-                                    <form method="POST" action="{{ route('requests.renew', $req->id) }}" class="space-y-4" data-renew-modal>
-                                        @csrf
-
-                                        <div>
-                                            <label class="block text-xs font-bold text-slate-600 mb-1.5">কবে রক্ত লাগবে</label>
-                                            <input type="datetime-local"
-                                                   name="needed_at"
-                                                   value="{{ old('needed_at') }}"
-                                                   class="renew-needed-at w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
-                                            @error('needed_at')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-xs font-bold text-slate-600 mb-1.5">জরুরিতা</label>
-                                            <select name="urgency" class="renew-urgency w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
-                                                @foreach (\App\Enums\UrgencyLevel::cases() as $case)
-                                                    <option value="{{ $case->value }}" @selected(old('urgency', $req->urgency?->value ?? (string) $req->urgency) === $case->value)>
-                                                        {{ $case->label() }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            @error('urgency')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
-                                            <p class="renew-threshold-note mt-1 text-xs font-semibold text-amber-700 hidden"></p>
-                                        </div>
-
-                                        <div class="pt-2 flex items-center justify-end gap-2">
-                                            <button type="button"
-                                                    @click="renewOpen = false"
-                                                    class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50">
-                                                বাতিল
-                                            </button>
-                                            <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-xs font-black text-white hover:bg-red-700">
-                                                রিনিউ সাবমিট
-                                            </button>
-                                        </div>
-                                    </form>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold">
+                        <th class="px-6 py-4 border-b border-slate-100">{{ ($isDonor ?? false) ? 'রিকোয়েস্ট ও গ্রুপ' : 'রোগীর নাম ও গ্রুপ' }}</th>
+                        <th class="px-6 py-4 border-b border-slate-100">দরকার</th>
+                        <th class="px-6 py-4 border-b border-slate-100">সাড়া (গৃহীত)</th>
+                        <th class="px-6 py-4 border-b border-slate-100">স্ট্যাটাস</th>
+                        <th class="px-6 py-4 border-b border-slate-100 text-right">অ্যাকশন</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-sm">
+                    @forelse($recentRequests as $req)
+                        @php
+                            $isOwner = ((int) ($req->requested_by ?? 0) === (int) auth()->id());
+                            $currentStatus = strtolower((string) $req->status);
+                            $isExpiredStatus = $currentStatus === 'expired';
+                            $isPendingLikeStatus = in_array($currentStatus, ['pending', 'in_progress'], true);
+                            $isPastNeededAt = $req->needed_at && \Carbon\Carbon::parse($req->needed_at)->isPast();
+                            $canRenew = $isOwner && ($isExpiredStatus || ($isPastNeededAt && $isPendingLikeStatus));
+                        @endphp
+                        <tr class="hover:bg-slate-50 transition">
+                            <td class="px-6 py-4">
+                                <div class="font-extrabold text-slate-900">{{ $req->patient_name ?? 'রোগী' }}</div>
+                                <div class="text-xs font-bold text-red-600 mt-0.5">{{ $req->blood_group?->value ?? (string) $req->blood_group }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="font-semibold text-slate-700">{{ $req->needed_at?->format('d M, Y') ?? 'যত দ্রুত সম্ভব' }}</div>
+                                <div class="text-xs text-slate-500 font-medium">{{ $req->needed_at?->format('h:i A') ?? '' }}</div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-extrabold text-emerald-600">{{ $req->accepted_responses ?? 0 }}</span>
+                                    <span class="text-slate-400 font-bold">/</span>
+                                    <span class="font-semibold text-slate-500">{{ $req->total_responses ?? 0 }}</span>
                                 </div>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            @empty
-                <div class="p-10 text-center flex flex-col items-center justify-center gap-3">
-                    <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
-                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    </div>
-                    <p class="text-slate-500 font-bold text-sm">
-                        {{ ($isDonor ?? false) ? 'আপনি এখনো কোনো রিকোয়েস্টে গৃহীত সাড়া দেননি।' : 'আপনি এখনো কোনো রক্তের রিকোয়েস্ট করেননি।' }}
-                    </p>
-                </div>
-            @endforelse
+                            </td>
+                            <td class="px-6 py-4">
+                                @if(strtolower($req->status) === 'fulfilled')
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 uppercase">
+                                        সম্পন্ন
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800 uppercase">
+                                        {{ $req->status }}
+                                    </span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div x-data="{ renewOpen: false }" class="inline-flex items-center gap-2">
+                                    @if($canRenew)
+                                        <button type="button"
+                                                @click="renewOpen = true"
+                                                class="whitespace-nowrap inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-xs font-extrabold bg-red-600 text-white hover:bg-red-700 transition">
+                                            রিনিউ করুন
+                                        </button>
+                                    @endif
+
+                                    <a href="{{ route('requests.show', $req->id) }}" class="whitespace-nowrap inline-flex items-center justify-center px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-extrabold text-slate-700 hover:bg-slate-100 hover:text-red-600 transition">
+                                        ডিটেইলস
+                                    </a>
+
+                                    @if($canRenew)
+                                        <div x-show="renewOpen"
+                                             style="display:none;"
+                                             class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/55 backdrop-blur-sm p-4"
+                                             x-transition.opacity>
+                                            <div @click.away="renewOpen = false" class="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 text-left">
+                                                <div class="mb-4">
+                                                    <h3 class="text-lg font-black text-slate-900">রিকোয়েস্ট রিনিউ করুন</h3>
+                                                    <p class="mt-1 text-xs font-semibold text-slate-500">নতুন সময় ও জরুরিতা সেট করলে রিকোয়েস্ট আবার ফিডে যাবে।</p>
+                                                </div>
+
+                                                <form method="POST" action="{{ route('requests.renew', $req->id) }}" class="space-y-4" data-renew-modal>
+                                                    @csrf
+
+                                                    <div>
+                                                        <label class="block text-xs font-bold text-slate-600 mb-1.5">কবে রক্ত লাগবে</label>
+                                                        <input type="datetime-local"
+                                                               name="needed_at"
+                                                               value="{{ old('needed_at') }}"
+                                                               class="renew-needed-at w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
+                                                        @error('needed_at')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+                                                    </div>
+
+                                                    <div>
+                                                        <label class="block text-xs font-bold text-slate-600 mb-1.5">জরুরিতা</label>
+                                                        <select name="urgency" class="renew-urgency w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
+                                                            @foreach (\App\Enums\UrgencyLevel::cases() as $case)
+                                                                <option value="{{ $case->value }}" @selected(old('urgency', $req->urgency?->value ?? (string) $req->urgency) === $case->value)>
+                                                                    {{ $case->label() }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                        @error('urgency')<p class="mt-1 text-xs font-semibold text-red-600">{{ $message }}</p>@enderror
+                                                        <p class="renew-threshold-note mt-1 text-xs font-semibold text-amber-700 hidden"></p>
+                                                    </div>
+
+                                                    <div class="pt-2 flex items-center justify-end gap-2">
+                                                        <button type="button"
+                                                                @click="renewOpen = false"
+                                                                class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-xs font-bold text-slate-700 hover:bg-slate-50">
+                                                            বাতিল
+                                                        </button>
+                                                        <button type="submit" class="rounded-lg bg-red-600 px-4 py-2 text-xs font-black text-white hover:bg-red-700">
+                                                            রিনিউ সাবমিট
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-6 py-10 text-center text-slate-500 font-medium">
+                                {{ ($isDonor ?? false) ? 'আপনি এখনো কোনো রিকোয়েস্টে গৃহীত সাড়া দেননি।' : 'আপনি এখনো কোনো রক্তের রিকোয়েস্ট করেননি।' }}
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
     @endif
