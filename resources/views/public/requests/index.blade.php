@@ -46,10 +46,10 @@
 
             <p class="text-sm font-bold text-slate-500 mb-5 uppercase tracking-wider">ফিল্টার করুন</p>
 
-            <div class="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+            <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 items-end">
 
                 {{-- Live Search --}}
-                <div>
+                <div class="col-span-2 lg:col-span-1">
                     <label class="block text-xs font-bold text-slate-600 mb-1.5">রোগী / হাসপাতাল</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-3 flex items-center pointer-events-none">
@@ -90,7 +90,7 @@
                 </div>
 
                 {{-- Component --}}
-                <div>
+                <div class="col-span-2 lg:col-span-1">
                     <label class="block text-xs font-bold text-slate-600 mb-1.5">রক্তের ধরন</label>
                     <select x-model="component_type" @change="fetchResults()"
                             class="w-full rounded-xl border border-slate-300 focus:border-red-500 focus:ring-1 focus:ring-red-500 text-sm font-medium text-slate-700 py-2.5 px-3 transition-all bg-white">
@@ -103,7 +103,7 @@
                 </div>
 
                 {{-- Search Button --}}
-                <div class="space-y-2">
+                <div class="col-span-2 lg:col-span-1 space-y-2 flex flex-col sm:flex-row gap-2 sm:space-y-0 lg:flex-col lg:space-y-2">
                     <button @click="dengue_mode = !dengue_mode; if (dengue_mode) component_type='{{ \App\Enums\BloodComponentType::PLATELETS->value }}'; fetchResults();"
                             type="button"
                             :class="dengue_mode ? 'bg-fuchsia-600 hover:bg-fuchsia-700 text-white' : 'bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200'"

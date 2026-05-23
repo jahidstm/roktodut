@@ -6,13 +6,13 @@
 {{-- 🎯 THE FIX: এই মেইন কন্টেইনার ডিভটি পুরো কন্টেন্টকে র‍্যাপ করে মাঝখানে রাখবে --}}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <div class="flex items-start justify-between gap-4 mb-8 scroll-reveal" data-scroll-reveal>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 scroll-reveal" data-scroll-reveal>
         <div>
             <h1 class="text-2xl font-extrabold tracking-tight">রক্তের রিকোয়েস্ট ফিড</h1>
             <p class="text-slate-500 font-medium mt-1">সাম্প্রতিক পেন্ডিং রিকোয়েস্টগুলো</p>
         </div>
 
-        <div class="flex gap-3">
+        <div class="flex flex-wrap gap-3 w-full md:w-auto">
             <a href="{{ route('live-demand.index') }}"
                class="shrink-0 inline-flex items-center justify-center bg-white border border-slate-200 hover:border-red-300 hover:bg-red-50 text-slate-700 hover:text-red-700 px-4 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
                 🗺️ ম্যাপে দেখুন

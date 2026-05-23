@@ -6,7 +6,7 @@
      ═══════════════════════════════════════════════════════════════════════ --}}
 
 {{-- ── 1. Search Widget ─────────────────────────────────────────────────── --}}
-<div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5" id="sidebar-search">
+<div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hidden lg:block" id="sidebar-search">
     <h3 class="text-sm font-extrabold text-slate-800 mb-4 flex items-center gap-2">
         <span class="w-6 h-6 bg-red-50 border border-red-100 rounded-lg flex items-center justify-center text-red-500 text-xs">🔍</span>
         ব্লগ খুঁজুন
@@ -41,7 +41,7 @@
 </div>
 
 {{-- ── 2. Category Filter ───────────────────────────────────────────────── --}}
-<div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5" id="sidebar-categories">
+<div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hidden lg:block" id="sidebar-categories">
     <h3 class="text-sm font-extrabold text-slate-800 mb-4 flex items-center gap-2">
         <span class="w-6 h-6 bg-red-50 border border-red-100 rounded-lg flex items-center justify-center text-red-500 text-xs">📂</span>
         বিভাগ
@@ -206,7 +206,7 @@
 </div>
 
 {{-- ── 5. Quick Info Widget ─────────────────────────────────────────────── --}}
-<div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5" id="sidebar-quick-facts">
+<div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-5 hidden lg:block" id="sidebar-quick-facts">
     <h3 class="text-sm font-extrabold text-slate-800 mb-4 flex items-center gap-2">
         <span class="w-6 h-6 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-center text-blue-500 text-xs">💡</span>
         দ্রুত তথ্য

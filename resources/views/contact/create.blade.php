@@ -32,7 +32,7 @@
         {{-- ════════════════════════════════════════════════
              LEFT — Support Info
         ════════════════════════════════════════════════ --}}
-        <div class="space-y-7">
+        <div class="space-y-7 order-2 lg:order-1">
 
             {{-- What to write --}}
             <div class="scroll-reveal" data-scroll-reveal>
@@ -96,8 +96,8 @@
                 </div>
             </div>
 
-            {{-- Emergency notice --}}
-            <div class="rounded-2xl border border-red-200 bg-red-50 p-5 scroll-reveal" data-scroll-reveal>
+            {{-- Emergency notice (Desktop Only) --}}
+            <div class="rounded-2xl border border-red-200 bg-red-50 p-5 hidden lg:block scroll-reveal" data-scroll-reveal>
                 <p class="text-sm font-black text-red-800 mb-2 flex items-center gap-2">
                     <span>🚨</span> জরুরি অবস্থায় কী করবেন?
                 </p>
@@ -117,7 +117,24 @@
         {{-- ════════════════════════════════════════════════
              RIGHT — Form Card
         ════════════════════════════════════════════════ --}}
-        <div>
+        <div class="order-1 lg:order-2 flex flex-col gap-6 lg:block lg:space-y-0">
+            
+            {{-- Emergency notice (Mobile Only) --}}
+            <div class="rounded-2xl border border-red-200 bg-red-50 p-5 lg:hidden scroll-reveal" data-scroll-reveal>
+                <p class="text-sm font-black text-red-800 mb-2 flex items-center gap-2">
+                    <span>🚨</span> জরুরি অবস্থায় কী করবেন?
+                </p>
+                <p class="text-sm text-red-700 leading-relaxed font-medium">
+                    রক্তের জরুরি প্রয়োজনে এই ফর্মে নয় — সরাসরি
+                    <strong>রক্তের অনুরোধ</strong> করুন অথবা জাতীয় হেল্পলাইন
+                    <strong>১৬৪৩০</strong> বা নিকটস্থ হাসপাতালের ব্লাড ব্যাংকে যোগাযোগ করুন।
+                </p>
+                <a href="{{ route('requests.create') }}"
+                   class="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-red-700 hover:text-red-900 underline underline-offset-2 transition-colors">
+                    🩸 রক্তের অনুরোধ করুন →
+                </a>
+            </div>
+
             <div class="rounded-2xl border border-slate-200 bg-white shadow-md overflow-hidden scroll-reveal"
                  data-scroll-reveal
                   x-data="{
@@ -316,7 +333,7 @@
             </div>
 
             {{-- Quick info strip --}}
-            <div class="mt-4 grid grid-cols-2 gap-3 scroll-reveal" data-scroll-reveal>
+            <div class="lg:mt-4 grid grid-cols-2 gap-3 scroll-reveal" data-scroll-reveal>
                 <a href="mailto:support@roktodut.com"
                    class="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 py-3 hover:border-red-200 hover:bg-red-50/30 transition-colors shadow-sm group">
                     <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center text-sm shrink-0 group-hover:bg-red-200 transition-colors">✉️</div>

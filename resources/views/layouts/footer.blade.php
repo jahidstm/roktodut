@@ -5,22 +5,22 @@
 <footer class="bg-slate-950">
 
     {{-- ══ Main Columns Area ══════════════════════════════════════════ --}}
-    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 pb-12">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-16 xl:gap-24">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-12 lg:pt-16 pb-10 lg:pb-12">
+        <div class="flex flex-col lg:grid lg:grid-cols-4 gap-10 lg:gap-16 xl:gap-24">
 
             {{-- Column 1: Brand & Trust --}}
-            <div class="space-y-5 sm:col-span-2 lg:col-span-1 lg:pr-8">
+            <div class="space-y-5 lg:col-span-1 lg:pr-8 flex flex-col items-center sm:items-start text-center sm:text-left mb-2 lg:mb-0">
                 <a href="{{ route('home') }}" class="inline-flex items-center gap-2.5">
                     <div class="h-10 w-10 rounded-xl bg-white flex items-center justify-center shrink-0 overflow-hidden shadow-sm">
                         <img src="{{ asset('images/image_14.png') }}" alt="RoktoDut" class="w-full h-full object-contain p-1">
                     </div>
                     <span class="text-xl font-extrabold text-white tracking-tight">রক্তদূত</span>
                 </a>
-                <p class="text-sm text-slate-400 font-medium leading-relaxed">
+                <p class="text-sm text-slate-400 font-medium leading-relaxed max-w-md">
                     জরুরি মুহূর্তে রক্তের সন্ধানে বাংলাদেশের সবচেয়ে নির্ভরযোগ্য ভেরিফায়েড প্ল্যাটফর্ম। এক ফোঁটা রক্ত, বাঁচাতে পারে একটি প্রাণ।
                 </p>
                 {{-- Social Icons --}}
-                <div class="flex items-center gap-4 pt-1">
+                <div class="flex items-center justify-center sm:justify-start gap-4 pt-1">
                     <a href="#" aria-label="Facebook" class="text-slate-500 hover:text-red-400 transition-colors">
                         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" />
@@ -44,9 +44,12 @@
                 </div>
             </div>
 
-            {{-- Column 2: Quick Links (B2C) — exactly 4 items --}}
-            <div>
-                <h3 class="text-xs font-extrabold text-white uppercase tracking-widest mb-5">কুইক লিংকস</h3>
+            {{-- Link Columns Wrapper for Mobile grid --}}
+            <div class="lg:col-span-3 grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-10 lg:gap-16 xl:gap-24">
+                
+                {{-- Column 2: Quick Links (B2C) --}}
+                <div>
+                    <h3 class="text-[11px] sm:text-xs font-extrabold text-white uppercase tracking-widest mb-4 sm:mb-5">কুইক লিংকস</h3>
                 <ul class="space-y-3.5">
                     <li>
                         <a href="{{ route('search') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
@@ -69,12 +72,11 @@
                         </a>
                     </li>
                 </ul>
-            </div>
+                </div>
 
-            {{-- Column 3: Organizations (B2B) — exactly 4 items --}}
-            {{-- Routes: org.register ✅, login ✅, gamification.guide ✅ (reused as guide) --}}
-            <div>
-                <h3 class="text-xs font-extrabold text-white uppercase tracking-widest mb-5">অর্গানাইজেশন</h3>
+                {{-- Column 3: Organizations (B2B) --}}
+                <div>
+                    <h3 class="text-[11px] sm:text-xs font-extrabold text-white uppercase tracking-widest mb-4 sm:mb-5">অর্গানাইজেশন</h3>
                 <ul class="space-y-3.5">
                     <li>
                         <a href="{{ route('org.register') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
@@ -100,11 +102,11 @@
                         </a>
                     </li>
                 </ul>
-            </div>
+                </div>
 
-            {{-- Column 4: Support & Legal --}}
-            <div>
-                <h3 class="text-xs font-extrabold text-white uppercase tracking-widest mb-5">সাপোর্ট ও লিগ্যাল</h3>
+                {{-- Column 4: Support & Legal --}}
+                <div class="col-span-2 sm:col-span-1">
+                    <h3 class="text-[11px] sm:text-xs font-extrabold text-white uppercase tracking-widest mb-4 sm:mb-5">সাপোর্ট ও লিগ্যাল</h3>
                 <ul class="space-y-3.5">
                     <li>
                         <a href="{{ route('about') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors font-medium">
@@ -127,18 +129,20 @@
                         </a>
                     </li>
                 </ul>
-            </div>
+                </div>
+
+            </div>{{-- /Link Columns Wrapper --}}
 
         </div>
     </div>
 
     {{-- ══ Bottom Bar — Visually distinct (darker + border) ════════════ --}}
     <div class="bg-black/40 border-t border-white/10">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <p class="text-[11px] text-white font-medium">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-2">
+            <p class="text-[11px] text-white/70 font-medium text-center sm:text-left">
                 &copy; {{ date('Y') }} রক্তদূত প্ল্যাটফর্ম। সর্বস্বত্ব সংরক্ষিত।
             </p>
-            <p class="text-[11px] text-white font-medium flex items-center gap-1">
+            <p class="text-[11px] text-white/70 font-medium flex items-center justify-center gap-1">
                 Made with <span class="text-red-500 mx-0.5">❤️</span> in Bangladesh
             </p>
         </div>

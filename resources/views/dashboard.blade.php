@@ -185,7 +185,7 @@
             </div>
 
             {{-- Stats Row --}}
-            <div class="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8">
+            <div class="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mt-6 sm:mt-8">
                 <div class="bg-white/5 rounded-2xl p-4 sm:p-5 border border-white/10 flex flex-col justify-center">
                     <p class="text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1">মোট পয়েন্ট</p>
                     <p class="text-2xl sm:text-3xl font-black text-white">{{ number_format($currentPoints) }}</p>

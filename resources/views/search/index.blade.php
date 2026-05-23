@@ -5,13 +5,13 @@
 @section('content')
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
     
-    <div class="flex items-start justify-between gap-4 mb-8 scroll-reveal" data-scroll-reveal>
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 scroll-reveal" data-scroll-reveal>
         <div>
             <h1 class="text-2xl font-extrabold tracking-tight">রক্তদাতা খুঁজুন</h1>
             <p class="text-slate-500 font-medium mt-1">লোকেশন ও গ্রুপের ভিত্তিতে ডোনার সার্চ করুন</p>
         </div>
 
-        <div class="flex gap-3">
+        <div class="flex flex-wrap gap-3 w-full md:w-auto">
             <a href="{{ route('live-demand.index') }}"
                class="shrink-0 inline-flex items-center justify-center bg-white border border-slate-200 hover:border-red-300 hover:bg-red-50 text-slate-700 hover:text-red-700 px-4 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
                 🗺️ ম্যাপে দেখুন
@@ -41,7 +41,7 @@
     @endif
 
     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8 scroll-reveal" data-scroll-reveal>
-        <form method="GET" action="{{ route('search') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+        <form method="GET" action="{{ route('search') }}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 items-end">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1">রক্তের গ্রুপ</label>
                     <select name="blood_group" class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
@@ -80,7 +80,7 @@
                     </select>
                 </div>
 
-                <div>
+                <div class="sm:col-span-2 lg:col-span-1">
                     <label for="filter_upazila" class="block text-sm font-bold text-slate-700 mb-1">উপজেলা/থানা</label>
                     <select name="upazila_id" id="filter_upazila" disabled class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-slate-700">
                         <option value="">প্রথমে জেলা নির্বাচন করুন</option>
