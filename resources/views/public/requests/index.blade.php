@@ -46,7 +46,7 @@
 
             <p class="text-sm font-bold text-slate-500 mb-5 uppercase tracking-wider">ফিল্টার করুন</p>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+            <div class="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
 
                 {{-- Live Search --}}
                 <div>

@@ -32,13 +32,13 @@
         </div>
 
         {{-- Headline --}}
-        <h1 class="text-4xl sm:text-5xl lg:text-[54px] font-black text-slate-900 leading-[1.15] mb-5 tracking-tight scroll-reveal" data-scroll-reveal>
+        <h1 class="text-3xl sm:text-5xl lg:text-[54px] font-black text-slate-900 leading-[1.15] mb-5 tracking-tight scroll-reveal" data-scroll-reveal>
             জরুরি মুহূর্তে রক্তের সন্ধানে—<br>
             <span class="text-red-600">আমরা আছি আপনার পাশে</span>
         </h1>
 
         {{-- Subtitle --}}
-        <p class="text-base sm:text-lg text-slate-500 mb-8 max-w-2xl mx-auto leading-relaxed font-medium scroll-reveal" data-scroll-reveal>
+        <p class="text-sm sm:text-lg text-slate-500 mb-8 max-w-2xl mx-auto leading-relaxed font-medium scroll-reveal" data-scroll-reveal>
             NID-ভেরিফাইড ডোনার নেটওয়ার্ক — জরুরি মুহূর্তে সঠিক রক্ত, সঠিক সময়ে।
             ৬৪ জেলায় সক্রিয়, সম্পূর্ণ বিনামূল্যে।
         </p>
@@ -46,12 +46,12 @@
         {{-- CTAs --}}
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 scroll-reveal" data-scroll-reveal>
             <a href="{{ route('search') }}"
-               class="{{ $btnPrimary }} px-7 py-3.5 text-sm sm:text-base">
+               class="{{ $btnPrimary }} px-5 py-3 text-sm sm:px-7 sm:py-3.5 sm:text-base">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 এখনই ডোনার খুঁজুন
             </a>
             <a href="{{ route('requests.create') }}"
-               class="{{ $btnSecondary }} px-7 py-3.5 text-sm sm:text-base">
+               class="{{ $btnSecondary }} px-5 py-3 text-sm sm:px-7 sm:py-3.5 sm:text-base">
                 জরুরি রিকোয়েস্ট করুন
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
             </a>
@@ -107,7 +107,7 @@
                 <form action="{{ route('search') }}" method="GET" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 items-end">
 
                     <div class="lg:col-span-1">
-                        <select name="blood_group" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all cursor-pointer">
+                        <select name="blood_group" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all cursor-pointer">
                             <option value="" class="text-slate-500">রক্তের গ্রুপ</option>
                             @foreach(\App\Enums\BloodGroup::cases() as $bg)
                                 <option value="{{ $bg->value }}" class="text-slate-900">{{ $bg->value }}</option>
@@ -116,7 +116,7 @@
                     </div>
 
                     <div class="lg:col-span-1">
-                        <select name="division_id" @change="fetchDistricts($event.target.value)" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all cursor-pointer">
+                        <select name="division_id" @change="fetchDistricts($event.target.value)" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all cursor-pointer">
                             <option value="" class="text-slate-500">বিভাগ নির্বাচন</option>
                             @foreach($divisions as $div)
                                 <option value="{{ $div->id }}" class="text-slate-900">{{ $div->name }}</option>
@@ -125,7 +125,7 @@
                     </div>
 
                     <div class="lg:col-span-1">
-                        <select name="district_id" @change="fetchUpazilas($event.target.value)" :disabled="districts.length === 0" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                        <select name="district_id" @change="fetchUpazilas($event.target.value)" :disabled="districts.length === 0" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                             <option value="" x-text="loadingDistricts ? 'লোড হচ্ছে...' : (districts.length === 0 ? 'জেলা নির্বাচন' : 'সব জেলা')" class="text-slate-500"></option>
                             <template x-for="d in districts" :key="d.id">
                                 <option :value="d.id" x-text="d.name" class="text-slate-900"></option>
@@ -134,7 +134,7 @@
                     </div>
 
                     <div class="lg:col-span-1">
-                        <select name="upazila_id" :disabled="upazilas.length === 0" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+                        <select name="upazila_id" :disabled="upazilas.length === 0" class="w-full bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 sm:py-3.5 text-sm font-bold text-slate-800 focus:bg-white focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
                             <option value="" x-text="loadingUpazilas ? 'লোড হচ্ছে...' : (upazilas.length === 0 ? 'উপজেলা / এরিয়া' : 'সব উপজেলা')" class="text-slate-500"></option>
                             <template x-for="u in upazilas" :key="u.id">
                                 <option :value="u.id" x-text="u.name" class="text-slate-900"></option>
@@ -143,7 +143,7 @@
                     </div>
 
                     <div class="lg:col-span-1">
-                        <button type="submit" class="w-full {{ $btnPrimary }} px-4 py-3.5 text-sm sm:text-base h-[52px]">
+                        <button type="submit" class="w-full {{ $btnPrimary }} px-4 py-3 sm:py-3.5 text-sm sm:text-base h-[48px] sm:h-[52px]">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             সার্চ করুন
                         </button>

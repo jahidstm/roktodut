@@ -199,7 +199,7 @@
         if($top3->has(2)) $orderedDonors->push(['donor'=>$top3[2],'rank'=>3,'emoji'=>'🥉','label'=>'৩য় স্থান']);
     @endphp
 
-    <div class="flex flex-col sm:flex-row items-end justify-center gap-5 mb-16 mt-6">
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-end justify-center gap-6 mb-16 mt-6">
         @foreach($orderedDonors as $item)
             @php
                 $d = $item['donor'];
@@ -213,7 +213,7 @@
             @endphp
 
             <div class="bg-white rounded-3xl px-6 w-full max-w-xs mx-auto sm:mx-0 flex flex-col items-center relative border-2 {{ $cardClasses }} transition-all duration-300 hover:-translate-y-2 scroll-reveal" data-scroll-reveal>
-                <div class="absolute -top-5 bg-slate-900 text-white text-xs font-black px-5 py-2 rounded-full flex items-center gap-1.5 shadow-lg">
+                <div class="absolute -top-4 sm:-top-5 bg-slate-900 text-white text-xs font-black px-5 py-2 rounded-full flex items-center gap-1.5 shadow-lg">
                     {{ $item['emoji'] }} {{ $item['label'] }}
                 </div>
                 <div class="w-20 h-20 rounded-full border-[3px] {{ $avatarRing }} flex items-center justify-center text-3xl font-black mb-5 overflow-hidden relative">
@@ -330,7 +330,10 @@
                 </div>
 
                 {{-- Stats (রক্তদান & পয়েন্ট) --}}
-                <div class="flex items-center gap-6 text-right pr-2">
+                <div class="flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-6 text-right pr-2">
+                    <div class="flex items-center gap-1 text-[11px] font-semibold text-slate-500 sm:hidden">
+                        রক্তদান <span class="font-bold text-blue-600">{{ $donor->total_verified_donations ?? 0 }}</span>
+                    </div>
                     <div class="hidden sm:block">
                         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">রক্তদান</div>
                         <div class="font-bold text-blue-600 text-sm">{{ $donor->total_verified_donations ?? 0 }}</div>
@@ -401,7 +404,10 @@
                     </div>
 
                     {{-- Stats --}}
-                    <div class="flex items-center gap-6 text-right pr-2">
+                    <div class="flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-6 text-right pr-2">
+                        <div class="flex items-center gap-1 text-[11px] font-semibold text-slate-500 sm:hidden">
+                            রক্তদান <span class="font-bold text-blue-600">{{ $myDons }}</span>
+                        </div>
                         <div class="hidden sm:block">
                             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">রক্তদান</div>
                             <div class="font-bold text-blue-600 text-sm">{{ $myDons }}</div>

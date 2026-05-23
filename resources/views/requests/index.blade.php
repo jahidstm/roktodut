@@ -26,7 +26,7 @@
 
     {{-- 🎯 Advanced Filter Section (Server-side Divisions + AJAX Cascade) --}}
     <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm mb-8 scroll-reveal" data-scroll-reveal>
-        <form action="{{ route('requests.index') }}" method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+        <form action="{{ route('requests.index') }}" method="GET" class="grid grid-cols-1 min-[480px]:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
             
             <div>
                 <label for="blood_group" class="block text-sm font-bold text-slate-700 mb-1">রক্তের গ্রুপ</label>
@@ -74,16 +74,16 @@
                 </select>
             </div>
 
-             <div class="sm:col-span-2 lg:col-span-5 flex justify-end gap-2 mt-2">
+             <div class="sm:col-span-2 lg:col-span-5 flex flex-col sm:flex-row sm:justify-end gap-2 mt-2">
                  @if(request()->hasAny(['blood_group', 'component_type', 'division_id', 'district_id', 'upazila_id']))
-                     <a href="{{ route('requests.index') }}" class="shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg font-extrabold transition-colors flex items-center justify-center">
+                     <a href="{{ route('requests.index') }}" class="w-full sm:w-auto shrink-0 bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-2.5 rounded-lg font-extrabold transition-colors flex items-center justify-center">
                          ক্লিয়ার
                     </a>
                 @endif
-                 <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-8 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
+                 <button type="submit" class="w-full sm:w-auto bg-red-600 hover:bg-red-700 text-white px-8 py-2.5 rounded-lg font-extrabold shadow-sm transition-colors">
                      খুঁজুন
                  </button>
-             </div>
+              </div>
 
             <input type="hidden" id="selectedDivision" value="{{ request('division_id', '') }}">
             <input type="hidden" id="selectedDistrict" value="{{ request('district_id', '') }}">

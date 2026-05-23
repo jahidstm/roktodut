@@ -159,7 +159,7 @@
                          x-transition:leave="transition ease-in duration-150"
                          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                          x-transition:leave-end="opacity-0 scale-95 translate-y-2"
-                         class="absolute right-0 mt-3 w-80 sm:w-96 rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200 overflow-hidden z-50"
+                         class="absolute right-4 sm:right-0 mt-3 w-[calc(100vw-2rem)] sm:w-96 rounded-2xl bg-white shadow-2xl ring-1 ring-slate-200 overflow-hidden z-50"
                          style="display:none;"
                          role="dialog"
                          aria-label="নোটিফিকেশন তালিকা">
@@ -271,7 +271,7 @@
                          x-transition:leave-start="opacity-100 scale-100 translate-y-0"
                          x-transition:leave-end="opacity-0 scale-95 translate-y-2"
                          style="display: none;"
-                         class="absolute right-0 mt-3 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50">
+                         class="absolute right-4 sm:right-0 mt-3 w-64 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50">
                         
                         {{-- Section 1: User Identity --}}
                         <div class="px-5 py-4 bg-slate-50/50 border-b border-slate-100">
@@ -371,30 +371,30 @@
             </div>
 
             <div class="flex-1 overflow-y-auto px-4 py-6 flex flex-col gap-2">
-                <a href="{{ route('home') }}" class="flex items-center px-4 py-3 rounded-xl font-bold transition-colors {{ request()->routeIs('home') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
+                <a href="{{ route('home') }}" class="flex items-center px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors {{ request()->routeIs('home') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
                     হোম
                 </a>
-                <a href="{{ $requestsRoute }}" class="flex items-center px-4 py-3 rounded-xl font-bold transition-colors {{ request()->routeIs('requests') || request()->routeIs('requests.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
+                <a href="{{ $requestsRoute }}" class="flex items-center px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors {{ request()->routeIs('requests') || request()->routeIs('requests.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
                     রক্তের অনুরোধ
                 </a>
-                <a href="{{ route('search') }}" class="flex items-center px-4 py-3 rounded-xl font-bold transition-colors {{ request()->routeIs('search') || request()->routeIs('search.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
+                <a href="{{ route('search') }}" class="flex items-center px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors {{ request()->routeIs('search') || request()->routeIs('search.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
                     রক্তদাতা খুঁজুন
                 </a>
-                <a href="{{ route('leaderboard') }}" class="flex items-center px-4 py-3 rounded-xl font-bold transition-colors {{ request()->routeIs('leaderboard') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
+                <a href="{{ route('leaderboard') }}" class="flex items-center px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors {{ request()->routeIs('leaderboard') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
                     লিডারবোর্ড
                 </a>
-                <a href="{{ route('blog.index') }}" class="flex items-center px-4 py-3 rounded-xl font-bold transition-colors {{ request()->routeIs('blog.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
+                <a href="{{ route('blog.index') }}" class="flex items-center px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors {{ request()->routeIs('blog.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
                     স্বাস্থ্যবার্তা
                 </a>
-                <a href="{{ route('live-demand.index') }}" class="flex items-center px-4 py-3 rounded-xl font-bold transition-colors {{ request()->routeIs('live-demand.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
+                <a href="{{ route('live-demand.index') }}" class="flex items-center px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors {{ request()->routeIs('live-demand.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
                     লাইভ ম্যাপ
                 </a>
             </div>
             
             @guest
             <div class="p-5 border-t border-slate-100 flex flex-col gap-3">
-                <a href="{{ route('login') }}" class="w-full py-3 px-4 text-center rounded-xl font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 transition-colors">লগইন করুন</a>
-                <a href="{{ route('register') }}" class="w-full py-3 px-4 text-center rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 shadow-sm transition-colors">নতুন অ্যাকাউন্ট খুলুন</a>
+                <a href="{{ route('login') }}" class="w-full py-3.5 px-4 min-h-[44px] text-center rounded-xl font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 transition-colors">লগইন করুন</a>
+                <a href="{{ route('register') }}" class="w-full py-3.5 px-4 min-h-[44px] text-center rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 shadow-sm transition-colors">নতুন অ্যাকাউন্ট খুলুন</a>
             </div>
             @endguest
         </div>

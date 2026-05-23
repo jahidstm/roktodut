@@ -47,13 +47,13 @@
     $myResponse = (!$isPublic && isset($request->responses)) ? $request->responses->first() : null;
 @endphp
 
-<article class="group flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg scroll-reveal"
+<article class="group flex flex-col h-full rounded-2xl border border-slate-200 bg-white p-4 sm:p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg scroll-reveal"
          data-scroll-reveal>
     <div class="flex items-start justify-between gap-3">
         <div class="min-w-0">
             <div class="flex flex-col gap-2">
                 <div class="flex flex-wrap items-center gap-2">
-                    <h3 class="text-lg font-black tracking-tight text-slate-900">
+                    <h3 class="text-base sm:text-lg font-black tracking-tight text-slate-900">
                         {{ $bloodGroup }} রক্ত প্রয়োজন
                     </h3>
                     <span class="inline-flex h-7 items-center rounded-full border border-violet-200 bg-violet-50 px-3 text-xs font-extrabold text-violet-700">
@@ -135,19 +135,19 @@
 
     <div class="mt-4 flex flex-wrap gap-2">
         <a href="{{ $detailsUrl }}"
-           class="inline-flex h-10 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
+           class="inline-flex h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
             View Details
         </a>
 
         @if($isPublic)
             @guest
                 <a href="{{ route('login') }}?redirect={{ urlencode(route('public.requests.index')) }}"
-                   class="inline-flex h-10 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-700">
+                   class="inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-700">
                     Respond
                 </a>
             @else
                 <a href="{{ $detailsUrl }}"
-                   class="inline-flex h-10 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-700">
+                   class="inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-700">
                     Respond
                 </a>
             @endguest
@@ -155,33 +155,33 @@
             @if($isOwner && $isOpen)
                 <form method="POST" action="{{ route('requests.fulfill', $request) }}">
                     @csrf
-                    <button class="inline-flex h-10 items-center justify-center rounded-xl bg-emerald-600 px-4 text-sm font-black text-white transition hover:bg-emerald-700">
+                    <button class="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-600 px-4 text-sm font-black text-white transition hover:bg-emerald-700">
                         Complete
                     </button>
                 </form>
                 <a href="{{ $detailsUrl }}"
-                   class="inline-flex h-10 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 text-sm font-bold text-emerald-700 transition hover:bg-emerald-100">
+                   class="inline-flex h-11 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 text-sm font-bold text-emerald-700 transition hover:bg-emerald-100">
                     Manage
                 </a>
             @elseif(!$isOwner && $isOpen)
                 @if($myResponse && $myResponse->status === 'accepted')
-                    <span class="inline-flex h-10 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 text-sm font-bold text-emerald-700">
+                    <span class="inline-flex h-11 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 text-sm font-bold text-emerald-700">
                         Response Sent
                     </span>
                     <a href="{{ $detailsUrl }}"
-                       class="inline-flex h-10 items-center justify-center rounded-xl border border-emerald-200 bg-white px-4 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50">
+                       class="inline-flex h-11 items-center justify-center rounded-xl border border-emerald-200 bg-white px-4 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50">
                         Manage
                     </a>
                 @elseif($myResponse && $myResponse->status === 'declined')
                     <a href="{{ $detailsUrl }}"
-                       class="inline-flex h-10 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
+                       class="inline-flex h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
                         Manage
                     </a>
                 @else
                     <form method="POST" action="{{ route('requests.respond', $request) }}">
                         @csrf
                         <input type="hidden" name="status" value="accepted" />
-                        <button class="inline-flex h-10 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                        <button class="inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                                 @disabled(!(auth()->check() && auth()->user()->is_eligible_to_donate))
                                 title="{{ auth()->check() && !auth()->user()->is_eligible_to_donate ? 'আপনি রক্তদানের যোগ্য নন' : '' }}">
                             Respond
@@ -190,7 +190,7 @@
                 @endif
             @elseif(($status === 'fulfilled' || $verifiedCount > 0) && auth()->check() && (auth()->id() === (int) $request->requested_by || auth()->user()->role === 'admin'))
                 <a href="{{ $detailsUrl }}"
-                   class="inline-flex h-10 items-center justify-center rounded-xl bg-indigo-600 px-4 text-sm font-black text-white transition hover:bg-indigo-700">
+                   class="inline-flex h-11 items-center justify-center rounded-xl bg-indigo-600 px-4 text-sm font-black text-white transition hover:bg-indigo-700">
                     View Proof
                 </a>
             @endif

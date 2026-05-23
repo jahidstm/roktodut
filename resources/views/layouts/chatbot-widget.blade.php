@@ -1,9 +1,9 @@
-<div x-data="chatbot()" class="fixed bottom-16 right-8 z-[9000]">
+<div x-data="chatbot()" class="fixed bottom-16 right-4 sm:right-8 z-[9000]">
     <button @click="open = !open" class="bg-[#D32F2F] hover:bg-red-700 text-white p-4 rounded-full shadow-2xl transition-transform hover:scale-105 flex items-center justify-center">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
     </button>
 
-    <div x-show="open" @click.outside="open = false" style="display: none;" class="absolute bottom-16 right-0 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col">
+    <div x-show="open" @click.outside="open = false" style="display: none;" class="absolute bottom-16 right-0 w-[calc(100vw-2rem)] sm:w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col">
         <div class="bg-[#D32F2F] text-white p-4 font-bold flex justify-between items-center">
             <span>রক্তদূত এআই সহকারী</span>
             <button @click="open = false" class="text-white hover:text-gray-200 text-xl font-bold">&times;</button>

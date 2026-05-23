@@ -100,7 +100,7 @@
                          x-transition:leave="transition ease-in duration-75"
                          x-transition:leave-start="opacity-100 scale-100"
                          x-transition:leave-end="opacity-0 scale-95"
-                         class="absolute right-0 top-12 z-50 w-80 rounded-2xl bg-white shadow-xl ring-1 ring-slate-200"
+                         class="absolute right-4 sm:right-0 top-12 z-50 w-[calc(100vw-2rem)] sm:w-80 rounded-2xl bg-white shadow-xl ring-1 ring-slate-200"
                          style="display: none;">
                         <div class="px-4 py-3 border-b border-slate-100 bg-slate-50 rounded-t-2xl">
                             <h3 class="text-sm font-extrabold text-slate-800">নোটিফিকেশন</h3>
