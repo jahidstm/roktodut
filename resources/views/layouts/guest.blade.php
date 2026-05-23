@@ -31,24 +31,28 @@
         <style>
             .scroll-reveal {
                 opacity: 0;
-                transform: translateY(24px);
+                --sr-x: 0px;
+                --sr-y: 24px;
+                transform: translate3d(var(--sr-x), var(--sr-y), 0);
                 transition: opacity 0.8s ease, transform 0.8s ease;
                 will-change: opacity, transform;
             }
             .scroll-reveal--left {
-                transform: translateX(-24px);
+                --sr-x: -24px;
+                --sr-y: 0px;
             }
             .scroll-reveal--right {
-                transform: translateX(24px);
+                --sr-x: 24px;
+                --sr-y: 0px;
             }
             .scroll-reveal.is-visible,
             [data-scroll-reveal].is-visible {
                 opacity: 1;
-                transform: translateY(0);
+                --sr-x: 0px;
+                --sr-y: 0px;
             }
-            .scroll-reveal--left.is-visible,
-            .scroll-reveal--right.is-visible {
-                transform: translateX(0);
+            .hover-lift:hover {
+                transform: translate3d(var(--sr-x, 0px), calc(var(--sr-y, 0px) - 2px), 0);
             }
             @media (prefers-reduced-motion: reduce) {
                 .scroll-reveal,
@@ -61,6 +65,41 @@
         </style>
 
         <script>
+            window.applyHeroButtonStyles = function(root = document) {
+                const candidates = root.querySelectorAll('a, button');
+                candidates.forEach((el) => {
+                    if (el.dataset.btnStyled === '1' || el.hasAttribute('data-btn-skip')) return;
+                    if (!el.closest('main') || el.closest('header, nav, [data-skip-button-style], [role="menu"], [role="dialog"]')) return;
+                    if (!el.textContent || !el.textContent.trim()) return;
+                    const classes = Array.from(el.classList);
+                    const hasPadding = classes.some(c => /^p[trblxy]?-\d/.test(c));
+                    const hasRounded = classes.some(c => c.startsWith('rounded'));
+                    const hasShadow = classes.some(c => c.startsWith('shadow'));
+                    const hasBorder = classes.some(c => c === 'border' || c.startsWith('border-'));
+                    const hasBg = classes.some(c => c.startsWith('bg-'));
+                    const hasTextWhite = classes.includes('text-white');
+                    const looksButton = hasPadding || hasRounded || hasShadow || hasBorder || hasBg;
+                    if (!looksButton) return;
+
+                    if (classes.some(c => ['bg-red-600', 'bg-red-700', 'bg-rose-600', 'bg-rose-700', 'bg-rose-500'].includes(c))) {
+                        el.classList.add('btn-primary');
+                    } else if (hasBg && hasTextWhite) {
+                        el.classList.add('btn-primary');
+                    } else if (classes.some(c => c.startsWith('border-white')) || (hasTextWhite && !hasBg)) {
+                        el.classList.add('btn-outline');
+                    } else if (classes.includes('bg-white') && hasBorder) {
+                        el.classList.add('btn-secondary');
+                    } else if (hasBorder && !hasBg) {
+                        el.classList.add('btn-secondary');
+                    } else {
+                        el.classList.add('btn-secondary');
+                    }
+
+                    el.classList.add('hover-lift');
+                    el.dataset.btnStyled = '1';
+                });
+            };
+
             window.initScrollReveal = function(root = document) {
                 const autoTargets = root.querySelectorAll('section');
                 autoTargets.forEach((el) => {
@@ -70,6 +109,7 @@
                     }
                 });
                 const revealItems = root.querySelectorAll('[data-scroll-reveal]');
+                window.applyHeroButtonStyles(root);
                 if (!revealItems.length) return;
                 const revealObserver = new IntersectionObserver((entries) => {
                     entries.forEach(entry => {
@@ -83,6 +123,7 @@
             };
 
             document.addEventListener('DOMContentLoaded', () => {
+                window.applyHeroButtonStyles();
                 window.initScrollReveal();
             });
         </script>

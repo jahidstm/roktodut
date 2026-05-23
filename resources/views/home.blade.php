@@ -4,6 +4,12 @@
 
 @section('content')
 
+@php
+    $btnPrimary = 'inline-flex items-center gap-2.5 bg-red-600 hover:bg-red-700 text-white rounded-2xl font-black shadow-[0_10px_25px_rgba(239,68,68,0.3)] hover:shadow-[0_15px_35px_rgba(239,68,68,0.4)] transition-all duration-300 hover-lift';
+    $btnSecondary = 'inline-flex items-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 rounded-2xl font-black shadow-sm transition-all duration-300 hover:shadow-md hover-lift';
+    $btnOutlineOnRed = 'inline-flex items-center gap-2.5 bg-transparent border border-white/30 hover:border-white text-white rounded-2xl font-black shadow-sm transition-all duration-300 hover:bg-white/5 hover:shadow-md hover-lift';
+@endphp
+
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 1 — LIGHT HERO (Premium Aesthetic)
 ═══════════════════════════════════════════════════════════════ --}}
@@ -40,12 +46,12 @@
         {{-- CTAs --}}
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 scroll-reveal" data-scroll-reveal>
             <a href="{{ route('search') }}"
-               class="inline-flex items-center gap-2.5 bg-red-600 hover:bg-red-700 text-white px-7 py-3.5 rounded-2xl font-black text-sm sm:text-base shadow-[0_10px_25px_rgba(239,68,68,0.3)] hover:shadow-[0_15px_35px_rgba(239,68,68,0.4)] transition-all duration-300 hover:-translate-y-0.5">
+               class="{{ $btnPrimary }} px-7 py-3.5 text-sm sm:text-base">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 এখনই ডোনার খুঁজুন
             </a>
             <a href="{{ route('requests.create') }}"
-               class="inline-flex items-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 px-7 py-3.5 rounded-2xl font-black text-sm sm:text-base shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
+               class="{{ $btnSecondary }} px-7 py-3.5 text-sm sm:text-base">
                 জরুরি রিকোয়েস্ট করুন
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
             </a>
@@ -137,7 +143,7 @@
                     </div>
 
                     <div class="lg:col-span-1">
-                        <button type="submit" class="w-full flex items-center justify-center gap-2.5 bg-red-600 hover:bg-red-700 text-white px-4 py-3.5 rounded-xl font-black text-sm sm:text-base shadow-[0_10px_25px_rgba(239,68,68,0.3)] hover:shadow-[0_15px_35px_rgba(239,68,68,0.4)] transition-all duration-300 hover:-translate-y-0.5 h-[52px]">
+                        <button type="submit" class="w-full {{ $btnPrimary }} px-4 py-3.5 text-sm sm:text-base h-[52px]">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                             সার্চ করুন
                         </button>
@@ -228,7 +234,7 @@
                 <h2 class="text-4xl font-black text-slate-900 tracking-tight scroll-reveal" data-scroll-reveal>জরুরি রক্তের অনুরোধ</h2>
                 <p class="text-slate-500 font-medium mt-2 max-w-lg scroll-reveal" data-scroll-reveal>এই মুহূর্তে যারা জরুরি ভিত্তিতে রক্তের প্রয়োজনে আছেন। আপনার একটু সাহায্য একটি জীবন বাঁচাতে পারে।</p>
             </div>
-            <a href="{{ route('public.requests.index') }}" class="shrink-0 inline-flex items-center gap-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 px-5 py-2.5 rounded-xl font-black text-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 scroll-reveal" data-scroll-reveal>
+            <a href="{{ route('public.requests.index') }}" class="shrink-0 {{ $btnSecondary }} px-5 py-2.5 text-sm scroll-reveal" data-scroll-reveal>
                 সব দেখুন <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </a>
         </div>
@@ -368,7 +374,7 @@
         </div>
 
         <div class="mt-14 flex justify-center scroll-reveal" data-scroll-reveal>
-            <a href="{{ route('register') }}" class="inline-flex items-center gap-2.5 bg-red-600 hover:bg-red-700 text-white px-7 py-3.5 rounded-2xl font-black text-sm sm:text-base shadow-[0_10px_25px_rgba(239,68,68,0.3)] hover:shadow-[0_15px_35px_rgba(239,68,68,0.4)] transition-all duration-300 hover:-translate-y-0.5">
+            <a href="{{ route('register') }}" class="{{ $btnPrimary }} px-7 py-3.5 text-sm sm:text-base">
                 আজই যুক্ত হোন
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
             </a>
@@ -393,7 +399,7 @@
         </p>
         
         <a href="{{ route('live-demand.index') }}"
-           class="inline-flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 text-slate-800 px-7 py-3.5 rounded-2xl font-black text-sm sm:text-base shadow-[0_10px_25px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.15)] transition-all duration-300 hover:-translate-y-0.5 scroll-reveal" data-scroll-reveal>
+           class="{{ $btnSecondary }} px-7 py-3.5 text-sm sm:text-base scroll-reveal" data-scroll-reveal>
             লাইভ ম্যাপ দেখুন
             <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </a>
@@ -470,7 +476,7 @@
             </div>
 
             <div class="mt-16 text-center scroll-reveal" data-scroll-reveal>
-                <a href="{{ route('leaderboard') }}" class="inline-flex items-center gap-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 px-7 py-3.5 rounded-2xl font-black text-sm sm:text-base shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5">
+                <a href="{{ route('leaderboard') }}" class="{{ $btnSecondary }} px-7 py-3.5 text-sm sm:text-base">
                     সম্পূর্ণ লিডারবোর্ড দেখুন
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
                 </a>
@@ -490,7 +496,7 @@
                 <div class="inline-flex items-center gap-2 bg-sky-50 border border-sky-100 text-sky-600 text-xs font-bold px-4 py-1.5 rounded-full mb-5 scroll-reveal" data-scroll-reveal>সংবাদ ও নিবন্ধ</div>
                 <h2 class="text-4xl font-black text-slate-900 tracking-tight scroll-reveal" data-scroll-reveal>সর্বশেষ ব্লগ পোস্ট</h2>
             </div>
-            <a href="{{ route('blog.index') }}" class="shrink-0 inline-flex items-center gap-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-800 px-5 py-2.5 rounded-xl font-black text-sm shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 scroll-reveal" data-scroll-reveal>
+            <a href="{{ route('blog.index') }}" class="shrink-0 {{ $btnSecondary }} px-5 py-2.5 text-sm scroll-reveal" data-scroll-reveal>
                 সব পোস্ট <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
             </a>
         </div>
@@ -592,12 +598,12 @@
 
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8 scroll-reveal" data-scroll-reveal>
             <a href="{{ route('requests.create') }}"
-               class="inline-flex items-center justify-center gap-2.5 bg-white hover:bg-slate-50 text-slate-800 px-7 py-3.5 rounded-2xl font-black text-sm sm:text-base shadow-[0_10px_25px_rgba(0,0,0,0.1)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.15)] transition-all duration-300 hover:-translate-y-0.5">
+               class="{{ $btnSecondary }} px-7 py-3.5 text-sm sm:text-base">
                 রক্তের রিকোয়েস্ট করুন
                 <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
             </a>
             <a href="{{ route('search') }}"
-               class="inline-flex items-center justify-center gap-2.5 bg-transparent border border-white/30 hover:border-white text-white px-7 py-3.5 rounded-2xl font-black text-sm sm:text-base shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/5">
+               class="{{ $btnOutlineOnRed }} px-7 py-3.5 text-sm sm:text-base">
                 ডোনার সার্চ করুন
             </a>
         </div>
