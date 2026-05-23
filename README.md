@@ -1,7 +1,6 @@
 <div align="center">
   <h1>🩸 RoktoDut (রক্তদূত)</h1>
-  <p><strong>A smart, privacy-first, and automation-driven platform for finding trustworthy blood donors—fast.</strong></p>
-  
+  <p><strong>A privacy-first, automation-driven platform that connects patients with verified blood donors in minutes.</strong></p>
   <p>
     <img src="https://img.shields.io/badge/Laravel-12.x-FF2D20?style=for-the-badge&logo=laravel&logoColor=white" alt="Laravel" />
     <img src="https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
@@ -13,73 +12,85 @@
 
 ---
 
-## 🚀 Project Overview
+## 🚀 Overview
+RoktoDut is a full-stack, production-grade blood donor discovery system built for Bangladesh. It prioritizes **speed in emergencies**, **trust in identities**, and **privacy in contact sharing** through automation, verification, and real-time analytics.
 
-**RoktoDut** is not just another conventional blood bank directory. It is a highly optimized, data-driven ecosystem designed to drastically reduce response times during medical emergencies, whilst strongly protecting donor privacy and maintaining absolute trust throughout the donation lifecycle.
+## ✨ Why it stands out
+- **No-login emergency search** with smart ranking to surface reliable donors first.
+- **Privacy shield** that hides phone numbers until a human verification step passes.
+- **Truth Loop verification** to confirm donations without manual follow-up.
+- **Live demand heatmap** across all districts for supply-vs-demand visibility.
+- **QR Smart Card verification** for NID-verified donors with controlled disclosure.
 
-### 🎯 Core Objectives:
-- Enable **donor discovery without login/registration** during critical emergencies.
-- Protect donors from **data scraping, spam, and harassment** through privacy-by-design architecture.
-- Automate the end-to-end donation flow with a **Truth Loop Verification System**.
-- Provide real-time data insights via **Spatial Heatmaps**.
+## 🧩 Core Features
+- **Donor discovery & smart ranking**: availability, verification tier, and reliability scoring.
+- **Emergency request flow**: public blood requests with response tracking and urgency sorting.
+- **Donation verification**: claim → recipient confirmation → automated cooldown.
+- **Gamification**: points, badges, and national leaderboards to drive retention.
+- **Organization panel**: hospitals/blood clubs can verify and manage members.
+- **Content platform**: health blogs and verified success stories.
+- **PWA + FCM**: offline fallback and push notifications for critical alerts.
+- **Real-time & automation**: queues, scheduled jobs, and alerts via Telegram.
 
----
+## 🏗️ Architecture
+| Layer | Tech |
+|---|---|
+| Backend | Laravel 12, PHP 8.2, MySQL, Redis, Sanctum, Reverb |
+| Frontend | Blade, Tailwind CSS, Alpine.js, Vite |
+| Maps & Analytics | Leaflet, GeoJSON, custom spatial analytics |
+| Notifications | Firebase (FCM), Telegram Bot |
+| ML Service | FastAPI + scikit-learn (donor ranking) + Groq (NLP request parsing) |
 
-## ✨ Key Innovations & Features
-
-### 1️⃣ Progressive Web App (PWA) Support 📱
-RoktoDut behaves natively on mobile devices. Users can install the app directly to their home screens via our seamless **PWA Install Banner**, complete with caching strategies and an app-like navigation experience for offline-ready access.
-
-### 2️⃣ Live Demand Heatmap (Spatial Analytics) 🗺️
-A visually stunning, real-time spatial map of Bangladesh built with **Leaflet.js** and GeoJSON. 
-- **Public View:** Shows real-time blood demand across all 64 districts. Users can tap on any district to find active donors instantly.
-- **Admin Analytics:** Features complex algorithms calculating **Donor Fatigue Index (DFI)** and **Critical Risk Score (CRS)** per district to monitor supply/demand bottlenecks.
-
-### 3️⃣ Privacy Shield & Secure Contact Reveal 🛡️
-- **Phone Privacy:** Donor phone numbers are masked by default (e.g., `017******89`).
-- **Anti-Scraping Challenge:** Users must solve a randomized math challenge to reveal contact information—thwarting automated bots.
-- **Rate Limiting:** IP-based rate limits (max 5 reveals per 15 minutes) prevent malicious abuse.
-
-### 4️⃣ Smart Search Engine & Priority Ranking 🚑
-Our intelligent sorting algorithm ensures patients find the most reliable donors first:
-1. **Ready Now:** Donors manually toggling their state to "Available".
-2. **Org Verified:** Members authenticated by registered hospitals or blood clubs.
-3. **NID Verified:** Donors with national identity verification.
-4. **Regular:** Standard registered donors.
-
-### 5️⃣ Automation & "The Truth Loop" (The Brain) 🧠
-- **Auto Cooldown:** After a successful donation, donors are automatically marked **Unavailable for 4 months (120 days)**.
-- **The Truth Loop:** When a donor claims they donated, the recipient is prompted to confirm or dispute. If not disputed within 24 hours, the system silently approves the donation.
-- **Welcome Back Prompt:** If a donor logs in after 30+ days of inactivity, the system smartly prompts them to confirm their current availability status.
-
-### 6️⃣ Gamification: Leaderboard & Badges 🏆
-To solve "Donor Retention", we introduced a rich gamified experience:
-- **Dynamic Leaderboards:** Real-time national ranking based on verified donations.
-- **Points & Milestones:** Donors earn points and unlock beautiful visual badges (emoji-based metadata) as they cross donation milestones.
-
-### 7️⃣ Organization Management Panel 🏥
-- **Hospitals & Blood Clubs:** Organizations can register and manage their members.
-- **Verified Tags:** Members verified by an organization gain a massive trust boost in the global search algorithm.
+## 🔐 Privacy & Safety by Design
+- Phone numbers are **masked by default** and only revealed after a challenge + rate limit.
+- **QR tokens are opaque** and cannot be enumerated from user IDs.
+- **NID data retention** is time-bound and automatically purged.
+- **Audit trails and shadow-ban** keep suspicious activity contained.
 
 ---
 
-## 🛠️ Technical Architecture & Stack
+## ⚙️ Local Setup (Laravel App)
+**Prerequisites:** PHP 8.2+, Composer, Node.js 18+, MySQL 8+, Redis
 
-### Backend
-- **Framework:** Laravel 12 (PHP 8.x)
-- **Database:** MySQL 8.0 (Optimized indexing for spatial & relational queries)
-- **Queue System:** Laravel Horizon/Redis for background jobs (DFI calculation, Cooldown resets)
+1. Install dependencies:
+   - `composer install`
+   - `npm install`
+2. Configure environment:
+   - `copy .env.example .env`
+   - Update DB, Redis, Firebase, and OAuth settings in `.env`
+3. Bootstrap app:
+   - `php artisan key:generate`
+   - `php artisan migrate`
+4. Build assets:
+   - `npm run build`
 
-### Frontend
-- **Styling:** Tailwind CSS 3 (Custom utility classes, animations, and responsive UI)
-- **Interactivity:** Alpine.js 3 (Lightweight reactive components, Teleport, Off-canvas menus)
-- **Mapping:** Leaflet.js (GeoJSON rendering, Interactive Tooltips)
-- **Bundler:** Vite 5
+**Run locally:**
+- `composer run dev` (Laravel server + queue + logs + Vite)
+
+## 🧠 Local Setup (ML Service)
+**Prerequisites:** Python 3.10+
+
+1. Install dependencies:
+   - `pip install -r roktodut-ml-service\requirements.txt`
+2. Run API:
+   - `uvicorn roktodut-ml-service.main:app --host 127.0.0.1 --port 8001`
+
+**Required env:** `ROKTODUT_API_KEY` (or default `ROKTODUT_AI_SECRET`), `GROQ_API_KEY` for NLP parsing.
 
 ---
 
-## 👥 Meet the Team
+## 🧪 Useful Commands
+| Task | Command |
+|---|---|
+| Run dev stack | `composer run dev` |
+| Build assets | `npm run build` |
+| Run tests | `composer run test` |
+| Ops check | `composer run ops-check` |
+| Smoke check | `composer run smoke-check` |
 
+---
+
+## 👥 Team
 | Name | Role / Contribution | GitHub |
 |---|---|---|
 | **Jahid Hasan** | Lead Backend, Database Architecture, Security | [@jahidstm](https://github.com/jahidstm) |
@@ -87,7 +98,6 @@ To solve "Donor Retention", we introduced a rich gamified experience:
 | **Nohzat Tabassum** | UI/UX, OAuth Integration, System Documentation | [@NohzatTabassum](https://github.com/NohzatTabassum) |
 | **Mst. Moumita Rahman Meem** | Database Seeders, Localization, Demo Data | [@Meem-1137](https://github.com/Meem-1137) |
 
-<br>
 <div align="center">
   <sub>Built with ❤️ for humanity. Every drop counts.</sub>
 </div>
