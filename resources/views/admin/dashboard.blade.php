@@ -27,7 +27,7 @@
     @endif
 
     {{-- 📊 ১. গ্লোবাল স্ট্যাটিস্টিকস --}}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12 scroll-reveal" data-scroll-reveal>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-12 scroll-reveal" data-scroll-reveal>
         <x-card>
             <div class="text-slate-500 text-sm font-bold uppercase tracking-wider">মোট ইউজার</div>
             <div class="mt-2 text-4xl font-black text-slate-900">{{ $totalUsers }}</div>
