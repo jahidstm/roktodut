@@ -422,8 +422,8 @@
         @if($topDonors->isNotEmpty())
             @php
                 $orderedDonors = collect();
-                if($topDonors->has(1)) $orderedDonors->push(['donor'=>$topDonors[1],'rank'=>2,'emoji'=>'🥈','label'=>'২য় স্থান']);
                 if($topDonors->has(0)) $orderedDonors->push(['donor'=>$topDonors[0],'rank'=>1,'emoji'=>'🥇','label'=>'১ম স্থান']);
+                if($topDonors->has(1)) $orderedDonors->push(['donor'=>$topDonors[1],'rank'=>2,'emoji'=>'🥈','label'=>'২য় স্থান']);
                 if($topDonors->has(2)) $orderedDonors->push(['donor'=>$topDonors[2],'rank'=>3,'emoji'=>'🥉','label'=>'৩য় স্থান']);
             @endphp
 
@@ -438,9 +438,10 @@
                             ? "border-amber-200 shadow-[0_20px_60px_rgba(251,191,36,0.12)] lg:scale-110 pb-8 pt-12"
                             : "border-slate-100 shadow-sm pb-6 pt-10 mt-0 lg:mt-8";
                         $avatarRing = match($rank) { 1=>"ring-4 ring-amber-100 border-amber-300", 2=>"border-slate-200", 3=>"border-orange-200", default=>"border-slate-100" };
+                        $orderClass = match($rank) { 1=>"order-1 lg:order-2", 2=>"order-2 lg:order-1", 3=>"order-3 lg:order-3", default=>"order-4" };
                     @endphp
 
-                    <div class="bg-white rounded-3xl px-6 w-full max-w-xs mx-auto lg:mx-0 flex flex-col items-center relative border-2 {{ $cardClasses }} transition-all duration-300 hover:-translate-y-2 scroll-reveal" data-scroll-reveal>
+                    <div class="bg-white rounded-3xl px-6 w-full max-w-xs mx-auto lg:mx-0 flex flex-col items-center relative border-2 {{ $cardClasses }} {{ $orderClass }} transition-all duration-300 hover:-translate-y-2 scroll-reveal" data-scroll-reveal>
                         <div class="absolute -top-5 bg-slate-900 text-white text-xs font-black px-5 py-2 rounded-full flex items-center gap-1.5 shadow-lg">
                             {{ $item['emoji'] }} {{ $item['label'] }}
                         </div>

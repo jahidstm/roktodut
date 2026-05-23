@@ -333,11 +333,12 @@
     </div>
 
     {{-- 📱 Mobile Off-Canvas Sidebar --}}
-    <div x-show="mobileMenuOpen" 
-         class="fixed inset-0 z-[100] lg:hidden" 
-         style="display: none;">
-         
-        <!-- Backdrop -->
+    <template x-teleport="body">
+        <div x-show="mobileMenuOpen" 
+             class="fixed inset-0 z-[100] lg:hidden" 
+             style="display: none;">
+             
+            <!-- Backdrop -->
         <div x-show="mobileMenuOpen" 
              x-transition:enter="transition-opacity ease-linear duration-200" 
              x-transition:enter-start="opacity-0" 
@@ -398,7 +399,8 @@
             </div>
             @endguest
         </div>
-    </div>
+        </div>
+    </template>
 </header>
 
 <main class="min-h-screen">
