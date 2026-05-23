@@ -275,25 +275,43 @@
 
         /* ══ Responsive ═════════════════════════════════════ */
         @media (max-width: 900px) {
-            .bi-layout { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto; overflow: auto; }
-            .panel { max-height: 180px; border-right: none; border-bottom: 1px solid #e2e8f0; }
-            .panel.right { border-left: none; border-top: 1px solid #e2e8f0; }
+            body, html { overflow: auto; height: auto; }
+            .topbar { padding: 0 0.8rem; }
+            .topbar-sub { display: none; }
+            .topbar-center { display: none; }
+            .live-pill { padding: 0.25rem 0.5rem; font-size: 0.65rem; }
+            .back-btn { padding: 0.3rem 0.5rem; font-size: 0.7rem; }
+            
+            .bi-layout { 
+                display: flex; 
+                flex-direction: column; 
+                height: auto; 
+                min-height: calc(100vh - 60px); 
+            }
+            .map-wrapper { height: 60vh; min-height: 400px; flex-shrink: 0; order: -1; }
+            .panel { max-height: none !important; border-right: none !important; border-bottom: 1px solid #e2e8f0; padding: 1.25rem 1rem; }
+            .panel.right { border-left: none !important; border-top: none !important; }
         }
     </style>
 </head>
 <body>
 
 {{-- ══ Topbar ══════════════════════════════════════════════ --}}
-<nav class="topbar">
-    <a href="{{ route('home') }}" class="topbar-brand">
-        <div class="topbar-logo">
-            <img src="{{ asset('images/image_14.png') }}" alt="রক্তদূত লোগো">
-        </div>
-        <div>
-            <div class="topbar-name">রক্তদূত</div>
-            <div class="topbar-sub">Blood Donation Platform</div>
-        </div>
-    </a>
+<nav class="topbar" x-data="{ mobileMenuOpen: false }">
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+        <button @click="mobileMenuOpen = true" class="lg:hidden" style="background:none; border:none; padding:0.25rem; color:#64748b; cursor:pointer;">
+            <svg style="width:24px; height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+        <a href="{{ route('home') }}" class="topbar-brand">
+            <div class="topbar-logo">
+                <img src="{{ asset('images/image_14.png') }}" alt="রক্তদূত লোগো">
+            </div>
+            <div>
+                <div class="topbar-name">রক্তদূত</div>
+                <div class="topbar-sub">Blood Donation Platform</div>
+            </div>
+        </a>
+    </div>
 
     <span class="topbar-center">🩸 লাইভ রক্তের চাহিদা মানচিত্র</span>
 
@@ -304,6 +322,8 @@
         </div>
         <a href="{{ route('home') }}" class="back-btn">← হোমে ফিরুন</a>
     </div>
+
+    @include('components.mobile-menu')
 </nav>
 
 {{-- ══ 3-Column BI Layout ═══════════════════════════════════ --}}
@@ -554,6 +574,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (info.demand > 0)
                 criticalList.push({ enName, bnName, demand: info.demand, crs: info.crs });
 
+            const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+            const hintText = isTouch && info.demand > 0 ? `👆 ডাবল ট্যাপ করে ডোনার খুঁজুন` : `👆 ক্লিক করে ডোনার খুঁজুন`;
+
             // ✅ Hover tooltip (sticky, animates in) — NO click popup
             const tooltipHtml = `
                 <div class="tt-card">
@@ -567,7 +590,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span>${info.demand} টি</span>
                     </div>
                     ${info.demand > 0
-                        ? `<div class="tt-hint">👆 ক্লিক করে ডোনার খুঁজুন</div>`
+                        ? `<div class="tt-hint">${hintText}</div>`
                         : ''}
                 </div>`;
 
@@ -581,7 +604,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             // Click → navigate to search
             if (info.demand > 0) {
+                let tooltipOpenedTime = 0;
+                layer.on('tooltipopen', () => { tooltipOpenedTime = Date.now(); });
+                
                 layer.on('click', () => {
+                    if (isTouch) {
+                        // Prevent immediate navigation on first tap
+                        if (Date.now() - tooltipOpenedTime < 400) return;
+                    }
                     window.location.href = '/search';
                 });
             }

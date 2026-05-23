@@ -227,19 +227,48 @@
         .leaflet-control-zoom a { background: #fff !important; color: #374151 !important; border-color: #e2e8f0 !important; }
         .leaflet-control-zoom a:hover { background: #f0fdfa !important; color: #0d9488 !important; }
         .leaflet-pane svg path { filter: none !important; }
+
+        /* ══ Responsive ═════════════════════════════════════ */
+        @media (max-width: 900px) {
+            body, html { overflow: auto; height: auto; }
+            .topbar { padding: 0 0.8rem; }
+            .topbar-sub { display: none; }
+            .topbar-center { display: none; }
+            .live-pill { display: none; }
+            .back-btn { padding: 0.3rem 0.5rem; font-size: 0.7rem; }
+            
+            .hm-wrap { 
+                display: flex; 
+                flex-direction: column; 
+                height: auto; 
+                min-height: calc(100vh - 60px); 
+            }
+            .map-col { height: 60vh; min-height: 400px; flex-shrink: 0; order: -1; border-bottom: 1px solid #e2e8f0; }
+            .hm-panel { max-height: none !important; padding: 1.25rem 1rem; }
+            .hm-panel.left { border-right: none; border-bottom: 1px solid #e2e8f0; }
+            .hm-panel.right { border-left: none; display: block; }
+            
+            .hm-sec[style*="flex:1"] { display: block !important; flex: none !important; overflow: visible !important; }
+            #raw-metrics-list { overflow: visible !important; max-height: 350px; overflow-y: auto !important; }
+        }
     </style>
 </head>
 <body>
 
     {{-- Standalone Header --}}
-    <header class="topbar">
-        <a href="{{ route('admin.dashboard') }}" class="topbar-brand">
-            <div class="topbar-logo"><img src="{{ asset('images/image_14.png') }}" alt="Roktodut"></div>
-            <div>
-                <div class="topbar-name">রক্তদূত</div>
-                <div class="topbar-sub">Blood Donation Platform</div>
-            </div>
-        </a>
+    <header class="topbar" x-data="{ mobileMenuOpen: false }">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+            <button @click="mobileMenuOpen = true" class="lg:hidden" style="background:none; border:none; padding:0.25rem; color:#64748b; cursor:pointer;">
+                <svg style="width:24px; height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            <a href="{{ route('admin.dashboard') }}" class="topbar-brand">
+                <div class="topbar-logo"><img src="{{ asset('images/image_14.png') }}" alt="Roktodut"></div>
+                <div>
+                    <div class="topbar-name">রক্তদূত</div>
+                    <div class="topbar-sub">Blood Donation Platform</div>
+                </div>
+            </a>
+        </div>
         
         <div class="topbar-center">
             🗺️ লাইভ রক্তের চাহিদা মানচিত্র
@@ -257,6 +286,8 @@
                 ← Analytics
             </a>
         </div>
+        
+        @include('components.mobile-menu')
     </header>
 
     {{-- 3-Column Heatmap Panel --}}
