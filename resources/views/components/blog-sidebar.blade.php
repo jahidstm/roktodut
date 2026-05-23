@@ -34,7 +34,7 @@
             <input type="hidden" name="type" value="{{ request('type') }}">
         @endif
         <button type="submit"
-                class="mt-3 w-full bg-red-600 hover:bg-red-700 text-white font-extrabold text-sm py-2.5 rounded-xl transition-colors shadow-sm">
+                class="mt-3 w-full flex items-center justify-center text-center bg-red-600 hover:bg-red-700 text-white font-extrabold text-sm py-2.5 rounded-xl transition-colors shadow-sm">
             সার্চ করুন
         </button>
     </form>

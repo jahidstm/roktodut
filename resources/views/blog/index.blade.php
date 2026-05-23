@@ -9,59 +9,59 @@
      Layout: full-width hero banner + 3-col main content + 1-col sidebar
      ═══════════════════════════════════════════════════════════════════════ --}}
 
-{{-- ── Main Content Area ────────────────────────────────────────────────── --}}
-<div class="mx-auto max-w-6xl px-4 sm:px-6 py-8 sm:py-12 lg:py-14">
+{{-- ── Hero Banner (Full-width) ─────────────────────────────────────────── --}}
+<div class="relative overflow-hidden bg-gradient-to-br from-red-600 via-red-700 to-[#D32F2F] text-center px-6 py-16 sm:py-20 lg:py-24 mb-8 sm:mb-12 shadow-2xl scroll-reveal" data-scroll-reveal>
+    {{-- Decorative blobs --}}
+    <div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px); background-size: 28px 28px;"></div>
+    <div class="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-10 -left-10 w-60 h-60 bg-red-900/30 rounded-full blur-2xl pointer-events-none"></div>
 
-    {{-- ── Hero Banner (Centered & Rounded Leaderboard Style) ──────────────── --}}
-    <div class="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-red-600 via-red-700 to-[#D32F2F] text-center px-6 py-16 sm:py-20 lg:py-24 mb-8 sm:mb-12 shadow-2xl scroll-reveal" data-scroll-reveal>
-        {{-- Decorative blobs --}}
-        <div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(rgba(255,255,255,.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.15) 1px, transparent 1px); background-size: 28px 28px;"></div>
-        <div class="absolute -top-20 -right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-10 -left-10 w-60 h-60 bg-red-900/30 rounded-full blur-2xl pointer-events-none"></div>
+    <div class="relative z-10 mx-auto max-w-4xl flex flex-col items-center">
+        
+        <span class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white text-xs font-extrabold tracking-widest uppercase px-4 py-1.5 rounded-full mb-5 scroll-reveal" data-scroll-reveal>
+            🩸 রক্তদূত স্বাস্থ্যবার্তা
+        </span>
+        
+        <h1 class="text-4xl sm:text-5xl lg:text-[4rem] font-black text-white leading-[1.15] mb-6 tracking-tight drop-shadow-sm scroll-reveal" data-scroll-reveal>
+            স্বাস্থ্য তথ্য ও <span class="text-yellow-300">সাফল্যের গল্প</span>
+        </h1>
+        
+        <p class="text-lg text-white/90 mb-10 font-medium max-w-2xl mx-auto leading-relaxed scroll-reveal" data-scroll-reveal>
+            রক্তদানের অভিজ্ঞতা, চিকিৎসা পরামর্শ এবং আমাদের ডোনারদের অনুপ্রেরণামূলক গল্প পড়ুন।
+        </p>
 
-        <div class="relative z-10 mx-auto max-w-4xl flex flex-col items-center">
-            
-            <span class="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 text-white text-xs font-extrabold tracking-widest uppercase px-4 py-1.5 rounded-full mb-5 scroll-reveal" data-scroll-reveal>
-                🩸 রক্তদূত স্বাস্থ্যবার্তা
-            </span>
-            
-            <h1 class="text-4xl sm:text-5xl lg:text-[4rem] font-black text-white leading-[1.15] mb-6 tracking-tight drop-shadow-sm scroll-reveal" data-scroll-reveal>
-                স্বাস্থ্য তথ্য ও <span class="text-yellow-300">সাফল্যের গল্প</span>
-            </h1>
-            
-            <p class="text-lg text-white/90 mb-10 font-medium max-w-2xl mx-auto leading-relaxed scroll-reveal" data-scroll-reveal>
-                রক্তদানের অভিজ্ঞতা, চিকিৎসা পরামর্শ এবং আমাদের ডোনারদের অনুপ্রেরণামূলক গল্প পড়ুন।
-            </p>
-
-            <div class="flex flex-col items-center w-full">
-                @auth
-                <div class="mb-8 scroll-reveal" data-scroll-reveal>
-                    <a href="{{ route('blog.create') }}" class="inline-flex items-center gap-2 bg-white text-slate-800 font-extrabold px-6 py-3 rounded-full shadow-lg hover:bg-slate-50 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200">
-                        <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-                        নতুন পোস্ট লিখুন
-                    </a>
-                </div>
-                @endauth
-
-                {{-- Category Filter Pills --}}
-                <div class="flex flex-wrap justify-center gap-3 w-full scroll-reveal" data-scroll-reveal>
-                    <a href="{{ route('blog.index') }}"
-                       class="{{ !request('type') ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }} inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-200">
-                        📋 সব পোস্ট
-                    </a>
-                    <a href="{{ route('blog.index', ['type' => 'health']) }}"
-                       class="{{ request('type') === 'health' ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }} inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-200">
-                        🏥 স্বাস্থ্য ব্লগ
-                    </a>
-                    <a href="{{ route('blog.index', ['type' => 'story']) }}"
-                       class="{{ request('type') === 'story' ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }} inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-200">
-                        💪 সাফল্যের গল্প
-                    </a>
-                </div>
+        <div class="flex flex-col items-center w-full">
+            @auth
+            <div class="mb-8 scroll-reveal" data-scroll-reveal>
+                <a href="{{ route('blog.create') }}" class="inline-flex items-center gap-2 bg-white text-slate-800 font-extrabold px-6 py-3 rounded-full shadow-lg hover:bg-slate-50 hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200">
+                    <svg class="w-5 h-5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                    নতুন পোস্ট লিখুন
+                </a>
             </div>
+            @endauth
 
+            {{-- Category Filter Pills --}}
+            <div class="flex flex-wrap justify-center gap-3 w-full scroll-reveal" data-scroll-reveal>
+                <a href="{{ route('blog.index') }}"
+                   class="{{ !request('type') ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }} inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-200">
+                    📋 সব পোস্ট
+                </a>
+                <a href="{{ route('blog.index', ['type' => 'health']) }}"
+                   class="{{ request('type') === 'health' ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }} inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-200">
+                    🏥 স্বাস্থ্য ব্লগ
+                </a>
+                <a href="{{ route('blog.index', ['type' => 'story']) }}"
+                   class="{{ request('type') === 'story' ? 'bg-white text-red-600 shadow-lg' : 'bg-white/15 text-white hover:bg-white/25 border border-white/20' }} inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full font-bold text-sm transition-all duration-200">
+                    💪 সাফল্যের গল্প
+                </a>
+            </div>
         </div>
+
     </div>
+</div>
+
+{{-- ── Main Content Area ────────────────────────────────────────────────── --}}
+<div class="mx-auto max-w-6xl px-4 sm:px-6 pb-8 sm:pb-12 lg:pb-14">
 
     <div class="flex flex-col lg:flex-row gap-8 xl:gap-10 items-start">
 
@@ -258,11 +258,41 @@
                 </div>
 
                 {{-- ── Pagination ─── --}}
-                @if($posts->hasPages())
-                    <div class="mt-10 flex justify-center">
-                        {{ $posts->appends(request()->query())->links() }}
-                    </div>
-                @endif
+                @php
+                    $posts->appends(request()->query());
+                    $from = $posts->firstItem() ?? 0;
+                    $to = $posts->lastItem() ?? 0;
+                    $total = $posts->total();
+                @endphp
+                <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-t border-slate-100 pt-6">
+                    <p class="text-sm font-semibold text-slate-600">
+                        দেখানো হচ্ছে: {{ \App\Support\BanglaDate::digits((string) $from) }}–{{ \App\Support\BanglaDate::digits((string) $to) }} (মোট {{ \App\Support\BanglaDate::digits((string) $total) }} টি)
+                    </p>
+
+                    @if($posts->hasPages())
+                        <nav class="inline-flex flex-wrap items-center gap-1" aria-label="Pagination">
+                            @if($posts->onFirstPage())
+                                <span class="px-3 py-2 rounded-lg border border-slate-200 bg-slate-100 text-slate-400 text-sm font-bold">আগের</span>
+                            @else
+                                <a href="{{ $posts->previousPageUrl() }}" class="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm font-bold hover:bg-slate-50">আগের</a>
+                            @endif
+
+                            @foreach($posts->getUrlRange(1, $posts->lastPage()) as $page => $url)
+                                @if($page == $posts->currentPage())
+                                    <span class="px-3 py-2 rounded-lg bg-red-600 text-white text-sm font-black">{{ \App\Support\BanglaDate::digits((string) $page) }}</span>
+                                @else
+                                    <a href="{{ $url }}" class="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm font-bold hover:bg-slate-50">{{ \App\Support\BanglaDate::digits((string) $page) }}</a>
+                                @endif
+                            @endforeach
+
+                            @if($posts->hasMorePages())
+                                <a href="{{ $posts->nextPageUrl() }}" class="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm font-bold hover:bg-slate-50">পরের</a>
+                            @else
+                                <span class="px-3 py-2 rounded-lg border border-slate-200 bg-slate-100 text-slate-400 text-sm font-bold">পরের</span>
+                            @endif
+                        </nav>
+                    @endif
+                </div>
 
             @else
                 {{-- ── Empty State ─── --}}
