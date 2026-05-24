@@ -103,7 +103,7 @@
             @endforeach
         </div>
 
-        <div class="mt-8">
+        <div class="mt-8 border-t border-slate-100 pt-6">
             {{ $requests->links() }}
         </div>
     @endif

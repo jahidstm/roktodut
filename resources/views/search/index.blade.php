@@ -153,39 +153,8 @@
             @endforeach
         </div>
 
-        @php
-            $from = $donors->firstItem() ?? 0;
-            $to = $donors->lastItem() ?? 0;
-            $total = $donors->total();
-        @endphp
-        <div class="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <p class="text-sm font-semibold text-slate-600">
-                দেখানো হচ্ছে: {{ \App\Support\BanglaDate::digits((string) $from) }}–{{ \App\Support\BanglaDate::digits((string) $to) }} (মোট {{ \App\Support\BanglaDate::digits((string) $total) }} জন)
-            </p>
-
-            @if($donors->hasPages())
-                <nav class="inline-flex items-center gap-1" aria-label="Pagination">
-                    @if($donors->onFirstPage())
-                        <span class="px-3 py-2 rounded-lg border border-slate-200 bg-slate-100 text-slate-400 text-sm font-bold">আগের</span>
-                    @else
-                        <a href="{{ $donors->previousPageUrl() }}" class="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm font-bold hover:bg-slate-50">আগের</a>
-                    @endif
-
-                    @foreach($donors->getUrlRange(1, $donors->lastPage()) as $page => $url)
-                        @if($page == $donors->currentPage())
-                            <span class="px-3 py-2 rounded-lg bg-red-600 text-white text-sm font-black">{{ \App\Support\BanglaDate::digits((string) $page) }}</span>
-                        @else
-                            <a href="{{ $url }}" class="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm font-bold hover:bg-slate-50">{{ \App\Support\BanglaDate::digits((string) $page) }}</a>
-                        @endif
-                    @endforeach
-
-                    @if($donors->hasMorePages())
-                        <a href="{{ $donors->nextPageUrl() }}" class="px-3 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 text-sm font-bold hover:bg-slate-50">পরের</a>
-                    @else
-                        <span class="px-3 py-2 rounded-lg border border-slate-200 bg-slate-100 text-slate-400 text-sm font-bold">পরের</span>
-                    @endif
-                </nav>
-            @endif
+        <div class="mt-8 border-t border-slate-100 pt-6">
+            {{ $donors->links() }}
         </div>
     @endif
 
