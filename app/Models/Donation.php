@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\BloodJourneyStatus;
 use App\Enums\DonationStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,6 +22,7 @@ class Donation extends Model
         'claim_deadline',
         'points_earned',
         'notes',
+        'journey_status',
     ];
 
     protected function casts(): array
@@ -29,6 +31,7 @@ class Donation extends Model
             'claim_status'  => DonationStatus::class,
             'donation_date'  => 'date',
             'claim_deadline' => 'datetime',
+            'journey_status' => BloodJourneyStatus::class,
         ];
     }
 

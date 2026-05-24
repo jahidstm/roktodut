@@ -46,6 +46,8 @@ class BloodRequest extends Model
         'spam_report_count',
         'managed_report_count',
         'is_hidden',
+        'is_super_critical',
+        'priority_score',
     ];
 
     protected function casts(): array
@@ -61,6 +63,8 @@ class BloodRequest extends Model
             'ml_confidence_score' => 'float',
             'is_phone_hidden' => 'boolean',
             'is_hidden'       => 'boolean',
+            'is_super_critical' => 'boolean',
+            'priority_score' => 'integer',
         ];
     }
 

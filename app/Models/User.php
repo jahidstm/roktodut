@@ -75,6 +75,11 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         'provider_id',
         'is_shadowbanned',
         'opt_out_org_broadcast',
+        'dfi_score',
+        'priority_tier',
+        'super_critical_tokens',
+        'suspension_reason',
+        'medical_clearance_document',
         // 🤖 Telegram
         'telegram_chat_id',
         'telegram_connected_at',
@@ -93,6 +98,8 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         'nid_number',           // Privacy Shield
         'nid_number_hash',
         'fcm_token',
+        'suspension_reason',
+        'medical_clearance_document',
     ];
 
     protected function casts(): array
@@ -121,6 +128,8 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
             'nid_uploaded_at' => 'datetime',
             'nid_retention_until' => 'datetime',
             'nid_last_accessed_at' => 'datetime',
+            'dfi_score' => 'decimal:2',
+            'super_critical_tokens' => 'integer',
         ];
     }
 
@@ -151,6 +160,11 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
     public function donations(): HasMany
     {
         return $this->hasMany(Donation::class, 'donor_id');
+    }
+
+    public function healthRecords(): HasMany
+    {
+        return $this->hasMany(HealthRecord::class);
     }
 
     public function bloodRequests(): HasMany
