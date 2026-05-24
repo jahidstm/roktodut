@@ -403,85 +403,87 @@
         </button>
 
         {{-- Upgrade Modal --}}
-        <div x-show="upgradeModalOpen"
-             style="display: none;"
-             class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto"
-             x-transition.opacity>
-            <div @click.away="upgradeModalOpen = false" class="w-full max-w-2xl rounded-2xl bg-white shadow-2xl border border-slate-200 text-left my-8">
-                <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-                    <h3 class="text-xl font-black text-slate-900">রক্তদাতা হিসেবে প্রোফাইল আপগ্রেড করুন</h3>
-                    <button @click="upgradeModalOpen = false" class="text-slate-400 hover:text-red-600 transition">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>
-                </div>
+        <template x-teleport="body">
+            <div x-show="upgradeModalOpen"
+                 style="display: none;"
+                 class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto"
+                 x-transition.opacity>
+                <div @click.away="upgradeModalOpen = false" class="w-full max-w-2xl rounded-2xl bg-white shadow-2xl border border-slate-200 text-left my-8">
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
+                        <h3 class="text-xl font-black text-slate-900">রক্তদাতা হিসেবে প্রোফাইল আপগ্রেড করুন</h3>
+                        <button @click="upgradeModalOpen = false" class="text-slate-400 hover:text-red-600 transition">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                        </button>
+                    </div>
 
-                <div class="p-6">
-                    <form method="POST" action="{{ route('profile.upgrade_to_donor') }}" class="space-y-6">
-                        @csrf
-                        
-                        @if(empty($user->phone))
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-1.5">ফোন নম্বর <span class="text-red-500">*</span></label>
-                            <input type="tel" name="phone" value="{{ old('phone') }}" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required placeholder="01XXX-XXXXXX">
-                            @error('phone') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                        </div>
-                        @endif
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div class="p-6">
+                        <form method="POST" action="{{ route('profile.upgrade_to_donor') }}" class="space-y-6">
+                            @csrf
+                            
+                            @if(empty($user->phone))
                             <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5">রক্তের গ্রুপ <span class="text-red-500">*</span></label>
-                                <select name="blood_group" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
-                                    <option value="">নির্বাচন করুন</option>
-                                    @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bg)
-                                        <option value="{{ $bg }}" @selected(old('blood_group', $user->blood_group?->value ?? $user->blood_group) == $bg)>{{ $bg }}</option>
-                                    @endforeach
-                                </select>
-                                @error('blood_group') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
+                                <label class="block text-sm font-bold text-slate-700 mb-1.5">ফোন নম্বর <span class="text-red-500">*</span></label>
+                                <input type="tel" name="phone" value="{{ old('phone') }}" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required placeholder="01XXX-XXXXXX">
+                                @error('phone') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
+                            </div>
+                            @endif
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">রক্তের গ্রুপ <span class="text-red-500">*</span></label>
+                                    <select name="blood_group" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
+                                        <option value="">নির্বাচন করুন</option>
+                                        @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bg)
+                                            <option value="{{ $bg }}" @selected(old('blood_group', $user->blood_group?->value ?? $user->blood_group) == $bg)>{{ $bg }}</option>
+                                        @endforeach
+                                    </select>
+                                    @error('blood_group') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">লিঙ্গ <span class="text-red-500">*</span></label>
+                                    <select name="gender" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
+                                        <option value="">নির্বাচন করুন</option>
+                                        <option value="male" @selected(old('gender', $user->gender) == 'male')>পুরুষ</option>
+                                        <option value="female" @selected(old('gender', $user->gender) == 'female')>মহিলা</option>
+                                    </select>
+                                    @error('gender') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
+                                </div>
                             </div>
 
                             <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5">লিঙ্গ <span class="text-red-500">*</span></label>
-                                <select name="gender" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
-                                    <option value="">নির্বাচন করুন</option>
-                                    <option value="male" @selected(old('gender', $user->gender) == 'male')>পুরুষ</option>
-                                    <option value="female" @selected(old('gender', $user->gender) == 'female')>মহিলা</option>
-                                </select>
-                                @error('gender') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-bold text-slate-700 mb-1.5">লোকেশন (কোথায় রক্ত দিতে ইচ্ছুক) <span class="text-red-500">*</span></label>
-                            <x-location-selector 
-                                :selected-division="old('division_id', $user->division_id)"
-                                :selected-district="old('district_id', $user->district_id)"
-                                :selected-upazila="old('upazila_id', $user->upazila_id)"
-                            />
-                        </div>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5">ওজন (কেজি)</label>
-                                <input type="number" name="weight" value="{{ old('weight', $user->weight) }}" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" placeholder="যেমন: 65">
-                                @error('weight') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
+                                <label class="block text-sm font-bold text-slate-700 mb-1.5">লোকেশন (কোথায় রক্ত দিতে ইচ্ছুক) <span class="text-red-500">*</span></label>
+                                <x-location-selector 
+                                    :selected-division="old('division_id', $user->division_id)"
+                                    :selected-district="old('district_id', $user->district_id)"
+                                    :selected-upazila="old('upazila_id', $user->upazila_id)"
+                                />
                             </div>
 
-                            <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5">শেষ রক্তদানের তারিখ</label>
-                                <input type="date" name="last_donation_date" value="{{ old('last_donation_date', $user->last_donated_at?->format('Y-m-d')) }}" max="{{ date('Y-m-d') }}" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500 text-slate-700">
-                                @error('last_donation_date') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                            </div>
-                        </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">ওজন (কেজি)</label>
+                                    <input type="number" name="weight" value="{{ old('weight', $user->weight) }}" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" placeholder="যেমন: 65">
+                                    @error('weight') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
+                                </div>
 
-                        <div class="pt-4 flex flex-col sm:flex-row sm:justify-end border-t border-slate-100 mt-6 gap-3">
-                            <button type="submit" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-black shadow-md shadow-emerald-200 transition-all">
-                                আপগ্রেড নিশ্চিত করুন
-                            </button>
-                        </div>
-                    </form>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">শেষ রক্তদানের তারিখ</label>
+                                    <input type="date" name="last_donation_date" value="{{ old('last_donation_date', $user->last_donated_at?->format('Y-m-d')) }}" max="{{ date('Y-m-d') }}" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500 text-slate-700">
+                                    @error('last_donation_date') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
+                                </div>
+                            </div>
+
+                            <div class="pt-4 flex flex-col sm:flex-row sm:justify-end border-t border-slate-100 mt-6 gap-3">
+                                <button type="submit" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-black shadow-md shadow-emerald-200 transition-all">
+                                    আপগ্রেড নিশ্চিত করুন
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
+        </template>
     </div>
     @endif
         @if($isDonor)
