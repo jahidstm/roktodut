@@ -26,6 +26,7 @@ use App\Http\Controllers\ClaimVerificationController;
 use App\Http\Controllers\OfflineClaimController;
 use App\Http\Controllers\FcmTokenController;
 use App\Http\Controllers\DonorHealthLedgerController;
+use App\Http\Controllers\SuspendedDonorController;
 
 use App\Http\Controllers\PublicBloodRequestController;
 use App\Http\Controllers\BlogController;
@@ -278,6 +279,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/donation-record', [DonationRecordController::class, 'update'])->name('donation.record.update');
     Route::get('/donations/{response}/proof', [DonationClaimController::class, 'viewProof'])->name('donations.proof');
     Route::get('/health-ledger', [DonorHealthLedgerController::class, 'index'])->name('health-ledger.index');
+    Route::post('/donor/medical-clearance', [SuspendedDonorController::class, 'uploadMedicalClearance'])
+        ->name('donor.medical-clearance.upload');
 
     // 📍 Geospatial: ডোনারের GPS লোকেশন সেভ করা
     Route::post('/profile/location', [ProfileController::class, 'updateLocation'])->name('profile.location.update');
@@ -314,6 +317,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('/admin/users/{user}/verify-nid', [AdminDashboardController::class, 'verifyNid'])->name('admin.nid.verify');
     Route::post('/admin/orgs/{organization}/verify', [AdminDashboardController::class, 'verifyOrg'])->name('admin.org.verify');
     Route::get('/admin/orgs/{organization}/document', [AdminDashboardController::class, 'viewOrgDocument'])->name('admin.org.document');
+    Route::get('/admin/medical-documents/{user}', [\App\Http\Controllers\Admin\SuspendedDonorController::class, 'download'])
+        ->name('admin.medical-documents.download');
+    Route::post('/admin/medical-documents/{user}/reactivate', [\App\Http\Controllers\Admin\SuspendedDonorController::class, 'reactivate'])
+        ->name('admin.medical-documents.reactivate');
 
     // 🛑 Spam Radar Routes
     Route::get('/admin/spam-radar', [SpamRadarController::class, 'index'])->name('admin.spam-radar.index');
