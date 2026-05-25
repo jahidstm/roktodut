@@ -102,12 +102,33 @@
                          x-transition:leave-end="opacity-0 scale-95"
                          class="absolute right-4 sm:right-0 top-12 z-50 w-[calc(100vw-2rem)] sm:w-80 rounded-2xl bg-white shadow-xl ring-1 ring-slate-200"
                          style="display: none;">
-                        <div class="px-4 py-3 border-b border-slate-100 bg-slate-50 rounded-t-2xl">
+                        <div class="px-4 py-3 border-b border-slate-100 bg-slate-50 rounded-t-2xl flex justify-between items-center">
                             <h3 class="text-sm font-extrabold text-slate-800">নোটিফিকেশন</h3>
                         </div>
-                        <div class="max-h-80 overflow-y-auto p-4 text-center text-sm font-bold text-slate-400">
-                            আপাতত কোনো নোটিফিকেশন নেই।
+                        <div class="max-h-80 overflow-y-auto">
+                            @forelse(auth()->user()->unreadNotifications as $notification)
+                                <a href="{{ route('notifications.read', $notification->id) }}" class="block px-4 py-3 border-b border-slate-100 hover:bg-slate-50 transition">
+                                    <div class="text-sm text-slate-700 font-semibold mb-1 leading-snug">
+                                        {{ $notification->data['message'] ?? 'নতুন নোটিফিকেশন' }}
+                                    </div>
+                                    <div class="text-xs text-slate-500 font-medium">
+                                        {{ $notification->created_at->diffForHumans() }}
+                                    </div>
+                                </a>
+                            @empty
+                                <div class="p-4 text-center text-sm font-bold text-slate-400">
+                                    আপাতত কোনো নোটিফিকেশন নেই।
+                                </div>
+                            @endforelse
                         </div>
+                        @if(auth()->user()->unreadNotifications->count() > 0)
+                            <div class="p-2 bg-slate-50 border-t border-slate-100 text-center rounded-b-2xl">
+                                <form method="POST" action="{{ route('notifications.read-all') }}">
+                                    @csrf
+                                    <button type="submit" class="text-xs font-bold text-red-600 hover:text-red-700 w-full p-2 transition">সবগুলো পঠিত মার্ক করুন</button>
+                                </form>
+                            </div>
+                        @endif
                     </div>
                 </div>
 
