@@ -285,6 +285,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/donation-record', [DonationRecordController::class, 'update'])->name('donation.record.update');
     Route::get('/donations/{response}/proof', [DonationClaimController::class, 'viewProof'])->name('donations.proof');
     Route::get('/health-ledger', [DonorHealthLedgerController::class, 'index'])->name('health-ledger.index');
+    Route::post('/health-ledger', [DonorHealthLedgerController::class, 'store'])->name('health-ledger.store');
     Route::post('/donor/medical-clearance', [SuspendedDonorController::class, 'uploadMedicalClearance'])
         ->name('donor.medical-clearance.upload');
 

@@ -24,4 +24,31 @@ class DonorHealthLedgerController extends Controller
             'charts' => $analysis['charts'],
         ]);
     }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'hemoglobin_level' => ['nullable', 'numeric', 'min:5', 'max:25'],
+            'systolic_bp'      => ['nullable', 'integer', 'min:70', 'max:200'],
+            'diastolic_bp'     => ['nullable', 'integer', 'min:40', 'max:130'],
+            'weight_kg'        => ['nullable', 'numeric', 'min:30', 'max:200'],
+            'recorded_at'      => ['required', 'date', 'before_or_equal:today'],
+        ]);
+
+        if (empty($validated['hemoglobin_level']) && empty($validated['systolic_bp']) && empty($validated['weight_kg'])) {
+            return back()->with('error', 'অন্তত একটি হেলথ মেট্রিক (হিমোগ্লোবিন, প্রেশার বা ওজন) ইনপুট দিন।');
+        }
+
+        HealthRecord::create([
+            'user_id'          => $request->user()->id,
+            'recorded_at'      => $validated['recorded_at'],
+            'hemoglobin_level' => $validated['hemoglobin_level'],
+            'systolic_bp'      => $validated['systolic_bp'],
+            'diastolic_bp'     => $validated['diastolic_bp'],
+            'weight_kg'        => $validated['weight_kg'],
+            'source'           => 'self_reported',
+        ]);
+
+        return back()->with('success', 'আপনার হেলথ রেকর্ড সফলভাবে যুক্ত হয়েছে।');
+    }
 }

@@ -48,13 +48,46 @@ class HealthVelocityService
             'hemoglobin' => [],
             'systolic' => [],
             'diastolic' => [],
+            'hb_markers' => [],
+            'sys_markers' => [],
+            'dia_markers' => [],
         ];
 
-        foreach ($sorted as $record) {
+        foreach ($sorted as $index => $record) {
             $charts['labels'][] = $record->recorded_at?->format('d M');
             $charts['hemoglobin'][] = $record->hemoglobin_level !== null ? (float) $record->hemoglobin_level : null;
             $charts['systolic'][] = $record->systolic_bp !== null ? (int) $record->systolic_bp : null;
             $charts['diastolic'][] = $record->diastolic_bp !== null ? (int) $record->diastolic_bp : null;
+            
+            if ($record->source === 'self_reported') {
+                if ($record->hemoglobin_level !== null) {
+                    $charts['hb_markers'][] = [
+                        'seriesIndex' => 0,
+                        'dataPointIndex' => $index,
+                        'fillColor' => '#ffffff',
+                        'strokeColor' => '#dc2626',
+                        'size' => 5
+                    ];
+                }
+                if ($record->systolic_bp !== null) {
+                    $charts['sys_markers'][] = [
+                        'seriesIndex' => 0,
+                        'dataPointIndex' => $index,
+                        'fillColor' => '#ffffff',
+                        'strokeColor' => '#2563eb',
+                        'size' => 5
+                    ];
+                }
+                if ($record->diastolic_bp !== null) {
+                    $charts['dia_markers'][] = [
+                        'seriesIndex' => 1,
+                        'dataPointIndex' => $index,
+                        'fillColor' => '#ffffff',
+                        'strokeColor' => '#0f766e',
+                        'size' => 5
+                    ];
+                }
+            }
         }
 
         return [
