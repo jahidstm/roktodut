@@ -12,6 +12,7 @@ use App\Models\ChronicRequestSubscription;
 use App\Models\BloodRequestResponse;
 use App\Models\User;
 use App\Services\MathCaptchaService;
+use App\Services\PriorityQueueService;
 use App\Support\PhoneNormalizer;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -284,6 +285,16 @@ class BloodRequestController extends Controller
 
         // ১. রিকোয়েস্ট সেভ করা
         $bloodRequest = BloodRequest::create($data);
+
+        // ২. Priority Routing (Anti-Gaming)
+        $useSuperCritical = $request->boolean('use_super_critical_token');
+        if ($request->user()) {
+            app(PriorityQueueService::class)->applyPriorityForRequest(
+                requester: $request->user(),
+                request: $bloodRequest,
+                useSuperCriticalToken: $useSuperCritical
+            );
+        }
 
         SmartBloodRequestBroadcastJob::dispatch(
             bloodRequestId: $bloodRequest->id,
