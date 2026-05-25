@@ -25,6 +25,7 @@ use App\Http\Controllers\ChatbotController;
 use App\Http\Controllers\ClaimVerificationController;
 use App\Http\Controllers\OfflineClaimController;
 use App\Http\Controllers\FcmTokenController;
+use App\Http\Controllers\DonorHealthLedgerController;
 
 use App\Http\Controllers\PublicBloodRequestController;
 use App\Http\Controllers\BlogController;
@@ -276,6 +277,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/blog', [BlogSubmissionController::class, 'store'])->name('blog.store');
     Route::post('/donation-record', [DonationRecordController::class, 'update'])->name('donation.record.update');
     Route::get('/donations/{response}/proof', [DonationClaimController::class, 'viewProof'])->name('donations.proof');
+    Route::get('/health-ledger', [DonorHealthLedgerController::class, 'index'])->name('health-ledger.index');
 
     // 📍 Geospatial: ডোনারের GPS লোকেশন সেভ করা
     Route::post('/profile/location', [ProfileController::class, 'updateLocation'])->name('profile.location.update');
