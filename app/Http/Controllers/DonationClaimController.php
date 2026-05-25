@@ -42,6 +42,12 @@ class DonationClaimController extends Controller
                 ]);
 
                 $this->notifyAdminsForProofReview($response, 'claim');
+                
+                // 🔔 Notify the recipient
+                $recipient = User::find($response->bloodRequest->requested_by);
+                if ($recipient) {
+                    $recipient->notify(new \App\Notifications\BloodResponseNotification($response->bloodRequest, Auth::user(), 'claimed'));
+                }
 
                 return back()->with('success', '🎉 পিন মিলেছে! আপনার দাবিটি (Claim) রেকর্ড করা হয়েছে। গ্রহীতা বা অ্যাডমিন রিভিউয়ের পর আপনার পয়েন্ট ও ব্যাজ যুক্ত হবে।');
             }
@@ -57,6 +63,12 @@ class DonationClaimController extends Controller
             ]);
 
             $this->notifyAdminsForProofReview($response, 'claim');
+            
+            // 🔔 Notify the recipient
+            $recipient = User::find($response->bloodRequest->requested_by);
+            if ($recipient) {
+                $recipient->notify(new \App\Notifications\BloodResponseNotification($response->bloodRequest, Auth::user(), 'claimed'));
+            }
 
             return back()->with('success', '📸 আপনার প্রমাণটি জমা হয়েছে। যাচাইয়ের পর পয়েন্ট ও ব্যাজ যুক্ত হবে।');
         }

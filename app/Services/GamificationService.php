@@ -489,7 +489,7 @@ class GamificationService
             // Send notification for badge unlock
             $user->notify(new \App\Notifications\GamificationRewardNotification(
                 title: '🏅 নতুন ব্যাজ আনলক হয়েছে!',
-                message: "অভিনন্দন! আপনি '{$badge->name_bn}' ব্যাজটি অর্জন করেছেন।",
+                message: "অভিনন্দন! আপনি '{$badge->bn_name}' ব্যাজটি অর্জন করেছেন।",
                 points: 0 // No points, just a badge
             ));
         }

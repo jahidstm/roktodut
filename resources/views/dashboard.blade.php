@@ -95,8 +95,8 @@
                 @endif
             </div>
 
-            <div class="grid grid-cols-1 gap-3 mt-8">
-                <form action="{{ route('donations.recipient_verify', $pendingClaim->id) }}" method="POST">
+            <div class="flex flex-col gap-3 mt-8 w-full">
+                <form action="{{ route('donations.recipient_verify', $pendingClaim->id) }}" method="POST" class="w-full">
                     @csrf
                     <input type="hidden" name="decision" value="approve">
                     <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-4 rounded-2xl shadow-lg shadow-emerald-100 transition-all flex items-center justify-center gap-2">
@@ -105,10 +105,10 @@
                     </button>
                 </form>
 
-                <form action="{{ route('donations.recipient_verify', $pendingClaim->id) }}" method="POST">
+                <form action="{{ route('donations.recipient_verify', $pendingClaim->id) }}" method="POST" class="w-full">
                     @csrf
                     <input type="hidden" name="decision" value="dispute">
-                    <button type="submit" onclick="return confirm('আপনি কি নিশ্চিত যে এই ডোনার রক্ত দেননি? এটি তার প্রোফাইলে নেতিবাচক প্রভাব ফেলবে।')" class="w-full bg-white hover:bg-red-50 text-red-600 font-bold py-3.5 rounded-2xl border-2 border-red-100 transition-all">
+                    <button type="submit" onclick="return confirm('আপনি কি নিশ্চিত যে এই ডোনার রক্ত দেননি? এটি তার প্রোফাইলে নেতিবাচক প্রভাব ফেলবে।')" class="w-full bg-white hover:bg-red-50 text-red-600 font-bold py-3.5 rounded-2xl border border-red-200 transition-all text-center flex items-center justify-center">
                         না, তিনি আসেননি (Report)
                     </button>
                 </form>

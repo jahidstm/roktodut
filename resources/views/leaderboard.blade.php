@@ -119,8 +119,8 @@
                    id="tab-time-all"
                    class="flex-1 text-center text-sm font-bold py-2.5 px-3 rounded-lg transition-all duration-200
                           {{ $time === 'all'
-                              ? 'bg-white text-red-600 shadow-sm'
-                              : 'text-slate-500 hover:text-slate-700' }}">
+                              ? 'bg-red-600 text-white shadow-md'
+                              : 'bg-slate-200 text-slate-600 hover:bg-slate-300 hover:text-slate-800' }}">
                     ⭐ সর্বকাল
                 </a>
 
@@ -129,8 +129,8 @@
                    id="tab-time-month"
                    class="flex-1 text-center text-sm font-bold py-2.5 px-3 rounded-lg transition-all duration-200
                           {{ $time === 'month'
-                              ? 'bg-white text-red-600 shadow-sm'
-                              : 'text-slate-500 hover:text-slate-700' }}">
+                              ? 'bg-red-600 text-white shadow-md'
+                              : 'bg-slate-200 text-slate-600 hover:bg-slate-300 hover:text-slate-800' }}">
                     📅 এই মাস
                 </a>
             </div>
@@ -149,8 +149,8 @@
                        id="tab-scope-bd"
                        class="flex-1 text-center text-sm font-bold py-2.5 px-3 rounded-lg transition-all duration-200
                               {{ $scope === 'bd'
-                                  ? 'bg-white text-red-600 shadow-sm'
-                                  : 'text-slate-500 hover:text-slate-700' }}">
+                                  ? 'bg-red-600 text-white shadow-md'
+                                  : 'bg-slate-200 text-slate-600 hover:bg-slate-300 hover:text-slate-800' }}">
                         🇧🇩 বাংলাদেশ
                     </a>
 
@@ -159,8 +159,8 @@
                        id="tab-scope-district"
                        class="flex-1 text-center text-sm font-bold py-2.5 px-3 rounded-lg transition-all duration-200
                               {{ $scope === 'district'
-                                  ? 'bg-white text-red-600 shadow-sm'
-                                  : 'text-slate-500 hover:text-slate-700' }}">
+                                  ? 'bg-red-600 text-white shadow-md'
+                                  : 'bg-slate-200 text-slate-600 hover:bg-slate-300 hover:text-slate-800' }}">
                         📍 জেলা
                     </a>
                 </div>
@@ -427,7 +427,7 @@
         @if($donors->count() > 10)
             <div x-show="!showAll" class="p-4 text-center border-t border-slate-50 bg-slate-50/50">
                 <button @click="showAll = true" type="button" class="inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors">
-                    View Full List ⬇️
+                    সম্পূর্ণ তালিকা দেখুন ⬇️
                 </button>
             </div>
         @endif
@@ -452,9 +452,33 @@
     if (!root) return;
 
     const tabSelector = '#tab-time-all, #tab-time-month, #tab-scope-bd, #tab-scope-district';
+    const pageCache = {};
 
     const loadLeaderboard = async (url, { pushState = true } = {}) => {
         try {
+            // Check cache first for instant response
+            if (pageCache[url]) {
+                const nextRoot = pageCache[url];
+                root.innerHTML = nextRoot.innerHTML;
+                
+                if (pushState) {
+                    window.history.pushState({ leaderboard: true }, '', url);
+                }
+                
+                if (window.Alpine && typeof window.Alpine.initTree === 'function') {
+                    window.Alpine.initTree(root);
+                }
+                if (typeof window.initScrollReveal === 'function') {
+                    window.initScrollReveal(root);
+                }
+                return;
+            }
+
+            // Visual loading state
+            root.style.opacity = '0.5';
+            root.style.pointerEvents = 'none';
+            root.style.transition = 'opacity 0.2s';
+
             const response = await fetch(url, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' },
                 credentials: 'same-origin',
@@ -474,7 +498,14 @@
                 return;
             }
 
+            // Cache for future clicks
+            pageCache[url] = nextRoot.cloneNode(true);
+
             root.innerHTML = nextRoot.innerHTML;
+            
+            // Remove loading state
+            root.style.opacity = '1';
+            root.style.pointerEvents = 'auto';
 
             if (pushState) {
                 window.history.pushState({ leaderboard: true }, '', url);
