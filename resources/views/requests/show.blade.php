@@ -219,11 +219,16 @@
                         </form>
                     </div>
                 @elseif ($myResponse->status === 'accepted')
-                    <div class="flex items-center gap-4">
+                    <div class="flex flex-wrap items-center gap-4">
                         <span class="px-6 py-3 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 font-black flex items-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
                             রোগী আপনার রিকোয়েস্ট অ্যাকসেপ্ট করেছেন
                         </span>
+
+                        <a href="{{ route('chat.show', $myResponse->id) }}" class="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold transition-colors shadow-sm flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                            রোগীর সাথে চ্যাট করুন
+                        </a>
                     </div>
                 @elseif ($myResponse->status === 'rejected')
                     <div class="flex items-center gap-4">
@@ -488,12 +493,18 @@
                                             অনুমোদিত
                                         </div>
                                     </div>
-                                    <button type="button"
-                                            class="reveal-btn w-full sm:w-auto shrink-0 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-sm transition-colors shadow-sm"
-                                            data-url="{{ route('requests.donors.reveal_phone', ['bloodRequest' => $bloodRequest->id, 'donor' => $resp->user_id]) }}"
-                                            data-target="phone-{{ $resp->user_id }}">
-                                        নম্বর দেখুন (Reveal)
-                                    </button>
+                                    <div class="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                                        <button type="button"
+                                                class="reveal-btn flex-1 sm:flex-none px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-extrabold text-sm transition-colors shadow-sm"
+                                                data-url="{{ route('requests.donors.reveal_phone', ['bloodRequest' => $bloodRequest->id, 'donor' => $resp->user_id]) }}"
+                                                data-target="phone-{{ $resp->user_id }}">
+                                            নম্বর দেখুন (Reveal)
+                                        </button>
+                                        <a href="{{ route('chat.show', $resp->id) }}" class="flex-1 sm:flex-none px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-extrabold text-sm transition-colors shadow-sm flex items-center justify-center gap-2">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                                            চ্যাট
+                                        </a>
+                                    </div>
                                 </div>
 
                                 <div class="text-sm font-semibold text-slate-700 mb-3 p-3 bg-white border border-emerald-100 rounded-lg flex items-center gap-2">

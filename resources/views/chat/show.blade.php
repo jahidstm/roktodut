@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8"
-     x-data="chatRoom(@json($messages), {{ (int) auth()->id() }}, '{{ e($storeUrl) }}', {{ (int) $response->id }}, {{ $isClosed ? 'true' : 'false' }})"
+     x-data='chatRoom(@json($messages), {{ (int) auth()->id() }}, "{{ e($storeUrl) }}", {{ (int) $response->id }}, {{ $isClosed ? "true" : "false" }})'
      x-init="init()">
 
     <div class="flex flex-col lg:flex-row gap-6">

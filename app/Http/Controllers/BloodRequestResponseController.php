@@ -176,19 +176,13 @@ class BloodRequestResponseController extends Controller
                 ->first();
 
             // 2. Race Condition Check
-            if ($request->status === 'accepted' && in_array($lockedRequest->status, ['in_progress', 'completed'])) {
-                abort(409, 'এই রিকোয়েস্টটি ইতিমধ্যে অন্য ডোনারের মাধ্যমে প্রসেসিংয়ে আছে।');
+            if ($request->status === 'accepted' && $lockedRequest->status === 'fulfilled') {
+                abort(409, 'এই রিকোয়েস্টটি ইতিমধ্যে সম্পন্ন (fulfilled) হয়েছে।');
             }
 
             $response->update([
                 'status' => $request->status,
             ]);
-
-            if ($request->status === 'accepted') {
-                $lockedRequest->update([
-                    'status' => 'in_progress',
-                ]);
-            }
         });
 
         // Send notification to the donor
