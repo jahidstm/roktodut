@@ -488,6 +488,36 @@
     @endif
         @if($isDonor)
     <x-dashboard.recovery-timer :items="$donationRecoveryCards" />
+    
+    {{-- Predictive Health Ledger Banner --}}
+    <div class="mt-2 mb-2">
+        <a href="{{ route('health-ledger.index') }}" class="group relative overflow-hidden p-6 sm:p-8 rounded-[2rem] bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 flex flex-col sm:flex-row items-center justify-between gap-6 sm:gap-8 scroll-reveal border border-slate-700/50" data-scroll-reveal>
+            <div class="absolute -right-12 -bottom-12 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/20 transition-all duration-700 ease-out"></div>
+            <div class="absolute -left-12 -top-12 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-blue-500/20 transition-all duration-700 ease-out"></div>
+            
+            <div class="flex flex-col sm:flex-row items-center text-center sm:text-left gap-5 sm:gap-6 relative z-10 w-full sm:w-auto">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 bg-emerald-500/10 rounded-[1.5rem] flex items-center justify-center text-emerald-400 border border-emerald-500/20 shrink-0 shadow-inner">
+                    <svg class="w-8 h-8 sm:w-10 sm:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                </div>
+                <div>
+                    <h3 class="text-white font-black text-xl sm:text-2xl leading-tight flex flex-col sm:flex-row items-center sm:items-baseline gap-2">
+                        প্রেডিক্টিভ হেলথ লেজার 
+                        <span class="inline-flex items-center justify-center bg-emerald-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm mt-1 sm:mt-0">New</span>
+                    </h3>
+                    <p class="text-slate-400 text-sm font-medium mt-2 leading-relaxed max-w-xl">
+                        আপনার হিমোগ্লোবিন, ব্লাড প্রেশার ও ওজনের ট্র্যাক রাখুন। আমাদের AI আপনার স্বাস্থ্য বিশ্লেষণ করে পরবর্তী রক্তদানের জন্য গাইডলাইন দেবে।
+                    </p>
+                </div>
+            </div>
+            
+            <div class="shrink-0 relative z-10 w-full sm:w-auto mt-2 sm:mt-0">
+                <span class="flex sm:inline-flex items-center justify-center bg-white text-slate-900 px-6 py-3.5 sm:py-3 rounded-xl text-sm font-black transition-transform group-hover:scale-105 shadow-md w-full sm:w-auto">
+                    হেলথ লেজার দেখুন
+                    <svg class="w-4 h-4 ml-2 text-slate-400 group-hover:text-slate-900 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M9 5l7 7-7 7"></path></svg>
+                </span>
+            </div>
+        </a>
+    </div>
     @endif
 
 {{-- 2. Core Actions (CTA Row) --}}
