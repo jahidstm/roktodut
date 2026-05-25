@@ -56,7 +56,7 @@
         </div>
 
         {{-- 1) Proof Review --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 scroll-reveal"
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
              :class="{'border-red-200 ring-2 ring-red-50': activeAccordion === 1}">
             <button @click="activeAccordion = activeAccordion === 1 ? null : 1" 
                     @keydown.enter="activeAccordion = activeAccordion === 1 ? null : 1"
@@ -96,7 +96,7 @@
         </div>
 
         {{-- 2) NID Review --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 scroll-reveal"
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
              :class="{'border-blue-200 ring-2 ring-blue-50': activeAccordion === 2}">
             <button @click="activeAccordion = activeAccordion === 2 ? null : 2" 
                     @keydown.enter="activeAccordion = activeAccordion === 2 ? null : 2"
@@ -135,7 +135,7 @@
         </div>
 
         {{-- 3) Organization Review --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 scroll-reveal"
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
              :class="{'border-indigo-200 ring-2 ring-indigo-50': activeAccordion === 3}">
             <button @click="activeAccordion = activeAccordion === 3 ? null : 3"
                     @keydown.enter="activeAccordion = activeAccordion === 3 ? null : 3"
@@ -171,7 +171,7 @@
         </div>
 
         {{-- 4) Support Inbox Governance --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 scroll-reveal"
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
              :class="{'border-blue-200 ring-2 ring-blue-50': activeAccordion === 4}">
             <button @click="activeAccordion = activeAccordion === 4 ? null : 4" 
                     @keydown.enter="activeAccordion = activeAccordion === 4 ? null : 4"
@@ -225,7 +225,7 @@
         </div>
 
         {{-- 5) Blog Governance --}}
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200 scroll-reveal"
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
              :class="{'border-violet-200 ring-2 ring-violet-50': activeAccordion === 5}">
             <button @click="activeAccordion = activeAccordion === 5 ? null : 5"
                     @keydown.enter="activeAccordion = activeAccordion === 5 ? null : 5"
