@@ -237,11 +237,15 @@
                 @endif
                 <div class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-center divide-x divide-slate-200 mb-5">
                     <div class="flex-1 text-center pr-4">
-                        <div class="text-2xl font-black text-slate-900">{{ $d->total_verified_donations ?? 0 }}</div>
+                        <div class="text-2xl font-black text-slate-900">
+                            <x-number-ticker :value="$d->total_verified_donations ?? 0" :duration="2000" />
+                        </div>
                         <div class="text-[10px] font-bold text-slate-400 mt-1">রক্তদান</div>
                     </div>
                     <div class="flex-1 text-center pl-4">
-                        <div class="text-2xl font-black text-slate-900">{{ number_format($time === 'month' ? ($d->monthly_points ?? 0) : ($d->points ?? 0)) }}</div>
+                        <div class="text-2xl font-black text-slate-900">
+                            <x-number-ticker :value="$time === 'month' ? ($d->monthly_points ?? 0) : ($d->points ?? 0)" :duration="2500" :format="true" />
+                        </div>
                         <div class="text-[10px] font-bold text-slate-400 mt-1">পয়েন্ট</div>
                     </div>
                 </div>
@@ -249,7 +253,20 @@
                     @if($d->badges->isNotEmpty())
                         @foreach($d->badges->take(3) as $badge)
                             @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
-                            <span class="text-xl drop-shadow-sm hover:scale-125 transition-transform cursor-help" title="{{ $bd['bn'] }}">{{ $bd['emoji'] }}</span>
+                            {{-- Lottie Animation Structure for Podium Badges --}}
+                            {{-- We fallback to emoji if the Lottie JSON path is empty or fails --}}
+                            <div class="group relative cursor-help" title="{{ $bd['bn'] }}">
+                                <lottie-player 
+                                    src="{{ asset('animations/badges/' . strtolower($badge->name) . '.json') }}" 
+                                    background="transparent" 
+                                    speed="1" 
+                                    style="width: 32px; height: 32px;" 
+                                    hover loop
+                                    {{-- If JSON is missing, show emoji --}}
+                                    onError="this.style.display='none'; this.nextElementSibling.style.display='inline-block';"
+                                ></lottie-player>
+                                <span class="text-xl drop-shadow-sm hover:scale-125 transition-transform" style="display:none;">{{ $bd['emoji'] }}</span>
+                            </div>
                         @endforeach
                     @else
                         <span class="text-xl opacity-20 grayscale">🎖️</span><span class="text-xl opacity-20 grayscale">🎖️</span><span class="text-xl opacity-20 grayscale">🎖️</span>
@@ -333,16 +350,16 @@
                 {{-- Stats (রক্তদান & পয়েন্ট) --}}
                 <div class="flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-6 text-right pr-2">
                     <div class="flex items-center gap-1 text-[11px] font-semibold text-slate-500 sm:hidden">
-                        রক্তদান <span class="font-bold text-blue-600">{{ $donor->total_verified_donations ?? 0 }}</span>
+                        রক্তদান <span class="font-bold text-blue-600"><x-number-ticker :value="$donor->total_verified_donations ?? 0" /></span>
                     </div>
                     <div class="hidden sm:block">
                         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">রক্তদান</div>
-                        <div class="font-bold text-blue-600 text-sm">{{ $donor->total_verified_donations ?? 0 }}</div>
+                        <div class="font-bold text-blue-600 text-sm"><x-number-ticker :value="$donor->total_verified_donations ?? 0" /></div>
                     </div>
                     <div>
                         <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{{ $pointsLabel }}</div>
                         <div class="font-bold text-amber-600 text-sm flex items-center gap-1 justify-end">
-                            {{ number_format($displayPts) }}
+                            <x-number-ticker :value="$displayPts" :format="true" />
                         </div>
                     </div>
                 </div>
@@ -407,16 +424,16 @@
                     {{-- Stats --}}
                     <div class="flex flex-col items-end gap-1 sm:flex-row sm:items-center sm:gap-6 text-right pr-2">
                         <div class="flex items-center gap-1 text-[11px] font-semibold text-slate-500 sm:hidden">
-                            রক্তদান <span class="font-bold text-blue-600">{{ $myDons }}</span>
+                            রক্তদান <span class="font-bold text-blue-600"><x-number-ticker :value="$myDons" /></span>
                         </div>
                         <div class="hidden sm:block">
                             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">রক্তদান</div>
-                            <div class="font-bold text-blue-600 text-sm">{{ $myDons }}</div>
+                            <div class="font-bold text-blue-600 text-sm"><x-number-ticker :value="$myDons" /></div>
                         </div>
                         <div>
                             <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">{{ $pointsLabel }}</div>
                             <div class="font-bold text-amber-600 text-sm flex items-center gap-1 justify-end">
-                                {{ number_format($myPts) }}
+                                <x-number-ticker :value="$myPts" :format="true" />
                             </div>
                         </div>
                     </div>
@@ -446,6 +463,9 @@
 
 </div>
 @push('scripts')
+{{-- Lottie Player Script (Lightweight) --}}
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+
 <script>
 (() => {
     const root = document.getElementById('leaderboard-root');

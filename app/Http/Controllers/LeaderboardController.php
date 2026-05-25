@@ -38,11 +38,14 @@ class LeaderboardController extends Controller
             ? $districts->firstWhere('id', $districtId)
             : null;
 
-        // ─── লিডারবোর্ড কোয়েরি ────────────────────────────────────────────
-        // top3 পোডিয়ামের জন্য আলাদা — N+1 নেই, eager load সহ
-        $top3   = $this->gamification->getTop3($scope, $districtId, $time);
-        // পুরো তালিকা (Top 50)
-        $donors = $this->gamification->getLeaderboard($scope, $districtId, $time, $limit);
+        // ─── লিডারবোর্ড কোয়েরি (Cached for 10 minutes) ────────────────────
+        $cacheKey = "leaderboard_{$scope}_{$districtId}_{$time}";
+
+        [$top3, $donors] = \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addMinutes(10), function () use ($scope, $districtId, $time, $limit) {
+            $top3 = $this->gamification->getTop3($scope, $districtId, $time);
+            $donors = $this->gamification->getLeaderboard($scope, $districtId, $time, $limit);
+            return [$top3, $donors];
+        });
 
         // ─── লগইন ইউজারের র‌্যাঙ্ক ও পয়েন্ট ─────────────────────────────
         $myRank   = null;
