@@ -15,25 +15,25 @@
     $verifiedCount = (int) ($request->verified_verifications_count ?? 0);
 
     $urgencyMap = [
-        'emergency' => ['label' => 'Emergency', 'cls' => 'bg-red-50 text-red-700 border-red-200'],
-        'urgent' => ['label' => 'Urgent', 'cls' => 'bg-amber-50 text-amber-700 border-amber-200'],
-        'normal' => ['label' => 'Normal', 'cls' => 'bg-slate-100 text-slate-700 border-slate-200'],
+        'emergency' => ['label' => 'ইমার্জেন্সি', 'cls' => 'bg-red-50 text-red-700 border-red-200'],
+        'urgent' => ['label' => 'আর্জেন্ট', 'cls' => 'bg-amber-50 text-amber-700 border-amber-200'],
+        'normal' => ['label' => 'নরমাল', 'cls' => 'bg-slate-100 text-slate-700 border-slate-200'],
     ];
     $urgencyInfo = $urgencyMap[$urgency] ?? $urgencyMap['normal'];
 
-    $statusLabel = 'Running';
+    $statusLabel = 'চলমান';
     $statusCls = 'bg-sky-50 text-sky-700 border-sky-200';
     if ($status === 'expired') {
-        $statusLabel = 'Cancelled';
+        $statusLabel = 'বাতিল';
         $statusCls = 'bg-rose-50 text-rose-700 border-rose-200';
     } elseif ($verifiedCount > 0 || $status === 'fulfilled') {
-        $statusLabel = 'Successful (Verified)';
+        $statusLabel = 'সফল (ভেরিফাইড)';
         $statusCls = 'bg-emerald-50 text-emerald-700 border-emerald-200';
     } elseif ($claimedCount > 0) {
-        $statusLabel = 'Claimed (In Review)';
+        $statusLabel = 'রিভিউতে আছে';
         $statusCls = 'bg-amber-50 text-amber-700 border-amber-200';
     } elseif ($acceptedCount > 0) {
-        $statusLabel = 'Donor Found';
+        $statusLabel = 'ডোনার পাওয়া গেছে';
         $statusCls = 'bg-indigo-50 text-indigo-700 border-indigo-200';
     }
 
@@ -68,7 +68,7 @@
             </div>
         </div>
         <span class="inline-flex h-7 shrink-0 items-center rounded-full border border-slate-200 bg-slate-50 px-3 text-xs font-bold text-slate-700">
-            Units: {{ \App\Support\BanglaDate::digits((string) ($request->bags_needed ?? 1)) }}
+            ইউনিট: {{ \App\Support\BanglaDate::digits((string) ($request->bags_needed ?? 1)) }}
         </span>
     </div>
 
@@ -128,7 +128,7 @@
 
         @if($showRequester && $request->requester)
             <div class="text-[11px] font-medium text-slate-500">
-                Requester: <span class="font-semibold text-slate-700">{{ $request->requester->name }}</span>
+                রিকোয়েস্ট করেছেন: <span class="font-semibold text-slate-700">{{ $request->requester->name }}</span>
             </div>
         @endif
     </div>
@@ -136,19 +136,19 @@
     <div class="mt-4 flex flex-wrap gap-2">
         <a href="{{ $detailsUrl }}"
            class="inline-flex h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700 transition hover:border-slate-400 hover:bg-slate-50">
-            View Details
+            বিস্তারিত দেখুন
         </a>
 
         @if($isPublic)
             @guest
                 <a href="{{ route('login') }}?redirect={{ urlencode(route('public.requests.index')) }}"
                    class="inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-700">
-                    Respond
+                    সাড়া দিন
                 </a>
             @else
                 <a href="{{ $detailsUrl }}"
                    class="inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-700">
-                    Respond
+                    সাড়া দিন
                 </a>
             @endguest
         @else
@@ -156,26 +156,26 @@
                 <form method="POST" action="{{ route('requests.fulfill', $request) }}">
                     @csrf
                     <button class="inline-flex h-11 items-center justify-center rounded-xl bg-emerald-600 px-4 text-sm font-black text-white transition hover:bg-emerald-700">
-                        Complete
+                        সম্পন্ন করুন
                     </button>
                 </form>
                 <a href="{{ $detailsUrl }}"
                    class="inline-flex h-11 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 text-sm font-bold text-emerald-700 transition hover:bg-emerald-100">
-                    Manage
+                    ম্যানেজ করুন
                 </a>
             @elseif(!$isOwner && $isOpen)
                 @if($myResponse && $myResponse->status === 'accepted')
                     <span class="inline-flex h-11 items-center justify-center rounded-xl border border-emerald-200 bg-emerald-50 px-4 text-sm font-bold text-emerald-700">
-                        Response Sent
+                        সাড়া পাঠানো হয়েছে
                     </span>
                     <a href="{{ $detailsUrl }}"
                        class="inline-flex h-11 items-center justify-center rounded-xl border border-emerald-200 bg-white px-4 text-sm font-bold text-emerald-700 transition hover:bg-emerald-50">
-                        Manage
+                        ম্যানেজ করুন
                     </a>
                 @elseif($myResponse && $myResponse->status === 'declined')
                     <a href="{{ $detailsUrl }}"
                        class="inline-flex h-11 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
-                        Manage
+                        ম্যানেজ করুন
                     </a>
                 @else
                     <form method="POST" action="{{ route('requests.respond', $request) }}">
@@ -184,14 +184,14 @@
                         <button class="inline-flex h-11 items-center justify-center rounded-xl bg-red-600 px-4 text-sm font-black text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                                 @disabled(!(auth()->check() && auth()->user()->is_eligible_to_donate))
                                 title="{{ auth()->check() && !auth()->user()->is_eligible_to_donate ? 'আপনি রক্তদানের যোগ্য নন' : '' }}">
-                            Respond
+                            সাড়া দিন
                         </button>
                     </form>
                 @endif
             @elseif(($status === 'fulfilled' || $verifiedCount > 0) && auth()->check() && (auth()->id() === (int) $request->requested_by || auth()->user()->role === 'admin'))
                 <a href="{{ $detailsUrl }}"
                    class="inline-flex h-11 items-center justify-center rounded-xl bg-indigo-600 px-4 text-sm font-black text-white transition hover:bg-indigo-700">
-                    View Proof
+                    প্রমাণ দেখুন
                 </a>
             @endif
         @endif

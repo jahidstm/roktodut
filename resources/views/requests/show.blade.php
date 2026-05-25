@@ -352,6 +352,23 @@
     @if($myResponse && strtolower($myResponse->status) === 'accepted' && $myResponse->verification_status === 'pending')
         <div x-data="{ claimMethod: 'pin', fileName: null }" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-6 mb-6">
             <div class="px-6 py-4 bg-slate-50 border-b border-slate-100">
+                <style>
+                    .verify-tab-active {
+                        background-color: #dc2626 !important;
+                        color: #ffffff !important;
+                        border-color: transparent !important;
+                        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                    }
+                    .verify-tab-inactive {
+                        background-color: #e2e8f0 !important;
+                        color: #475569 !important;
+                        border-color: transparent !important;
+                    }
+                    .verify-tab-inactive:hover {
+                        background-color: #cbd5e1 !important;
+                        color: #1e293b !important;
+                    }
+                </style>
                 <h3 class="text-lg font-extrabold text-slate-800">রক্তদান কনফার্ম করুন</h3>
                 <p class="text-sm font-medium text-slate-500">পয়েন্ট এবং ব্যাজ পেতে আপনার রক্তদান ভেরিফাই করুন。</p>
             </div>
@@ -360,11 +377,17 @@
                 @csrf
                 
                 {{-- Method Selector (Tabs) --}}
-                <div class="flex p-1 bg-slate-100 rounded-xl mb-6">
-                    <button type="button" @click="claimMethod = 'pin'" :class="{'bg-white shadow-sm text-red-600': claimMethod === 'pin', 'text-slate-500 hover:text-slate-700': claimMethod !== 'pin'}" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all">
+                <div class="flex bg-slate-100 p-1.5 rounded-xl mb-6 shadow-inner border border-slate-200 gap-2" role="tablist">
+                    <button type="button" @click="claimMethod = 'pin'" 
+                            :class="claimMethod == 'pin' ? 'verify-tab-active' : 'verify-tab-inactive'"
+                            role="tab"
+                            class="flex-1 flex justify-center items-center py-2.5 text-center text-sm font-extrabold rounded-lg transition-all duration-200 border">
                         পিন কোড (ইনস্ট্যান্ট)
                     </button>
-                    <button type="button" @click="claimMethod = 'image'" :class="{'bg-white shadow-sm text-red-600': claimMethod === 'image', 'text-slate-500 hover:text-slate-700': claimMethod !== 'image'}" class="flex-1 py-2.5 text-sm font-bold rounded-lg transition-all">
+                    <button type="button" @click="claimMethod = 'image'" 
+                            :class="claimMethod == 'image' ? 'verify-tab-active' : 'verify-tab-inactive'"
+                            role="tab"
+                            class="flex-1 flex justify-center items-center py-2.5 text-center text-sm font-extrabold rounded-lg transition-all duration-200 border">
                         ছবি আপলোড (রিভিউ)
                     </button>
                 </div>
@@ -382,7 +405,7 @@
                 {{-- Image Upload Block --}}
                 <div x-show="claimMethod === 'image'" x-transition.opacity style="display: none;" class="space-y-4">
                     <label class="block text-sm font-bold text-slate-700">প্রমাণ আপলোড করুন:</label>
-                    <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:bg-slate-50 transition cursor-pointer relative" :class="fileName ? 'bg-red-50 border-red-300' : ''">
+                    <div class="border-2 border-dashed border-slate-300 rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-slate-50 transition cursor-pointer relative" :class="fileName ? 'bg-red-50 border-red-300' : ''">
                         <input type="file" name="proof_image" accept="image/*,application/pdf" @change="fileName = $event.target.files[0].name" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                         
                         <svg class="mx-auto h-10 w-10 text-slate-400 mb-3" :class="fileName ? 'text-red-500' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
@@ -393,7 +416,7 @@
                     @error('proof_image') <p class="text-red-600 text-xs font-bold text-center mt-1">{{ $message }}</p> @enderror
                 </div>
 
-                <button type="submit" class="w-full mt-6 bg-red-600 hover:bg-red-700 text-white font-black py-3.5 rounded-xl shadow-sm transition">
+                <button type="submit" class="w-full flex justify-center items-center mt-6 bg-red-600 hover:bg-red-700 text-white font-black py-3.5 rounded-xl shadow-sm transition text-center">
                     কনফার্ম করুন
                 </button>
             </form>

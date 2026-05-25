@@ -105,6 +105,18 @@ class ChatController extends Controller
 
         MessageSent::dispatch($message);
 
+        // Notify the OTHER user
+        $requesterId = (int) ($response->bloodRequest?->requested_by ?? 0);
+        $donorId = (int) $response->user_id;
+        $otherUserId = ((int) $user->id === $donorId) ? $requesterId : $donorId;
+
+        if ($otherUserId > 0) {
+            $otherUser = \App\Models\User::find($otherUserId);
+            if ($otherUser) {
+                $otherUser->notify(new \App\Notifications\NewChatMessageNotification($response, $user, $messageText));
+            }
+        }
+
         if ($request->expectsJson()) {
             return response()->json([
                 'message' => [
