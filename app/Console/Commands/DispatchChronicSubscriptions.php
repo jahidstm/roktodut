@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\DispatchEmergencyAlertsJob;
+use App\Jobs\SmartBloodRequestBroadcastJob;
 use App\Models\BloodRequest;
 use App\Models\ChronicRequestSubscription;
 use App\Models\ChronicSubscriptionBuddy;
@@ -82,21 +82,12 @@ class DispatchChronicSubscriptions extends Command
                         if ($rankedDonors->isNotEmpty()) {
                             $donorIds = $rankedDonors->pluck('donor_id')->map(fn($id) => (int) $id)->all();
                             $this->ensureBuddyPool($subscription, $donorIds);
-                            $priorityDonorIds = $this->resolvePriorityDonorIds($subscription, $donorIds);
-
-                            $rankedByPriority = collect($rankedDonors)
-                                ->sortBy(function (array $row) use ($priorityDonorIds): int {
-                                    $position = array_search((int) ($row['donor_id'] ?? 0), $priorityDonorIds, true);
-                                    return $position === false ? PHP_INT_MAX : $position;
-                                })
-                                ->values()
-                                ->all();
-
-                            DispatchEmergencyAlertsJob::dispatch(
-                                bloodRequestId: $request->id,
-                                rankedDonors: $rankedByPriority
-                            )->afterCommit();
                         }
+
+                        SmartBloodRequestBroadcastJob::dispatch(
+                            bloodRequestId: $request->id,
+                            topK: 15
+                        )->afterCommit();
 
                         $created++;
                     }

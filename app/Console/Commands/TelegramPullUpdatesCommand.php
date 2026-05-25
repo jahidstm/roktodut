@@ -27,14 +27,14 @@ class TelegramPullUpdatesCommand extends Command
 
         // ২. getUpdates কল করা
         $response = Http::get("https://api.telegram.org/bot{$token}/getUpdates");
-        
+
         if (!$response->successful()) {
             $this->error('Failed to connect to Telegram API');
             return;
         }
 
         $updates = $response->json('result') ?? [];
-        
+
         if (empty($updates)) {
             $this->info("No new messages found.");
             return;
@@ -47,12 +47,12 @@ class TelegramPullUpdatesCommand extends Command
             $latestUpdateId = $update['update_id'];
             $messageText = $update['message']['text'] ?? '';
             $chatId = $update['message']['chat']['id'] ?? null;
-            
+
             if (!$chatId) continue;
 
             if (str_starts_with($messageText, '/start verify_')) {
                 $verifyToken = str_replace('/start verify_', '', $messageText);
-                
+
                 $user = User::where('telegram_verify_token', $verifyToken)->first();
                 if ($user) {
                     $user->update([
@@ -157,9 +157,11 @@ class TelegramPullUpdatesCommand extends Command
         }
 
         $request->update(['status' => 'pending']);
-        $rankedDonors = app(\App\Services\DonorMatchingService::class)->rankDonors($request)->toArray();
-        \App\Jobs\DispatchEmergencyAlertsJob::dispatch($request->id, $rankedDonors);
-        
+        \App\Jobs\SmartBloodRequestBroadcastJob::dispatch(
+            bloodRequestId: $request->id,
+            topK: 15
+        )->afterCommit();
+
         $telegramService->send($chatId, "✅ Request #{$requestId} approved and published! Alerts are being dispatched.");
     }
 }

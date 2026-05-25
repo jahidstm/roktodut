@@ -13,6 +13,7 @@ Schedule::command('requests:expire')->everyFifteenMinutes();
 
 Schedule::command('donations:auto-approve')->hourly();
 Schedule::command('subscriptions:dispatch-requests')->hourly();
+Schedule::command('donor:dfi-decay')->daily();
 Schedule::command('nid:purge-expired')->daily();
 
 // Queue worker fallback (shared hosting / no Supervisor)

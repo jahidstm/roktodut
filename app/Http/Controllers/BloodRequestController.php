@@ -6,12 +6,11 @@ use App\Enums\BloodComponentType;
 use App\Enums\UrgencyLevel;
 use App\Events\DonationCompleted;
 use App\Http\Requests\StoreBloodRequestRequest;
-use App\Jobs\DispatchEmergencyAlertsJob;
+use App\Jobs\SmartBloodRequestBroadcastJob;
 use App\Models\BloodRequest;
 use App\Models\ChronicRequestSubscription;
 use App\Models\BloodRequestResponse;
 use App\Models\User;
-use App\Services\DonorMatchingService;
 use App\Services\MathCaptchaService;
 use App\Support\PhoneNormalizer;
 use Illuminate\Http\Request;
@@ -286,29 +285,14 @@ class BloodRequestController extends Controller
         // ১. রিকোয়েস্ট সেভ করা
         $bloodRequest = BloodRequest::create($data);
 
-        // ⚙️ AI Ranking + Cascading Dispatch Pipeline
-        $rankedDonors = app(DonorMatchingService::class)->rankDonors($bloodRequest, 50);
-        $firstBatchDonorIds = $rankedDonors->take(5)->pluck('donor_id')->map(fn($id) => (int) $id)->all();
-
-        if ($rankedDonors->isNotEmpty()) {
-            DispatchEmergencyAlertsJob::dispatch(
-                bloodRequestId: $bloodRequest->id,
-                rankedDonors: $rankedDonors->values()->all()
-            )->afterCommit();
-        }
-
-        $telegramConnectedCount = User::query()
-            ->whereIn('id', $firstBatchDonorIds)
-            ->whereNotNull('telegram_chat_id')
-            ->count();
+        SmartBloodRequestBroadcastJob::dispatch(
+            bloodRequestId: $bloodRequest->id,
+            topK: 15
+        )->afterCommit();
 
         $successMsg = $data['is_phone_hidden']
             ? '🛡️ আপনার রিকোয়েস্ট তৈরি হয়েছে! নম্বর গোপন রাখা হয়েছে — ডোনাররা সরাসরি আপনার Telegram-এ নিজের নম্বর পাঠাবে।'
-            : 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে। '
-            . count($firstBatchDonorIds)
-            . ' জন ডোনারকে ইন-অ্যাপ অ্যালার্ট পাঠানো হয়েছে, এর মধ্যে Telegram-এ সংযুক্ত '
-            . $telegramConnectedCount
-            . ' জন।';
+            : 'আপনার রক্তের রিকোয়েস্টটি সফলভাবে তৈরি হয়েছে। শীর্ষ ডোনারদের কাছে নোটিফিকেশন পাঠানো হচ্ছে।';
 
         return redirect()->route('requests.show', $bloodRequest)
             ->with('success', $successMsg);
