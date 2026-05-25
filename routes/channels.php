@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\BloodRequestResponse;
 use Illuminate\Support\Facades\Broadcast;
 
 /*
@@ -22,4 +23,26 @@ use Illuminate\Support\Facades\Broadcast;
  */
 Broadcast::channel('user.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
+});
+
+/**
+ * Private Chat Channel
+ *
+ * শুধু রিকোয়েস্টার এবং সেই নির্দিষ্ট একসেপ্টেড ডোনারই listen করতে পারবে।
+ *
+ * Client-side: Echo.private(`chat.response.${responseId}`)
+ */
+Broadcast::channel('chat.response.{responseId}', function ($user, $responseId) {
+    $response = BloodRequestResponse::query()
+        ->with('bloodRequest')
+        ->find($responseId);
+
+    if (!$response || $response->status !== 'accepted') {
+        return false;
+    }
+
+    $requesterId = $response->bloodRequest?->requested_by;
+
+    return (int) $user->id === (int) $response->user_id
+        || (int) $user->id === (int) $requesterId;
 });
