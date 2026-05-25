@@ -399,7 +399,7 @@ class BloodRequestController extends Controller
                         $fail('জরুরি (Emergency) রিকোয়েস্টের জন্য রক্তের প্রয়োজন অবশ্যই পরবর্তী ২৪ ঘণ্টার মধ্যে হতে হবে।');
                     }
 
-                    if ($value === UrgencyLevel::URGENT->value && $neededAt->gt(now()->addHours(72))) {
+                    if ($value === UrgencyLevel::HIGH->value && $neededAt->gt(now()->addHours(72))) {
                         $fail('আর্জেন্ট (Urgent) রিকোয়েস্টের জন্য সময় অবশ্যই পরবর্তী ৭২ ঘণ্টার মধ্যে হতে হবে।');
                     }
                 },

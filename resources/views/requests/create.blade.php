@@ -264,15 +264,19 @@
 
             <x-captcha-field :captcha-question="$captchaQuestion" />
 
-            <div class="flex items-center gap-2 sm:gap-4 pt-6 border-t border-slate-100">
+            <div class="grid grid-cols-2 gap-3 sm:gap-4 pt-6 border-t border-slate-100">
+                <a href="{{ route('requests.index') }}" class="w-full flex items-center justify-center px-4 sm:px-8 py-3.5 rounded-xl font-bold text-slate-700 bg-white border-2 border-slate-200 hover:bg-slate-50 transition whitespace-nowrap text-[13px] sm:text-sm">
+                    বাতিল
+                </a>
+                
                 {{-- 🎯 ডাইনামিক সাবমিট বাটন --}}
                 <button type="submit" 
                         :disabled="isSubmitting"
-                        class="flex-1 bg-red-600 hover:bg-red-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white px-3 sm:px-8 py-3.5 rounded-xl text-[13px] sm:text-sm font-black transition-all shadow-sm shadow-red-200 flex items-center justify-center whitespace-nowrap">
+                        class="w-full bg-red-600 hover:bg-red-700 disabled:bg-slate-400 disabled:cursor-not-allowed text-white px-3 sm:px-8 py-3.5 rounded-xl text-[13px] sm:text-sm font-black transition-all shadow-sm shadow-red-200 flex items-center justify-center whitespace-nowrap">
                     
                     <span x-show="!isSubmitting" class="flex items-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                        রিকোয়েস্ট সাবমিট করুন
+                        সাবমিট করুন
                     </span>
 
                     <span x-show="isSubmitting" style="display: none;" class="flex items-center gap-2">
@@ -280,13 +284,9 @@
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                         </svg>
-                        প্রসেসিং হচ্ছে...
+                        প্রসেসিং...
                     </span>
                 </button>
-                
-                <a href="{{ route('requests.index') }}" class="px-4 sm:px-6 py-3.5 rounded-xl font-bold text-slate-500 hover:bg-slate-100 transition whitespace-nowrap text-[13px] sm:text-sm">
-                    বাতিল
-                </a>
             </div>
         </form>
     </div>

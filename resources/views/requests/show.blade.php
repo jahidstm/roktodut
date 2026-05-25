@@ -336,7 +336,7 @@
                            class="w-full rounded-lg border-slate-300 text-sm font-semibold focus:border-violet-500 focus:ring-violet-500">
                 </div>
 
-                <button type="submit" class="w-full md:w-auto px-4 py-2.5 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-sm font-black">
+                <button type="submit" class="w-full px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-black flex items-center justify-center h-[42px] mt-auto">
                     Auto Plan চালু করুন
                 </button>
             </form>
