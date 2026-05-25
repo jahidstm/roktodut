@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\MessageSent;
+use App\Enums\BloodJourneyStatus;
 use App\Models\BloodRequestResponse;
 use App\Models\ChatMessage;
 use App\Models\Donation;
@@ -27,7 +28,11 @@ class ChatController extends Controller
             ->where('donor_id', $response->user_id)
             ->value('journey_status');
 
-        $isClosed = in_array($journeyStatus, ['delivered', 'discarded'], true);
+        $journeyValue = $journeyStatus instanceof BloodJourneyStatus
+            ? $journeyStatus->value
+            : ($journeyStatus ? (string) $journeyStatus : null);
+
+        $isClosed = in_array($journeyValue, ['delivered', 'discarded'], true);
 
         $oppositePartyPhone = $isRequester
             ? ($response->user?->phone ?? null)
@@ -74,7 +79,11 @@ class ChatController extends Controller
             ->where('donor_id', $response->user_id)
             ->value('journey_status');
 
-        if (in_array($journeyStatus, ['delivered', 'discarded'], true)) {
+        $journeyValue = $journeyStatus instanceof BloodJourneyStatus
+            ? $journeyStatus->value
+            : ($journeyStatus ? (string) $journeyStatus : null);
+
+        if (in_array($journeyValue, ['delivered', 'discarded'], true)) {
             abort(403, 'Chat is closed');
         }
 

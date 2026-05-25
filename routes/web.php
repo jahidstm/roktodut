@@ -34,6 +34,7 @@ use App\Http\Controllers\BlogSubmissionController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\Admin\SupportMessageController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\Admin\SpamRadarController;
@@ -43,6 +44,7 @@ use App\Http\Controllers\PwaController;
 use App\Http\Controllers\HospitalController;
 use App\Models\Division;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\SmartCardImageController;
@@ -68,6 +70,8 @@ Route::post('/offline-verify/{claim}/confirm', [ClaimVerificationController::cla
 Route::get('/avatar/{user}', [ProfileController::class, 'avatar'])
     ->middleware('throttle:120,1')
     ->name('profile.avatar');
+
+Broadcast::routes(['middleware' => ['web', 'auth']]);
 
 // ─────────────────────────────────────────────────────────────────────────
 // 🤖 Telegram Bot Webhook (NO auth — Telegram সার্ভার থেকে আসে)
@@ -251,6 +255,8 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/responses/{response}/status', [BloodRequestResponseController::class, 'updateStatus'])->name('requests.responses.update');
     Route::post('/responses/{response}/claim', [DonationClaimController::class, 'store'])->name('donations.claim');
     Route::post('/responses/{response}/recipient-verify', [DonationClaimController::class, 'verifyByRecipient'])->name('donations.recipient_verify');
+    Route::get('/responses/{response}/chat', [ChatController::class, 'index'])->name('chat.show');
+    Route::post('/responses/{response}/chat', [ChatController::class, 'store'])->name('chat.store');
     Route::post('/requests/{bloodRequest}/fulfill', [BloodRequestController::class, 'fulfill'])->name('requests.fulfill');
     Route::post('/requests/{bloodRequest}/subscribe', [BloodRequestController::class, 'subscribeRecurring'])->name('requests.subscribe');
     Route::post('/requests/{bloodRequest}/report', [\App\Http\Controllers\BloodRequestReportController::class, 'store'])->name('requests.report');

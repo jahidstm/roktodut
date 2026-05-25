@@ -34,15 +34,15 @@ Broadcast::channel('user.{id}', function ($user, $id) {
  */
 Broadcast::channel('chat.response.{responseId}', function ($user, $responseId) {
     $response = BloodRequestResponse::query()
-        ->with('bloodRequest')
+        ->with('bloodRequest:id,requested_by')
         ->find($responseId);
 
     if (!$response || $response->status !== 'accepted') {
         return false;
     }
 
-    $requesterId = $response->bloodRequest?->requested_by;
+    $requesterId = (int) ($response->bloodRequest?->requested_by ?? 0);
 
     return (int) $user->id === (int) $response->user_id
-        || (int) $user->id === (int) $requesterId;
+        || (int) $user->id === $requesterId;
 });
