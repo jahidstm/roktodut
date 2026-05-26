@@ -402,6 +402,13 @@ Route::middleware(['auth', 'role:org_admin'])->group(function () {
     Route::post('/org/camps/{camp}/cancel', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'cancel'])->name('org.camps.cancel');
     Route::get('/org/camps/{camp}', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'show'])->name('org.camps.show');
     Route::post('/org/camps/{camp}/attendance', [\App\Http\Controllers\OrgAdmin\BloodCampController::class, 'logAttendance'])->name('org.camps.attendance');
+    // Ambulances
+    Route::prefix('org/ambulances')->name('org.ambulances.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\OrgAdmin\AmbulanceController::class, 'index'])->name('index');
+        Route::get('/create', [\App\Http\Controllers\OrgAdmin\AmbulanceController::class, 'create'])->name('create');
+        Route::post('/', [\App\Http\Controllers\OrgAdmin\AmbulanceController::class, 'store'])->name('store');
+        Route::delete('/{ambulance}', [\App\Http\Controllers\OrgAdmin\AmbulanceController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // --- ৭. AJAX লোকেশন রাউটস ---

@@ -46,6 +46,9 @@
         <a href="{{ route('org.camps.index') }}" data-org-tab class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all text-slate-600 hover:bg-slate-50 hover:text-teal-600">
             🏕️ রক্তদান ক্যাম্প
         </a>
+        <a href="{{ route('org.ambulances.index') }}" data-org-tab class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all text-slate-600 hover:bg-slate-50 hover:text-indigo-600">
+            🚑 অ্যাম্বুলেন্স সার্ভিস
+        </a>
     </div>
 
     {{-- 📊 Analytics Cards --}}
