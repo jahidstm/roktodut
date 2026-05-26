@@ -1,14 +1,20 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-black text-2xl text-slate-900 leading-tight">
-                নতুন অ্যাম্বুলেন্স যুক্ত করুন
-            </h2>
-            <a href="{{ route('ambulances.index') }}" class="text-sm font-bold text-red-600 hover:text-red-700">
-                &larr; ডিরেক্টরিতে ফিরে যান
-            </a>
+@extends('layouts.app')
+
+@section('title', 'নতুন অ্যাম্বুলেন্স যুক্ত করুন — রক্তদূত')
+
+@section('content')
+    <div class="bg-white border-b border-slate-200">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex items-center justify-between">
+                <h2 class="font-black text-2xl text-slate-900 leading-tight">
+                    নতুন অ্যাম্বুলেন্স যুক্ত করুন
+                </h2>
+                <a href="{{ route('ambulances.index') }}" class="text-sm font-bold text-red-600 hover:text-red-700">
+                    &larr; ডিরেক্টরিতে ফিরে যান
+                </a>
+            </div>
         </div>
-    </x-slot>
+    </div>
 
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
@@ -24,7 +30,7 @@
             </div>
 
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-[2rem] border border-slate-100 p-8 sm:p-10">
-                <form action="{{ route('user.ambulances.store') }}" method="POST" x-data="{
+                <form action="{{ route('ambulances.store') }}" method="POST" x-data="{
                     districts: [],
                     upazilas: [],
                     loadingDistricts: false,
@@ -132,4 +138,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+@endsection

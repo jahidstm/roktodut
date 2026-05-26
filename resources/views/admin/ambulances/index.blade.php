@@ -1,11 +1,17 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-black text-2xl text-slate-900 leading-tight flex items-center gap-2">
-                <span class="text-3xl">🚑</span> অ্যাম্বুলেন্স ম্যানেজমেন্ট
-            </h2>
+@extends('layouts.app')
+
+@section('title', 'অ্যাম্বুলেন্স ম্যানেজমেন্ট — রক্তদূত')
+
+@section('content')
+    <div class="bg-white border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex items-center justify-between">
+                <h2 class="font-black text-2xl text-slate-900 leading-tight flex items-center gap-2">
+                    <span class="text-3xl">🚑</span> অ্যাম্বুলেন্স ম্যানেজমেন্ট
+                </h2>
+            </div>
         </div>
-    </x-slot>
+    </div>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -97,4 +103,4 @@
 
         </div>
     </div>
-</x-app-layout>
+@endsection

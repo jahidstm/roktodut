@@ -1,14 +1,20 @@
-<x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-black text-2xl text-slate-900 leading-tight">
-                নতুন অ্যাম্বুলেন্স যোগ করুন
-            </h2>
-            <a href="{{ route('org.ambulances.index') }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-700">
-                &larr; লিস্টে ফিরে যান
-            </a>
+@extends('layouts.app')
+
+@section('title', 'নতুন অ্যাম্বুলেন্স যোগ করুন — রক্তদূত')
+
+@section('content')
+    <div class="bg-white border-b border-slate-200">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="flex items-center justify-between">
+                <h2 class="font-black text-2xl text-slate-900 leading-tight">
+                    নতুন অ্যাম্বুলেন্স যোগ করুন
+                </h2>
+                <a href="{{ route('org.ambulances.index') }}" class="text-sm font-bold text-indigo-600 hover:text-indigo-700">
+                    &larr; লিস্টে ফিরে যান
+                </a>
+            </div>
         </div>
-    </x-slot>
+    </div>
 
     <div class="py-12">
         <div class="max-w-3xl mx-auto sm:px-6 lg:px-8">
@@ -121,4 +127,4 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+@endsection

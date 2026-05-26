@@ -42,15 +42,15 @@ class AmbulanceManagementController extends Controller
             if ($user) {
                 $gamificationService->awardPoints(
                     user: $user,
-                    points: 20,
+                    points: 5,
                     actionType: PointLog::ACTION_AMBULANCE_VERIFIED,
                     metadata: ['ambulance_id' => $ambulance->id]
                 );
                 
                 $user->notify(new \App\Notifications\GamificationRewardNotification(
                     title: '✅ অ্যাম্বুলেন্স ভেরিফাইড!',
-                    message: "আপনার সাবমিট করা অ্যাম্বুলেন্স '{$ambulance->name}' ভেরিফাই হয়েছে। স্পেশাল অবদান রাখার জন্য আপনি ২০ পয়েন্ট পেয়েছেন!",
-                    points: 20
+                    message: "আপনার সাবমিট করা অ্যাম্বুলেন্স '{$ambulance->name}' ভেরিফাই হয়েছে। স্পেশাল অবদান রাখার জন্য আপনি ৫ পয়েন্ট পেয়েছেন!",
+                    points: 5
                 ));
             }
         }

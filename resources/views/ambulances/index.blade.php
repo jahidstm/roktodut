@@ -116,7 +116,7 @@
                     <p class="text-sm font-medium text-slate-500">সঠিক তথ্য সাবমিট করে ভেরিফাই হলে জিতে নিন স্পেশাল পয়েন্ট!</p>
                 </div>
             </div>
-            <a href="{{ route('user.ambulances.create') }}" class="{{ $btnPrimary }} px-6 py-2.5 text-sm shrink-0 whitespace-nowrap">
+            <a href="{{ route('ambulances.create') }}" class="{{ $btnPrimary }} px-6 py-2.5 text-sm shrink-0 whitespace-nowrap">
                 অ্যাম্বুলেন্স যোগ করুন &rarr;
             </a>
         </div>
