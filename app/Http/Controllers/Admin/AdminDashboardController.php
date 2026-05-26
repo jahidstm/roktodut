@@ -91,6 +91,9 @@ class AdminDashboardController extends Controller
         // ১২. Pending Reports
         $pendingReports = \App\Models\Report::where('status', 'open')->count();
 
+        // 🚑 ১৩. Pending Ambulances
+        $pendingAmbulances = \App\Models\Ambulance::where('is_verified', false)->count();
+
         return view('admin.dashboard', compact(
             'totalUsers',
             'totalDonors',
@@ -108,7 +111,8 @@ class AdminDashboardController extends Controller
             'recentSecurityLogs',
             'pendingSupportMessages',
             'pendingHospitals',
-            'pendingReports'
+            'pendingReports',
+            'pendingAmbulances'
         ));
     }
 

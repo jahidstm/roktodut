@@ -30,6 +30,7 @@ class PointLog extends Model
     const ACTION_PROFILE_COMPLETION       = 'profile_completion';
     const ACTION_MANUAL_ADJUSTMENT        = 'manual_adjustment'; // অ্যাডমিন কর্তৃক
     const ACTION_CAMP_DONATION            = 'camp_donation';
+    const ACTION_AMBULANCE_VERIFIED       = 'ambulance_verified';
 
     // ─── বাংলা লেবেল ──────────────────────────────────────────────────
     public function actionLabel(): string
@@ -43,6 +44,7 @@ class PointLog extends Model
             self::ACTION_PROFILE_COMPLETION      => '✅ প্রোফাইল কমপ্লিট',
             self::ACTION_MANUAL_ADJUSTMENT       => '🔧 অ্যাডমিন অ্যাডজাস্টমেন্ট',
             self::ACTION_CAMP_DONATION           => '🏕️ ক্যাম্প ডোনেশন',
+            self::ACTION_AMBULANCE_VERIFIED      => '🚑 অ্যাম্বুলেন্স ভেরিফাইড',
             default                              => $this->action_type,
         };
     }

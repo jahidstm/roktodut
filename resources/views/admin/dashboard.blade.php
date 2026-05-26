@@ -519,6 +519,53 @@
                 </div>
             </div>
         </div>
+
+        {{-- Ambulance Management --}}
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all duration-200"
+             :class="{'border-emerald-200 ring-2 ring-emerald-50': activeAccordion === 'ambulances'}">
+            <button @click="activeAccordion = activeAccordion === 'ambulances' ? null : 'ambulances'"
+                    @keydown.enter="activeAccordion = activeAccordion === 'ambulances' ? null : 'ambulances'"
+                    @keydown.space.prevent="activeAccordion = activeAccordion === 'ambulances' ? null : 'ambulances'"
+                    class="w-full flex items-center justify-between p-5 bg-white hover:bg-emerald-50/30 transition-colors focus:outline-none">
+                <div class="flex items-center gap-4 text-left">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl shrink-0 transition-transform" :class="{'scale-110': activeAccordion === 'ambulances'}">🚑</div>
+                    <div>
+                        <div class="flex items-center gap-2 flex-wrap mb-0.5">
+                            <h3 class="text-lg font-extrabold text-slate-900">অ্যাম্বুলেন্স ম্যানেজমেন্ট</h3>
+                            @if(isset($pendingAmbulances) && $pendingAmbulances > 0)
+                                <span class="bg-amber-100 text-amber-700 text-[10px] font-black px-2 py-0.5 rounded-full border border-amber-200 animate-pulse">🟡 {{ $pendingAmbulances }} পেন্ডিং</span>
+                            @else
+                                <span class="bg-emerald-50 text-emerald-600 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-100">✅ সব ক্লিয়ার</span>
+                            @endif
+                        </div>
+                        <p class="text-sm text-slate-500 font-medium">ইউজারদের সাবমিট করা অ্যাম্বুলেন্স ভেরিফাই করুন এবং গ্যামিফিকেশন পয়েন্ট দিন</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex flex-wrap gap-2">
+                        <span class="bg-emerald-50 text-emerald-700 text-[10px] font-bold px-2.5 py-1 rounded-md border border-emerald-100">✅ Approve</span>
+                        <span class="bg-red-50 text-red-600 text-[10px] font-bold px-2.5 py-1 rounded-md border border-red-100">🗑️ Reject</span>
+                    </div>
+                    @if(isset($pendingAmbulances) && $pendingAmbulances > 0)
+                        <span class="bg-amber-500 text-white text-xs font-bold px-3 py-1.5 rounded-full">{{ $pendingAmbulances }} টি পেন্ডিং</span>
+                    @endif
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500 transition-transform duration-300" :class="{'rotate-180 bg-emerald-100 text-emerald-600': activeAccordion === 'ambulances'}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                    </div>
+                </div>
+            </button>
+            <div x-show="activeAccordion === 'ambulances'" x-collapse style="display: none;">
+                <div class="p-6 border-t border-slate-100 bg-slate-50/50">
+                    <p class="text-sm text-slate-600 font-semibold mb-5 max-w-2xl">
+                        পাবলিক ডিরেক্টরির জন্য ইউজারদের সাবমিট করা অ্যাম্বুলেন্সগুলোর তথ্য যাচাই করুন। ভেরিফাই করলে কন্ট্রিবিউটর গ্যামিফিকেশন পয়েন্ট পাবেন।
+                    </p>
+                    <a href="{{ route('admin.ambulances.index') }}" class="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-extrabold px-6 py-3 rounded-xl text-sm transition shadow-sm">
+                        ম্যানেজমেন্ট প্যানেলে প্রবেশ করুন
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- 🔒 ৫. সিকিউরিটি ও অডিট প্যানেল --}}

@@ -368,6 +368,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::get('/{report}', [AdminReportController::class, 'show'])->name('show');
         Route::post('/{report}/status', [AdminReportController::class, 'updateStatus'])->name('status');
     });
+
+    // 🚑 Admin Ambulance Management
+    Route::prefix('admin/ambulances')->name('admin.ambulances.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AmbulanceManagementController::class, 'index'])->name('index');
+        Route::patch('/{ambulance}/verify', [\App\Http\Controllers\Admin\AmbulanceManagementController::class, 'verify'])->name('verify');
+        Route::delete('/{ambulance}', [\App\Http\Controllers\Admin\AmbulanceManagementController::class, 'destroy'])->name('destroy');
+    });
 });
 
 // --- ৬. অর্গানাইজেশন অ্যাডমিন রাউটস (ইন্টিগ্রেটেড গ্রুপ) ---
