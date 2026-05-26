@@ -70,7 +70,7 @@
                                             <form action="{{ route('admin.ambulances.verify', $ambulance->id) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('PATCH')
-                                                <button type="submit" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white px-3 py-1.5 rounded-lg font-bold transition border border-emerald-100 hover:border-emerald-600 text-xs" onclick="return confirm('আপনি কি নিশ্চিত যে এই তথ্যটি সঠিক? ভেরিফাই করলে ইউজার পয়েন্ট পাবে।')">
+                                                <button type="submit" class="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white px-3 py-1.5 rounded-lg font-bold transition border border-emerald-100 hover:border-emerald-600 text-xs" onclick="return confirm('আপনি কি নিশ্চিত যে এই তথ্যটি সঠিক?')">
                                                     ভেরিফাই করুন
                                                 </button>
                                             </form>

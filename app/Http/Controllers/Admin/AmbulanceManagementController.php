@@ -36,6 +36,13 @@ class AmbulanceManagementController extends Controller
         
         $ambulance->update(['is_verified' => true]);
         
+        if ($ambulance->added_by) {
+            $user = $ambulance->adder;
+            if ($user) {
+                $user->notify(new \App\Notifications\AmbulanceVerifiedNotification($ambulance));
+            }
+        }
+        
         return back()->with('success', 'অ্যাম্বুলেন্স সফলভাবে ভেরিফাই করা হয়েছে।');
     }
     
