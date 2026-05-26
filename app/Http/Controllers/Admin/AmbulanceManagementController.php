@@ -28,7 +28,7 @@ class AmbulanceManagementController extends Controller
         return view('admin.ambulances.index', compact('ambulances', 'status'));
     }
     
-    public function verify(Ambulance $ambulance, GamificationService $gamificationService)
+    public function verify(Ambulance $ambulance)
     {
         if ($ambulance->is_verified) {
             return back()->with('error', 'অ্যাম্বুলেন্সটি ইতোমধ্যেই ভেরিফাইড।');
@@ -36,26 +36,7 @@ class AmbulanceManagementController extends Controller
         
         $ambulance->update(['is_verified' => true]);
         
-        // Award points if added by a user
-        if ($ambulance->added_by) {
-            $user = $ambulance->adder;
-            if ($user) {
-                $gamificationService->awardPoints(
-                    user: $user,
-                    points: 5,
-                    actionType: PointLog::ACTION_AMBULANCE_VERIFIED,
-                    metadata: ['ambulance_id' => $ambulance->id]
-                );
-                
-                $user->notify(new \App\Notifications\GamificationRewardNotification(
-                    title: '✅ অ্যাম্বুলেন্স ভেরিফাইড!',
-                    message: "আপনার সাবমিট করা অ্যাম্বুলেন্স '{$ambulance->name}' ভেরিফাই হয়েছে। স্পেশাল অবদান রাখার জন্য আপনি ৫ পয়েন্ট পেয়েছেন!",
-                    points: 5
-                ));
-            }
-        }
-        
-        return back()->with('success', 'অ্যাম্বুলেন্স সফলভাবে ভেরিফাই করা হয়েছে এবং ইউজারকে পয়েন্ট দেওয়া হয়েছে।');
+        return back()->with('success', 'অ্যাম্বুলেন্স সফলভাবে ভেরিফাই করা হয়েছে।');
     }
     
     public function destroy(Ambulance $ambulance)

@@ -113,7 +113,7 @@
                 <div class="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-2xl flex-shrink-0">🎁</div>
                 <div>
                     <h3 class="font-black text-slate-900 text-lg">আপনার এলাকার অ্যাম্বুলেন্স যুক্ত করুন</h3>
-                    <p class="text-sm font-medium text-slate-500">সঠিক তথ্য সাবমিট করে ভেরিফাই হলে জিতে নিন স্পেশাল পয়েন্ট!</p>
+                    <p class="text-sm font-medium text-slate-500">সঠিক তথ্য সাবমিট করে অন্যকে জরুরি মুহূর্তে সাহায্য করুন।</p>
                 </div>
             </div>
             <a href="{{ route('ambulances.create') }}" class="{{ $btnPrimary }} px-6 py-2.5 text-sm shrink-0 whitespace-nowrap">

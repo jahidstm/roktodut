@@ -55,7 +55,7 @@
                                     </td>
                                     <td class="px-6 py-4">
                                         @if($ambulance->adder)
-                                            <a href="{{ route('admin.users.show', $ambulance->adder->id) }}" class="font-bold text-blue-600 hover:underline">
+                                            <a href="{{ route('admin.gamification.show', $ambulance->adder->id) }}" class="font-bold text-blue-600 hover:underline">
                                                 {{ $ambulance->adder->name }}
                                             </a>
                                             <div class="text-xs text-slate-500 font-medium">
