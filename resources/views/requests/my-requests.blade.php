@@ -3,7 +3,7 @@
 @section('title', 'আমার রিকোয়েস্ট — রক্তদূত')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-panel-id="my-requests">
     @if(session('success'))
         <div class="mb-6 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-emerald-800 font-bold">
             {{ session('success') }}

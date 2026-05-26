@@ -38,7 +38,7 @@
         }
     }
 @endphp
-<div id="leaderboard-root" class="max-w-5xl mx-auto px-4 py-8 sm:py-12">
+<div id="leaderboard-root" class="max-w-5xl mx-auto px-4 py-8 sm:py-12" data-panel-id="leaderboard">
 
     {{-- ══════════════════════════════════════════
          Hero Section — dynamic based on filters
@@ -102,7 +102,7 @@
     {{-- ══════════════════════════════════════════
          Filter Cards — Two Independent Groups
     ══════════════════════════════════════════ --}}
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 hide-in-dashboard">
 
         {{-- ── Card A: সময়কাল ────────────────────────────────────────────── --}}
         <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 scroll-reveal" data-scroll-reveal>
@@ -199,7 +199,7 @@
         if($top3->has(2)) $orderedDonors->push(['donor'=>$top3[2],'rank'=>3,'emoji'=>'🥉','label'=>'৩য় স্থান']);
     @endphp
 
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-end justify-center gap-6 mb-16 mt-6">
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-end justify-center gap-6 mb-16 mt-6 hide-in-dashboard">
         @foreach($orderedDonors as $item)
             @php
                 $d = $item['donor'];
@@ -453,7 +453,7 @@
     {{-- ══════════════════════════════════════════
          Footer link row
     ══════════════════════════════════════════ --}}
-    <div class="mt-5 flex items-center justify-center">
+    <div class="mt-5 flex items-center justify-center hide-in-dashboard">
         <a href="{{ route('gamification.guide') }}"
            class="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-red-600 transition-colors border border-slate-200 hover:border-red-200 bg-white rounded-xl px-5 py-2.5 shadow-sm">
             🪙 পয়েন্ট ও ব্যাজ সিস্টেম সম্পর্কে জানুন

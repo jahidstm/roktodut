@@ -7,7 +7,7 @@
 @endpush
 
 @section('content')
-<div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10" x-data="{ showAddModal: false }">
+<div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10" x-data="{ showAddModal: false }" data-panel-id="health-ledger">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div class="flex flex-col gap-2">
             <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Predictive Health Ledger</h1>

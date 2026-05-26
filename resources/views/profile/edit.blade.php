@@ -3,7 +3,7 @@
 @section('title', 'প্রোফাইল সেটিংস — রক্তদূত')
 
 @section('content')
-<div class="bg-[#f8fafc] min-h-screen py-10 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+<div class="bg-[#f8fafc] min-h-screen py-10 px-4 sm:px-6 lg:px-8 relative overflow-hidden" data-panel-id="profile">
     <!-- Abstract Background Decorators -->
     <div class="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-red-50/80 to-transparent pointer-events-none"></div>
     <div class="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] rounded-full bg-red-100/30 blur-[120px] pointer-events-none"></div>
@@ -12,7 +12,7 @@
     <div class="max-w-4xl mx-auto space-y-10 relative z-10">
 
         {{-- ১. পেজ হেডার --}}
-        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left mb-6 scroll-reveal" data-scroll-reveal>
+        <div class="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left mb-6 scroll-reveal hide-in-dashboard" data-scroll-reveal>
             <div class="w-16 h-16 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 flex items-center justify-center shrink-0 relative">
                 <div class="absolute inset-0 bg-red-500/10 rounded-2xl rotate-3 scale-105 -z-10"></div>
                 <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

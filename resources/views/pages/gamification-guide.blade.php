@@ -3,7 +3,7 @@
 @section('title', 'পয়েন্ট ও ব্যাজ গাইড – রক্তদূত')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 py-8 sm:py-12">
+<div class="max-w-4xl mx-auto px-4 py-8 sm:py-12" data-panel-id="gamification-guide">
 
     {{-- ══════════ Hero ══════════ --}}
     <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-500 via-orange-500 to-red-600 p-8 sm:p-12 mb-10 shadow-2xl">
@@ -239,7 +239,7 @@
     </section>
 
     {{-- ══════════ CTA ══════════ --}}
-    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+    <div class="flex flex-col sm:flex-row gap-3 justify-center hide-in-dashboard">
         <a href="{{ route('leaderboard') }}"
             class="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-black px-6 py-3 rounded-2xl shadow-sm transition-all">
             🏆 লিডারবোর্ড দেখুন
