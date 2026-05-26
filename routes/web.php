@@ -175,6 +175,10 @@ Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leade
 Route::get('/live-demand', [\App\Http\Controllers\LiveDemandController::class, 'index'])
     ->name('live-demand.index');
 
+// 🚑 Ambulance Directory (Public)
+Route::get('/ambulances', [\App\Http\Controllers\AmbulanceController::class, 'index'])
+    ->name('ambulances.index');
+
 
 
 Route::get('/gamification-guide', function () {
@@ -247,6 +251,9 @@ Route::middleware(['auth'])->group(function () {
 
 // --- ৪. ভেরিফাইড ইউজার কোর ফিচারস ---
 Route::middleware(['auth'])->group(function () {
+    // Ambulance Submission (Crowdsourcing)
+    Route::get('/user/ambulances/create', [\App\Http\Controllers\User\AmbulanceSubmissionController::class, 'create'])->name('user.ambulances.create');
+    Route::post('/user/ambulances', [\App\Http\Controllers\User\AmbulanceSubmissionController::class, 'store'])->name('user.ambulances.store');
     Route::resource('requests', BloodRequestController::class)
         ->parameters(['requests' => 'bloodRequest'])
         ->only(['index']);

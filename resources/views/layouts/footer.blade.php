@@ -90,6 +90,12 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{ route('ambulances.index') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white hover:translate-x-1.5 transition-all font-medium">
+                            অ্যাম্বুলেন্স সার্ভিস
+                            <span class="bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full ml-1">NEW</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('leaderboard') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white hover:translate-x-1.5 transition-all font-medium">
                             লিডারবোর্ড
                         </a>
