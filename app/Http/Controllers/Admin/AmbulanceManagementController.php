@@ -12,20 +12,19 @@ class AmbulanceManagementController extends Controller
 {
     public function index(Request $request)
     {
-        $status = $request->query('status', 'pending');
-        
-        $query = Ambulance::with(['division', 'district', 'upazila', 'adder'])
-            ->where('status', 'active');
+        $pendingAmbulances = Ambulance::with(['division', 'district', 'upazila', 'adder'])
+            ->where('status', 'active')
+            ->where('is_verified', false)
+            ->latest()
+            ->paginate(20, ['*'], 'pending_page');
             
-        if ($status === 'pending') {
-            $query->where('is_verified', false);
-        } elseif ($status === 'verified') {
-            $query->where('is_verified', true);
-        }
-        
-        $ambulances = $query->latest()->paginate(20);
-        
-        return view('admin.ambulances.index', compact('ambulances', 'status'));
+        $verifiedAmbulances = Ambulance::with(['division', 'district', 'upazila', 'adder'])
+            ->where('status', 'active')
+            ->where('is_verified', true)
+            ->latest()
+            ->paginate(20, ['*'], 'verified_page');
+            
+        return view('admin.ambulances.index', compact('pendingAmbulances', 'verifiedAmbulances'));
     }
     
     public function verify(Ambulance $ambulance)

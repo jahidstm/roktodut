@@ -13,60 +13,65 @@
         </div>
     </div>
 
+    @php
+        $isVerifiedActive = request('status') === 'verified' || request()->has('verified_page');
+    @endphp
+
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             {{-- Tabs --}}
-            <div class="flex space-x-1 bg-slate-100/50 p-1 rounded-xl mb-8 w-max border border-slate-200">
-                <a href="{{ route('admin.ambulances.index', ['status' => 'pending']) }}" class="px-6 py-2.5 rounded-lg text-sm font-bold transition-all {{ $status === 'pending' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50' }}">
+            <div class="flex flex-wrap gap-3 mb-8">
+                <button type="button" id="tab-btn-pending" onclick="switchTab('pending')" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all border focus:outline-none {{ !$isVerifiedActive ? 'bg-red-600 text-white border-red-600 shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50' }}">
                     পেন্ডিং অ্যাম্বুলেন্স
-                </a>
-                <a href="{{ route('admin.ambulances.index', ['status' => 'verified']) }}" class="px-6 py-2.5 rounded-lg text-sm font-bold transition-all {{ $status === 'verified' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50' }}">
+                </button>
+                <button type="button" id="tab-btn-verified" onclick="switchTab('verified')" class="px-6 py-2.5 rounded-xl text-sm font-bold transition-all border focus:outline-none {{ $isVerifiedActive ? 'bg-red-600 text-white border-red-600 shadow-md' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50' }}">
                     ভেরিফাইড অ্যাম্বুলেন্স
-                </a>
+                </button>
             </div>
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl border border-slate-100">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm text-left">
-                        <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100 font-bold">
-                            <tr>
-                                <th scope="col" class="px-6 py-4">নাম ও ধরন</th>
-                                <th scope="col" class="px-6 py-4">যোগাযোগ ও লোকেশন</th>
-                                <th scope="col" class="px-6 py-4">যুক্ত করেছেন</th>
-                                <th scope="col" class="px-6 py-4 text-right">অ্যাকশন</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($ambulances as $ambulance)
-                                <tr class="bg-white border-b border-slate-50 hover:bg-slate-50/50 transition">
-                                    <td class="px-6 py-4">
-                                        <div class="font-bold text-slate-900">{{ $ambulance->name }}</div>
-                                        <div class="text-xs font-medium text-slate-500 mt-1 uppercase tracking-wider">{{ $ambulance->type }}</div>
-                                        @if($ambulance->vehicle_number)
-                                            <div class="text-xs font-medium text-slate-400 mt-1">Reg: {{ $ambulance->vehicle_number }}</div>
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="font-bold text-slate-700">{{ $ambulance->phone }}</div>
-                                        <div class="text-xs text-slate-500 mt-1 font-medium">
-                                            {{ $ambulance->upazila?->name }}, {{ $ambulance->district?->name }}
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        @if($ambulance->adder)
-                                            <a href="{{ route('admin.gamification.show', $ambulance->adder->id) }}" class="font-bold text-blue-600 hover:underline">
-                                                {{ $ambulance->adder->name }}
-                                            </a>
-                                            <div class="text-xs text-slate-500 font-medium">
-                                                {{ $ambulance->created_at->format('d M Y, h:i A') }}
+            <!-- Pending Table -->
+            <div id="tab-content-pending" style="display: {{ !$isVerifiedActive ? 'block' : 'none' }};">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl border border-slate-100 mb-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100 font-bold">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4">নাম ও ধরন</th>
+                                    <th scope="col" class="px-6 py-4">যোগাযোগ ও লোকেশন</th>
+                                    <th scope="col" class="px-6 py-4">যুক্ত করেছেন</th>
+                                    <th scope="col" class="px-6 py-4 text-right">অ্যাকশন</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($pendingAmbulances as $ambulance)
+                                    <tr class="bg-white border-b border-slate-50 hover:bg-slate-50/50 transition">
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold text-slate-900">{{ $ambulance->name }}</div>
+                                            <div class="text-xs font-medium text-slate-500 mt-1 uppercase tracking-wider">{{ $ambulance->type }}</div>
+                                            @if($ambulance->vehicle_number)
+                                                <div class="text-xs font-medium text-slate-400 mt-1">Reg: {{ $ambulance->vehicle_number }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold text-slate-700">{{ $ambulance->phone }}</div>
+                                            <div class="text-xs text-slate-500 mt-1 font-medium">
+                                                {{ $ambulance->upazila?->name }}, {{ $ambulance->district?->name }}
                                             </div>
-                                        @else
-                                            <span class="text-slate-400 font-medium">সিস্টেম/অজ্ঞাত</span>
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 text-right space-x-2">
-                                        @if(!$ambulance->is_verified)
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            @if($ambulance->adder)
+                                                <a href="{{ route('admin.gamification.show', $ambulance->adder->id) }}" class="font-bold text-blue-600 hover:underline">
+                                                    {{ $ambulance->adder->name }}
+                                                </a>
+                                                <div class="text-xs text-slate-500 font-medium">
+                                                    {{ $ambulance->created_at->format('d M Y, h:i A') }}
+                                                </div>
+                                            @else
+                                                <span class="text-slate-400 font-medium">সিস্টেম/অজ্ঞাত</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 text-right space-x-2">
                                             <form action="{{ route('admin.ambulances.verify', $ambulance->id) }}" method="POST" class="inline">
                                                 @csrf
                                                 @method('PATCH')
@@ -74,33 +79,137 @@
                                                     ভেরিফাই করুন
                                                 </button>
                                             </form>
-                                        @endif
-                                        <form action="{{ route('admin.ambulances.destroy', $ambulance->id) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-lg font-bold transition border border-red-100 hover:border-red-600 text-xs" onclick="return confirm('আপনি কি নিশ্চিত? ডিলিট করলে আর ফেরত পাওয়া যাবে না।')">
-                                                ডিলিট
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="px-6 py-12 text-center">
-                                        <div class="text-slate-400 mb-2 text-4xl">📭</div>
-                                        <div class="text-slate-500 font-medium text-sm">কোনো অ্যাম্বুলেন্স ডেটা পাওয়া যায়নি।</div>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                                            <form action="{{ route('admin.ambulances.destroy', $ambulance->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-lg font-bold transition border border-red-100 hover:border-red-600 text-xs" onclick="return confirm('আপনি কি নিশ্চিত? ডিলিট করলে আর ফেরত পাওয়া যাবে না।')">
+                                                    ডিলিট
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-12 text-center">
+                                            <div class="text-slate-400 mb-2 text-4xl">📭</div>
+                                            <div class="text-slate-500 font-medium text-sm">কোনো পেন্ডিং অ্যাম্বুলেন্স ডেটা পাওয়া যায়নি।</div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+                {{ $pendingAmbulances->links() }}
             </div>
 
-            <div class="mt-6">
-                {{ $ambulances->links() }}
+            <!-- Verified Table -->
+            <div id="tab-content-verified" style="display: {{ $isVerifiedActive ? 'block' : 'none' }};">
+                <div class="bg-white overflow-hidden shadow-sm sm:rounded-2xl border border-slate-100 mb-6">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-100 font-bold">
+                                <tr>
+                                    <th scope="col" class="px-6 py-4">নাম ও ধরন</th>
+                                    <th scope="col" class="px-6 py-4">যোগাযোগ ও লোকেশন</th>
+                                    <th scope="col" class="px-6 py-4">যুক্ত করেছেন</th>
+                                    <th scope="col" class="px-6 py-4 text-right">অ্যাকশন</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($verifiedAmbulances as $ambulance)
+                                    <tr class="bg-white border-b border-slate-50 hover:bg-slate-50/50 transition">
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold text-slate-900">{{ $ambulance->name }}</div>
+                                            <div class="text-xs font-medium text-slate-500 mt-1 uppercase tracking-wider">{{ $ambulance->type }}</div>
+                                            @if($ambulance->vehicle_number)
+                                                <div class="text-xs font-medium text-slate-400 mt-1">Reg: {{ $ambulance->vehicle_number }}</div>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            <div class="font-bold text-slate-700">{{ $ambulance->phone }}</div>
+                                            <div class="text-xs text-slate-500 mt-1 font-medium">
+                                                {{ $ambulance->upazila?->name }}, {{ $ambulance->district?->name }}
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4">
+                                            @if($ambulance->adder)
+                                                <a href="{{ route('admin.gamification.show', $ambulance->adder->id) }}" class="font-bold text-blue-600 hover:underline">
+                                                    {{ $ambulance->adder->name }}
+                                                </a>
+                                                <div class="text-xs text-slate-500 font-medium">
+                                                    {{ $ambulance->created_at->format('d M Y, h:i A') }}
+                                                </div>
+                                            @else
+                                                <span class="text-slate-400 font-medium">সিস্টেম/অজ্ঞাত</span>
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 text-right space-x-2">
+                                            <form action="{{ route('admin.ambulances.destroy', $ambulance->id) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white px-3 py-1.5 rounded-lg font-bold transition border border-red-100 hover:border-red-600 text-xs" onclick="return confirm('আপনি কি নিশ্চিত? ডিলিট করলে আর ফেরত পাওয়া যাবে ওয়েবসাইটে দেখানো বন্ধ হয়ে যাবে।')">
+                                                    ডিলিট
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" class="px-6 py-12 text-center">
+                                            <div class="text-slate-400 mb-2 text-4xl">📭</div>
+                                            <div class="text-slate-500 font-medium text-sm">কোনো ভেরিফাইড অ্যাম্বুলেন্স ডেটা পাওয়া যায়নি।</div>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {{ $verifiedAmbulances->links() }}
             </div>
 
         </div>
     </div>
+
+    <script>
+        function switchTab(tab) {
+            const btnPending = document.getElementById('tab-btn-pending');
+            const btnVerified = document.getElementById('tab-btn-verified');
+            const contentPending = document.getElementById('tab-content-pending');
+            const contentVerified = document.getElementById('tab-content-verified');
+
+            const baseClass = "px-6 py-2.5 rounded-xl text-sm font-bold transition-all border focus:outline-none ";
+            const activeClass = "bg-red-600 text-white border-red-600 shadow-md";
+            const inactiveClass = "bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50";
+
+            if (tab === 'pending') {
+                contentPending.style.display = 'block';
+                contentVerified.style.display = 'none';
+
+                btnPending.className = baseClass + activeClass;
+                btnVerified.className = baseClass + inactiveClass;
+                
+                // Update URL parameter without reloading
+                if (window.history && window.history.pushState) {
+                    const newUrl = new URL(window.location);
+                    newUrl.searchParams.set('status', 'pending');
+                    window.history.pushState({}, '', newUrl);
+                }
+            } else {
+                contentPending.style.display = 'none';
+                contentVerified.style.display = 'block';
+
+                btnVerified.className = baseClass + activeClass;
+                btnPending.className = baseClass + inactiveClass;
+                
+                // Update URL parameter without reloading
+                if (window.history && window.history.pushState) {
+                    const newUrl = new URL(window.location);
+                    newUrl.searchParams.set('status', 'verified');
+                    window.history.pushState({}, '', newUrl);
+                }
+            }
+        }
+    </script>
 @endsection
