@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\GamificationGovernanceController;
 use App\Http\Controllers\Admin\BlogModerationController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Donor\DashboardController as DonorDashboardController;
 use App\Http\Controllers\DonationRecordController;
 use App\Http\Controllers\OrgAdmin\DashboardController as OrgDashboardController;
 use App\Http\Controllers\OrgAdmin\VerificationController;
@@ -306,6 +307,21 @@ Route::middleware(['auth'])->group(function () {
 
 
 // --- ৫. ড্যাশবোর্ড রাউটস (রোল ভিত্তিক) ---
+
+// ডোনার ড্যাশবোর্ড (dedicated sidebar layout)
+Route::get('/donor/dashboard', [DonorDashboardController::class, 'index'])
+    ->middleware(['auth', 'role:donor'])
+    ->name('donor.dashboard');
+
+Route::get('/donor/recent-requests', [DonorDashboardController::class, 'recentRequests'])
+    ->middleware(['auth', 'role:donor'])
+    ->name('donor.recent_requests');
+
+Route::get('/donor/blood-history', [DonorDashboardController::class, 'bloodHistory'])
+    ->middleware(['auth', 'role:donor'])
+    ->name('donor.blood_history');
+
+// জেনেরিক ড্যাশবোর্ড (Recipient — বা donor হলে redirect করে donor.dashboard এ)
 Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'role:donor,recipient'])
     ->name('dashboard');

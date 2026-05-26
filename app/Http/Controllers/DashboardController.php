@@ -20,7 +20,13 @@ class DashboardController extends Controller
         }
 
         $user = Auth::user()->load('badges');
-        $isDonor = $user->is_donor; // ✅ Use new boolean flag instead of role
+        $isDonor = $user->is_donor;
+
+        // ২. ডোনার হলে → নতুন dedicated donor dashboard এ পাঠাও
+        if ($isDonor) {
+            return redirect()->route('donor.dashboard');
+        }
+
 
         // ২. স্ট্যাটিস্টিকস ক্যালকুলেশন
         // "মোট রিকোয়েস্ট": Donor হলে responded requests, Recipient হলে created requests
