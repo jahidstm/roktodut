@@ -60,7 +60,7 @@
     </div>
 @endif
 
-<div class="max-w-5xl mx-auto px-4 sm:px-6 py-6 flex flex-col gap-6">
+<div class="flex flex-col gap-6">
 
     {{-- ══ A) HERO BANNER ══ --}}
     @php

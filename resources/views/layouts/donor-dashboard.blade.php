@@ -78,6 +78,22 @@
             min-height: calc(100vh - 76px);
             min-width: 0;
         }
+        #page-content {
+            width: 100%;
+            max-width: 64rem;
+            margin: 0 auto;
+            padding: 1.5rem 1rem 2.5rem;
+        }
+        @media (min-width: 640px) {
+            #page-content {
+                padding: 1.75rem 1.5rem 3rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            #page-content {
+                padding: 2rem 2rem 3.5rem;
+            }
+        }
         /* hide original */
         .old-donor-content {
             margin-left: 260px;
