@@ -345,6 +345,17 @@
             পয়েন্ট গাইড
         </a>
 
+        <div class="h-px bg-slate-200 mx-5 my-2"></div>
+
+        <form method="POST" action="{{ route('logout') }}" x-data>
+            @csrf
+            <a href="{{ route('logout') }}"
+               @click.prevent="$root.submit();"
+               class="sidebar-nav-item text-slate-600 hover:text-red-600 hover:bg-red-50">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                লগআউট
+            </a>
+        </form>
         
     </nav>
 
