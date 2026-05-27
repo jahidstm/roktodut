@@ -10,7 +10,7 @@
 <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10" x-data="{ showAddModal: false }" data-panel-id="health-ledger">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div class="flex flex-col gap-2">
-            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Predictive Health Ledger</h1>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">স্বাস্থ্য রেকর্ড</h1>
             <p class="text-sm text-slate-500">আপনার সর্বশেষ হেলথ মেট্রিক্সের ট্রেন্ড ও রিস্ক সিগন্যাল।</p>
         </div>
         <button @click="showAddModal = true" class="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-5 rounded-xl transition-colors shadow-sm text-sm shrink-0">
