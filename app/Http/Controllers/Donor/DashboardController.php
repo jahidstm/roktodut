@@ -122,6 +122,8 @@ class DashboardController extends Controller
             ? round(($totalContributions / $totalUserResponses) * 100, 1)
             : 'তথ্য নেই';
 
+        $totalLivesSaved = $totalContributions * 3;
+
         // ── ৩. Donation Recovery Cards ────────────────────────────────────────
         $donationRecoveryCards = collect([
             ['component_key' => BloodComponentType::WHOLE_BLOOD->value, 'title' => 'পূর্ণ রক্ত / PRBC', 'max_cooldown_days' => 120],
@@ -237,6 +239,7 @@ class DashboardController extends Controller
             'gamificationStats',
             'totalRequestsMade',
             'totalContributions',
+            'totalLivesSaved',
             'fulfilledRequests',
             'successRate',
             'donationRecoveryCards',

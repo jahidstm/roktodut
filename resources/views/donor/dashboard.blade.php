@@ -61,7 +61,7 @@
 @endif
 
 <div class="flex flex-col gap-6">
-    
+
     {{-- ══ A) HERO BANNER ══ --}}
     @php
         $currentPoints   = $gamificationStats['currentPoints'] ?? 0;
@@ -98,7 +98,7 @@
                         <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
                         <span class="truncate">{{ $user->upazila?->name ?? 'উপজেলা নেই' }}, {{ $user->district?->name ?? 'জেলা নেই' }}</span>
                     </p>
-                    
+
                     {{-- Badges --}}
                     @if($user->badges->count() > 0)
                     <div class="flex flex-wrap gap-2 mt-3">
@@ -174,52 +174,77 @@
         </div>
     </div>
 
-    {{-- ══ B) ELIGIBILITY + DATE UPDATE ══ --}}
-    <div class="bg-white p-5 sm:p-6 rounded-3xl border {{ $isEligible ? 'border-emerald-200' : 'border-amber-200' }} shadow-sm flex flex-col md:flex-row items-center justify-between gap-5 scroll-reveal" data-scroll-reveal>
-        <div class="flex items-center gap-4">
-            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full {{ $isEligible ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600' }}">
-                <svg class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
-                </svg>
-            </div>
-            <div>
-                <h3 class="text-base font-extrabold {{ $isEligible ? 'text-emerald-700' : 'text-amber-700' }}">
-                    {{ $isEligible ? 'আপনি রক্তদানের জন্য যোগ্য ✓' : 'আপাতত রক্তদানের জন্য যোগ্য নন' }}
-                </h3>
-                <p class="text-xs font-semibold text-slate-500 mt-0.5">
-                    @if(!$user->last_donated_at)
-                        আমাদের সিস্টেমে আপনার পূর্বের রেকর্ড নেই।
-                    @elseif($isEligible)
-                        সর্বশেষ রক্তদানের পর ১২০ দিন পার হয়েছে।
+    {{-- ══ B) DONATION READINESS PANEL (NEW DESIGN — KEEP) ══ --}}
+    <div class="bg-white rounded-3xl border {{ $isEligible ? 'border-emerald-200' : 'border-amber-200' }} shadow-sm overflow-hidden scroll-reveal" data-scroll-reveal>
+
+        {{-- State Banner --}}
+        <div class="px-5 sm:px-6 py-5 {{ $isEligible ? 'bg-emerald-50' : 'bg-amber-50' }} flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b {{ $isEligible ? 'border-emerald-100' : 'border-amber-100' }}">
+            <div class="flex items-center gap-4">
+                <div class="w-11 h-11 rounded-full {{ $isEligible ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600' }} flex items-center justify-center shrink-0">
+                    @if($isEligible)
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     @else
-                        পরবর্তী তারিখ: <span class="text-slate-800 font-extrabold">{{ $nextDate->format('d M, Y') }}</span>
-                        (আর <span class="text-red-600 font-extrabold">{{ (int) now()->startOfDay()->diffInDays($nextDate->startOfDay()) }} দিন</span> বাকি)
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     @endif
-                </p>
+                </div>
+                <div>
+                    <h3 class="text-sm font-extrabold {{ $isEligible ? 'text-emerald-800' : 'text-amber-800' }}">
+                        {{ $isEligible ? '✓ আপনি রক্তদানের জন্য যোগ্য' : 'কুলডাউন চলছে' }}
+                    </h3>
+                    <p class="text-xs font-medium {{ $isEligible ? 'text-emerald-600' : 'text-amber-700' }} mt-0.5">
+                        @if(!$user->last_donated_at)
+                            আমাদের সিস্টেমে পূর্বের কোনো রেকর্ড নেই।
+                        @elseif($isEligible)
+                            সর্বশেষ রক্তদানের পর ১২০+ দিন পার হয়েছে।
+                        @else
+                            পরবর্তী তারিখ: <strong>{{ $nextDate->format('d M, Y') }}</strong> — আর <strong>{{ (int) now()->startOfDay()->diffInDays($nextDate->startOfDay()) }} দিন</strong> বাকি
+                        @endif
+                    </p>
+                </div>
+            </div>
+
+            {{-- Last Donation Date Update Form --}}
+            <form action="{{ route('donation.record.update') }}" method="POST" class="flex items-end gap-2 w-full sm:w-auto shrink-0">
+                @csrf
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">শেষ ডোনেশন তারিখ</label>
+                    <input type="date" name="last_donated_at"
+                           value="{{ $user->last_donated_at?->format('Y-m-d') }}"
+                           max="{{ date('Y-m-d') }}"
+                           {{ !$isEligible && $user->last_donated_at ? 'readonly disabled' : '' }}
+                           class="rounded-lg border-slate-300 text-sm font-semibold text-slate-700 focus:border-red-500 focus:ring-red-500 shadow-sm {{ !$isEligible && $user->last_donated_at ? 'bg-slate-100 opacity-60 cursor-not-allowed' : '' }}">
+                </div>
+                <button type="submit"
+                        {{ !$isEligible && $user->last_donated_at ? 'disabled' : '' }}
+                        class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-lg font-extrabold text-sm transition shadow-sm {{ !$isEligible && $user->last_donated_at ? 'opacity-40 cursor-not-allowed' : '' }}">
+                    সেভ
+                </button>
+            </form>
+        </div>
+
+        {{-- Blood Component Recovery Cards --}}
+        <div class="px-5 sm:px-6 py-5">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-4">রক্তের উপাদান পুনরুদ্ধার অগ্রগতি</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                @foreach($donationRecoveryCards as $card)
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <p class="text-sm font-extrabold text-slate-700">{{ $card['title'] }}</p>
+                        <span class="text-xs font-black {{ $card['text_class'] }}">
+                            {{ $card['remaining_days'] === 0 ? '✓ প্রস্তুত' : $card['remaining_days'].' দিন' }}
+                        </span>
+                    </div>
+                    <div class="h-2 bg-slate-100 rounded-full overflow-hidden">
+                        <div class="h-full {{ $card['bar_class'] }} rounded-full transition-all duration-700" style="width: {{ $card['progress_percent'] }}%"></div>
+                    </div>
+                    <p class="text-[10px] text-slate-400 font-medium mt-1.5">
+                        {{ $card['is_ready'] ? 'রক্তদানের জন্য প্রস্তুত' : 'উপলব্ধ: '.$card['eligible_on_formatted'] }}
+                    </p>
+                </div>
+                @endforeach
             </div>
         </div>
-        <form action="{{ route('donation.record.update') }}" method="POST" class="flex items-end gap-3 w-full md:w-auto">
-            @csrf
-            <div class="flex-1 md:w-44">
-                <label class="block text-xs font-bold text-slate-500 mb-1">শেষ রক্তদানের তারিখ আপডেট</label>
-                <input type="date" name="last_donated_at"
-                       value="{{ $user->last_donated_at?->format('Y-m-d') }}"
-                       max="{{ date('Y-m-d') }}"
-                       {{ !$isEligible && $user->last_donated_at ? 'readonly disabled' : '' }}
-                       class="w-full rounded-lg border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500 font-semibold text-sm text-slate-700 {{ !$isEligible && $user->last_donated_at ? 'bg-slate-100 cursor-not-allowed opacity-70' : '' }}">
-            </div>
-            <button type="submit"
-                    {{ !$isEligible && $user->last_donated_at ? 'disabled' : '' }}
-                    class="bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-lg font-extrabold text-sm shadow-sm transition {{ !$isEligible && $user->last_donated_at ? 'opacity-50 cursor-not-allowed' : '' }}">
-                সেভ
-            </button>
-        </form>
     </div>
-
-    {{-- ══ C) DYNAMIC RECOVERY TIMER ══ --}}
-    <x-dashboard.recovery-timer :items="$donationRecoveryCards" />
-
-
 
     {{-- ══ E) QUICK ACTIONS GRID ══ --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -374,10 +399,10 @@
         </div>
         <div class="bg-white rounded-2xl border border-red-100 p-5 shadow-sm flex items-center gap-4">
             <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>
             </div>
             <div>
-                <div class="text-2xl font-black text-red-600">{{ ($totalContributions ?? 0) * 3 }}</div>
+                <div class="text-2xl font-black text-red-600">{{ $totalLivesSaved ?? 0 }}</div>
                 <div class="text-xs font-bold text-red-500 mt-0.5">জীবন বাঁচিয়েছেন</div>
             </div>
         </div>
@@ -392,28 +417,27 @@
         </div>
     </div>
 
-
-
-    {{-- ══ K) REFERRAL BANNER ══ --}}
+    {{-- ══ K) REFERRAL BANNER (NEW DESIGN — KEEP) ══ --}}
     @if(isset($myCode))
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-600 p-6 sm:p-8 shadow-xl scroll-reveal" data-scroll-reveal>
-        <div class="absolute -top-8 -right-8 w-40 h-40 bg-white/10 rounded-full pointer-events-none"></div>
+    <div class="relative overflow-hidden rounded-3xl bg-slate-900 border border-slate-800 p-6 sm:p-8 shadow-xl scroll-reveal" data-scroll-reveal>
+        <div class="absolute -top-12 -right-12 w-56 h-56 bg-emerald-500/8 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-12 -left-12 w-40 h-40 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
         <div class="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div class="flex-1">
                 <div class="flex items-center gap-3 mb-2">
-                    <span class="text-3xl">👥</span>
-                    <h2 class="text-white font-black text-lg sm:text-xl">বন্ধুকে আমন্ত্রণ জানান &amp; আয় করুন!</h2>
+                    <span class="text-2xl">👥</span>
+                    <h2 class="text-white font-black text-lg sm:text-xl">বন্ধুকে আমন্ত্রণ জানান</h2>
                 </div>
-                <p class="text-emerald-100 text-sm font-medium">বন্ধু সাইন-আপ করলে <span class="text-white font-black">+১০ পয়েন্ট</span>, প্রথম ডোনেশনে <span class="text-white font-black">+৩০ পয়েন্ট</span>!</p>
+                <p class="text-slate-400 text-sm font-medium">বন্ধু সাইন-আপ করলে <span class="text-emerald-400 font-black">+১০ পয়েন্ট</span>, প্রথম ডোনেশনে <span class="text-emerald-400 font-black">+৩০ পয়েন্ট</span> পাবেন!</p>
             </div>
             <div class="flex-shrink-0 w-full sm:w-auto">
-                <div class="bg-white/15 border border-white/25 rounded-2xl p-4 text-center mb-3">
-                    <div class="text-white/75 text-[10px] font-extrabold uppercase tracking-widest mb-1">আপনার রেফারেল কোড</div>
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-4 text-center mb-3">
+                    <div class="text-slate-500 text-[10px] font-extrabold uppercase tracking-widest mb-1">আপনার রেফারেল কোড</div>
                     <div class="text-white font-black text-2xl tracking-[0.2em]">{{ $myCode }}</div>
                 </div>
                 <div class="flex gap-2">
-                    <input id="referral-link-dashboard" type="text" value="{{ $referralLink }}" class="flex-1 text-xs py-2.5 px-3 rounded-xl bg-white/15 border border-white/25 text-white font-semibold focus:outline-none min-w-0" readonly>
-                    <button id="dash-copy-btn" onclick="copyDashboardReferral()" class="shrink-0 bg-white text-emerald-700 font-black text-xs px-4 py-2.5 rounded-xl hover:bg-emerald-50 transition">কপি করুন</button>
+                    <input id="referral-link-dashboard" type="text" value="{{ $referralLink }}" class="flex-1 text-xs py-2.5 px-3 rounded-xl bg-white/5 border border-white/10 text-slate-300 font-semibold focus:outline-none min-w-0" readonly>
+                    <button id="dash-copy-btn" onclick="copyDashboardReferral()" class="shrink-0 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs px-4 py-2.5 rounded-xl transition">কপি করুন</button>
                 </div>
             </div>
         </div>
@@ -429,10 +453,12 @@ function copyDashboardReferral() {
     const btn   = document.getElementById('dash-copy-btn');
     navigator.clipboard.writeText(input.value).then(() => {
         btn.textContent = '✓ কপি হয়েছে!';
-        btn.classList.add('bg-emerald-100', 'text-emerald-800');
+        btn.classList.remove('bg-emerald-600', 'hover:bg-emerald-500');
+        btn.classList.add('bg-emerald-800');
         setTimeout(() => {
             btn.textContent = 'কপি করুন';
-            btn.classList.remove('bg-emerald-100', 'text-emerald-800');
+            btn.classList.add('bg-emerald-600', 'hover:bg-emerald-500');
+            btn.classList.remove('bg-emerald-800');
         }, 2500);
     });
 }
