@@ -43,7 +43,7 @@
     {{-- ══════════════════════════════════════════
          Hero Section — dynamic based on filters
     ══════════════════════════════════════════ --}}
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-600 via-red-700 to-red-900 p-8 sm:p-12 mb-6 shadow-2xl scroll-reveal" data-scroll-reveal>
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-red-600 via-red-700 to-red-900 p-8 sm:p-12 mb-6 shadow-2xl scroll-reveal hide-in-dashboard" data-scroll-reveal>
         {{-- Decorative blobs --}}
         <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
         <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4 pointer-events-none"></div>
