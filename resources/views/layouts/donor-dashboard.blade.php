@@ -33,7 +33,7 @@
         /* ── Donor Dashboard Shell ── */
         .donor-shell {
             display: flex;
-            min-height: 100vh;
+            min-height: calc(100vh - 76px);
             background: #f8fafc;
         }
 
@@ -419,7 +419,7 @@
     </main>
 
     {{-- ── Footer (minimal) ── --}}
-    <footer class="border-t border-slate-200 py-4 px-6 flex items-center justify-between">
+    <footer class="mt-auto border-t border-slate-200 bg-slate-50 py-4 px-6 flex items-center justify-between">
         <p class="text-xs text-slate-400 font-medium">&copy; {{ date('Y') }} রক্তদূত — রক্তদান প্ল্যাটফর্ম</p>
         <a href="{{ route('home') }}" class="text-xs text-slate-400 hover:text-red-600 font-semibold transition-colors">পাবলিক সাইট &rarr;</a>
     </footer>
