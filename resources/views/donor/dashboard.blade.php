@@ -61,7 +61,7 @@
 @endif
 
 <div class="flex flex-col gap-6">
-
+    
     {{-- ══ A) HERO BANNER ══ --}}
     @php
         $currentPoints   = $gamificationStats['currentPoints'] ?? 0;
@@ -274,8 +274,8 @@
             </div>
         </a>
 
-        <button type="button" x-data @click="$dispatch('open-modal', 'offline-donation-claim')"
-                class="group relative overflow-hidden p-5 rounded-2xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-purple-300 hover:-translate-y-0.5 flex flex-col gap-3 text-left scroll-reveal" data-scroll-reveal>
+        <a href="{{ route('donor.offline-claim') }}"
+           class="group relative overflow-hidden p-5 rounded-2xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-purple-300 hover:-translate-y-0.5 flex flex-col gap-3 text-left scroll-reveal" data-scroll-reveal>
             <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 border border-purple-100 shrink-0 group-hover:scale-110 transition-transform">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
@@ -283,61 +283,7 @@
                 <h3 class="text-slate-900 font-black text-sm leading-tight">অফলাইন ক্লেইম</h3>
                 <p class="text-slate-500 text-xs font-medium mt-0.5">পয়েন্ট যোগ করুন</p>
             </div>
-        </button>
-    </div>
-
-    {{-- ══ F) OFFLINE CLAIM MODAL ══ --}}
-    <x-modal name="offline-donation-claim" :show="$errors->hasAny(['recipient_phone', 'patient_name', 'district_id', 'hospital_name', 'donation_date', 'proof_path'])" maxWidth="2xl">
-        <form method="POST" action="{{ route('offline-claims.store') }}" enctype="multipart/form-data" class="p-6 space-y-5">
-            @csrf
-            <div>
-                <h3 class="text-lg font-extrabold text-slate-900">অফলাইন রক্তদান ক্লেইম</h3>
-                <p class="text-sm font-medium text-slate-500 mt-1">রিকোয়েস্ট ছাড়া ফোনে রক্ত দিলে এখানে ক্লেইম দিন।</p>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">গ্রহীতার ফোন <span class="text-red-500">*</span></label>
-                    <input type="text" name="recipient_phone" value="{{ old('recipient_phone') }}" placeholder="01XXXXXXXXX" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
-                    @error('recipient_phone') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">রোগীর নাম <span class="text-red-500">*</span></label>
-                    <input type="text" name="patient_name" value="{{ old('patient_name') }}" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
-                    @error('patient_name') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">জেলা <span class="text-red-500">*</span></label>
-                    <select name="district_id" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
-                        <option value="">জেলা নির্বাচন করুন</option>
-                        @foreach($districts as $district)
-                            <option value="{{ $district->id }}" @selected((int) old('district_id') === (int) $district->id)>{{ $district->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('district_id') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1.5">রক্তদানের তারিখ <span class="text-red-500">*</span></label>
-                    <input type="date" name="donation_date" value="{{ old('donation_date') }}" max="{{ now()->toDateString() }}" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
-                    @error('donation_date') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                </div>
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1.5">হাসপাতালের নাম (ঐচ্ছিক)</label>
-                <input type="text" name="hospital_name" value="{{ old('hospital_name') }}" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500">
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-slate-700 mb-1.5">প্রুফ ছবি (ঐচ্ছিক)</label>
-                <input type="file" name="proof_path" accept="image/*" class="w-full rounded-xl border border-slate-300 bg-white text-sm font-semibold file:mr-4 file:border-0 file:bg-red-600 file:px-4 file:py-2.5 file:text-white hover:file:bg-red-700">
-                <p class="text-xs text-slate-500 font-medium mt-1">ছবি না দিলে অ্যাডমিন রিভিউতে যাবে।</p>
-            </div>
-            <div class="pt-2 flex justify-end gap-2">
-                <button type="button" x-data @click="$dispatch('close-modal', 'offline-donation-claim')" class="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50">বাতিল</button>
-                <button type="submit" class="rounded-lg bg-red-600 px-5 py-2.5 text-sm font-black text-white hover:bg-red-700">ক্লেইম সাবমিট</button>
-            </div>
-        </form>
-    </x-modal>
+        </a>
 
     {{-- ══ G) LOCAL EMERGENCY RADAR ══ --}}
     @if($radarRequests->isNotEmpty())
@@ -546,6 +492,7 @@
     </div>
     @endif
 
+    </div>
 </div>
 
 @push('scripts')

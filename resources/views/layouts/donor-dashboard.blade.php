@@ -121,10 +121,15 @@
         .sidebar-nav-item {
             display: flex;
             align-items: center;
+            justify-content: flex-start;
             gap: 1rem;
             padding: 0.85rem 1.25rem;
             border-radius: 0.75rem;
             margin: 0.35rem 1.25rem;
+            /* Keep a consistent full-width hit-area (also fixes <button> not stretching in some cases) */
+            width: calc(100% - 2.5rem);
+            box-sizing: border-box;
+
             font-size: 0.95rem;
             font-weight: 600;
             color: #64748b; /* slate-500 */
@@ -134,6 +139,21 @@
             position: relative;
             overflow: hidden;
             background: transparent;
+        }
+
+        /* Normalize button menu item to look/behave like links */
+        button.sidebar-nav-item {
+            appearance: none;
+            border: 0;
+            cursor: pointer;
+            text-align: left;
+            font: inherit;
+        }
+
+        .sidebar-nav-item:focus { outline: none; }
+        .sidebar-nav-item:focus-visible {
+            outline: 2px solid rgba(239, 68, 68, 0.35);
+            outline-offset: 2px;
         }
         
         .sidebar-nav-item::before {
@@ -329,6 +349,12 @@
            class="sidebar-nav-item {{ request()->routeIs('health-ledger.*') ? 'active' : '' }}" data-tab="health-ledger">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
             স্বাস্থ্য রেকর্ড
+        </a>
+
+        <a href="{{ route('donor.offline-claim') }}"
+           class="sidebar-nav-item {{ request()->routeIs('donor.offline-claim') ? 'active' : '' }}">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            অফলাইন ক্লেইম
         </a>
 
 
@@ -528,7 +554,7 @@
         }
     }
 
-    let currentTab = 'overview';
+    let currentTab = document.querySelector('.sidebar-nav-item[data-tab].active')?.dataset?.tab || 'overview';
 
     async function switchTab(tabId, url) {
         if (tabId === currentTab) return;
@@ -630,9 +656,12 @@
         });
     });
 
+    // Expose for layout-level helpers (e.g., Offline Claim)
+    window.__spaNavigate = switchTab;
+    window.__spaSetActiveTab = setActiveTab;
+
 })();
 </script>
-
 
 
 {{-- FCM Push Notifications --}}

@@ -218,10 +218,7 @@ class DashboardController extends Controller
             ->with(['user', 'bloodRequest'])
             ->first();
 
-        // ── ৯. Districts for offline claim modal ──────────────────────────────
-        $districts = District::orderBy('name')->get(['id', 'name']);
-
-        // ── ১০. Referral Code ─────────────────────────────────────────────────
+        // ── ৯. Referral Code ─────────────────────────────────────────────────
         $gamification = app(GamificationService::class);
         $myCode       = $gamification->generateReferralCode($user);
         $referralLink = url('/register?ref=' . $myCode);
@@ -248,10 +245,20 @@ class DashboardController extends Controller
             'donationHistory',
             'recentRequests',
             'pendingClaim',
-            'districts',
             'myCode',
             'referralLink',
             'showInactivePopup'
         ));
+    }
+
+    public function offlineClaim(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->is_donor) return redirect()->route('dashboard');
+        if (!$user->is_onboarded) return redirect()->route('onboarding.show');
+
+        $districts = District::orderBy('name')->get(['id', 'name']);
+
+        return view('donor.offline-claim', compact('districts'));
     }
 }
