@@ -471,6 +471,10 @@
     .donor-content .hide-in-dashboard {
         display: none !important;
     }
+
+    .donor-content .show-in-dashboard {
+        display: flex !important;
+    }
 </style>
 
 <div id="spa-progress"></div>

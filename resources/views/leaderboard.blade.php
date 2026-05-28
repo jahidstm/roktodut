@@ -284,6 +284,62 @@
     {{-- ══════════════════════════════════════════
          Full Rankings List (IELTSly Style)
     ══════════════════════════════════════════ --}}
+    
+    {{-- ── Current User Rank Card (Dashboard Only) ── --}}
+    @auth
+        @php
+            $myPts       = $time === 'month' ? (Auth::user()->monthly_points ?? 0) : (Auth::user()->points ?? 0);
+            $myDons      = Auth::user()->total_verified_donations ?? 0;
+        @endphp
+        
+        <div class="hidden bg-white rounded-[2rem] p-6 mb-8 border border-red-100 shadow-[0_8px_30px_rgba(220,38,38,0.06)] items-center justify-between relative overflow-hidden show-in-dashboard scroll-reveal flex-col sm:flex-row gap-6 sm:gap-0" data-scroll-reveal>
+            {{-- Decorative background --}}
+            <div class="absolute right-0 top-0 w-64 h-64 bg-red-50/50 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2"></div>
+            
+            <div class="flex items-center gap-4 sm:gap-6 w-full sm:w-auto">
+                {{-- Rank Circle --}}
+                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-[3px] sm:border-4 border-red-100 bg-white shadow-md sm:shadow-lg flex flex-col items-center justify-center shrink-0 relative z-10 px-2">
+                    <span class="text-[8px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Rank</span>
+                    <span class="text-base sm:text-xl font-black text-red-600 mt-0.5 sm:mt-1 truncate w-full text-center">#{{ $myRank ?? 'N/A' }}</span>
+                </div>
+                
+                {{-- Name & Badge --}}
+                <div>
+                    <h2 class="text-xl sm:text-2xl font-black text-slate-900 mb-1 sm:mb-2">{{ Auth::user()->name }}</h2>
+                    <div class="flex flex-wrap items-center gap-2">
+                        @if($myRank && $myRank <= 10)
+                            <span class="text-[10px] sm:text-[11px] font-bold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded-full">Top 10</span>
+                        @elseif($myRank && $myRank <= 50)
+                            <span class="text-[10px] sm:text-[11px] font-bold text-amber-600 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">Top 50</span>
+                        @elseif($myRank && $myRank <= 100)
+                            <span class="text-[10px] sm:text-[11px] font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">Top 100</span>
+                        @endif
+                        
+                        @foreach(Auth::user()->badges->take(1) as $badge)
+                            @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
+                            <span class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-full px-2 py-0.5">
+                                {{ $bd['emoji'] }} {{ $badge->bn_name ?? $badge->name }}
+                            </span>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            
+            {{-- Stats --}}
+            <div class="flex items-center gap-6 sm:gap-8 pr-0 sm:pr-4 w-full sm:w-auto justify-center sm:justify-end">
+                <div class="text-center">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 sm:mb-1">রক্তদান</div>
+                    <div class="text-2xl sm:text-3xl font-black text-blue-600"><x-number-ticker :value="$myDons" /></div>
+                </div>
+                <div class="w-px h-10 sm:h-12 bg-slate-200"></div>
+                <div class="text-center">
+                    <div class="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-0.5 sm:mb-1">{{ $pointsLabel ?? 'পয়েন্ট' }}</div>
+                    <div class="text-2xl sm:text-3xl font-black text-amber-600"><x-number-ticker :value="$myPts" :format="true" /></div>
+                </div>
+            </div>
+        </div>
+    @endauth
+
     <div class="mb-4 flex items-center justify-between scroll-reveal" data-scroll-reveal>
         <div class="flex items-center gap-2">
             <span class="text-2xl drop-shadow-sm">🏆</span>
@@ -345,9 +401,6 @@
                                 {{ $bd['emoji'] }} {{ $badge->bn_name ?? $badge->name }}
                             </span>
                         @endforeach
-                        @if($donor->badges->isEmpty())
-                            <span class="text-[10px] font-bold text-slate-400 bg-slate-100 rounded px-1.5 py-0.5">রক্তদাতা</span>
-                        @endif
                     </div>
                 </div>
 
