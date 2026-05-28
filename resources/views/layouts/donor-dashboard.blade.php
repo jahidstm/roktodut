@@ -567,8 +567,8 @@
             contentEl.innerHTML = cache[tabId];
             window.scrollTo({ top: 0 });
             document.querySelector('.donor-content')?.scrollTo?.({ top: 0 });
-            reinitAlpine(contentEl);
             runPageScripts(null, contentEl);
+            reinitAlpine(contentEl);
             if (window.initScrollReveal) {
                 requestAnimationFrame(() => window.initScrollReveal(contentEl));
             }
@@ -629,8 +629,8 @@
             window.scrollTo({ top: 0 });
             document.querySelector('.donor-content')?.scrollTo?.({ top: 0 });
 
-            reinitAlpine(contentEl);
             runPageScripts(doc, contentEl);
+            reinitAlpine(contentEl);
             if (window.initScrollReveal) {
                 requestAnimationFrame(() => window.initScrollReveal(contentEl));
             }

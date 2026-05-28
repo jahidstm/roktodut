@@ -728,7 +728,9 @@
         });
     });
 
-    document.addEventListener('alpine:init', () => {
+    const initProfileAlpine = () => {
+        if (typeof Alpine === 'undefined') return;
+        
         Alpine.data('emergencyToggle', (initialStatus, lockedStatus) => ({
             isAvailable: initialStatus,
             isLocked: lockedStatus,
@@ -837,6 +839,12 @@
                 setTimeout(() => { this.toast = false; }, 3500);
             }
         }));
-    });
+    };
+
+    if (window.Alpine) {
+        initProfileAlpine();
+    } else {
+        document.addEventListener('alpine:init', initProfileAlpine);
+    }
 </script>
 @endsection

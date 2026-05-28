@@ -78,7 +78,7 @@
         <div class="absolute top-0 right-0 w-64 h-64 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start gap-6">
             {{-- Profile --}}
             <div class="flex items-center gap-4 sm:gap-5">
                 <div class="relative">
@@ -92,7 +92,6 @@
                     @endif
                 </div>
                 <div>
-                    <p class="text-slate-400 text-xs sm:text-sm font-semibold mb-0.5">স্বাগতম ফিরে আসার জন্য,</p>
                     <h2 class="text-xl sm:text-2xl font-black text-white leading-tight">{{ $user->name }}</h2>
                     <p class="text-slate-400 text-xs sm:text-sm font-medium mt-1 flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5 text-slate-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/></svg>
@@ -101,14 +100,57 @@
 
                     {{-- Badges --}}
                     @if($user->badges->count() > 0)
-                    <div class="flex flex-wrap gap-2 mt-3">
-                        @foreach($user->badges->take(4) as $badge)
-                            @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
-                            <div class="inline-flex items-center gap-1.5 text-[10px] font-bold bg-white/10 border border-white/10 text-slate-200 rounded-full px-2.5 py-1" title="{{ $bd['bn'] }}">
-                                <span>{{ $bd['emoji'] }}</span>
-                                <span class="truncate">{{ $bd['bn'] }}</span>
-                            </div>
-                        @endforeach
+                    <div x-data="{ 
+                            expanded: false, 
+                            overflowCount: 0,
+                            calc() {
+                                if (this.expanded) return;
+                                let hidden = 0;
+                                const items = Array.from(this.$refs.container.children).filter(el => el.classList.contains('badge-item'));
+                                if(!items.length) return;
+                                const firstTop = items[0].offsetTop;
+                                items.forEach(item => {
+                                    if (item.offsetTop > firstTop) hidden++;
+                                });
+                                this.overflowCount = hidden;
+                            }
+                         }" 
+                         x-init="$nextTick(() => calc()); window.addEventListener('resize', () => calc());"
+                         class="mt-3 relative w-full max-w-[280px] sm:max-w-md"
+                    >
+                        {{-- The badges container --}}
+                        <div x-ref="container" 
+                             :class="expanded ? 'flex-wrap' : 'flex-wrap max-h-[28px] overflow-hidden'" 
+                             class="flex gap-2 relative pr-14"
+                        >
+                            @foreach($user->badges as $badge)
+                                @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
+                                <div class="badge-item inline-flex items-center gap-1.5 text-[10px] font-bold bg-white/10 border border-white/10 text-slate-200 rounded-full px-2.5 py-1 transition-all" 
+                                     title="{{ $bd['bn'] }}">
+                                    <span>{{ $bd['emoji'] }}</span>
+                                    <span class="truncate max-w-[120px]">{{ $bd['bn'] }}</span>
+                                </div>
+                            @endforeach
+                            
+                            {{-- Expand Button (Absolute positioned at the end of the first line) --}}
+                            <button type="button"
+                                    x-show="!expanded && overflowCount > 0" 
+                                    @click="expanded = true" 
+                                    class="absolute top-0 right-0 h-[26px] inline-flex items-center justify-center gap-1 text-[10px] font-bold bg-slate-800 hover:bg-slate-700 border border-slate-600 text-white rounded-full px-2.5 transition-colors shadow-sm"
+                                    style="display: none;">
+                                <span x-text="'+' + overflowCount + ' আরও'"></span>
+                            </button>
+                        </div>
+                        
+                        {{-- Collapse Button --}}
+                        <button type="button"
+                                x-show="expanded && overflowCount > 0" 
+                                @click="expanded = false" 
+                                class="mt-2 inline-flex items-center gap-1 text-[10px] font-bold text-slate-400 hover:text-white transition-colors"
+                                style="display: none;">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"></path></svg>
+                            কম দেখান
+                        </button>
                     </div>
                     @endif
                 </div>
@@ -116,18 +158,13 @@
 
             {{-- Actions --}}
             <div class="flex flex-wrap gap-2 sm:gap-3 w-full md:w-auto">
-                <a href="{{ route('gamification.guide') }}" class="flex-1 md:flex-none text-center inline-flex items-center justify-center bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition">
-                    🪙 পয়েন্ট গাইড
-                </a>
-                <a href="{{ route('leaderboard') }}" class="flex-1 md:flex-none text-center inline-flex items-center justify-center bg-white/10 hover:bg-white/20 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition">
-                    🏆 লিডারবোর্ড
-                </a>
+
                 <form action="{{ route('donor_profile.is_available_now') }}" method="POST" class="m-0 w-full sm:w-auto">
                     @csrf
                     <button type="submit"
                             {{ !$isEligible ? 'disabled' : '' }}
                             title="{{ !$isEligible ? 'কুলডাউন চলাকালীন পরিবর্তন করা যাবে না' : 'স্ট্যাটাস পরিবর্তন করুন' }}"
-                            class="inline-flex items-center justify-center gap-2 {{ $isAvailable ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-700 hover:bg-slate-600' }} text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed w-full">
+                            class="inline-flex items-center justify-center gap-2 {{ $isAvailable ? 'bg-red-600 hover:bg-red-700' : 'bg-slate-700 hover:bg-slate-600' }} text-white px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-xl hover:shadow-red-500/20 disabled:transform-none disabled:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed w-full">
                         <span class="w-2 h-2 rounded-full {{ $isAvailable ? 'bg-white animate-pulse' : 'bg-slate-400' }}"></span>
                         {{ $isAvailable ? 'রক্তদানে প্রস্তুত' : 'বর্তমানে ব্যস্ত' }}
                     </button>
@@ -171,6 +208,46 @@
                 @endif
             </div>
             @endif
+        </div>
+    </div>
+
+    {{-- ══ IMPACT STATS ══ --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 mt-6">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            </div>
+            <div>
+                <div class="text-2xl font-black text-slate-900">{{ $totalRequestsMade ?? 0 }}</div>
+                <div class="text-xs font-bold text-slate-500 mt-0.5">সাড়া দিয়েছেন</div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl border border-emerald-100 p-5 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            </div>
+            <div>
+                <div class="text-2xl font-black text-emerald-600">{{ $totalContributions ?? 0 }}</div>
+                <div class="text-xs font-bold text-emerald-500 mt-0.5">ভেরিফাইড ডোনেশন</div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl border border-red-100 p-5 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>
+            </div>
+            <div>
+                <div class="text-2xl font-black text-red-600">{{ $totalLivesSaved ?? 0 }}</div>
+                <div class="text-xs font-bold text-red-500 mt-0.5">জীবন বাঁচিয়েছেন</div>
+            </div>
+        </div>
+        <div class="bg-white rounded-2xl border border-blue-100 p-5 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+            </div>
+            <div>
+                <div class="text-2xl font-black text-blue-600">{{ $successRate ?? 0 }}{{ ($successRate !== 'তথ্য নেই') ? '%' : '' }}</div>
+                <div class="text-xs font-bold text-blue-500 mt-0.5">সফলতার হার</div>
+            </div>
         </div>
     </div>
 
@@ -247,14 +324,14 @@
     </div>
 
     {{-- ══ E) QUICK ACTIONS GRID ══ --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <a href="{{ route('requests.create') }}" class="group relative overflow-hidden p-5 rounded-2xl bg-gradient-to-br from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 flex flex-col gap-3 scroll-reveal" data-scroll-reveal>
-            <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center text-white border border-white/30 shrink-0">
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">
+        <a href="{{ route('requests.create') }}" class="group relative overflow-hidden p-5 rounded-2xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-red-300 hover:-translate-y-0.5 flex flex-col gap-3 scroll-reveal" data-scroll-reveal>
+            <div class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center text-red-600 border border-red-100 shrink-0 group-hover:scale-110 transition-transform">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
             </div>
             <div>
-                <h3 class="text-white font-black text-sm leading-tight">জরুরি রিকোয়েস্ট</h3>
-                <p class="text-red-100 text-xs font-medium mt-0.5">নতুন রক্তের অনুরোধ</p>
+                <h3 class="text-slate-900 font-black text-sm leading-tight">জরুরি রিকোয়েস্ট</h3>
+                <p class="text-slate-500 text-xs font-medium mt-0.5">নতুন রক্তের অনুরোধ</p>
             </div>
         </a>
 
@@ -278,16 +355,7 @@
             </div>
         </a>
 
-        <a href="{{ route('donor.offline-claim') }}"
-           class="group relative overflow-hidden p-5 rounded-2xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-purple-300 hover:-translate-y-0.5 flex flex-col gap-3 text-left scroll-reveal" data-scroll-reveal>
-            <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center text-purple-600 border border-purple-100 shrink-0 group-hover:scale-110 transition-transform">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-            <div>
-                <h3 class="text-slate-900 font-black text-sm leading-tight">অফলাইন ক্লেইম</h3>
-                <p class="text-slate-500 text-xs font-medium mt-0.5">পয়েন্ট যোগ করুন</p>
-            </div>
-        </a>
+
     </div>
 
     {{-- ══ G) LOCAL EMERGENCY RADAR ══ --}}
@@ -377,45 +445,7 @@
     </div>
     @endif
 
-    {{-- ══ I) IMPACT STATS ══ --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-            </div>
-            <div>
-                <div class="text-2xl font-black text-slate-900">{{ $totalRequestsMade ?? 0 }}</div>
-                <div class="text-xs font-bold text-slate-500 mt-0.5">সাড়া দিয়েছেন</div>
-            </div>
-        </div>
-        <div class="bg-white rounded-2xl border border-emerald-100 p-5 shadow-sm flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-            </div>
-            <div>
-                <div class="text-2xl font-black text-emerald-600">{{ $totalContributions ?? 0 }}</div>
-                <div class="text-xs font-bold text-emerald-500 mt-0.5">ভেরিফাইড ডোনেশন</div>
-            </div>
-        </div>
-        <div class="bg-white rounded-2xl border border-red-100 p-5 shadow-sm flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>
-            </div>
-            <div>
-                <div class="text-2xl font-black text-red-600">{{ $totalLivesSaved ?? 0 }}</div>
-                <div class="text-xs font-bold text-red-500 mt-0.5">জীবন বাঁচিয়েছেন</div>
-            </div>
-        </div>
-        <div class="bg-white rounded-2xl border border-blue-100 p-5 shadow-sm flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
-            </div>
-            <div>
-                <div class="text-2xl font-black text-blue-600">{{ $successRate ?? 0 }}{{ ($successRate !== 'তথ্য নেই') ? '%' : '' }}</div>
-                <div class="text-xs font-bold text-blue-500 mt-0.5">সফলতার হার</div>
-            </div>
-        </div>
-    </div>
+
 
     {{-- ══ K) REFERRAL BANNER (NEW DESIGN — KEEP) ══ --}}
     @if(isset($myCode))
