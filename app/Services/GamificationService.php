@@ -155,8 +155,8 @@ class GamificationService
 
         // ─── ১. ডোনেশন কাউন্ট ও তারিখ আপডেট ──────────────────────────
         $donor->increment('total_verified_donations');
-        $component = $bloodRequest->component_type instanceof \App\Enums\BloodComponentType 
-            ? $bloodRequest->component_type->value 
+        $component = $bloodRequest->component_type instanceof \App\Enums\BloodComponentType
+            ? $bloodRequest->component_type->value
             : (string) $bloodRequest->component_type;
 
         $cooldownDays = match ($component) {
@@ -279,13 +279,13 @@ class GamificationService
         );
 
         $this->updateMonthlyPoints($donor, $points);
-        
+
         $donor->notify(new \App\Notifications\GamificationRewardNotification(
             title: '✅ অফলাইন রক্তদান ভেরিফাইড!',
             message: "আপনার অফলাইন রক্তদানের ক্লেইমটি সফলভাবে ভেরিফাই হয়েছে এবং আপনি {$points} পয়েন্ট পেয়েছেন!",
             points: $points
         ));
-        
+
         $this->checkAndAwardBadges($donor);
     }
 
@@ -514,13 +514,24 @@ class GamificationService
         if ($time === 'monthly')  $time = 'month';
         if ($scope === 'national') $scope = 'bd';
 
-        $query = User::where('role', 'donor')
+        $query = User::select([
+            'id',
+            'name',
+            'profile_image',
+            'blood_group',
+            'total_verified_donations',
+            'points',
+            'monthly_points',
+            'monthly_points_month',
+            'district_id',
+        ])
+            ->where('role', 'donor')
             ->notShadowbanned()
             ->where(function ($q) {
                 $q->where('total_verified_donations', '>', 0)
                     ->orWhere('points', '>', 0);
             })
-            ->with(['badges', 'district']);
+            ->with(['badges:id,name,bn_name', 'district:id,name']);
 
         // অঞ্চল ফিল্টার
         if ($scope === 'district' && $districtId) {

@@ -117,6 +117,7 @@
                 {{-- সর্বকাল tab --}}
                 <a href="{{ route('leaderboard', array_merge($baseParams, ['time' => 'all'])) }}"
                    id="tab-time-all"
+                   data-leaderboard-tab="1"
                    class="flex-1 text-center text-sm font-bold py-2.5 px-3 rounded-lg transition-all duration-200
                           {{ $time === 'all'
                               ? 'bg-red-600 text-white shadow-md'
@@ -127,6 +128,7 @@
                 {{-- এই মাস tab --}}
                 <a href="{{ route('leaderboard', array_merge($baseParams, ['time' => 'month'])) }}"
                    id="tab-time-month"
+                   data-leaderboard-tab="1"
                    class="flex-1 text-center text-sm font-bold py-2.5 px-3 rounded-lg transition-all duration-200
                           {{ $time === 'month'
                               ? 'bg-red-600 text-white shadow-md'
@@ -147,6 +149,7 @@
                     {{-- বাংলাদেশ tab --}}
                     <a href="{{ route('leaderboard', array_merge($baseParams, ['scope' => 'bd', 'district_id' => ''])) }}"
                        id="tab-scope-bd"
+                       data-leaderboard-tab="1"
                        class="flex-1 text-center text-sm font-bold py-2.5 px-3 rounded-lg transition-all duration-200
                               {{ $scope === 'bd'
                                   ? 'bg-red-600 text-white shadow-md'
@@ -157,6 +160,7 @@
                     {{-- জেলা tab --}}
                     <a href="{{ route('leaderboard', array_merge($baseParams, ['scope' => 'district'])) }}"
                        id="tab-scope-district"
+                       data-leaderboard-tab="1"
                        class="flex-1 text-center text-sm font-bold py-2.5 px-3 rounded-lg transition-all duration-200
                               {{ $scope === 'district'
                                   ? 'bg-red-600 text-white shadow-md'
@@ -471,7 +475,7 @@
     const root = document.getElementById('leaderboard-root');
     if (!root) return;
 
-    const tabSelector = '#tab-time-all, #tab-time-month, #tab-scope-bd, #tab-scope-district';
+    const tabSelector = '[data-leaderboard-tab]';
     const pageCache = {};
 
     const loadLeaderboard = async (url, { pushState = true } = {}) => {
@@ -480,6 +484,8 @@
             if (pageCache[url]) {
                 const nextRoot = pageCache[url];
                 root.innerHTML = nextRoot.innerHTML;
+                root.style.opacity = '1';
+                root.style.pointerEvents = 'auto';
                 
                 if (pushState) {
                     window.history.pushState({ leaderboard: true }, '', url);
@@ -500,7 +506,7 @@
             root.style.transition = 'opacity 0.2s';
 
             const response = await fetch(url, {
-                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-Partial': 'leaderboard' },
                 credentials: 'same-origin',
             });
 
@@ -542,17 +548,19 @@
         }
     };
 
-    root.addEventListener('click', (event) => {
+    document.addEventListener('click', (event) => {
         const link = event.target.closest(tabSelector);
         if (!link) return;
+        if (!root.contains(link)) return;
 
         if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         event.preventDefault();
         loadLeaderboard(link.href);
     });
 
-    root.addEventListener('change', (event) => {
+    document.addEventListener('change', (event) => {
         if (event.target.id !== 'district-select') return;
+        if (!root.contains(event.target)) return;
 
         const form = event.target.closest('form');
         if (!form) return;

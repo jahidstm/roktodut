@@ -53,39 +53,45 @@ class LeaderboardController extends Controller
 
         if (Auth::check()) {
             $authUser = Auth::user();
+            $currentYm = now()->format('Y-m');
 
-            $baseQuery = User::where('role', 'donor')
-                ->notShadowbanned()
-                ->where(function ($q) {
-                    $q->where('total_verified_donations', '>', 0)
-                      ->orWhere('points', '>', 0);
-                });
+            $cacheKey = 'leaderboard_my_rank_' . $authUser->id . '_' . $scope . '_' . ($districtId ?? 'all') . '_' . $time . '_' . $currentYm;
 
-            if ($scope === 'district' && $districtId) {
-                $baseQuery->where('district_id', $districtId);
-            }
+            [$myRank, $myPoints] = \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addMinutes(3), function () use ($authUser, $scope, $districtId, $time, $currentYm) {
+                $baseQuery = User::where('role', 'donor')
+                    ->notShadowbanned()
+                    ->where(function ($q) {
+                        $q->where('total_verified_donations', '>', 0)
+                          ->orWhere('points', '>', 0);
+                    });
 
-            if ($time === 'month') {
-                $currentYm = now()->format('Y-m');
-                $myPoints  = $authUser->monthly_points_month === $currentYm
-                    ? ($authUser->monthly_points ?? 0)
-                    : 0;
+                if ($scope === 'district' && $districtId) {
+                    $baseQuery->where('district_id', $districtId);
+                }
 
-                $myRank = $baseQuery
-                    ->where('monthly_points_month', $currentYm)
-                    ->where('monthly_points', '>', $myPoints)
-                    ->count() + 1;
-            } else {
-                $myPoints = $authUser->points ?? 0;
+                if ($time === 'month') {
+                    $myPoints = $authUser->monthly_points_month === $currentYm
+                        ? ($authUser->monthly_points ?? 0)
+                        : 0;
 
-                $myRank = $baseQuery->where(function ($q) use ($authUser) {
-                    $q->where('total_verified_donations', '>', $authUser->total_verified_donations ?? 0)
-                      ->orWhere(function ($q2) use ($authUser) {
-                          $q2->where('total_verified_donations', $authUser->total_verified_donations ?? 0)
-                             ->where('points', '>', $authUser->points ?? 0);
-                      });
-                })->count() + 1;
-            }
+                    $myRank = $baseQuery
+                        ->where('monthly_points_month', $currentYm)
+                        ->where('monthly_points', '>', $myPoints)
+                        ->count() + 1;
+                } else {
+                    $myPoints = $authUser->points ?? 0;
+
+                    $myRank = $baseQuery->where(function ($q) use ($authUser) {
+                        $q->where('total_verified_donations', '>', $authUser->total_verified_donations ?? 0)
+                          ->orWhere(function ($q2) use ($authUser) {
+                              $q2->where('total_verified_donations', $authUser->total_verified_donations ?? 0)
+                                 ->where('points', '>', $authUser->points ?? 0);
+                          });
+                    })->count() + 1;
+                }
+
+                return [$myRank, $myPoints];
+            });
         }
 
         // ─── বাংলা UI লেবেল ────────────────────────────────────────────────
@@ -99,7 +105,7 @@ class LeaderboardController extends Controller
         // পয়েন্ট লেবেল (view-এ ব্যবহার হবে)
         $pointsLabel = $time === 'month' ? 'মাসিক পয়েন্ট' : 'পয়েন্ট';
 
-        return view('leaderboard', compact(
+        $view = view('leaderboard', compact(
             'donors',
             'top3',
             'districts',
@@ -112,5 +118,12 @@ class LeaderboardController extends Controller
             'myRank',
             'myPoints',
         ));
+
+        if ($request->ajax()) {
+            $sections = $view->renderSections();
+            return response($sections['content'] ?? $view->render());
+        }
+
+        return $view;
     }
 }

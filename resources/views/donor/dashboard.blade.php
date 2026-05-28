@@ -213,7 +213,7 @@
 
     {{-- ══ IMPACT STATS ══ --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 mt-6">
-        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex items-center gap-4">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex items-center gap-4 scroll-reveal" data-scroll-reveal>
             <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center shrink-0">
                 <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
             </div>
@@ -222,7 +222,7 @@
                 <div class="text-xs font-bold text-slate-500 mt-0.5">সাড়া দিয়েছেন</div>
             </div>
         </div>
-        <div class="bg-white rounded-2xl border border-emerald-100 p-5 shadow-sm flex items-center gap-4">
+        <div class="bg-white rounded-2xl border border-emerald-100 p-5 shadow-sm flex items-center gap-4 scroll-reveal" data-scroll-reveal>
             <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0">
                 <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
             </div>
@@ -231,7 +231,7 @@
                 <div class="text-xs font-bold text-emerald-500 mt-0.5">ভেরিফাইড ডোনেশন</div>
             </div>
         </div>
-        <div class="bg-white rounded-2xl border border-red-100 p-5 shadow-sm flex items-center gap-4">
+        <div class="bg-white rounded-2xl border border-red-100 p-5 shadow-sm flex items-center gap-4 scroll-reveal" data-scroll-reveal>
             <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center shrink-0">
                 <svg class="w-6 h-6 text-red-600" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg>
             </div>
@@ -240,7 +240,7 @@
                 <div class="text-xs font-bold text-red-500 mt-0.5">জীবন বাঁচিয়েছেন</div>
             </div>
         </div>
-        <div class="bg-white rounded-2xl border border-blue-100 p-5 shadow-sm flex items-center gap-4">
+        <div class="bg-white rounded-2xl border border-blue-100 p-5 shadow-sm flex items-center gap-4 scroll-reveal" data-scroll-reveal>
             <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
                 <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
             </div>
