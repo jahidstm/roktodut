@@ -198,6 +198,9 @@ Route::get('/terms', function () {
     return view('pages.terms');
 })->name('terms');
 
+Route::get('/faq', function () {
+    return view('pages.faq');
+})->name('faq');
 
 
 Route::get('/urgent-requests', [PublicBloodRequestController::class, 'index'])->name('public.requests.index');

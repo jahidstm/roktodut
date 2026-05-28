@@ -166,7 +166,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white hover:translate-x-1.5 transition-all font-medium">
+                        <a href="{{ route('faq') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white hover:translate-x-1.5 transition-all font-medium">
                             সচরাচর জিজ্ঞাসা (FAQ)
                         </a>
                     </li>
