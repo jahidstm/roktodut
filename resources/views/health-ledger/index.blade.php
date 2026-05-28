@@ -60,7 +60,7 @@
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-900">Hemoglobin Trend (g/dL)</h2>
+                    <h2 class="text-lg font-bold text-slate-900">হিমোগ্লোবিন ট্রেন্ড (g/dL)</h2>
                     <p class="text-xs text-slate-500">শেষ ৬ মাসের ট্রেন্ড</p>
                 </div>
                 <span class="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md">আপনার স্বাস্থ্য বিশ্লেষণ</span>
@@ -71,7 +71,7 @@
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex items-center justify-between mb-4">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-900">Blood Pressure Trend (mmHg)</h2>
+                    <h2 class="text-lg font-bold text-slate-900">ব্লাড প্রেসার ট্রেন্ড (mmHg)</h2>
                     <p class="text-xs text-slate-500">সিস্টোলিক ও ডায়াস্টোলিক</p>
                 </div>
                 <span class="text-xs font-bold text-slate-400 bg-slate-100 px-2.5 py-1 rounded-md">আপনার স্বাস্থ্য বিশ্লেষণ</span>
@@ -81,7 +81,7 @@
     </div>
 
     <div class="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 class="text-base font-bold text-slate-900 mb-4">Recent Health Entries</h3>
+        <h3 class="text-base font-bold text-slate-900 mb-4">সাম্প্রতিক হেলথ রেকর্ড</h3>
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead class="text-slate-500">

@@ -283,7 +283,7 @@
     <div class="mb-4 flex items-center justify-between scroll-reveal" data-scroll-reveal>
         <div class="flex items-center gap-2">
             <span class="text-2xl drop-shadow-sm">🏆</span>
-            <h2 class="text-xl font-black text-slate-800">Top Performers</h2>
+            <h2 class="text-xl font-black text-slate-800">শীর্ষ রক্তদাতা</h2>
         </div>
         <div class="text-xs font-bold text-slate-400 bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
             {{ $donors->count() }} জন ডোনার
