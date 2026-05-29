@@ -141,6 +141,15 @@
             background: transparent;
         }
 
+        /* ── Sidebar Header ── */
+        .donor-sidebar-header {
+            padding: 1.25rem 1.5rem 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
         /* Normalize button menu item to look/behave like links */
         button.sidebar-nav-item {
             appearance: none;
@@ -301,12 +310,22 @@
 ══════════════════════════════════════ --}}
 <aside class="donor-sidebar" :class="sidebarOpen ? 'open' : ''" id="donor-sidebar">
 
-    
-
-
+    {{-- Sidebar Header: Donor Info --}}
+    <div class="donor-sidebar-header">
+        <div class="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+        </div>
+        <div class="min-w-0">
+            <p class="text-sm font-black text-slate-800 truncate">ডোনার ড্যাশবোর্ড</p>
+            <p class="text-[10px] font-bold text-slate-500 truncate">রক্তদূত - জীবন রক্ষায়</p>
+        </div>
+    </div>
 
     {{-- ── Navigation ── --}}
-    <nav class="flex-1 py-6">
+    <nav class="flex-1 py-4">
         <a href="{{ route('donor.dashboard') }}"
            class="sidebar-nav-item {{ request()->routeIs('donor.dashboard') ? 'active' : '' }}" data-tab="overview">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
