@@ -122,15 +122,15 @@
             display: flex;
             align-items: center;
             justify-content: flex-start;
-            gap: 1rem;
-            padding: 0.85rem 1.25rem;
+            gap: 0.875rem;
+            padding: 0.75rem 1.25rem;
             border-radius: 0.75rem;
-            margin: 0.35rem 1.25rem;
+            margin: 0.2rem 1rem;
             /* Keep a consistent full-width hit-area (also fixes <button> not stretching in some cases) */
-            width: calc(100% - 2.5rem);
+            width: calc(100% - 2rem);
             box-sizing: border-box;
 
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: #64748b; /* slate-500 */
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -163,7 +163,7 @@
             top: 0;
             height: 100%;
             width: 4px;
-            background-color: #ef4444;
+            background-color: #dc2626;
             transform: scaleY(0);
             transition: transform 0.3s ease;
             border-radius: 0 4px 4px 0;
@@ -191,8 +191,8 @@
         }
         
         .sidebar-nav-item svg {
-            width: 1.3rem;
-            height: 1.3rem;
+            width: 1.2rem;
+            height: 1.2rem;
             flex-shrink: 0;
             transition: all 0.3s ease;
         }
@@ -375,6 +375,30 @@
         
     </nav>
 
+    {{-- User info at bottom --}}
+    @auth
+    <div class="px-4 py-4 border-t border-slate-200 mt-auto">
+        <div class="flex items-center gap-3 px-2">
+            <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-black text-sm shrink-0">
+                {{ mb_substr(auth()->user()->name, 0, 1) }}
+            </div>
+            <div class="min-w-0">
+                <p class="text-sm font-bold text-slate-800 truncate">{{ auth()->user()->name }}</p>
+                <p class="text-[10px] font-bold text-red-500 uppercase tracking-wider">
+                    @if(auth()->user()->role?->value === 'org_admin' || auth()->user()->role === 'org_admin')
+                        Org Admin
+                    @elseif(auth()->user()->role?->value === 'admin' || auth()->user()->role === 'admin')
+                        Admin
+                    @elseif(auth()->user()->is_donor)
+                        Donor
+                    @else
+                        User
+                    @endif
+                </p>
+            </div>
+        </div>
+    </div>
+    @endauth
     
 </aside>
 
@@ -408,13 +432,11 @@
         @yield('content')
     </main>
 
-    {{-- ── Footer (minimal) ── --}}
-    <footer class="mt-auto border-t border-slate-200 bg-slate-50 py-4 px-6 flex items-center justify-between">
-        <p class="text-xs text-slate-400 font-medium">&copy; {{ date('Y') }} রক্তদূত — রক্তদান প্ল্যাটফর্ম</p>
-        <a href="{{ route('home') }}" class="text-xs text-slate-400 hover:text-red-600 font-semibold transition-colors">পাবলিক সাইট &rarr;</a>
-    </footer>
 </div>
 </div> {{-- End donor-shell --}}
+
+{{-- ── Shared Footer ── --}}
+@include('layouts.footer')
 
 {{-- Toast container --}}
 <div id="notif-toast-container"
