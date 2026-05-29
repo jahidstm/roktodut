@@ -1,40 +1,12 @@
-@extends('layouts.app')
+@extends('layouts.org-dashboard')
 
 @section('title', 'রক্তের অনুরোধ (অর্গ জোন) — রক্তদূত')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    
-    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-extrabold text-slate-900">অর্গানাইজেশন কমান্ড সেন্টার</h1>
-            <p class="text-slate-500 font-medium mt-1">আপনার এরিয়ার ডোনারদের ভেরিফিকেশন এবং ম্যানেজমেন্ট ড্যাশবোর্ড।</p>
-        </div>
-        <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100 shadow-sm">
-            <span class="relative flex h-3 w-3">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-            </span>
-            <span class="text-sm font-bold text-blue-700">অ্যাডমিন মোড অ্যাক্টিভ</span>
-        </div>
-    </div>
-
-    <div id="org-command-shell">
-    {{-- 🧭 Top Navigation Tabs --}}
-    <div class="mb-8 flex overflow-x-auto bg-white border border-slate-200 rounded-2xl p-2 shadow-sm gap-2 whitespace-nowrap">
-        <a href="{{ route('org.dashboard') }}" data-org-tab class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all text-slate-600 hover:bg-slate-50 hover:text-slate-900">
-            👥 মেম্বার ম্যানেজমেন্ট
-        </a>
-        <a href="{{ route('org.requests.index') }}" data-org-tab class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all bg-red-600 text-white shadow-sm">
-            🩸 রক্তের অনুরোধ (অর্গ জোন)
-        </a>
-        <a href="{{ route('org.camps.index') }}" data-org-tab class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all text-slate-600 hover:bg-slate-50 hover:text-teal-600">
-            🏕️ রক্তদান ক্যাম্প
-        </a>
-    </div>
+<div data-panel-id="blood-requests">
 
     {{-- 🚨 Blood Requests Feed --}}
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 mb-8">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8 scroll-reveal" data-scroll-reveal>
         <div class="mb-6 border-b border-slate-100 pb-4">
             <h2 class="text-xl font-extrabold text-slate-900 flex items-center gap-2">
                 <span class="text-red-500">📍</span> আপনার এরিয়ার জরুরি অনুরোধ
@@ -61,7 +33,7 @@
                                 {{ $request->created_at->diffForHumans() }}
                             </span>
                         </div>
-                        
+
                         <h3 class="text-lg font-black text-slate-900 mb-1">{{ $request->patient_name }}</h3>
                         <p class="text-sm text-slate-600 font-medium mb-4 flex items-start gap-1.5">
                             <svg class="w-4 h-4 mt-0.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
@@ -87,7 +59,7 @@
                                 </button>
                             </form>
                         @endif
-                        
+
                         <button onclick="navigator.clipboard.writeText(`{{ $shareText }}`); alert('বার্তা কপি করা হয়েছে!');" title="শেয়ার বার্তা কপি করুন" class="p-2 bg-slate-50 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-xl transition border border-slate-200">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         </button>
@@ -101,11 +73,11 @@
                 </div>
             @endforelse
         </div>
-        
+
         <div class="mt-6">
             {{ $requests->links() }}
         </div>
     </div>
-    </div>
+
 </div>
 @endsection

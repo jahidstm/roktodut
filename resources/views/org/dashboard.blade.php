@@ -1,58 +1,28 @@
-@extends('layouts.app')
+@extends('layouts.org-dashboard')
 
 @section('title', 'অর্গানাইজেশন ড্যাশবোর্ড — রক্তদূত')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    
-    <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 scroll-reveal" data-scroll-reveal>
-        <div>
-            <h1 class="text-2xl font-extrabold text-slate-900">অর্গানাইজেশন কমান্ড সেন্টার</h1>
-            <p class="text-slate-500 font-medium mt-1">আপনার এরিয়ার ডোনারদের ভেরিফিকেশন এবং ম্যানেজমেন্ট ড্যাশবোর্ড।</p>
-        </div>
-        <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-xl border border-blue-100 shadow-sm">
-            <span class="relative flex h-3 w-3">
-              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-              <span class="relative inline-flex rounded-full h-3 w-3 bg-blue-500"></span>
-            </span>
-            <span class="text-sm font-bold text-blue-700">অ্যাডমিন মোড অ্যাক্টিভ</span>
-        </div>
-    </div>
+<div data-panel-id="members">
 
+    {{-- Pending verification warning --}}
     @if($organization && $organization->status === 'pending')
-    <div class="mb-8 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row items-center gap-6 relative overflow-hidden scroll-reveal" data-scroll-reveal>
-        <div class="absolute right-0 top-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl -z-0"></div>
-        <div class="w-14 h-14 bg-white text-amber-600 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-amber-100 z-10">
-            <svg class="w-7 h-7 animate-spin-slow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <div class="mb-6 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row items-center gap-4 relative overflow-hidden scroll-reveal" data-scroll-reveal>
+        <div class="absolute right-0 top-0 w-24 h-24 bg-amber-500/10 rounded-full blur-3xl -z-0"></div>
+        <div class="w-12 h-12 bg-white text-amber-600 rounded-2xl flex items-center justify-center shrink-0 shadow-sm border border-amber-100 z-10">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         </div>
         <div class="z-10">
-            <h3 class="text-xl font-black text-amber-900">ভেরিফিকেশন পেন্ডিং রয়েছে ⏳</h3>
-            <p class="text-amber-800 text-sm font-bold mt-1.5 leading-relaxed">
-                আপনার অর্গানাইজেশনের দেওয়া ডকুমেন্টস সিস্টেম অ্যাডমিন যাচাই করছেন। ভেরিফিকেশন সম্পন্ন হলে আপনার প্রোফাইলে নোটিফিকেশন আসবে এবং আপনার অর্গানাইজেশন ফুল্লি ফাংশনাল হবে। অনুগ্রহ করে অপেক্ষা করুন।
+            <h3 class="text-lg font-black text-amber-900">ভেরিফিকেশন পেন্ডিং ⏳</h3>
+            <p class="text-amber-800 text-sm font-bold mt-1 leading-relaxed">
+                আপনার অর্গানাইজেশনের দেওয়া ডকুমেন্টস সিস্টেম অ্যাডমিন যাচাই করছেন। ভেরিফিকেশন সম্পন্ন হলে নোটিফিকেশন পাবেন।
             </p>
         </div>
     </div>
     @endif
 
-    <div id="org-command-shell">
-    {{-- 🧭 Top Navigation Tabs --}}
-    <div class="mb-8 flex overflow-x-auto bg-white border border-slate-200 rounded-2xl p-2 shadow-sm gap-2 whitespace-nowrap scroll-reveal" data-scroll-reveal>
-        <a href="{{ route('org.dashboard') }}" data-org-tab class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all bg-slate-900 text-white shadow-sm">
-            👥 মেম্বার ম্যানেজমেন্ট
-        </a>
-        <a href="{{ route('org.requests.index') }}" data-org-tab class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all text-slate-600 hover:bg-slate-50 hover:text-red-600">
-            🩸 রক্তের অনুরোধ (অর্গ জোন)
-        </a>
-        <a href="{{ route('org.camps.index') }}" data-org-tab class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all text-slate-600 hover:bg-slate-50 hover:text-teal-600">
-            🏕️ রক্তদান ক্যাম্প
-        </a>
-        <a href="{{ route('org.ambulances.index') }}" data-org-tab class="px-5 py-2.5 rounded-xl font-extrabold text-sm transition-all text-slate-600 hover:bg-slate-50 hover:text-indigo-600">
-            🚑 অ্যাম্বুলেন্স সার্ভিস
-        </a>
-    </div>
-
     {{-- 📊 Analytics Cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10 scroll-reveal" data-scroll-reveal>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 scroll-reveal" data-scroll-reveal>
         <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex flex-col justify-center">
             <p class="text-xs font-bold text-slate-500 uppercase tracking-wide">ভেরিফাইড মেম্বার</p>
             <h3 class="text-3xl font-black text-emerald-600 mt-1">{{ $stats['verified'] ?? 0 }}</h3>
@@ -76,11 +46,11 @@
             <h3 class="text-3xl font-black text-teal-600 mt-1">{{ $stats['camp_donations'] ?? 0 }} <span class="text-xs font-bold text-slate-400">(লগড)</span></h3>
         </div>
     </div>
-    
+
     {{-- District Chart --}}
     @if(isset($districtWiseMembers) && count($districtWiseMembers) > 0)
-    <div class="mb-10 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm scroll-reveal" data-scroll-reveal>
-        <h3 class="text-lg font-extrabold text-slate-800 mb-4 flex items-center gap-2">📍 জেলা ভিত্তিক ভেরিফাইড মেম্বার</h3>
+    <div class="mb-8 bg-white border border-slate-200 rounded-2xl p-6 shadow-sm scroll-reveal" data-scroll-reveal>
+        <h3 class="text-base font-extrabold text-slate-800 mb-4 flex items-center gap-2">📍 জেলা ভিত্তিক ভেরিফাইড মেম্বার</h3>
         <div class="flex flex-wrap gap-3">
             @foreach($districtWiseMembers as $district => $count)
                 <div class="bg-slate-50 border border-slate-100 rounded-xl px-4 py-2 flex items-center justify-between gap-4">
@@ -92,21 +62,21 @@
     </div>
     @endif
 
-    {{-- 🔍 Filters & Table --}}
-    <div id="org-members-panel" class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden scroll-reveal" data-scroll-reveal>
-        
+    {{-- 🔍 Members Table --}}
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden scroll-reveal" data-scroll-reveal>
+
         <div class="px-6 py-5 border-b border-slate-100 bg-slate-50/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
                 <h2 class="text-lg font-extrabold text-slate-900">মেম্বার তালিকা</h2>
                 <p class="text-xs text-slate-500 font-bold mt-1 uppercase tracking-tight">অর্গানাইজেশনের সকল ডোনারের স্ট্যাটাস</p>
             </div>
-            
-            {{-- Tabs / Filter --}}
+
+            {{-- Filter Tabs --}}
             <div class="flex bg-white border border-slate-200 rounded-lg p-1 shadow-sm">
-                <a href="{{ route('org.dashboard') }}" data-member-filter class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ !request('status') ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-900' }}">সবাই</a>
-                <a href="{{ route('org.dashboard', ['status' => 'pending']) }}" data-member-filter class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ request('status') === 'pending' ? 'bg-amber-100 text-amber-800' : 'text-slate-500 hover:text-slate-900' }}">পেন্ডিং</a>
-                <a href="{{ route('org.dashboard', ['status' => 'verified']) }}" data-member-filter class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ request('status') === 'verified' ? 'bg-emerald-100 text-emerald-800' : 'text-slate-500 hover:text-slate-900' }}">ভেরিফাইড</a>
-                <a href="{{ route('org.dashboard', ['status' => 'rejected']) }}" data-member-filter class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ request('status') === 'rejected' ? 'bg-red-100 text-red-800' : 'text-slate-500 hover:text-slate-900' }}">বাতিলকৃত</a>
+                <a href="{{ route('org.dashboard') }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ !request('status') ? 'bg-slate-900 text-white' : 'text-slate-500 hover:text-slate-900' }}">সবাই</a>
+                <a href="{{ route('org.dashboard', ['status' => 'pending']) }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ request('status') === 'pending' ? 'bg-amber-100 text-amber-800' : 'text-slate-500 hover:text-slate-900' }}">পেন্ডিং</a>
+                <a href="{{ route('org.dashboard', ['status' => 'verified']) }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ request('status') === 'verified' ? 'bg-emerald-100 text-emerald-800' : 'text-slate-500 hover:text-slate-900' }}">ভেরিফাইড</a>
+                <a href="{{ route('org.dashboard', ['status' => 'rejected']) }}" class="px-4 py-1.5 text-xs font-extrabold rounded-md transition-colors {{ request('status') === 'rejected' ? 'bg-red-100 text-red-800' : 'text-slate-500 hover:text-slate-900' }}">বাতিলকৃত</a>
             </div>
         </div>
 
@@ -142,36 +112,25 @@
                                     <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black bg-slate-100 text-slate-600 uppercase">Not Submitted</span>
                                 @endif
                             </td>
-                            
-                            {{-- 🎯 Fixed Action Column --}}
+
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                 @if($user->nid_status === 'pending')
                                     <div class="flex items-center justify-end gap-2">
-                                        
-                                        {{-- 👁️ Review Details Button --}}
                                         <a href="{{ route('org.donor.verify', $user->id) }}" class="inline-flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white rounded-md font-bold transition-colors text-xs">
                                             রিভিউ করুন
                                         </a>
-
-                                        {{-- Quick Approve Button --}}
                                         <form action="{{ route('org.members.verify', $user->id) }}" method="POST" onsubmit="return confirm('আপনি কি নিশ্চিত যে এই ডোনার আপনাদের ক্লাবের ভেরিফাইড মেম্বার?');">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="status" value="verified">
-                                            <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white rounded-md font-bold transition-colors text-xs">
-                                                ✓
-                                            </button>
+                                            <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-emerald-100 text-emerald-700 hover:bg-emerald-600 hover:text-white rounded-md font-bold transition-colors text-xs">✓</button>
                                         </form>
-
-                                        {{-- Quick Reject Button --}}
                                         <form action="{{ route('org.members.verify', $user->id) }}" method="POST" onsubmit="let reason = prompt('বাতিল করার কারণ লিখুন:'); if(reason) { this.reject_reason.value = reason; return true; } return false;">
                                             @csrf
                                             @method('PATCH')
                                             <input type="hidden" name="status" value="rejected">
                                             <input type="hidden" name="reject_reason" value="">
-                                            <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-md font-bold transition-colors text-xs">
-                                                ✕
-                                            </button>
+                                            <button type="submit" class="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-md font-bold transition-colors text-xs">✕</button>
                                         </form>
                                     </div>
                                 @elseif($user->nid_status === 'verified')
@@ -183,10 +142,10 @@
                                     <div class="flex items-center justify-end gap-1 flex-wrap w-48 ml-auto">
                                         <span class="text-slate-400 font-bold text-xs uppercase bg-slate-50 px-2 py-1 rounded">Rejected</span>
                                         @if($user->rejected_reason)
-                                            <p class="text-[10px] text-red-500 text-right w-full font-medium" title="কারণ">কারণ: {{ Str::limit($user->rejected_reason, 30) }}</p>
+                                            <p class="text-[10px] text-red-500 text-right w-full font-medium">কারণ: {{ Str::limit($user->rejected_reason, 30) }}</p>
                                         @endif
                                         @if($user->reviewed_by)
-                                            <p class="text-[10px] text-slate-400 text-right w-full" title="Reviewed By">রিভিউয়ার আইডি #{{ $user->reviewed_by }}</p>
+                                            <p class="text-[10px] text-slate-400 text-right w-full">রিভিউয়ার আইডি #{{ $user->reviewed_by }}</p>
                                         @endif
                                     </div>
                                 @endif
@@ -202,7 +161,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         {{-- Pagination --}}
         @if(method_exists($members, 'hasPages') && $members->hasPages())
             <div class="px-6 py-4 border-t border-slate-100 bg-slate-50">
@@ -210,6 +169,6 @@
             </div>
         @endif
     </div>
-    </div>
+
 </div>
 @endsection

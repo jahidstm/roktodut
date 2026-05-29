@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.org-dashboard')
 
 @section('title', 'ক্যাম্প ম্যানেজমেন্ট - রক্তদূত')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+<div class="max-w-7xl mx-auto">
     
     <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="flex items-center gap-3">

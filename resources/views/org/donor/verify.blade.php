@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.org-dashboard')
 
 @section('title', 'ডোনার ভেরিফিকেশন — রক্তদূত')
 
