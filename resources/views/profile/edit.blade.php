@@ -30,7 +30,7 @@
         @endphp
 
         {{-- Recipient Upgrade Banner --}}
-        @if(!$isDonor)
+        @if(!$isDonor && !$user->isAdmin())
         <div x-data="{ upgradeModalOpen: false }" class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-3xl border border-red-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 mb-6 scroll-reveal" data-scroll-reveal>
             <div class="flex items-center gap-4">
                 <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white text-red-600 shadow-sm">
