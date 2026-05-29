@@ -427,7 +427,17 @@
 ══════════════════════════════════════ --}}
 <div class="donor-content">
 
-    {{-- ── Top Header ── --}}
+    {{-- ── Mobile topbar (hamburger) ── --}}
+    <div class="lg:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-slate-200 sticky top-0 z-30">
+        <button @click="sidebarOpen = true"
+                class="w-9 h-9 rounded-lg bg-red-50 text-red-600 flex items-center justify-center hover:bg-red-100 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </button>
+        <span class="text-sm font-black text-slate-800">ডোনার ড্যাশবোর্ড</span>
+    </div>
+
     {{-- ── Flash Messages ── --}}
     @if (session('success'))
         <div class="mx-6 mt-4">
