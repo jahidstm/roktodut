@@ -23,15 +23,9 @@ class DashboardController extends Controller
         }
 
         // 🔍 শুধু এই অ্যাডমিনের অর্গানাইজেশনের মেম্বার (ডোনার) দের খুঁজে বের করো
-        $query = User::where('organization_id', $admin->organization_id)
-            ->where('role', 'donor');
-
-        // ফিল্টারিং (Pending, Approved, Rejected)
-        if ($request->filled('status')) {
-            $query->where('nid_status', $request->status);
-        }
-
-        $members = $query->latest()->paginate(15)->withQueryString();
+        $totalMembers = User::where('organization_id', $admin->organization_id)
+            ->where('role', 'donor')
+            ->count();
 
         // 📊 সামারি স্ট্যাটাস (অ্যানালিটিক্স এর জন্য)
         $verifiedMembers = User::where('organization_id', $admin->organization_id)->where('role', 'donor')->where('nid_status', 'verified')->get();
@@ -67,7 +61,32 @@ class DashboardController extends Controller
 
         $organization = \App\Models\Organization::find($admin->organization_id);
 
-        return view('org.dashboard', compact('members', 'stats', 'request', 'districtWiseMembers', 'organization'));
+        return view('org.dashboard', compact('stats', 'districtWiseMembers', 'organization', 'totalMembers'));
+    }
+
+    /**
+     * মেম্বার লিস্ট প্রদর্শন
+     */
+    public function members(Request $request)
+    {
+        $admin = Auth::user();
+
+        // 🛡️ সিকিউরিটি চেক: অ্যাডমিনের নিজের কোনো অর্গানাইজেশন আইডি না থাকলে এক্সেস পাবে না
+        if (!$admin->organization_id) {
+            abort(403, 'আপনার কোনো অর্গানাইজেশন অ্যাসাইন করা নেই।');
+        }
+
+        $query = User::where('organization_id', $admin->organization_id)
+            ->where('role', 'donor');
+
+        // ফিল্টারিং (Pending, Approved, Rejected)
+        if ($request->filled('status')) {
+            $query->where('nid_status', $request->status);
+        }
+
+        $members = $query->latest()->paginate(15)->withQueryString();
+
+        return view('org.members.index', compact('members', 'request'));
     }
 
     /**

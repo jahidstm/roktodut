@@ -403,6 +403,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 // --- ৬. অর্গানাইজেশন অ্যাডমিন রাউটস (ইন্টিগ্রেটেড গ্রুপ) ---
 Route::middleware(['auth', 'role:org_admin'])->group(function () {
     Route::get('/org/dashboard', [OrgDashboardController::class, 'index'])->name('org.dashboard');
+    Route::get('/org/members', [OrgDashboardController::class, 'members'])->name('org.members.index');
     Route::patch('/org/members/{donor}/verify', [OrgDashboardController::class, 'updateVerificationStatus'])->name('org.members.verify');
     Route::get('/org/donor/{id}/verify', [VerificationController::class, 'show'])->name('org.donor.verify');
     Route::get('/org/nid/{user}/image', [ProfileController::class, 'viewNidForOrg'])
