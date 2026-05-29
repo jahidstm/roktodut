@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin-dashboard')
 
 @section('title', 'Spam Radar - System Command Center')
 
 @section('content')
-<div class="py-8 bg-slate-50 min-h-screen">
+<div data-panel-id="spam-radar" class="py-8 bg-slate-50 min-h-screen">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">

@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin-dashboard')
 
 @section('title', 'Audit Logs — Admin — রক্তদূত')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 py-8">
+<div data-panel-id="audit-logs" class="max-w-7xl mx-auto px-4 py-8">
     <div class="mb-6">
         <h1 class="text-2xl font-extrabold text-slate-900">Audit Logs</h1>
         <p class="text-sm font-semibold text-slate-500 mt-1">Admin/Org actions tracking timeline</p>

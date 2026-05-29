@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin-dashboard')
 
 @section('title', 'Gamification Governance — রক্তদূত অ্যাডমিন')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 py-8">
+<div data-panel-id="gamification" class="max-w-7xl mx-auto px-4 py-8">
 
     {{-- ── হেডার ── --}}
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

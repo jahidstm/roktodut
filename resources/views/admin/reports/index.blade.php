@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin-dashboard')
 
 @section('title', 'রিপোর্ট ট্রায়াজ — অ্যাডমিন — রক্তদূত')
 
 @section('content')
-<div class="max-w-6xl mx-auto px-4 py-8">
+<div data-panel-id="reports" class="max-w-6xl mx-auto px-4 py-8">
     <div class="mb-6">
         <h1 class="text-2xl font-extrabold text-slate-900">রিপোর্ট ট্রায়াজ</h1>
         <p class="text-sm text-slate-500 font-semibold mt-1">ইউজার ও গেস্ট রিপোর্ট রিভিউ করুন</p>

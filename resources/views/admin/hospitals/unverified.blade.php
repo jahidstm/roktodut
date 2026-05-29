@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin-dashboard')
 
 @section('title', 'হাসপাতালের নাম যাচাই — অ্যাডমিন')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 py-8">
+<div data-panel-id="hospitals" class="max-w-7xl mx-auto px-4 py-8">
 
     {{-- Header --}}
     <div class="mb-8 border-b border-slate-200 pb-5 flex items-center justify-between gap-4 flex-wrap">

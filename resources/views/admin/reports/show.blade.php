@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin-dashboard')
 
 @section('title', 'রিপোর্ট #' . $report->id . ' — অ্যাডমিন — রক্তদূত')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 py-8">
+<div data-panel-id="reports" class="max-w-4xl mx-auto px-4 py-8">
     <div class="mb-6 flex items-center justify-between gap-3">
         <h1 class="text-2xl font-extrabold text-slate-900">রিপোর্ট #{{ $report->id }}</h1>
         <a href="{{ route('admin.reports.index') }}" class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50">সব রিপোর্ট</a>

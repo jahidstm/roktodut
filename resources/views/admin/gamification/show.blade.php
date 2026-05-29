@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin-dashboard')
 
 @section('title', $user->name . ' — Gamification Governance')
 
 @section('content')
-<div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+<div data-panel-id="gamification" class="max-w-6xl mx-auto px-4 py-8 space-y-8">
 
     <div class="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>

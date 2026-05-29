@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layouts.admin-dashboard')
 
 @section('title', 'অ্যানালিটিক্স ড্যাশবোর্ড — রক্তদূত অ্যাডমিন')
 
@@ -15,7 +15,7 @@
     $bn = fn ($value) => \App\Support\BanglaDate::digits((string) ($value ?? 0));
 @endphp
 
-<div class="max-w-7xl mx-auto px-4 py-8"
+<div data-panel-id="analytics" class="max-w-7xl mx-auto px-4 py-8"
      x-data="analyticsDashboard(@js($bloodGroupData), @js($monthlyTrend))"
      x-init="initCharts()">
 

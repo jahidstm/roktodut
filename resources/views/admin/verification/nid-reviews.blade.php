@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin-dashboard')
 
 @section('title', 'NID ভেরিফিকেশন রিভিউ কিউ | রক্তদূত অ্যাডমিন')
 
 @section('content')
-<div class="max-w-6xl mx-auto px-4 py-8">
+<div data-panel-id="nid-reviews" class="max-w-6xl mx-auto px-4 py-8">
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
             <h1 class="text-2xl font-extrabold text-slate-900 flex items-center gap-2">

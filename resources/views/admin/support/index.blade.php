@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin-dashboard')
 
 @section('title', 'সাপোর্ট ইনবক্স — অ্যাডমিন — রক্তদূত')
 
 @section('content')
-<div class="max-w-6xl mx-auto px-4 py-8">
+<div data-panel-id="support" class="max-w-6xl mx-auto px-4 py-8">
 
     {{-- ── পেজ হেডার ──────────────────────────────────────────────────────── --}}
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

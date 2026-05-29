@@ -1,9 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin-dashboard')
 
 @section('title', 'বার্তা #' . $message->id . ' — সাপোর্ট — রক্তদূত')
 
 @section('content')
-<div class="max-w-4xl mx-auto px-4 py-8">
+<div data-panel-id="support" class="max-w-4xl mx-auto px-4 py-8">
 
     {{-- ── ব্রেডক্রাম ──────────────────────────────────────────────────────── --}}
     <div class="flex items-center gap-2 text-sm font-semibold text-slate-500 mb-6">
