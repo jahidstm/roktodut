@@ -131,7 +131,7 @@
                     @endif
                 </div>
                 <div>
-                    <p class="text-slate-400 text-xs sm:text-sm font-semibold mb-0.5">স্বাগতম ফিরে আসার জন্য,</p>
+
                     <h2 class="text-xl sm:text-2xl font-black text-white leading-tight">{{ $user->name }}</h2>
                     <p class="text-slate-400 text-xs sm:text-sm font-medium mt-1 flex items-center gap-1.5">
                         <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
