@@ -91,13 +91,8 @@
                     </li>
                     <li>
                         <a href="{{ route('ambulances.index') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white hover:translate-x-1.5 transition-all font-medium">
-                            অ্যাম্বুলেন্স সার্ভিস
-                            <span class="bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full ml-1">NEW</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('leaderboard') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white hover:translate-x-1.5 transition-all font-medium">
-                            লিডারবোর্ড
+                            <span>অ্যাম্বুলেন্স সার্ভিস</span>
+                            <span class="animate-pulse bg-red-500/20 text-red-400 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full border border-red-500/30 group-hover:bg-red-600 group-hover:text-white group-hover:border-red-600 transition-all leading-none">New</span>
                         </a>
                     </li>
                     <li>
@@ -114,8 +109,7 @@
                 <ul class="space-y-3.5">
                     <li>
                         <a href="{{ route('org.register') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white hover:translate-x-1.5 transition-all font-medium">
-                            <span>ক্লাব/হাসপাতাল রেজিস্ট্রেশন</span>
-                            <span class="animate-pulse bg-red-500/20 text-red-400 text-[9px] font-black uppercase px-1.5 py-0.5 rounded-full border border-red-500/30 group-hover:bg-red-600 group-hover:text-white group-hover:border-red-600 transition-all leading-none">New</span>
+                            ক্লাব/হাসপাতাল রেজিস্ট্রেশন
                         </a>
                     </li>
                     <li>
@@ -134,7 +128,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white hover:translate-x-1.5 transition-all font-medium">
+                        <a href="{{ route('org.camps.create') }}" class="group flex items-center gap-2 text-sm text-slate-400 hover:text-white hover:translate-x-1.5 transition-all font-medium">
                             রক্তদান ক্যাম্পেইন
                         </a>
                     </li>
