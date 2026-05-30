@@ -117,6 +117,48 @@ class BloodRequestController extends Controller
     }
 
     /**
+     * "আমার রিকোয়েস্টে যারা যারা সাড়া দিয়েছেন" তালিকা।
+     */
+    public function myResponses(Request $request)
+    {
+        $userId = $request->user()?->id;
+        $guestToken = $request->cookie('rd_guest_token');
+        $hasValidGuestToken = is_string($guestToken) && strlen($guestToken) >= 32 && strlen($guestToken) <= 64;
+
+        $query = BloodRequestResponse::query()
+            ->with([
+                'bloodRequest:id,patient_name,blood_group,needed_at,status',
+                'user:id,name,phone,blood_group'
+            ]);
+
+        if ($userId || $hasValidGuestToken) {
+            $query->whereHas('bloodRequest', function ($q) use ($userId, $guestToken, $hasValidGuestToken) {
+                $q->where(function ($q2) use ($userId, $guestToken, $hasValidGuestToken) {
+                    if ($userId) {
+                        $q2->where('requested_by', $userId);
+                    }
+                    if ($hasValidGuestToken) {
+                        if ($userId) {
+                            $q2->orWhere('guest_token', $guestToken);
+                        } else {
+                            $q2->where('guest_token', $guestToken);
+                        }
+                    }
+                });
+            });
+        } else {
+            $query->whereRaw('1 = 0');
+        }
+
+        $responses = $query
+            ->orderByDesc('created_at')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('requests.my-responses', compact('responses'));
+    }
+
+    /**
      * রিকোয়েস্ট তৈরির ফর্ম দেখায়
      */
     public function create(Request $request, MathCaptchaService $mathCaptchaService)

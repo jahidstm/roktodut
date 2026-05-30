@@ -216,6 +216,8 @@ Route::post('/requests', [BloodRequestController::class, 'store'])
     ->name('requests.store');
 Route::get('/my-requests', [BloodRequestController::class, 'myRequests'])
     ->name('requests.my-requests');
+Route::get('/my-request-responses', [BloodRequestController::class, 'myResponses'])
+    ->name('requests.my-responses');
 Route::post('/requests/{bloodRequest}/renew', [BloodRequestController::class, 'renew'])
     ->name('requests.renew');
 Route::get('/requests/{bloodRequest}', [BloodRequestController::class, 'show'])
