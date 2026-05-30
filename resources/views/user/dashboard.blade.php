@@ -217,66 +217,7 @@
         </div>
     @endif
 
-    {{-- ── B) Become a Donor Banner ── --}}
-    <div class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-3xl border border-red-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 scroll-reveal" data-scroll-reveal>
-        <div class="flex items-center gap-4">
-            <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white text-red-600 shadow-sm">
-                <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                </svg>
-            </div>
-            <div>
-                <h3 class="text-xl font-extrabold text-slate-900">রক্তদাতা হিসেবে যুক্ত হতে চান?</h3>
-                <p class="text-sm font-semibold text-slate-600 mt-1">আপনার প্রোফাইল আপগ্রেড করুন এবং মানুষের জীবন বাঁচাতে অবদান রাখুন।</p>
-            </div>
-        </div>
-        <a href="{{ route('profile.upgrade') }}" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-extrabold shadow-md transition-all text-center whitespace-nowrap">
-            রক্তদাতা হোন (Become a Donor)
-        </a>
-    </div>
 
-    {{-- ── C) Quick Action Cards ── --}}
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {{-- জরুরি রক্ত --}}
-        <a href="{{ route('requests.create') }}" class="group relative overflow-hidden p-6 rounded-3xl bg-gradient-to-br from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 transition-all shadow-lg shadow-red-100 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px] scroll-reveal" data-scroll-reveal>
-            <div class="absolute -right-4 -top-4 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
-            <div class="w-11 h-11 bg-white/20 rounded-2xl flex items-center justify-center text-white border border-white/30 shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
-            </div>
-            <div>
-                <h3 class="text-white font-black text-lg leading-tight">জরুরি রক্তের দরকার?</h3>
-                <p class="text-red-100 text-sm font-medium mt-1 leading-snug">নতুন রিকোয়েস্ট তৈরি করুন এবং ডোনারদের সাথে যোগাযোগ করুন।</p>
-            </div>
-        </a>
-
-        {{-- রক্তের ফিড --}}
-        <a href="{{ route('requests.index') }}" class="group relative overflow-hidden p-6 rounded-3xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-emerald-300 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px] scroll-reveal" data-scroll-reveal>
-            <div class="absolute -right-4 -bottom-4 w-28 h-28 bg-emerald-50 rounded-full blur-xl pointer-events-none"></div>
-            <div class="relative z-10 flex flex-col gap-3">
-                <div class="w-11 h-11 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 border border-emerald-100 shrink-0 group-hover:scale-110 transition-transform">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
-                </div>
-                <div>
-                    <h3 class="text-slate-900 font-black text-lg leading-tight">রক্তের ফিড দেখুন</h3>
-                    <p class="text-slate-500 text-sm font-medium mt-1 leading-snug">আপনার এলাকার সাম্প্রতিক রক্তের রিকোয়েস্টগুলো দেখুন।</p>
-                </div>
-            </div>
-        </a>
-
-        {{-- আমার রিকোয়েস্ট --}}
-        <a href="{{ route('requests.my-requests') }}" class="group relative overflow-hidden p-6 rounded-3xl bg-white hover:shadow-lg transition-all shadow-sm border border-slate-200 hover:border-blue-300 hover:-translate-y-1 flex flex-col gap-3 min-h-[150px] scroll-reveal" data-scroll-reveal>
-            <div class="absolute -left-4 -bottom-4 w-28 h-28 bg-blue-50 rounded-full blur-xl pointer-events-none"></div>
-            <div class="relative z-10 flex flex-col gap-3">
-                <div class="w-11 h-11 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 border border-blue-100 shrink-0 group-hover:scale-110 transition-transform">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                </div>
-                <div>
-                    <h3 class="text-slate-900 font-black text-lg leading-tight">আমার রিকোয়েস্ট</h3>
-                    <p class="text-slate-500 text-sm font-medium mt-1 leading-snug">আপনার তৈরি করা রক্তের রিকোয়েস্টগুলো দেখুন ও ম্যানেজ করুন।</p>
-                </div>
-            </div>
-        </a>
-    </div>
 
     {{-- ── D) Impact Stats ── --}}
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 scroll-reveal" data-scroll-reveal>
