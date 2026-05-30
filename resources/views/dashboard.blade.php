@@ -357,7 +357,7 @@
                 </h3>
                 <p class="text-sm font-semibold text-slate-500 mt-1">
                     @if(!$user->last_donated_at)
-                        আমাদের সিস্টেমে আপনার পূর্বের রক্তদানের কোনো রেকর্ড নেই।
+                        আমাদের সিস্টেমে আপনার পূর্বের রক্তদানের কোনো রেকর্ড নেই.
                     @elseif($isEligible)
                         আপনার সর্বশেষ রক্তদানের পর ১২০ দিন পার হয়ে গেছে।
                     @else
@@ -382,7 +382,7 @@
 
     @else
     {{-- Become a Donor Upgrade CTA --}}
-    <div x-data="{ upgradeModalOpen: {{ $errors->any() ? 'true' : 'false' }} }" class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-3xl border border-red-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 scroll-reveal" data-scroll-reveal>
+    <div class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-3xl border border-red-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 scroll-reveal" data-scroll-reveal>
         <div class="flex items-center gap-4">
             <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white text-red-600 shadow-sm">
                 <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -398,58 +398,8 @@
                 </p>
             </div>
         </div>
-        <button @click="upgradeModalOpen = true" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-extrabold shadow-md transition-all text-center whitespace-nowrap">
+        <a href="{{ route('profile.upgrade') }}" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-extrabold shadow-md transition-all text-center whitespace-nowrap">
             রক্তদাতা হোন (Become a Donor)
-        </button>
-
-        {{-- Upgrade Modal --}}
-        <template x-teleport="body">
-            <div x-show="upgradeModalOpen"
-                 style="display: none;"
-                 class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto"
-                 x-transition.opacity>
-                <div @click.away="upgradeModalOpen = false" class="w-full max-w-2xl rounded-2xl bg-white shadow-2xl border border-slate-200 text-left my-8">
-                    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-                        <h3 class="text-xl font-black text-slate-900">রক্তদাতা হিসেবে প্রোফাইল আপগ্রেড করুন</h3>
-                        <button @click="upgradeModalOpen = false" class="text-slate-400 hover:text-red-600 transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
-                    </div>
-
-                    <div class="p-6">
-                        <form method="POST" action="{{ route('profile.upgrade_to_donor') }}" class="space-y-6">
-                            @csrf
-                            
-                            @if(empty($user->phone))
-                            <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5">ফোন নম্বর <span class="text-red-500">*</span></label>
-                                <input type="tel" name="phone" value="{{ old('phone') }}" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required placeholder="01XXX-XXXXXX">
-                                @error('phone') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                            </div>
-                            @endif
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">রক্তের গ্রুপ <span class="text-red-500">*</span></label>
-                                    <select name="blood_group" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
-                                        <option value="">নির্বাচন করুন</option>
-                                        @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bg)
-                                            <option value="{{ $bg }}" @selected(old('blood_group', $user->blood_group?->value ?? $user->blood_group) == $bg)>{{ $bg }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('blood_group') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">লিঙ্গ <span class="text-red-500">*</span></label>
-                                    <select name="gender" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
-                                        <option value="">নির্বাচন করুন</option>
-                                        <option value="male" @selected(old('gender', $user->gender) == 'male')>পুরুষ</option>
-                                        <option value="female" @selected(old('gender', $user->gender) == 'female')>মহিলা</option>
-                                    </select>
-                                    @error('gender') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
 
                             <div>
                                 <label class="block text-sm font-bold text-slate-700 mb-1.5">লোকেশন (কোথায় রক্ত দিতে ইচ্ছুক) <span class="text-red-500">*</span></label>
