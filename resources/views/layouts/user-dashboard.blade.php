@@ -226,6 +226,26 @@
                 transition: none !important;
             }
         }
+
+        /* SPA Loading bar */
+        #user-spa-progress {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 2.5px;
+            background: linear-gradient(90deg, #dc2626, #f87171, #dc2626);
+            background-size: 200% 100%;
+            animation: user-shimmer 1s linear infinite;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.15s;
+            pointer-events: none;
+        }
+        #user-spa-progress.active { opacity: 1; }
+        @keyframes user-shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        #user-page-content { transition: opacity 0.18s ease; }
     </style>
 
     @stack('head')
@@ -326,6 +346,7 @@
             @csrf
             <a href="{{ route('logout') }}"
                @click.prevent="$root.submit();"
+               data-no-spa
                class="user-nav-item text-slate-600 hover:text-red-600 hover:bg-red-50">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                 লগআউট
@@ -393,6 +414,9 @@
 {{-- ── Shared Footer ── --}}
 @include('layouts.footer')
 
+{{-- SPA Progress Bar --}}
+<div id="user-spa-progress"></div>
+
 {{-- Toast container --}}
 <div id="notif-toast-container"
      class="fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"
@@ -403,28 +427,176 @@
 {{-- Scroll Reveal --}}
 <script>
     window.initScrollReveal = function(root = document) {
-        root.querySelectorAll('.scroll-reveal:not([data-scroll-reveal])').forEach(el => {
-            if (!el.hasAttribute('data-scroll-reveal')) {
-                el.setAttribute('data-scroll-reveal', '');
-                el.classList.add('scroll-reveal');
-            }
-        });
-        const revealItems = root.querySelectorAll('[data-scroll-reveal]');
-        if (!revealItems.length) return;
-        const revealObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    revealObserver.unobserve(entry.target);
-                }
-            });
+        const items = root.querySelectorAll('[data-scroll-reveal]');
+        if (!items.length) return;
+        const obs = new IntersectionObserver((entries) => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); obs.unobserve(e.target); } });
         }, { threshold: 0.05, rootMargin: '0px 0px -10% 0px' });
-        revealItems.forEach(item => revealObserver.observe(item));
+        items.forEach(el => obs.observe(el));
     };
+    document.addEventListener('DOMContentLoaded', () => window.initScrollReveal());
+</script>
 
-    document.addEventListener('DOMContentLoaded', () => {
-        window.initScrollReveal();
+{{-- SPA Navigation --}}
+<script>
+(function () {
+    'use strict';
+
+    const cache = {};
+    const navLinks = document.querySelectorAll('.user-nav-item[data-tab]');
+    const contentEl = document.getElementById('user-page-content');
+    const progressBar = document.getElementById('user-spa-progress');
+
+    if (!contentEl) return;
+
+    function setActive(tabId) {
+        navLinks.forEach(link => {
+            link.classList.toggle('active', link.dataset.tab === tabId);
+        });
+    }
+
+    function showProgress() { progressBar?.classList.add('active'); }
+    function hideProgress() { progressBar?.classList.remove('active'); }
+
+    function fadeOut() {
+        contentEl.style.opacity = '0.4';
+        contentEl.style.pointerEvents = 'none';
+    }
+
+    function fadeIn() {
+        contentEl.style.opacity = '1';
+        contentEl.style.pointerEvents = '';
+    }
+
+    function reinitAlpine(el) {
+        if (typeof Alpine === 'undefined') return;
+        el.querySelectorAll('[x-data]').forEach(node => {
+            if (node._x_dataStack) { try { Alpine.destroyTree(node); } catch {} }
+        });
+        try { Alpine.initTree(el); } catch {}
+    }
+
+    function runPageScripts(fetchedDoc, injectEl) {
+        const seen = new Set();
+        const exec = (code) => { try { new Function(code)(); } catch(e) { console.error(e); } };
+        const SKIP_SIGS = ['initScrollReveal', '__userSpaNavigate'];
+        const isSkip = (c) => SKIP_SIGS.some(s => c.includes(s));
+
+        injectEl.querySelectorAll('script:not([type="module"])').forEach(s => {
+            const c = s.textContent;
+            if (!c.trim() || seen.has(c) || isSkip(c)) return;
+            seen.add(c); exec(c);
+        });
+
+        if (fetchedDoc) {
+            fetchedDoc.body?.querySelectorAll('script:not([src]):not([type="module"])').forEach(s => {
+                const c = s.textContent;
+                if (!c.trim() || seen.has(c) || isSkip(c)) return;
+                seen.add(c); exec(c);
+            });
+        }
+    }
+
+    let currentTab = document.querySelector('.user-nav-item[data-tab].active')?.dataset?.tab || 'overview';
+
+    async function switchTab(tabId, url) {
+        if (tabId === currentTab && cache[tabId]) return;
+        currentTab = tabId;
+        setActive(tabId);
+
+        // Mobile: close sidebar after nav click
+        const bodyEl = document.querySelector('body[x-data]');
+        if (bodyEl && bodyEl._x_dataStack) {
+            try { bodyEl._x_dataStack[0].sidebarOpen = false; } catch {}
+        }
+
+        // Serve from cache instantly
+        if (typeof cache[tabId] === 'string') {
+            window.history.pushState({ tab: tabId }, '', url);
+            contentEl.innerHTML = cache[tabId];
+            window.scrollTo({ top: 0 });
+            runPageScripts(null, contentEl);
+            reinitAlpine(contentEl);
+            if (window.initScrollReveal) requestAnimationFrame(() => window.initScrollReveal(contentEl));
+            return;
+        }
+
+        showProgress();
+        fadeOut();
+
+        try {
+            const res = await fetch(url, {
+                headers: { 'Accept': 'text/html', 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin',
+                redirect: 'follow'
+            });
+
+            if (res.url.includes('/login')) { window.location.href = res.url; return; }
+
+            const html = await res.text();
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+
+            let newHtml = '';
+            const panel = doc.querySelector(`[data-panel-id="${tabId}"]`);
+            if (panel) {
+                newHtml = panel.outerHTML;
+            } else {
+                const pageContent = doc.getElementById('user-page-content');
+                if (pageContent) {
+                    newHtml = pageContent.innerHTML;
+                } else {
+                    window.location.href = url;
+                    return;
+                }
+            }
+
+            cache[tabId] = newHtml;
+
+            contentEl.querySelectorAll('[x-data]').forEach(node => {
+                if (node._x_dataStack) { try { Alpine.destroyTree?.(node); } catch {} }
+            });
+
+            contentEl.innerHTML = newHtml;
+
+            const t = doc.querySelector('title')?.textContent;
+            if (t) document.title = t;
+
+            window.history.pushState({ tab: tabId }, t || '', url);
+            window.scrollTo({ top: 0 });
+
+            runPageScripts(doc, contentEl);
+            reinitAlpine(contentEl);
+            if (window.initScrollReveal) requestAnimationFrame(() => window.initScrollReveal(contentEl));
+
+        } catch (err) {
+            console.error('[User SPA] Error:', err);
+            window.location.href = url;
+        } finally {
+            fadeIn();
+            hideProgress();
+        }
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            if (this.getAttribute('target') === '_blank') return;
+            if (this.hasAttribute('data-no-spa')) return;
+            if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+            e.preventDefault();
+            switchTab(this.dataset.tab, this.href);
+        });
     });
+
+    window.__userSpaNavigate = switchTab;
+    window.__userSpaSetActive = setActive;
+
+    window.addEventListener('popstate', function(e) {
+        if (e.state && e.state.tab) {
+            const link = document.querySelector(`.user-nav-item[data-tab="${e.state.tab}"]`);
+            if (link) switchTab(e.state.tab, link.href);
+        }
+    });
+})();
 </script>
 
 </body>
