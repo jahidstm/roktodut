@@ -46,10 +46,12 @@
 
 {{-- 🚀 Isolated AJAX Script (Protected against DOM Conflicts) --}}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    (function() {
         const divSelect = document.getElementById('comp_division');
         const distSelect = document.getElementById('comp_district');
         const upzSelect = document.getElementById('comp_upazila');
+
+        if (!divSelect || !distSelect || !upzSelect) return;
 
         const oldDist = "{{ $selectedDistrict ?? '' }}";
         const oldUpz = "{{ $selectedUpazila ?? '' }}";
@@ -122,5 +124,5 @@
         if(divSelect.value) {
             loadDistricts(divSelect.value, oldDist);
         }
-    });
+    })();
 </script>
