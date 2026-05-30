@@ -218,8 +218,7 @@
     @endif
 
     {{-- ── B) Become a Donor Banner ── --}}
-    <div x-data="{ upgradeModalOpen: {{ $errors->any() ? 'true' : 'false' }} }"
-         class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-3xl border border-red-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 scroll-reveal" data-scroll-reveal>
+    <div class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-3xl border border-red-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 scroll-reveal" data-scroll-reveal>
         <div class="flex items-center gap-4">
             <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white text-red-600 shadow-sm">
                 <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -231,84 +230,9 @@
                 <p class="text-sm font-semibold text-slate-600 mt-1">আপনার প্রোফাইল আপগ্রেড করুন এবং মানুষের জীবন বাঁচাতে অবদান রাখুন।</p>
             </div>
         </div>
-        <button @click="upgradeModalOpen = true" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-extrabold shadow-md transition-all text-center whitespace-nowrap">
+        <a href="{{ route('profile.upgrade') }}" class="w-full md:w-auto bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-extrabold shadow-md transition-all text-center whitespace-nowrap">
             রক্তদাতা হোন (Become a Donor)
-        </button>
-
-        {{-- Upgrade Modal --}}
-        <template x-teleport="body">
-            <div x-show="upgradeModalOpen"
-                 style="display: none;"
-                 class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto"
-                 x-transition.opacity>
-                <div @click.away="upgradeModalOpen = false" class="w-full max-w-2xl rounded-2xl bg-white shadow-2xl border border-slate-200 text-left my-8">
-                    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white rounded-t-2xl z-10">
-                        <h3 class="text-xl font-black text-slate-900">রক্তদাতা হিসেবে প্রোফাইল আপগ্রেড করুন</h3>
-                        <button @click="upgradeModalOpen = false" class="text-slate-400 hover:text-red-600 transition">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-                        </button>
-                    </div>
-                    <div class="p-6">
-                        <form method="POST" action="{{ route('profile.upgrade_to_donor') }}" class="space-y-6">
-                            @csrf
-                            @if(empty($user->phone))
-                            <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5">ফোন নম্বর <span class="text-red-500">*</span></label>
-                                <input type="tel" name="phone" value="{{ old('phone') }}" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required placeholder="01XXX-XXXXXX">
-                                @error('phone') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                            </div>
-                            @endif
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">রক্তের গ্রুপ <span class="text-red-500">*</span></label>
-                                    <select name="blood_group" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
-                                        <option value="">নির্বাচন করুন</option>
-                                        @foreach(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'] as $bg)
-                                            <option value="{{ $bg }}" @selected(old('blood_group', $user->blood_group?->value ?? $user->blood_group) == $bg)>{{ $bg }}</option>
-                                        @endforeach
-                                    </select>
-                                    @error('blood_group') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">লিঙ্গ <span class="text-red-500">*</span></label>
-                                    <select name="gender" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" required>
-                                        <option value="">নির্বাচন করুন</option>
-                                        <option value="male" @selected(old('gender', $user->gender) == 'male')>পুরুষ</option>
-                                        <option value="female" @selected(old('gender', $user->gender) == 'female')>মহিলা</option>
-                                    </select>
-                                    @error('gender') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-slate-700 mb-1.5">লোকেশন <span class="text-red-500">*</span></label>
-                                <x-location-selector
-                                    :selected-division="old('division_id', $user->division_id)"
-                                    :selected-district="old('district_id', $user->district_id)"
-                                    :selected-upazila="old('upazila_id', $user->upazila_id)"
-                                />
-                            </div>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">ওজন (কেজি)</label>
-                                    <input type="number" name="weight" value="{{ old('weight', $user->weight) }}" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500" placeholder="যেমন: 65">
-                                    @error('weight') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-700 mb-1.5">শেষ রক্তদানের তারিখ</label>
-                                    <input type="date" name="last_donation_date" value="{{ old('last_donation_date', $user->last_donated_at?->format('Y-m-d')) }}" max="{{ date('Y-m-d') }}" class="w-full rounded-xl border-slate-300 text-sm font-semibold focus:border-red-500 focus:ring-red-500 text-slate-700">
-                                    @error('last_donation_date') <p class="text-xs font-bold text-red-600 mt-1">{{ $message }}</p> @enderror
-                                </div>
-                            </div>
-                            <div class="pt-4 flex flex-col sm:flex-row sm:justify-end border-t border-slate-100 mt-6 gap-3">
-                                <button type="submit" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-black shadow-md transition-all">
-                                    আপগ্রেড নিশ্চিত করুন
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </template>
+        </a>
     </div>
 
     {{-- ── C) Quick Action Cards ── --}}

@@ -60,6 +60,16 @@ class ProfileController extends Controller
     }
 
     /**
+     * রক্তদাতা হিসেবে আপগ্রেড করার ফর্ম
+     */
+    public function upgradeForm(Request $request): View
+    {
+        return view('profile.upgrade', [
+            'user' => $request->user(),
+        ]);
+    }
+
+    /**
      * প্রোফাইল আপডেট করা + ১০০% হলে গ্যামিফিকেশন বোনাস
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
