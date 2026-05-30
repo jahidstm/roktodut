@@ -6,7 +6,7 @@
             $layout = 'layouts.admin-dashboard';
         } elseif($u->isOrgAdmin()) {
             $layout = 'layouts.org-dashboard';
-        } elseif($u->is_donor) {
+        } elseif($u->isDonor()) {
             $layout = 'layouts.donor-dashboard';
         } else {
             $layout = 'layouts.user-dashboard';
