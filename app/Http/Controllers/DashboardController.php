@@ -239,7 +239,8 @@ class DashboardController extends Controller
             ];
         })->values();
 
-        return view('dashboard', compact(
+        // Recipient → নতুন user-dashboard layout ও view
+        return view('user.dashboard', compact(
             'totalRequestsMade',
             'fulfilledRequests',
             'totalContributions',
@@ -247,15 +248,8 @@ class DashboardController extends Controller
             'recentRequests',
             'pendingClaim',
             'ongoingCommitments',
-            'donationHistory',
-            'successfulDonationsCount',
-            'livesSaved',
             'districts',
-            'gamificationStats',
-            'radarRequests',
-            'showInactivePopup',
-            'isDonor',
-            'donationRecoveryCards'
+            'isDonor'
         ));
     }
 }
