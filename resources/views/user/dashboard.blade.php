@@ -3,6 +3,7 @@
 @section('title', 'ইউজার ড্যাশবোর্ড — রক্তদূত')
 
 @section('content')
+<div data-panel-id="overview">
 
 {{-- 🚀 Welcome Back Prompt --}}
 @if(session('welcome_back_prompt'))
@@ -557,4 +558,5 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+</div>
 @endsection

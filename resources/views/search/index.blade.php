@@ -3,7 +3,7 @@
 @section('title', 'রক্তদাতা খুঁজুন — রক্তদূত')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-panel-id="search">
     
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 scroll-reveal" data-scroll-reveal>
         <div>

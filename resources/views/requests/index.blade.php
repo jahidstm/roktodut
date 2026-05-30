@@ -4,7 +4,7 @@
 
 @section('content')
 {{-- 🎯 THE FIX: এই মেইন কন্টেইনার ডিভটি পুরো কন্টেন্টকে র‍্যাপ করে মাঝখানে রাখবে --}}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-panel-id="blood-feed">
 
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8 scroll-reveal" data-scroll-reveal>
         <div>

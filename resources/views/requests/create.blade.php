@@ -13,7 +13,7 @@
 
 @section('content')
 {{-- 🎯 THE FIX: ফর্মটি মাঝখানে রাখতে এবং উপরে-নিচে পর্যাপ্ত শ্বাস নেওয়ার জায়গা (Breathing Space) দিতে px-4 sm:px-6 lg:px-8 py-10 যোগ করা হলো --}}
-<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8" data-panel-id="new-request">
 
     <h1 class="text-2xl font-extrabold tracking-tight text-slate-900 scroll-reveal" data-scroll-reveal>নতুন রক্তের রিকোয়েস্ট</h1>
     <p class="text-slate-500 font-medium mt-1 scroll-reveal" data-scroll-reveal>সঠিক তথ্য দিলে দ্রুত ডোনার রেসপন্স পাবে।</p>
@@ -295,10 +295,8 @@
 @endsection
 
 @push('scripts')
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLs=" crossorigin=""></script>
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+(function initCreateRequest() {
     const urgencySelect = document.getElementById('urgency');
     const neededAtInput = document.getElementById('needed_at');
     const note = document.getElementById('urgency-threshold-note');
@@ -348,10 +346,13 @@ document.addEventListener('DOMContentLoaded', function () {
     updateUrgencyAvailability();
 
     // 📍 Leaflet Map Initialization
-    let map = L.map('hospital-map').setView([23.8103, 90.4125], 7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
+    function initMap() {
+        if (!document.getElementById('hospital-map')) return;
+        
+        let map = L.map('hospital-map').setView([23.8103, 90.4125], 7);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
 
     let marker = null;
     const latInput = document.getElementById('input-latitude');
@@ -382,26 +383,41 @@ document.addEventListener('DOMContentLoaded', function () {
         setMarker(e.latlng.lat, e.latlng.lng);
     });
 
-    document.getElementById('use-my-location').addEventListener('click', function() {
-        if (!navigator.geolocation) {
-            alert('আপনার ব্রাউজার লোকেশন সাপোর্ট করে না।');
-            return;
-        }
-        const originalText = this.innerHTML;
-        this.innerHTML = 'খুঁজছি...';
-        navigator.geolocation.getCurrentPosition(
-            position => {
-                setMarker(position.coords.latitude, position.coords.longitude);
-                map.setView([position.coords.latitude, position.coords.longitude], 15);
-                this.innerHTML = originalText;
-            },
-            () => {
-                alert('লোকেশন পাওয়া যায়নি। দয়া করে ম্যাপে ক্লিক করে পিন বসান।');
-                this.innerHTML = originalText;
+        document.getElementById('use-my-location').addEventListener('click', function() {
+            if (!navigator.geolocation) {
+                alert('আপনার ব্রাউজার লোকেশন সাপোর্ট করে না।');
+                return;
             }
-        );
-    });
-});
+            const originalText = this.innerHTML;
+            this.innerHTML = 'খুঁজছি...';
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    setMarker(position.coords.latitude, position.coords.longitude);
+                    map.setView([position.coords.latitude, position.coords.longitude], 15);
+                    this.innerHTML = originalText;
+                },
+                () => {
+                    alert('লোকেশন পাওয়া যায়নি। দয়া করে ম্যাপে ক্লিক করে পিন বসান।');
+                    this.innerHTML = originalText;
+                }
+            );
+        });
+    }
+
+    if (typeof L === 'undefined') {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css';
+        document.head.appendChild(link);
+
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+        script.onload = initMap;
+        document.head.appendChild(script);
+    } else {
+        initMap();
+    }
+})();
 </script>
 
 {{-- 🏥 Hospital Autocomplete Alpine Component --}}
