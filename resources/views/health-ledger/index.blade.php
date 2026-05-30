@@ -1,4 +1,19 @@
-@extends('layouts.app')
+@php
+    $layout = 'layouts.app';
+    if(auth()->check()){
+        $u = auth()->user();
+        if($u->isAdmin()) {
+            $layout = 'layouts.admin-dashboard';
+        } elseif($u->isOrgAdmin()) {
+            $layout = 'layouts.org-dashboard';
+        } elseif($u->isDonor()) {
+            $layout = 'layouts.donor-dashboard';
+        } else {
+            $layout = 'layouts.user-dashboard';
+        }
+    }
+@endphp
+@extends($layout)
 
 @section('title', 'হেলথ লেজার ড্যাশবোর্ড')
 
