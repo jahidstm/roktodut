@@ -29,25 +29,7 @@
             $isDonor = $user->is_donor ?? false;
         @endphp
 
-        {{-- Recipient Upgrade Banner --}}
-        @if(!$isDonor && !$user->isAdmin() && !$user->isOrgAdmin())
-        <div class="bg-gradient-to-r from-red-50 to-red-100 p-6 rounded-3xl border border-red-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 mb-6 scroll-reveal" data-scroll-reveal>
-            <div class="flex items-center gap-4">
-                <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-white text-red-600 shadow-sm">
-                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="text-xl font-extrabold text-slate-900">রক্তদাতা হিসেবে যুক্ত হতে চান?</h3>
-                    <p class="text-sm font-semibold text-slate-600 mt-1">আপনার প্রোফাইল আপগ্রেড করুন এবং মানুষের জীবন বাঁচাতে অবদান রাখুন।</p>
-                </div>
-            </div>
-            <a href="{{ route('profile.upgrade') }}" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl font-extrabold shadow-md transition-all text-center whitespace-nowrap">
-                রক্তদাতা হোন (Become a Donor)
-            </a>
-        </div>
-        @endif
+
 
         {{-- Flash Messages (Glass Effect) --}}
         @if(session('status') === 'profile-updated' || session('success_msg'))
