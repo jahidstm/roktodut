@@ -610,6 +610,7 @@
         // If in cache, render instantly
         if (typeof cache[tabId] === 'string') {
             contentEl.innerHTML = cache[tabId];
+            history.pushState({ tabId, url }, '', url);
             window.scrollTo({ top: 0 });
             document.querySelector('.donor-content')?.scrollTo?.({ top: 0 });
             runPageScripts(null, contentEl);
@@ -663,6 +664,9 @@
 
             contentEl.innerHTML = newContentHtml;
 
+            // Update URL in browser address bar (no reload)
+            history.pushState({ tabId, url }, '', url);
+
             // Update title
             const t = doc.querySelector('title')?.textContent;
             if (t) document.title = t;
@@ -704,6 +708,13 @@
     // Expose for layout-level helpers (e.g., Offline Claim)
     window.__spaNavigate = switchTab;
     window.__spaSetActiveTab = setActiveTab;
+
+    // Handle browser back/forward buttons
+    window.addEventListener('popstate', function(e) {
+        if (e.state?.tabId && e.state?.url) {
+            switchTab(e.state.tabId, e.state.url);
+        }
+    });
 
 })();
 </script>

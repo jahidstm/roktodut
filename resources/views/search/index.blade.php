@@ -7,9 +7,9 @@
         } elseif($u->isOrgAdmin()) {
             $layout = 'layouts.org-dashboard';
         } elseif($u->isDonor()) {
-            $layout = 'layouts.donor-dashboard';
+            $layout = 'layouts.app'; // full-width, no sidebar
         } else {
-            $layout = 'layouts.user-dashboard';
+            $layout = 'layouts.app';
         }
     }
 @endphp
