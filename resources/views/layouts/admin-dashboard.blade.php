@@ -296,18 +296,27 @@
                class="admin-nav-item {{ request()->routeIs('admin.donations.proof_reviews') ? 'active' : '' }}" data-tab="proof-reviews">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                 পেন্ডিং ভেরিফিকেশন
+                @if(isset($pendingClaimsCount) && $pendingClaimsCount > 0)
+                    <span class="admin-nav-badge">{{ $pendingClaimsCount }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.nid.reviews') }}"
                class="admin-nav-item {{ request()->routeIs('admin.nid.reviews') ? 'active' : '' }}" data-tab="nid-reviews">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"/></svg>
                 NID ভেরিফিকেশন
+                @if(isset($pendingNidsCount) && $pendingNidsCount > 0)
+                    <span class="admin-nav-badge">{{ $pendingNidsCount }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.org.reviews') }}"
                class="admin-nav-item {{ request()->routeIs('admin.org.reviews') ? 'active' : '' }}" data-tab="org-reviews">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                 অর্গ/হাসপাতাল যাচাই
+                @if(isset($pendingOrgsCount) && $pendingOrgsCount > 0)
+                    <span class="admin-nav-badge">{{ $pendingOrgsCount }}</span>
+                @endif
             </a>
 
             <div class="admin-section-label">মডারেশন</div>
@@ -316,18 +325,27 @@
                class="admin-nav-item {{ request()->routeIs('admin.support.messages.*') ? 'active' : '' }}" data-tab="support">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                 সাপোর্ট ইনবক্স
+                @if(isset($pendingSupportCount) && $pendingSupportCount > 0)
+                    <span class="admin-nav-badge">{{ $pendingSupportCount }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.blog.moderation.index') }}"
                class="admin-nav-item {{ request()->routeIs('admin.blog.moderation.*') ? 'active' : '' }}" data-tab="blog-moderation">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                 ব্লগ মডারেশন
+                @if(isset($pendingBlogCount) && $pendingBlogCount > 0)
+                    <span class="admin-nav-badge">{{ $pendingBlogCount }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.reports.index') }}"
                class="admin-nav-item {{ request()->routeIs('admin.reports.*') ? 'active' : '' }}" data-tab="reports">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                 রিপোর্ট
+                @if(isset($pendingReportsCount) && $pendingReportsCount > 0)
+                    <span class="admin-nav-badge">{{ $pendingReportsCount }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.spam-radar.index') }}"
@@ -368,12 +386,18 @@
                class="admin-nav-item {{ request()->routeIs('admin.hospitals.*') ? 'active' : '' }}" data-tab="hospitals">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                 হাসপাতাল যাচাই
+                @if(isset($pendingHospitalsCount) && $pendingHospitalsCount > 0)
+                    <span class="admin-nav-badge">{{ $pendingHospitalsCount }}</span>
+                @endif
             </a>
 
             <a href="{{ route('admin.ambulances.index') }}"
                class="admin-nav-item {{ request()->routeIs('admin.ambulances.*') ? 'active' : '' }}" data-tab="ambulances">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"/></svg>
                 অ্যাম্বুলেন্স
+                @if(isset($pendingAmbulancesCount) && $pendingAmbulancesCount > 0)
+                    <span class="admin-nav-badge">{{ $pendingAmbulancesCount }}</span>
+                @endif
             </a>
 
             <div class="h-px bg-slate-100 mx-4 my-2"></div>

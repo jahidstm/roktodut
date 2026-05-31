@@ -172,8 +172,17 @@ class AppServiceProvider extends ServiceProvider
             ];
         });
 
-        View::composer('admin.layouts.sidebar', function ($view) {
-            $view->with('pendingBlogCount', Post::pendingReview()->count());
+        View::composer('layouts.admin-dashboard', function ($view) {
+            $view->with([
+                'pendingClaimsCount' => \App\Models\BloodRequestResponse::whereIn('verification_status', ['claimed', 'disputed'])->count(),
+                'pendingNidsCount' => \App\Models\User::where('nid_status', 'pending')->whereNotNull('nid_path')->whereNull('organization_id')->count(),
+                'pendingOrgsCount' => \App\Models\Organization::where('status', 'pending')->count(),
+                'pendingBlogCount' => \App\Models\Post::pendingReview()->count(),
+                'pendingSupportCount' => \App\Models\ContactMessage::where('status', 'new')->count(),
+                'pendingReportsCount' => \App\Models\Report::where('status', 'open')->count(),
+                'pendingHospitalsCount' => \App\Models\Hospital::unverified()->count(),
+                'pendingAmbulancesCount' => \App\Models\Ambulance::where('is_verified', false)->count(),
+            ]);
         });
     }
 
