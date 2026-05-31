@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="csrf-token" content="{{ csrf_token() }}" />
-    <meta name="theme-color" content="#dc2626" />
+    <meta name="theme-color" content="#2563eb" />
     <title>@yield('title', 'অ্যাডমিন ড্যাশবোর্ড — রক্তদূত')</title>
     <link rel="icon" href="{{ asset('images/image_14.png') }}" type="image/png">
 
@@ -98,7 +98,7 @@
             top: 0;
             height: 100%;
             width: 4px;
-            background-color: #dc2626;
+            background-color: #2563eb;
             transform: scaleY(0);
             transition: transform 0.3s ease;
             border-radius: 0 4px 4px 0;
@@ -111,9 +111,9 @@
         }
 
         .admin-nav-item.active {
-            background: linear-gradient(90deg, #fee2e2 0%, #fff1f2 100%);
-            color: #b91c1c;
-            box-shadow: 0 1px 3px rgba(220, 38, 38, 0.1);
+            background: linear-gradient(90deg, #dbeafe 0%, #eff6ff 100%);
+            color: #1d4ed8;
+            box-shadow: 0 1px 3px rgba(37, 99, 235, 0.1);
         }
 
         .admin-nav-item.active::before {
@@ -121,7 +121,7 @@
         }
 
         .admin-nav-item.active svg {
-            color: #dc2626;
+            color: #2563eb;
             transform: scale(1.1);
         }
 
@@ -139,7 +139,7 @@
             font-weight: 800;
             padding: 0.2rem 0.5rem;
             border-radius: 9999px;
-            background: #dc2626;
+            background: #2563eb;
             color: white;
             line-height: 1.2;
         }
@@ -227,7 +227,7 @@
             position: fixed;
             top: 0; left: 0; right: 0;
             height: 2.5px;
-            background: linear-gradient(90deg, #dc2626, #f87171, #dc2626);
+            background: linear-gradient(90deg, #2563eb, #60a5fa, #2563eb);
             background-size: 200% 100%;
             animation: admin-shimmer 1s linear infinite;
             z-index: 9999;
@@ -269,7 +269,7 @@
 
         {{-- Sidebar Header: System Admin Info --}}
         <div class="admin-sidebar-header">
-            <div class="w-9 h-9 rounded-xl bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+            <div class="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                           d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
@@ -400,12 +400,12 @@
         @auth
         <div class="px-4 py-4 border-t border-slate-100 mt-auto">
             <div class="flex items-center gap-3 px-2">
-                <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-black text-sm shrink-0">
+                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-black text-sm shrink-0">
                     {{ mb_substr(auth()->user()->name, 0, 1) }}
                 </div>
                 <div class="min-w-0">
                     <p class="text-sm font-bold text-slate-800 truncate">{{ auth()->user()->name }}</p>
-                    <p class="text-[10px] font-bold text-red-500 uppercase tracking-wider">Admin</p>
+                    <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wider">Admin</p>
                 </div>
             </div>
         </div>
