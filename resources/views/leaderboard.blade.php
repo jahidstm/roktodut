@@ -2,15 +2,10 @@
     $layout = 'layouts.app';
     if(auth()->check()){
         $u = auth()->user();
-        if($u->isAdmin()) {
-            $layout = 'layouts.admin-dashboard';
-        } elseif($u->isOrgAdmin()) {
-            $layout = 'layouts.org-dashboard';
-        } elseif($u->isDonor()) {
-            $layout = 'layouts.donor-dashboard';
-        } else {
-            $layout = 'layouts.user-dashboard';
+        if($u->isDonor()) {
+            $layout = 'layouts.donor-dashboard'; // leaderboard is in donor sidebar
         }
+        // admin, org admin, recipient → full-width app layout
     }
 @endphp
 @extends($layout)

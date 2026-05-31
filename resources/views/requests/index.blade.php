@@ -1,17 +1,6 @@
 @php
     $layout = 'layouts.app';
-    if(auth()->check()){
-        $u = auth()->user();
-        if($u->isAdmin()) {
-            $layout = 'layouts.admin-dashboard';
-        } elseif($u->isOrgAdmin()) {
-            $layout = 'layouts.org-dashboard';
-        } elseif($u->isDonor()) {
-            $layout = 'layouts.app'; // full-width, no sidebar
-        } else {
-            $layout = 'layouts.app';
-        }
-    }
+    // Blood request feed is full-width for all roles, no sidebar
 @endphp
 @extends($layout)
 
