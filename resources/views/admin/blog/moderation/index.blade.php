@@ -100,8 +100,11 @@
                             <span class="inline-flex items-center gap-1 bg-amber-100 text-amber-700 text-xs font-extrabold px-2.5 py-1 rounded-full">
                                 ⏳ পেন্ডিং রিভিউ
                             </span>
-                            <p class="text-xs text-slate-400 font-medium mt-1">
-                                {{ $post->created_at->locale('bn')->diffForHumans() }}
+                            <span class="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-full">
+                                🕐 {{ $post->created_at->diffForHumans() }}
+                            </span>
+                            <p class="text-[10px] text-slate-400 font-medium mt-1" title="{{ $post->created_at->format('d M Y, h:i A') }}">
+                                {{ $post->created_at->format('d M Y') }}
                             </p>
                         </div>
                     </div>

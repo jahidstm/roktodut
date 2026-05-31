@@ -65,6 +65,7 @@
                         <tr class="bg-slate-50 border-b border-slate-200 text-xs font-extrabold text-slate-500 uppercase tracking-wider">
                             <th class="text-left px-6 py-4">ডোনার</th>
                             <th class="text-left px-6 py-4">জেলা</th>
+                            <th class="text-left px-6 py-4">জমার সময়</th>
                             <th class="text-center px-6 py-4">ডকুমেন্ট</th>
                             <th class="text-center px-6 py-4">অ্যাকশন</th>
                         </tr>
@@ -85,6 +86,16 @@
                                 </td>
                                 <td class="px-6 py-4 text-sm text-slate-600 font-semibold">
                                     {{ $donor->district?->name ?? '—' }}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="flex flex-col gap-0.5">
+                                        <span class="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-200 text-amber-700 text-xs font-bold px-2.5 py-1 rounded-lg whitespace-nowrap">
+                                            🕐 {{ $donor->updated_at->diffForHumans() }}
+                                        </span>
+                                        <span class="text-[10px] text-slate-400 font-medium pl-0.5" title="{{ $donor->updated_at->format('d M Y, h:i A') }}">
+                                            {{ $donor->updated_at->format('d M Y') }}
+                                        </span>
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4 text-center">
                                     <a href="{{ \Illuminate\Support\Facades\URL::temporarySignedRoute('admin.nid.image', now()->addMinutes(2), ['user' => $donor->id]) }}"

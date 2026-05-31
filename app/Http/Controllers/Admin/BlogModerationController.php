@@ -55,7 +55,7 @@ class BlogModerationController extends Controller
                 'categories',
             ])
             ->pendingReview()
-            ->oldest('created_at')
+            ->latest('created_at')
             ->paginate(20);
 
         // Summary counts for the admin dashboard sidebar/header

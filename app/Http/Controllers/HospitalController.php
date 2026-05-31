@@ -87,7 +87,7 @@ class HospitalController extends Controller
         $hospitals = Hospital::unverified()
             ->with('district:id,name')
             ->withCount('bloodRequests')
-            ->orderByDesc('blood_requests_count')
+            ->orderByDesc('created_at')
             ->paginate(20);
 
         // Merge target list: only verified hospitals

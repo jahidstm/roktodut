@@ -64,8 +64,13 @@
                                                 <a href="{{ route('admin.gamification.show', $ambulance->adder->id) }}" class="font-bold text-blue-600 hover:underline">
                                                     {{ $ambulance->adder->name }}
                                                 </a>
-                                                <div class="text-xs text-slate-500 font-medium">
-                                                    {{ $ambulance->created_at->format('d M Y, h:i A') }}
+                                                <div class="flex flex-col gap-0.5 mt-1">
+                                                    <span class="inline-flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded whitespace-nowrap">
+                                                        🕐 {{ $ambulance->created_at->diffForHumans() }}
+                                                    </span>
+                                                    <span class="text-[10px] text-slate-400 font-medium" title="{{ $ambulance->created_at->format('d M Y, h:i A') }}">
+                                                        {{ $ambulance->created_at->format('d M Y') }}
+                                                    </span>
                                                 </div>
                                             @else
                                                 <span class="text-slate-400 font-medium">সিস্টেম/অজ্ঞাত</span>

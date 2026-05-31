@@ -154,7 +154,7 @@ class AdminDashboardController extends Controller
         $pendingNids = User::with('district')
             ->where('nid_status', 'pending')
             ->whereNotNull('nid_path')
-            ->orderBy('updated_at', 'asc')
+            ->orderByDesc('updated_at')
             ->paginate(15)
             ->withQueryString();
 
@@ -177,7 +177,7 @@ class AdminDashboardController extends Controller
     {
         $pendingOrgs = \App\Models\Organization::with(['locationDistrict', 'locationUpazila'])
             ->where('status', 'pending')
-            ->orderBy('created_at', 'asc')
+            ->orderByDesc('created_at')
             ->paginate(12)
             ->withQueryString();
 

@@ -114,9 +114,15 @@
                             @endif
                         </td>
 
-                        {{-- Created at --}}
-                        <td class="px-6 py-4 text-xs text-slate-500 font-semibold whitespace-nowrap">
-                            {{ $h->created_at->diffForHumans() }}
+                        <td class="px-6 py-4 text-xs font-semibold whitespace-nowrap">
+                            <div class="flex flex-col gap-0.5">
+                                <span class="inline-flex items-center gap-1 bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold px-2 py-0.5 rounded whitespace-nowrap">
+                                    🕐 {{ $h->created_at->diffForHumans() }}
+                                </span>
+                                <span class="text-slate-400 font-medium" title="{{ $h->created_at->format('d M Y, h:i A') }}">
+                                    {{ $h->created_at->format('d M Y') }}
+                                </span>
+                            </div>
                         </td>
 
                         {{-- Actions --}}
