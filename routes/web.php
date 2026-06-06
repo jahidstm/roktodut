@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\GamificationGovernanceController;
 use App\Http\Controllers\Admin\BlogModerationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Donor\DashboardController as DonorDashboardController;
+use App\Http\Controllers\Donor\AvailabilityCalendarController;
 use App\Http\Controllers\DonationRecordController;
 use App\Http\Controllers\OrgAdmin\DashboardController as OrgDashboardController;
 use App\Http\Controllers\OrgAdmin\VerificationController;
@@ -331,6 +332,19 @@ Route::get('/donor/recent-requests', [DonorDashboardController::class, 'recentRe
 Route::get('/donor/blood-history', [DonorDashboardController::class, 'bloodHistory'])
     ->middleware(['auth', 'role:donor'])
     ->name('donor.blood_history');
+
+// Donor Availability Calendar
+Route::middleware(['auth', 'role:donor'])->group(function () {
+    Route::get('/donor/availability', [AvailabilityCalendarController::class, 'index'])
+        ->name('donor.availability.index');
+    Route::post('/donor/availability', [AvailabilityCalendarController::class, 'store'])
+        ->name('donor.availability.store');
+    Route::delete('/donor/availability/{availability}', [AvailabilityCalendarController::class, 'destroy'])
+        ->name('donor.availability.destroy');
+    Route::patch('/donor/availability/{availability}/toggle', [AvailabilityCalendarController::class, 'toggle'])
+        ->name('donor.availability.toggle');
+});
+
 
 // জেনেরিক ড্যাশবোর্ড (Recipient — বা donor হলে redirect করে donor.dashboard এ)
 Route::get('/dashboard', [DashboardController::class, 'index'])

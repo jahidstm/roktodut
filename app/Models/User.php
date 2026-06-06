@@ -162,6 +162,34 @@ class User extends Authenticatable // implements MustVerifyEmail — আপা�
         return $this->hasMany(Donation::class, 'donor_id');
     }
 
+    /**
+     * Donor's calendar availability rules.
+     */
+    public function availabilities(): HasMany
+    {
+        return $this->hasMany(DonorAvailability::class);
+    }
+
+    /**
+     * Check if this donor is calendar-available right now.
+     * Used by AI dispatch for non-emergency requests.
+     *
+     * Logic:
+     *  - No active rules → fall back to is_available toggle (backward-compatible)
+     *  - Has active rules → at least one must cover current datetime
+     */
+    public function isCalendarAvailableNow(): bool
+    {
+        $activeRules = $this->availabilities()->where('is_active', true)->get();
+
+        if ($activeRules->isEmpty()) {
+            return (bool) $this->is_available;
+        }
+
+        $now = now()->setTimezone('Asia/Dhaka');
+        return $activeRules->some(fn ($rule) => $rule->isAvailableAt($now));
+    }
+
     public function healthRecords(): HasMany
     {
         return $this->hasMany(HealthRecord::class);

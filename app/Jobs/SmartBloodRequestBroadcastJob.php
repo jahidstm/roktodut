@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Enums\BloodComponentType;
 use App\Models\BloodRequest;
+use App\Models\DonorAvailability;
 use App\Models\DonorResponseLog;
 use App\Models\User;
 use App\Services\DfiCalculationService;
@@ -168,7 +169,55 @@ class SmartBloodRequestBroadcastJob implements ShouldQueue
                 ->orderBy('id');
         }
 
+        // 🗓️ Calendar Bitmask Filter
+        // Super-critical emergencies bypass the calendar — human life > schedule.
+        if (!$this->isSuperCritical($request)) {
+            $now         = now()->setTimezone('Asia/Dhaka');
+            $todayBit    = DonorAvailability::bitForDay($now->dayOfWeek);
+            $todayDate   = $now->toDateString();
+            $currentTime = $now->format('H:i:s');
+
+            $query->where(function (Builder $q) use ($todayBit, $todayDate, $currentTime) {
+                $q->whereDoesntHave(
+                    'availabilities',
+                    fn (Builder $r) => $r->where('is_active', true)
+                )
+                ->orWhereHas('availabilities', function (Builder $r) use ($todayBit, $todayDate, $currentTime) {
+                    $r->where('is_active', true)
+                      ->where(function (Builder $rq) use ($todayBit, $todayDate, $currentTime) {
+                          $rq->where(function (Builder $sq) use ($todayBit, $currentTime) {
+                              $sq->where('type', 'weekly')
+                                 ->whereRaw('(weekdays_bitmask & ?) > 0', [$todayBit])
+                                 ->where(fn (Builder $tq) => $tq
+                                     ->whereNull('time_from')
+                                     ->orWhereRaw('? BETWEEN time_from AND time_to', [$currentTime]));
+                          })
+                          ->orWhere(function (Builder $sq) use ($todayDate, $currentTime) {
+                              $sq->where('type', 'specific_date')
+                                 ->where('specific_date', $todayDate)
+                                 ->where(fn (Builder $tq) => $tq
+                                     ->whereNull('time_from')
+                                     ->orWhereRaw('? BETWEEN time_from AND time_to', [$currentTime]));
+                          })
+                          ->orWhere(function (Builder $sq) use ($todayDate, $currentTime) {
+                              $sq->where('type', 'date_range')
+                                 ->where('date_from', '<=', $todayDate)
+                                 ->where('date_to', '>=', $todayDate)
+                                 ->where(fn (Builder $tq) => $tq
+                                     ->whereNull('time_from')
+                                     ->orWhereRaw('? BETWEEN time_from AND time_to', [$currentTime]));
+                          });
+                      });
+                });
+            });
+        }
+
         return $query->limit($limit)->get();
+    }
+
+    private function isSuperCritical(BloodRequest $request): bool
+    {
+        return (bool) $request->is_super_critical;
     }
 
     /**

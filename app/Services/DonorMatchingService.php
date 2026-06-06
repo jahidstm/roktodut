@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\BloodComponentType;
 use App\Models\BloodRequest;
+use App\Models\DonorAvailability;
 use App\Models\DonorResponseLog;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -227,12 +228,62 @@ class DonorMatchingService
             }
         }
 
+        // 🗓️ Calendar Availability Check (Bitmask)
+        // Emergency requests bypass this check (handled in the Job layer).
+        // - No active rules → fall back to is_available toggle (backward-compatible)
+        // - Has active rules → at least ONE must match today + current time
+        $now          = now()->setTimezone('Asia/Dhaka');
+        $todayBit     = DonorAvailability::bitForDay($now->dayOfWeek); // e.g. Friday = 32
+        $todayDate    = $now->toDateString();
+        $currentTime  = $now->format('H:i:s');
+
         return $query
             ->where(function (Builder $q) {
                 $q->whereNull('is_available')->orWhere('is_available', true);
             })
             ->where(function (Builder $q) {
                 $q->whereNull('cooldown_until')->orWhere('cooldown_until', '<=', now());
+            })
+            // Calendar check — donors with NO active rules pass through (backward-compat).
+            // Donors WITH active rules must match today via bitwise AND (O(1), indexed).
+            ->where(function (Builder $q) use ($todayBit, $todayDate, $currentTime) {
+                $q->whereDoesntHave(
+                    'availabilities',
+                    fn (Builder $r) => $r->where('is_active', true)
+                )
+                ->orWhereHas('availabilities', function (Builder $r) use ($todayBit, $todayDate, $currentTime) {
+                    $r->where('is_active', true)
+                      ->where(function (Builder $rq) use ($todayBit, $todayDate, $currentTime) {
+
+                          // ① Weekly — Bitwise AND: (weekdays_bitmask & todayBit) > 0
+                          $rq->where(function (Builder $sq) use ($todayBit, $currentTime) {
+                              $sq->where('type', 'weekly')
+                                 ->whereRaw('(weekdays_bitmask & ?) > 0', [$todayBit])
+                                 ->where(fn (Builder $tq) => $tq
+                                     ->whereNull('time_from')
+                                     ->orWhereRaw('? BETWEEN time_from AND time_to', [$currentTime]));
+                          })
+
+                          // ② Specific date
+                          ->orWhere(function (Builder $sq) use ($todayDate, $currentTime) {
+                              $sq->where('type', 'specific_date')
+                                 ->where('specific_date', $todayDate)
+                                 ->where(fn (Builder $tq) => $tq
+                                     ->whereNull('time_from')
+                                     ->orWhereRaw('? BETWEEN time_from AND time_to', [$currentTime]));
+                          })
+
+                          // ③ Date range
+                          ->orWhere(function (Builder $sq) use ($todayDate, $currentTime) {
+                              $sq->where('type', 'date_range')
+                                 ->where('date_from', '<=', $todayDate)
+                                 ->where('date_to', '>=', $todayDate)
+                                 ->where(fn (Builder $tq) => $tq
+                                     ->whereNull('time_from')
+                                     ->orWhereRaw('? BETWEEN time_from AND time_to', [$currentTime]));
+                          });
+                      });
+                });
             })
             ->where(function (Builder $q) use ($request) {
                 $component = $request->component_type instanceof BloodComponentType
