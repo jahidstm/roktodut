@@ -31,6 +31,7 @@ class Organization extends Model
         'admin_id',
         'status',
         'is_verified',
+        'is_blood_bank',
         'reviewed_by',
         'reviewed_at',
         'rejection_reason',
@@ -39,7 +40,8 @@ class Organization extends Model
     protected function casts(): array
     {
         return [
-            'is_verified' => 'boolean',
+            'is_verified'  => 'boolean',
+            'is_blood_bank' => 'boolean',
         ];
     }
 
@@ -88,5 +90,23 @@ class Organization extends Model
     public function reports(): MorphMany
     {
         return $this->morphMany(Report::class, 'reportable');
+    }
+
+    public function bloodInventories(): HasMany
+    {
+        return $this->hasMany(BloodInventory::class);
+    }
+
+    public function bloodInventoryLogs(): HasMany
+    {
+        return $this->hasMany(BloodInventoryLog::class);
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // Scopes
+    // ─────────────────────────────────────────────────────────────
+    public function scopeBloodBanks($query)
+    {
+        return $query->where('is_blood_bank', true);
     }
 }

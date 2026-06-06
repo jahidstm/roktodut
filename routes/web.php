@@ -43,6 +43,7 @@ use App\Http\Controllers\Admin\AdminHeatmapController;
 use App\Http\Controllers\TelegramController;
 use App\Http\Controllers\PwaController;
 use App\Http\Controllers\HospitalController;
+use App\Http\Controllers\BloodBankController;
 use App\Models\Division;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Broadcast;
@@ -436,7 +437,15 @@ Route::middleware(['auth', 'role:org_admin'])->group(function () {
         Route::post('/', [\App\Http\Controllers\OrgAdmin\AmbulanceController::class, 'store'])->name('store');
         Route::delete('/{ambulance}', [\App\Http\Controllers\OrgAdmin\AmbulanceController::class, 'destroy'])->name('destroy');
     });
+    // Blood Bank Inventory (Org Admin)
+    Route::get('/org/inventory', [\App\Http\Controllers\OrgAdmin\BloodInventoryController::class, 'index'])->name('org.inventory.index');
+    Route::put('/org/inventory', [\App\Http\Controllers\OrgAdmin\BloodInventoryController::class, 'update'])->name('org.inventory.update');
+    Route::post('/org/inventory/toggle', [\App\Http\Controllers\OrgAdmin\BloodInventoryController::class, 'toggleAccepting'])->name('org.inventory.toggle');
 });
+
+// Public Blood Bank Search (no auth required)
+Route::get('/blood-bank', [BloodBankController::class, 'index'])->name('blood-bank.index');
+Route::get('/blood-bank/{organization}', [BloodBankController::class, 'show'])->name('blood-bank.show');
 
 // --- ৭. AJAX লোকেশন রাউটস ---
 Route::get('/ajax/divisions', [LocationController::class, 'getDivisions']);
