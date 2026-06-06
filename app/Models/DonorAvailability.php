@@ -8,31 +8,31 @@ use Illuminate\Support\Carbon;
 
 class DonorAvailability extends Model
 {
-    // ── Bitmask constants (Sun=0 in Carbon, but bit = 2^dayOfWeek) ──────────
-    public const SUNDAY    = 1;   // 2^0
-    public const MONDAY    = 2;   // 2^1
-    public const TUESDAY   = 4;   // 2^2
-    public const WEDNESDAY = 8;   // 2^3
-    public const THURSDAY  = 16;  // 2^4
-    public const FRIDAY    = 32;  // 2^5
-    public const SATURDAY  = 64;  // 2^6
+    // ── BD Bitmask constants (Sat=1, Sun=2, Mon=4, Tue=8, Wed=16, Thu=32, Fri=64)
+    public const SATURDAY  = 1;   // 2^0
+    public const SUNDAY    = 2;   // 2^1
+    public const MONDAY    = 4;   // 2^2
+    public const TUESDAY   = 8;   // 2^3
+    public const WEDNESDAY = 16;  // 2^4
+    public const THURSDAY  = 32;  // 2^5
+    public const FRIDAY    = 64;  // 2^6
     public const ALL_DAYS  = 127; // 1+2+4+8+16+32+64
 
-    // Bitmask labels (for display)
+    // Bitmask labels (for display - ordered Saturday to Friday)
     public const DAY_LABELS = [
+        self::SATURDAY  => 'শনিবার',
         self::SUNDAY    => 'রবিবার',
         self::MONDAY    => 'সোমবার',
         self::TUESDAY   => 'মঙ্গলবার',
         self::WEDNESDAY => 'বুধবার',
         self::THURSDAY  => 'বৃহস্পতিবার',
         self::FRIDAY    => 'শুক্রবার',
-        self::SATURDAY  => 'শনিবার',
     ];
 
     // Ordered bit values for UI iteration
     public const DAY_BITS = [
-        self::SUNDAY, self::MONDAY, self::TUESDAY, self::WEDNESDAY,
-        self::THURSDAY, self::FRIDAY, self::SATURDAY,
+        self::SATURDAY, self::SUNDAY, self::MONDAY, self::TUESDAY,
+        self::WEDNESDAY, self::THURSDAY, self::FRIDAY,
     ];
 
     protected $fillable = [
@@ -93,7 +93,7 @@ class DonorAvailability extends Model
 
         return match ($this->type) {
             'weekly' => $this->weekdays_bitmask !== null
-                && ($this->weekdays_bitmask & (1 << $dt->dayOfWeek)) > 0
+                && ($this->weekdays_bitmask & self::bitForDay($dt->dayOfWeek)) > 0
                 && $inWindow,
 
             'specific_date' => $this->specific_date !== null
@@ -111,8 +111,9 @@ class DonorAvailability extends Model
     }
 
     // ── Static helper: day bit from Carbon dayOfWeek (0=Sun … 6=Sat) ────────
+    // Maps Carbon to BD Week: Sat=1, Sun=2, Mon=4, Tue=8, Wed=16, Thu=32, Fri=64
     public static function bitForDay(int $dayOfWeek): int
     {
-        return 1 << $dayOfWeek;
+        return 1 << (($dayOfWeek + 1) % 7);
     }
 }

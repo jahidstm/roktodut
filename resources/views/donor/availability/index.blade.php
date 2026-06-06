@@ -45,11 +45,11 @@
             <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
                 <h2 class="text-sm font-black text-slate-700 uppercase tracking-wider mb-3">⚡ দ্রুত সেটআপ</h2>
                 <div class="flex flex-wrap gap-2">
-                    <button type="button" onclick="applyPreset([32,64])"
+                    <button type="button" onclick="applyPreset([0,6])"
                             class="preset-btn px-3 py-1.5 rounded-full text-xs font-bold bg-red-50 text-red-700 border border-red-200 hover:bg-red-100 transition">
                         শুক্র–শনি (ছুটির দিন)
                     </button>
-                    <button type="button" onclick="applyPreset([1,2,3,4,5,16,8,4,2])"
+                    <button type="button" onclick="applyPreset([0,1,2,3,4,5,6])"
                             class="preset-btn px-3 py-1.5 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200 hover:bg-slate-200 transition"
                             data-bits="127">
                         সব দিন
@@ -58,7 +58,7 @@
                             class="preset-btn px-3 py-1.5 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition">
                         শুধু সকাল ৯টা–বিকাল ৫টা
                     </button>
-                    <button type="button" onclick="applyPreset([32,64], '10:00', '14:00')"
+                    <button type="button" onclick="applyPreset([0,6], '10:00', '14:00')"
                             class="preset-btn px-3 py-1.5 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 transition">
                         শুক্র–শনি সকাল
                     </button>
@@ -89,7 +89,7 @@
                     <div id="panel-weekly" class="tab-panel">
                         <label class="block text-xs font-bold text-slate-600 mb-3">কোন কোন দিন?</label>
                         <div class="grid grid-cols-7 gap-1.5 mb-4" id="weekday-grid">
-                            @foreach([0 => 'রবি', 1 => 'সোম', 2 => 'মঙ্গল', 3 => 'বুধ', 4 => 'বৃহঃ', 5 => 'শুক্র', 6 => 'শনি'] as $day => $label)
+                            @foreach([0 => 'শনি', 1 => 'রবি', 2 => 'সোম', 3 => 'মঙ্গল', 4 => 'বুধ', 5 => 'বৃহঃ', 6 => 'শুক্র'] as $day => $label)
                                 <label class="cursor-pointer">
                                     <input type="checkbox" name="weekdays[]" value="{{ $day }}" class="sr-only weekday-cb" id="day-{{ $day }}">
                                     <span id="day-pill-{{ $day }}"
@@ -171,15 +171,16 @@
                     </div>
                 @else
                     <div class="grid grid-cols-7 gap-1 text-center mb-2">
-                        @foreach(['র', 'সো', 'মঙ', 'বু', 'বৃ', 'শু', 'শ'] as $h)
+                        @foreach(['শ', 'র', 'সো', 'মঙ', 'বু', 'বৃ', 'শু'] as $h)
                             <div class="text-[10px] font-black text-slate-400">{{ $h }}</div>
                         @endforeach
                     </div>
 
                     @php
                         // Pad the start of the calendar to the correct weekday
+                        // Maps Carbon (Sun=0, Sat=6) to our BD UI (Sat=0, Sun=1)
                         $firstDay = $calendarDays[0]['date'];
-                        $padCount = $firstDay->dayOfWeek; // Carbon: 0=Sun
+                        $padCount = ($firstDay->dayOfWeek + 1) % 7; 
                     @endphp
 
                     <div class="grid grid-cols-7 gap-1">
