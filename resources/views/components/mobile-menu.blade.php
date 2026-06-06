@@ -45,12 +45,28 @@
                 <a href="{{ route('home') }}" class="flex items-center px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors {{ request()->routeIs('home') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
                     হোম
                 </a>
-                <a href="{{ $requestsRoute }}" class="flex items-center px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors {{ request()->routeIs('requests') || request()->routeIs('requests.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
-                    রক্তের অনুরোধ
-                </a>
-                <a href="{{ route('search') }}" class="flex items-center px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors {{ request()->routeIs('search') || request()->routeIs('search.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
-                    রক্তদাতা খুঁজুন
-                </a>
+                {{-- 1 & 2. রক্ত খুঁজুন (Accordion) --}}
+                <div x-data="{ openMenu: {{ request()->routeIs('requests.*') || request()->routeIs('requests') || request()->routeIs('search.*') || request()->routeIs('search') ? 'true' : 'false' }} }" class="flex flex-col">
+                    <button @click="openMenu = !openMenu" class="flex items-center justify-between px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors w-full text-left {{ request()->routeIs('requests.*') || request()->routeIs('requests') || request()->routeIs('search.*') || request()->routeIs('search') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
+                        <span>রক্ত খুঁজুন</span>
+                        <svg class="w-4 h-4 transition-transform duration-200" :class="openMenu ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                    </button>
+                    
+                    <div x-show="openMenu" x-collapse class="pl-4 pr-2 pt-1 flex flex-col gap-1">
+                        <a href="{{ $requestsRoute }}" class="flex items-center gap-3 px-3 py-3 rounded-xl transition-colors {{ request()->routeIs('requests') || request()->routeIs('requests.*') ? 'bg-red-50/80 text-red-700 font-bold' : 'text-slate-600 hover:bg-slate-50' }}">
+                            <div class="p-1.5 rounded-lg {{ request()->routeIs('requests') || request()->routeIs('requests.*') ? 'bg-red-100 text-red-600' : 'bg-slate-100 text-slate-500' }}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            </div>
+                            <span class="text-sm">রক্তের অনুরোধ</span>
+                        </a>
+                        <a href="{{ route('search') }}" class="flex items-center gap-3 px-3 py-3 rounded-xl transition-colors {{ request()->routeIs('search') || request()->routeIs('search.*') ? 'bg-emerald-50/80 text-emerald-700 font-bold' : 'text-slate-600 hover:bg-slate-50' }}">
+                            <div class="p-1.5 rounded-lg {{ request()->routeIs('search') || request()->routeIs('search.*') ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100 text-slate-500' }}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                            <span class="text-sm">রক্তদাতা খুঁজুন</span>
+                        </a>
+                    </div>
+                </div>
                 <a href="{{ route('blood-bank.index') }}" class="flex items-center px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors {{ request()->routeIs('blood-bank.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
                     ব্লাড ব্যাংক
                 </a>

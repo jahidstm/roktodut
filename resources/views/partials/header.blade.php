@@ -38,25 +38,56 @@
                     <div class="absolute top-1.5 bottom-1.5 bg-slate-200/80 rounded-full transition-all duration-300 ease-out z-0 pointer-events-none"
                          :style="`left: ${left}px; width: ${width}px; opacity: ${opacity}; transform: scale(${opacity ? 1 : 0.95})`"></div>
 
-                    {{-- 1. রক্তের অনুরোধ --}}
-                    <a href="{{ $requestsRoute }}"
-                       @mouseenter="left = $el.offsetLeft; width = $el.offsetWidth; opacity = 1"
-                       class="relative z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors duration-300 ease-out
-                              {{ request()->routeIs('requests') || request()->routeIs('requests.*') 
-                                 ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
-                                 : 'text-slate-600 hover:text-slate-900' }}">
-                        রক্তের অনুরোধ
-                    </a>
+                    {{-- 1 & 2. রক্ত খুঁজুন (Dropdown) --}}
+                    <div x-data="{ openDropdown: false }" 
+                         @mouseenter="openDropdown = true; left = $el.offsetLeft; width = $el.offsetWidth; opacity = 1" 
+                         @mouseleave="openDropdown = false" 
+                         class="relative z-10 flex items-center">
+                        <button type="button"
+                           class="flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors duration-300 ease-out
+                                  {{ request()->routeIs('requests.*') || request()->routeIs('requests') || request()->routeIs('search.*') || request()->routeIs('search')
+                                     ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
+                                     : 'text-slate-600 hover:text-slate-900' }}">
+                            রক্ত খুঁজুন
+                            <svg class="w-4 h-4 transition-transform duration-200" :class="openDropdown ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                        </button>
 
-                    {{-- 2. রক্তদাতা খুঁজুন --}}
-                    <a href="{{ route('search') }}"
-                       @mouseenter="left = $el.offsetLeft; width = $el.offsetWidth; opacity = 1"
-                       class="relative z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors duration-300 ease-out
-                              {{ request()->routeIs('search') || request()->routeIs('search.*') 
-                                 ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
-                                 : 'text-slate-600 hover:text-slate-900' }}">
-                        রক্তদাতা খুঁজুন
-                    </a>
+                        {{-- Dropdown Panel --}}
+                        <div x-show="openDropdown" 
+                             x-transition:enter="transition ease-out duration-200"
+                             x-transition:enter-start="opacity-0 translate-y-2 scale-95"
+                             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave="transition ease-in duration-100"
+                             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+                             x-transition:leave-end="opacity-0 translate-y-2 scale-95"
+                             class="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-64 z-50"
+                             x-cloak>
+                             <div class="bg-white rounded-2xl shadow-xl ring-1 ring-slate-900/5 p-2 overflow-hidden">
+                                 
+                                 {{-- Link 1: রক্তের অনুরোধ --}}
+                                 <a href="{{ $requestsRoute }}" class="flex items-start gap-3 p-3 rounded-xl hover:bg-red-50/80 transition-colors group">
+                                     <div class="bg-red-100 text-red-600 p-2 rounded-lg group-hover:bg-red-200 transition-colors shrink-0">
+                                         <svg class="w-5 h-5 transform transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                                     </div>
+                                     <div>
+                                         <p class="text-sm font-black text-slate-800 group-hover:text-red-700 transition-colors">রক্তের অনুরোধ</p>
+                                         <p class="text-[10px] text-slate-500 font-medium mt-0.5 leading-snug">চলমান জরুরি রক্তের রিকোয়েস্টগুলো দেখুন</p>
+                                     </div>
+                                 </a>
+
+                                 {{-- Link 2: রক্তদাতা খুঁজুন --}}
+                                 <a href="{{ route('search') }}" class="flex items-start gap-3 p-3 rounded-xl hover:bg-emerald-50/80 transition-colors mt-1 group">
+                                     <div class="bg-emerald-100 text-emerald-600 p-2 rounded-lg group-hover:bg-emerald-200 transition-colors shrink-0">
+                                         <svg class="w-5 h-5 transform transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                     </div>
+                                     <div>
+                                         <p class="text-sm font-black text-slate-800 group-hover:text-emerald-700 transition-colors">রক্তদাতা খুঁজুন</p>
+                                         <p class="text-[10px] text-slate-500 font-medium mt-0.5 leading-snug">নির্দিষ্ট এলাকায় ফিল্টার করে ডোনার খুঁজুন</p>
+                                     </div>
+                                 </a>
+                             </div>
+                        </div>
+                    </div>
 
                     {{-- 2.5 ব্লাড ব্যাংক --}}
                     <a href="{{ route('blood-bank.index') }}"
