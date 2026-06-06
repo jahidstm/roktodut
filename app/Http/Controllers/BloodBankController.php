@@ -6,6 +6,7 @@ use App\Enums\BloodGroup;
 use App\Models\BloodInventory;
 use App\Models\District;
 use App\Models\Division;
+use App\Models\Upazila;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 
@@ -19,9 +20,15 @@ class BloodBankController extends Controller
     {
         $divisions = Division::orderBy('name')->get();
         $districts = collect();
+        $upazilas = collect();
 
         if ($request->filled('division_id')) {
             $districts = District::where('division_id', $request->division_id)
+                ->orderBy('name')->get();
+        }
+
+        if ($request->filled('district_id')) {
+            $upazilas = Upazila::where('district_id', $request->district_id)
                 ->orderBy('name')->get();
         }
 
@@ -33,6 +40,10 @@ class BloodBankController extends Controller
 
         if ($request->filled('district_id')) {
             $query->where('district', $request->district_id);
+        }
+        
+        if ($request->filled('upazila_id')) {
+            $query->where('upazila', $request->upazila_id);
         }
 
         if ($request->filled('blood_group')) {
@@ -47,7 +58,7 @@ class BloodBankController extends Controller
         $bloodGroups = collect(BloodGroup::cases())->map(fn($bg) => $bg->value);
 
         return view('public.blood-bank.index', compact(
-            'bloodBanks', 'bloodGroups', 'divisions', 'districts'
+            'bloodBanks', 'bloodGroups', 'divisions', 'districts', 'upazilas'
         ));
     }
 

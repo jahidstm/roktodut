@@ -17,8 +17,8 @@
 
             {{-- Search Form --}}
             <form method="GET" action="{{ route('blood-bank.index') }}"
-                  class="bg-white rounded-2xl p-4 shadow-2xl max-w-2xl mx-auto">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  class="bg-white rounded-2xl p-4 shadow-2xl max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     {{-- Blood Group --}}
                     <select name="blood_group"
                             class="rounded-xl border border-slate-200 px-3 py-2.5 text-slate-700 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
@@ -44,11 +44,23 @@
 
                     {{-- District --}}
                     <select name="district_id"
-                            class="rounded-xl border border-slate-200 px-3 py-2.5 text-slate-700 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+                            class="rounded-xl border border-slate-200 px-3 py-2.5 text-slate-700 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                            onchange="this.form.submit()">
                         <option value="">সব জেলা</option>
                         @foreach($districts as $dist)
                             <option value="{{ $dist->id }}" {{ request('district_id') == $dist->id ? 'selected' : '' }}>
                                 {{ $dist->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    {{-- Upazila --}}
+                    <select name="upazila_id"
+                            class="rounded-xl border border-slate-200 px-3 py-2.5 text-slate-700 font-semibold text-sm focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <option value="">উপজেলা / এরিয়া</option>
+                        @foreach($upazilas as $upa)
+                            <option value="{{ $upa->id }}" {{ request('upazila_id') == $upa->id ? 'selected' : '' }}>
+                                {{ $upa->name }}
                             </option>
                         @endforeach
                     </select>
