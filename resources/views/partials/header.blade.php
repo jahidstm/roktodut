@@ -58,6 +58,16 @@
                         রক্তদাতা খুঁজুন
                     </a>
 
+                    {{-- 2.5 ব্লাড ব্যাংক --}}
+                    <a href="{{ route('blood-bank.index') }}"
+                       @mouseenter="left = $el.offsetLeft; width = $el.offsetWidth; opacity = 1"
+                       class="relative z-10 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-semibold whitespace-nowrap transition-colors duration-300 ease-out
+                              {{ request()->routeIs('blood-bank.*') 
+                                 ? 'text-red-600 bg-white shadow-sm ring-1 ring-slate-900/5' 
+                                 : 'text-slate-600 hover:text-slate-900' }}">
+                        ব্লাড ব্যাংক
+                    </a>
+
                     {{-- 3. লাইভ ম্যাপ --}}
                     <a href="{{ route('live-demand.index') }}"
                        @mouseenter="left = $el.offsetLeft; width = $el.offsetWidth; opacity = 1"

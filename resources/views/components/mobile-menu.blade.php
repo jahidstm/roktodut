@@ -51,6 +51,9 @@
                 <a href="{{ route('search') }}" class="flex items-center px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors {{ request()->routeIs('search') || request()->routeIs('search.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
                     রক্তদাতা খুঁজুন
                 </a>
+                <a href="{{ route('blood-bank.index') }}" class="flex items-center px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors {{ request()->routeIs('blood-bank.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
+                    ব্লাড ব্যাংক
+                </a>
                 <a href="{{ route('live-demand.index') }}" class="flex items-center px-4 py-3.5 min-h-[44px] rounded-xl font-bold transition-colors {{ request()->routeIs('live-demand.*') ? 'bg-red-50 text-red-600' : 'text-slate-700 hover:bg-slate-50' }}">
                     লাইভ ম্যাপ
                 </a>

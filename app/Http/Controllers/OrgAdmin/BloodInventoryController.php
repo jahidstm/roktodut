@@ -127,8 +127,8 @@ class BloodInventoryController extends Controller
             return response()->json(['success' => false, 'message' => 'অর্গানাইজেশন পাওয়া যায়নি।'], 404);
         }
 
-        $current = BloodInventory::where('organization_id', $org->id)->first();
-        $newValue = $current ? !$current->is_accepting_donations : false;
+        // Get intended state from frontend
+        $newValue = $request->boolean('state');
 
         // সব blood group-এর জন্য একসাথে toggle
         BloodInventory::where('organization_id', $org->id)

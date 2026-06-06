@@ -13,24 +13,35 @@
         </div>
 
         {{-- Accepting Toggle --}}
-        <div id="toggle-accepting-wrap" class="flex items-center gap-3">
-            @php
-                $isAccepting = $rows->where('is_accepting_donations', true)->isNotEmpty()
-                               && $rows->first()?->exists;
-                $firstRow = $rows->first(fn($r) => $r->exists);
-                $accepting = $firstRow ? $firstRow->is_accepting_donations : true;
-            @endphp
+        @php
+            $firstRow = $rows->first(fn($r) => $r->exists);
+            $accepting = $firstRow ? $firstRow->is_accepting_donations : true;
+        @endphp
+        <div id="toggle-accepting-wrap" class="flex items-center gap-3"
+             x-data="{ accepting: {{ $accepting ? 'true' : 'false' }}, loading: false }">
             <span class="text-sm font-semibold text-slate-600">আজ Donation নিচ্ছি:</span>
-            <button id="toggle-accepting-btn"
-                    onclick="toggleAccepting()"
-                    class="relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300 focus:outline-none {{ $accepting ? 'bg-emerald-500' : 'bg-slate-300' }}"
-                    aria-pressed="{{ $accepting ? 'true' : 'false' }}">
-                <span id="toggle-dot"
-                      class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-300 {{ $accepting ? 'translate-x-6' : 'translate-x-1' }}">
+            <button type="button"
+                    @click="
+                        if(loading) return;
+                        loading = true;
+                        fetch('{{ route('org.inventory.toggle') }}', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content },
+                            body: JSON.stringify({ state: !accepting })
+                        }).then(r => r.json()).then(data => {
+                            if(data.success) { accepting = data.accepting; document.getElementById('accepting-hidden').value = accepting ? '1' : '0'; }
+                        }).finally(() => loading = false);
+                    "
+                    class="relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300 focus:outline-none"
+                    :class="accepting ? 'bg-emerald-500' : 'bg-slate-300'"
+                    :aria-pressed="accepting.toString()">
+                <span class="inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-300"
+                      :class="accepting ? 'translate-x-6' : 'translate-x-1'">
                 </span>
             </button>
-            <span id="toggle-label" class="text-sm font-bold {{ $accepting ? 'text-emerald-600' : 'text-slate-400' }}">
-                {{ $accepting ? 'হ্যাঁ' : 'না' }}
+            <span class="text-sm font-bold"
+                  :class="accepting ? 'text-emerald-600' : 'text-slate-400'"
+                  x-text="accepting ? 'হ্যাঁ' : 'না'">
             </span>
         </div>
     </div>
@@ -65,19 +76,19 @@
 
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
             {{-- Table Header --}}
-            <div class="grid grid-cols-12 bg-slate-50 border-b border-slate-200 px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-500">
-                <div class="col-span-3">রক্তের গ্রুপ</div>
-                <div class="col-span-4">পরিমাণ (ব্যাগ)</div>
-                <div class="col-span-5">অবস্থা</div>
+            <div class="flex items-center justify-between bg-slate-50 border-b border-slate-200 px-6 py-3 text-xs font-black uppercase tracking-widest text-slate-500">
+                <div class="w-1/3">রক্তের গ্রুপ</div>
+                <div class="w-1/3 flex justify-center text-center">পরিমাণ (ব্যাগ)</div>
+                <div class="w-1/3 flex justify-end text-right">অবস্থা</div>
             </div>
 
             {{-- Blood Group Rows --}}
             @foreach($rows as $i => $row)
-            <div class="grid grid-cols-12 items-center px-6 py-4 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 last:border-0 hover:bg-slate-50 transition">
                 <input type="hidden" name="inventory[{{ $i }}][blood_group]" value="{{ $row->blood_group }}">
 
                 {{-- Blood Group Badge --}}
-                <div class="col-span-3">
+                <div class="w-1/3">
                     <span class="inline-flex items-center justify-center w-12 h-12 rounded-2xl font-black text-lg
                         @if(str_contains($row->blood_group, 'O')) bg-red-100 text-red-700
                         @elseif(str_contains($row->blood_group, 'AB')) bg-purple-100 text-purple-700
@@ -88,7 +99,7 @@
                 </div>
 
                 {{-- Units Input --}}
-                <div class="col-span-4">
+                <div class="w-1/3 flex justify-center">
                     <div class="flex items-center gap-2">
                         <button type="button"
                                 onclick="changeUnit(this, -1)"
@@ -110,7 +121,7 @@
                 </div>
 
                 {{-- Status Badge --}}
-                <div class="col-span-5">
+                <div class="w-1/3 flex justify-end">
                     <span class="status-badge inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border
                         {{ ($row->units_available ?? 0) >= 5 ? 'bg-emerald-100 text-emerald-700 border-emerald-200' :
                            (($row->units_available ?? 0) >= 1 ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-red-100 text-red-600 border-red-200') }}">
@@ -179,20 +190,20 @@
 
 @push('scripts')
 <script>
-    function changeUnit(btn, delta) {
-        const row = btn.closest('.grid');
+    window.changeUnit = function(btn, delta) {
+        const row = btn.closest('.flex');
         const input = row.querySelector('.unit-input');
         const newVal = Math.max(0, Math.min(9999, parseInt(input.value || 0) + delta));
         input.value = newVal;
-        updateStatusForInput(input, newVal);
-    }
+        window.updateStatusForInput(input, newVal);
+    };
 
-    function updateStatus(input) {
-        updateStatusForInput(input, parseInt(input.value || 0));
-    }
+    window.updateStatus = function(input) {
+        window.updateStatusForInput(input, parseInt(input.value || 0));
+    };
 
-    function updateStatusForInput(input, val) {
-        const row = input.closest('.grid');
+    window.updateStatusForInput = function(input, val) {
+        const row = input.closest('.flex');
         const badge = row.querySelector('.status-badge');
         const dot = row.querySelector('.status-dot');
         const text = row.querySelector('.status-text');
@@ -212,9 +223,9 @@
             badge.classList.add('bg-red-100', 'text-red-600', 'border-red-200');
             dot.textContent = '❌'; text.textContent = 'নেই';
         }
-    }
+    };
 
-    async function toggleAccepting() {
+    window.toggleAccepting = async function() {
         const btn = document.getElementById('toggle-accepting-btn');
         const dot = document.getElementById('toggle-dot');
         const label = document.getElementById('toggle-label');
