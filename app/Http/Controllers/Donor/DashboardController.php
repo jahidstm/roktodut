@@ -228,7 +228,7 @@ class DashboardController extends Controller
         // ── ১০. Chronic Buddy Subscriptions ──────────────────────────────────
         $buddySubscriptions = $user->buddySubscriptions()
             ->with(['hospital', 'district', 'upazila'])
-            ->wherePivot('is_active', true)
+            ->where('chronic_subscription_buddies.is_active', true)
             ->get();
 
         // ── ১১. Welcome-back popup flag ───────────────────────────────────────
