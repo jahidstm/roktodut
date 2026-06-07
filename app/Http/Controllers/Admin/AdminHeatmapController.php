@@ -9,14 +9,16 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AdminHeatmapController extends Controller
 {
-    private const VALID_RANGES = ['all_time', 'today', 'last_7_days', 'last_30_days'];
+    private const VALID_RANGES       = ['all_time', 'today', 'last_7_days', 'last_30_days'];
+    private const VALID_BLOOD_GROUPS = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
 
     public function __construct(private SpatialAnalyticsService $spatialService) {}
 
     public function index(Request $request)
     {
         $dateRange   = $this->resolveRange($request);
-        $heatmapData = $this->spatialService->getHeatmapData($dateRange);
+        $bloodGroup  = $this->resolveBloodGroup($request);
+        $heatmapData = $this->spatialService->getHeatmapData($dateRange, $bloodGroup);
 
         return view('admin.analytics.heatmap', [
             'heatmapData'  => $heatmapData,
@@ -24,6 +26,7 @@ class AdminHeatmapController extends Controller
             'criticalCount'=> collect($heatmapData)->filter(fn($d) => $d['crs'] > 50)->count(),
             'generatedAt'  => now()->format('d M Y, h:i A'),
             'dateRange'    => $dateRange,
+            'bloodGroup'   => $bloodGroup,
         ]);
     }
 
@@ -34,7 +37,8 @@ class AdminHeatmapController extends Controller
     public function exportCsv(Request $request): StreamedResponse
     {
         $dateRange   = $this->resolveRange($request);
-        $heatmapData = $this->spatialService->getHeatmapData($dateRange);
+        $bloodGroup  = $this->resolveBloodGroup($request);
+        $heatmapData = $this->spatialService->getHeatmapData($dateRange, $bloodGroup);
         $districtMap = $this->spatialService->getDistrictMap();   // BN => EN
         $enToBn      = array_flip($districtMap);                  // EN => BN
 
@@ -44,7 +48,9 @@ class AdminHeatmapController extends Controller
             'last_30_days' => 'last_30_days',
             default        => 'all_time',
         };
-        $fileName = "heatmap_export_{$rangeLabel}_" . now()->format('Y_m_d_His') . '.csv';
+        
+        $bgLabel = $bloodGroup ? '_' . str_replace(['+', '-'], ['_pos', '_neg'], $bloodGroup) : '';
+        $fileName = "heatmap_export_{$rangeLabel}{$bgLabel}_" . now()->format('Y_m_d_His') . '.csv';
 
         return response()->streamDownload(function () use ($heatmapData, $enToBn) {
             $handle = fopen('php://output', 'w');
@@ -84,6 +90,12 @@ class AdminHeatmapController extends Controller
     {
         $range = $request->query('range', 'all_time');
         return in_array($range, self::VALID_RANGES, true) ? $range : 'all_time';
+    }
+
+    private function resolveBloodGroup(Request $request): ?string
+    {
+        $group = $request->query('group');
+        return in_array($group, self::VALID_BLOOD_GROUPS, true) ? $group : null;
     }
 }
 

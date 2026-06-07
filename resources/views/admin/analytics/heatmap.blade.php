@@ -120,6 +120,19 @@
             color: #fff; box-shadow: 0 2px 6px rgba(20,184,166,0.3);
         }
 
+        /* ══ Blood Group Filter Toolbar ══════════════════════ */
+        .bg-btn {
+            font-size: 0.72rem; font-weight: 700;
+            padding: 0.38rem 0.85rem; border-radius: 9999px;
+            border: 1px solid #e2e8f0; background: #fff; color: #475569;
+            cursor: pointer; transition: all 0.15s; white-space: nowrap;
+        }
+        .bg-btn:hover { border-color: #dc2626; color: #dc2626; }
+        .bg-btn.active {
+            background: #dc2626; border-color: #dc2626;
+            color: #fff; box-shadow: 0 2px 6px rgba(220,38,38,0.3);
+        }
+
         /* ══ Map ════════════════════════════════════════════ */
         #admin-map {
             width: calc(100% - 24px);
@@ -220,6 +233,36 @@
         .att-badge { display: inline-block; font-size: 0.6rem; font-weight: 800; padding: 0.12rem 0.5rem; border-radius: 9999px; background: #f1f5f9; color: #475569; margin-bottom: 0.5rem; }
         .att-row  { display: flex; justify-content: space-between; font-size: 0.73rem; color: #475569; margin-bottom: 0.25rem; }
         .att-row span { font-weight: 700; color: #0f172a; }
+
+        /* Blood group breakdown bar */
+        .tt-bg-section {
+            margin-top: 0.55rem; padding-top: 0.45rem;
+            border-top: 1px solid #f1f5f9;
+        }
+        .tt-bg-label {
+            font-size: 0.6rem; font-weight: 700; color: #94a3b8;
+            text-transform: uppercase; letter-spacing: 0.08em;
+            margin-bottom: 0.35rem;
+        }
+        .tt-bg-row {
+            display: flex; align-items: center; gap: 0.45rem;
+            margin-bottom: 0.22rem;
+        }
+        .tt-bg-name {
+            font-size: 0.68rem; font-weight: 800; color: #dc2626;
+            width: 30px; flex-shrink: 0;
+        }
+        .tt-bg-bar-wrap {
+            flex: 1; background: #f1f5f9; border-radius: 3px; height: 6px; overflow: hidden;
+        }
+        .tt-bg-bar {
+            height: 100%; background: #dc2626; border-radius: 3px;
+            transition: width 0.4s ease;
+        }
+        .tt-bg-count {
+            font-size: 0.67rem; font-weight: 700; color: #374151;
+            width: 18px; text-align: right; flex-shrink: 0;
+        }
 
         /* Leaflet chrome */
         .leaflet-control-attribution { display: none !important; }
@@ -327,7 +370,21 @@
                 <button class="range-btn {{ $dateRange === 'today' ? 'active' : '' }}" data-range="today">আজকে</button>
                 <button class="range-btn {{ $dateRange === 'last_7_days' ? 'active' : '' }}" data-range="last_7_days">গত ৭ দিন</button>
                 <button class="range-btn {{ $dateRange === 'last_30_days' ? 'active' : '' }}" data-range="last_30_days">গত ৩০ দিন</button>
+                <span style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 0.5rem;"></span>
                 <span id="range-label" style="margin-left:auto;font-size:0.68rem;color:#94a3b8;font-weight:600;align-self:center;"></span>
+            </div>
+            
+            <div class="range-toolbar" id="bg-toolbar" style="padding-top: 0.25rem; border-top: none; overflow-x: auto;">
+                <span style="font-size: 0.68rem; font-weight: 700; color: #94a3b8; align-self: center; margin-right: 0.2rem;">গ্রুপ:</span>
+                <button class="bg-btn {{ empty($bloodGroup) ? 'active' : '' }}" data-bg="">সব</button>
+                <button class="bg-btn {{ $bloodGroup === 'A+' ? 'active' : '' }}" data-bg="A+">A+</button>
+                <button class="bg-btn {{ $bloodGroup === 'A-' ? 'active' : '' }}" data-bg="A-">A-</button>
+                <button class="bg-btn {{ $bloodGroup === 'B+' ? 'active' : '' }}" data-bg="B+">B+</button>
+                <button class="bg-btn {{ $bloodGroup === 'B-' ? 'active' : '' }}" data-bg="B-">B-</button>
+                <button class="bg-btn {{ $bloodGroup === 'O+' ? 'active' : '' }}" data-bg="O+">O+</button>
+                <button class="bg-btn {{ $bloodGroup === 'O-' ? 'active' : '' }}" data-bg="O-">O-</button>
+                <button class="bg-btn {{ $bloodGroup === 'AB+' ? 'active' : '' }}" data-bg="AB+">AB+</button>
+                <button class="bg-btn {{ $bloodGroup === 'AB-' ? 'active' : '' }}" data-bg="AB-">AB-</button>
             </div>
 
             <div class="map-frame">
@@ -370,7 +427,7 @@
 
             {{-- ✅ Export CSV Button --}}
             <div style="padding:0.75rem 0 0.25rem;">
-                <a id="export-btn" href="{{ route('admin.heatmap.export') }}?range={{ $dateRange }}"
+                <a id="export-btn" href="{{ route('admin.heatmap.export') }}?range={{ $dateRange }}&group={{ $bloodGroup }}"
                    class="export-btn">
                     <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -429,10 +486,32 @@
         attributionControl: false, maxBoundsViscosity: 1.0,
     });
 
+    // ══ Build blood-group breakdown HTML ═════════════════════
+    function buildBgBreakdown(bgGroups) {
+        if (!bgGroups || Object.keys(bgGroups).length === 0) return '';
+
+        const maxCnt = Math.max(...Object.values(bgGroups));
+        const sorted = Object.entries(bgGroups).sort((a, b) => b[1] - a[1]);
+        const rows   = sorted.map(([grp, cnt]) => {
+            const pct = maxCnt > 0 ? Math.round((cnt / maxCnt) * 100) : 0;
+            return `<div class="tt-bg-row">
+                <span class="tt-bg-name">${grp}</span>
+                <div class="tt-bg-bar-wrap"><div class="tt-bg-bar" style="width:${pct}%"></div></div>
+                <span class="tt-bg-count">${cnt}</span>
+            </div>`;
+        }).join('');
+
+        return `<div class="tt-bg-section">
+            <div class="tt-bg-label">ব্লাড গ্রুপ বিভাজন</div>
+            ${rows}
+        </div>`;
+    }
+
     const BASE_OP = 0.85, HOVER_OP = 1.0, BASE_W = 1.5, HOVER_W = 2.5;
     let geoLayer = null;
     let geojsonData = null;
     let currentRange = '{{ $dateRange }}';
+    let currentBg = '{{ $bloodGroup ?? "" }}';
 
     // ══ Fetch GeoJSON once ═══════════════════════════════════
     async function loadGeoJSON() {
@@ -440,9 +519,12 @@
         return await res.json();
     }
 
-    // ══ Fetch heatmap data by range ══════════════════════════
-    async function fetchHeatmap(range) {
-        const res = await fetch(`/api/analytics/spatial-heatmap?range=${range}`);
+    // ══ Fetch heatmap data by range & group ══════════════════
+    async function fetchHeatmap(range, bg) {
+        const url = new URL(window.location.origin + '/api/analytics/spatial-heatmap');
+        if (range) url.searchParams.set('range', range);
+        if (bg) url.searchParams.set('group', bg);
+        const res = await fetch(url);
         return await res.json();
     }
 
@@ -468,6 +550,8 @@
                 if (info.crs > 30 && info.crs <= 50) warningCount++;
                 if (info.demand > 0) topList.push({ en, demand: info.demand, crs: info.crs });
 
+                const bgBreakdown = buildBgBreakdown(info.blood_groups);
+
                 // ✅ Admin tooltip — raw metrics
                 layer.bindTooltip(`
                     <div class="att-card">
@@ -476,6 +560,7 @@
                         <div class="att-row"><span>চাহিদা (Demand)</span><span>${info.demand} টি</span></div>
                         <div class="att-row"><span>ডোনার সংকট (DFI)</span><span>${info.avg_dfi}</span></div>
                         <div class="att-row"><span>ঝুঁকি (CRS)</span><span style="color:${getColor(info.crs)};font-size:0.85rem;font-weight:800;">${info.crs}</span></div>
+                        ${bgBreakdown}
                     </div>`, {
                     sticky: true, permanent: false,
                     direction: 'top', className: 'admin-tt', offset: [0, -8],
@@ -524,7 +609,9 @@
         `).join('') || '<p style="font-size:0.73rem;color:#94a3b8;">কোনো সক্রিয় রিকোয়েস্ট নেই।</p>';
 
         // Update export link
-        document.getElementById('export-btn').href = `/admin/heatmap/export?range=${currentRange}`;
+        let exportUrl = `/admin/heatmap/export?range=${currentRange}`;
+        if (currentBg) exportUrl += `&group=${encodeURIComponent(currentBg)}`;
+        document.getElementById('export-btn').href = exportUrl;
     }
 
     // ══ Show / hide loading overlay ══════════════════════════
@@ -532,18 +619,22 @@
         document.getElementById('map-loading').style.display = show ? 'flex' : 'none';
     }
 
-    // ══ Switch range ═════════════════════════════════════════
-    async function switchRange(range) {
+    // ══ Switch filter ════════════════════════════════════════
+    async function switchFilter(range, bg) {
         currentRange = range;
+        currentBg = bg;
 
         // Update toolbar button states
         document.querySelectorAll('.range-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.range === range);
         });
+        document.querySelectorAll('.bg-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.bg === bg);
+        });
 
         showLoading(true);
         try {
-            const data = await fetchHeatmap(range);
+            const data = await fetchHeatmap(range, bg);
             renderLayer(data);
             document.getElementById('range-label').textContent = rangeBn[range] || '';
         } catch (err) {
@@ -584,11 +675,17 @@
             showLoading(false);
         }
 
-        // ── Date-range button click ───────────────────────
+        // ── Filter button clicks ──────────────────────────────
         document.getElementById('range-toolbar').addEventListener('click', e => {
             const btn = e.target.closest('.range-btn');
             if (!btn || btn.dataset.range === currentRange) return;
-            switchRange(btn.dataset.range);
+            switchFilter(btn.dataset.range, currentBg);
+        });
+
+        document.getElementById('bg-toolbar').addEventListener('click', e => {
+            const btn = e.target.closest('.bg-btn');
+            if (!btn || btn.dataset.bg === currentBg) return;
+            switchFilter(currentRange, btn.dataset.bg);
         });
     })();
 })();

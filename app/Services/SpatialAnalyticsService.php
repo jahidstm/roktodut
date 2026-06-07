@@ -158,7 +158,10 @@ class SpatialAnalyticsService
         $bgRows = $bgQuery->get();
         $bgByDistrict = [];
         foreach ($bgRows as $row) {
-            $bgByDistrict[$row->district_name][$row->blood_group] = (int) $row->cnt;
+            $bgKey = $row->blood_group instanceof \App\Enums\BloodGroup 
+                ? $row->blood_group->value 
+                : (string) $row->blood_group;
+            $bgByDistrict[$row->district_name][$bgKey] = (int) $row->cnt;
         }
 
         // ── 3. Total demand per district (from the breakdown) ─────────────
