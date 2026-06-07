@@ -103,7 +103,11 @@ class ChatController extends Controller
             'is_read' => false,
         ]);
 
-        MessageSent::dispatch($message);
+        try {
+            broadcast(new MessageSent($message))->toOthers();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Chat broadcast failed: ' . $e->getMessage());
+        }
 
         // Notify the OTHER user
         $requesterId = (int) ($response->bloodRequest?->requested_by ?? 0);

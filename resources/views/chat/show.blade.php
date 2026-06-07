@@ -42,12 +42,20 @@
 
                         <template x-for="msg in messages" :key="msg.id">
                             <div class="flex" :class="isMine(msg) ? 'justify-end' : 'justify-start'">
-                                <div class="max-w-[80%] px-4 py-2.5 shadow-sm"
-                                     :class="isMine(msg)
-                                        ? 'bg-red-600 text-white rounded-l-2xl rounded-br-2xl'
-                                        : 'bg-white border border-slate-200 text-slate-900 rounded-r-2xl rounded-bl-2xl'">
+                                <div class="max-w-[80%] px-4 py-2.5 shadow-sm transition-all duration-300"
+                                     :class="[
+                                         isMine(msg)
+                                            ? 'bg-red-600 text-white rounded-l-2xl rounded-br-2xl'
+                                            : 'bg-white border border-slate-200 text-slate-900 rounded-r-2xl rounded-bl-2xl',
+                                         msg.is_sending ? 'opacity-60' : 'opacity-100'
+                                     ]">
                                     <p class="text-sm font-semibold whitespace-pre-line" x-text="msg.message"></p>
-                                    <div class="mt-1 text-[10px] font-semibold opacity-70" x-text="formatTime(msg.created_at)"></div>
+                                    <div class="mt-1 flex items-center justify-end gap-1 text-[10px] font-semibold opacity-70">
+                                        <span x-text="formatTime(msg.created_at)"></span>
+                                        <template x-if="msg.is_sending">
+                                            <svg class="w-3 h-3 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                        </template>
+                                    </div>
                                 </div>
                             </div>
                         </template>
@@ -123,54 +131,71 @@
                 }
                 window.Echo
                     .private(`chat.response.${this.responseId}`)
-                    .listen('MessageSent', (event) => {
+                    .listen('.MessageSent', (event) => {
                         if (!event || this.messageIds.has(event.id)) {
                             return;
                         }
-                        this.messages.push({
+                        this.messages = [...this.messages, {
                             id: event.id,
                             sender_id: event.sender_id,
                             message: event.message,
                             created_at: event.created_at,
-                        });
+                        }];
                         this.messageIds.add(event.id);
                         this.scrollToBottom();
                     });
             },
             async sendMessage(overrideText = null) {
                 if (this.isClosed) return;
-                const text = String(overrideText ?? this.newMessage).trim();
+                
+                const isEvent = overrideText && typeof overrideText === 'object' && overrideText instanceof Event;
+                const text = String(!isEvent && overrideText ? overrideText : this.newMessage).trim();
+                
                 if (!text || this.sending) return;
 
+                const tempId = 'temp_' + Date.now();
+                const tempMessage = {
+                    id: tempId,
+                    sender_id: this.userId,
+                    message: text,
+                    created_at: new Date().toISOString(),
+                    is_sending: true
+                };
+
+                this.messages = [...this.messages, tempMessage];
+                this.messageIds.add(tempId);
+                this.newMessage = ''; 
+                this.scrollToBottom();
+
                 this.sending = true;
-                const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
                 try {
-                    const response = await fetch(this.postUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json',
-                            'X-CSRF-TOKEN': csrf,
-                        },
-                        credentials: 'same-origin',
-                        body: JSON.stringify({ message: text }),
-                    });
+                    const response = await window.axios.post(this.postUrl, { message: text });
+                    const data = response.data;
 
-                    const data = await response.json().catch(() => ({}));
-                    if (!response.ok) {
-                        throw new Error(data?.message || 'মেসেজ পাঠানো যায়নি।');
+                    if (data?.message) {
+                        // Ensure we aren't duplicating if Echo beat us to it
+                        if (!this.messageIds.has(data.message.id)) {
+                            this.messages = this.messages.map(m => m.id === tempId ? data.message : m);
+                            this.messageIds.delete(tempId);
+                            this.messageIds.add(data.message.id);
+                        } else {
+                            // Echo already added it, just remove our temp
+                            this.messages = this.messages.filter(m => m.id !== tempId);
+                            this.messageIds.delete(tempId);
+                        }
                     }
 
-                    if (data?.message && !this.messageIds.has(data.message.id)) {
-                        this.messages.push(data.message);
-                        this.messageIds.add(data.message.id);
-                    }
-
-                    this.newMessage = '';
                     this.scrollToBottom();
                 } catch (error) {
                     console.error('[Chat] Send failed:', error);
+                    this.messages = this.messages.filter(m => m.id !== tempId);
+                    this.messageIds.delete(tempId);
+                    if (!this.newMessage) {
+                        this.newMessage = text;
+                    }
+                    const errMsg = error.response?.data?.message || error.message || 'মেসেজ পাঠানো যায়নি।';
+                    alert(errMsg);
                 } finally {
                     this.sending = false;
                 }

@@ -33,4 +33,9 @@ class MessageSent implements ShouldBroadcastNow
             'created_at' => $this->message->created_at?->toISOString(),
         ];
     }
+
+    public function broadcastAs(): string
+    {
+        return 'MessageSent';
+    }
 }
