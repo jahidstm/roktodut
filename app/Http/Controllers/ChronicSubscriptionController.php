@@ -34,7 +34,7 @@ class ChronicSubscriptionController extends Controller
     {
         $divisions = Division::all();
         $districts = \App\Models\District::orderBy('name')->get();
-        $hospitals = Hospital::where('is_verified', true)->orderBy('display_name')->get();
+        $hospitals = Hospital::where('is_verified', true)->orderBy('name')->get();
 
         return view('chronic.create', compact('divisions', 'districts', 'hospitals'));
     }
@@ -105,7 +105,7 @@ class ChronicSubscriptionController extends Controller
 
         $divisions = Division::all();
         $districts = \App\Models\District::orderBy('name')->get();
-        $hospitals = Hospital::where('is_verified', true)->orderBy('display_name')->get();
+        $hospitals = Hospital::where('is_verified', true)->orderBy('name')->get();
 
         return view('chronic.edit', compact('subscription', 'divisions', 'districts', 'hospitals'));
     }
