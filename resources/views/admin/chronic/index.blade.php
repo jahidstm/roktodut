@@ -1,8 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin-dashboard')
 
-@section('title', 'Admin - Chronic Patients')
+@section('title', 'দীর্ঘমেয়াদী রোগী ব্যবস্থাপনা — রক্তদূত')
 
 @section('content')
+<div data-panel-id="chronic">
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
@@ -98,5 +99,6 @@
             {{ $subscriptions->links() }}
         </div>
     </div>
+</div>
 </div>
 @endsection

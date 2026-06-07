@@ -1,8 +1,9 @@
-@extends('layouts.app')
+@extends('layouts.admin-dashboard')
 
-@section('title', 'Admin - View Subscription')
+@section('title', 'সাবস্ক্রিপশন বিস্তারিত — রক্তদূত')
 
 @section('content')
+<div data-panel-id="chronic">
 <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
 
     <div class="mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -71,5 +72,6 @@
             @endif
         </div>
     </div>
+</div>
 </div>
 @endsection
