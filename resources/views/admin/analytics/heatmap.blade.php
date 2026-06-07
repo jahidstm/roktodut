@@ -74,7 +74,7 @@
         .hm-wrap {
             display: grid;
             grid-template-columns: 290px 1fr 320px;
-            height: calc(100vh - 60px);
+            height: calc(100vh - 110px); /* 60px topbar + 50px filter bar */
             overflow: hidden;
         }
 
@@ -103,11 +103,20 @@
         .leg-tx { font-size: 0.73rem; color: #374151; font-weight: 500; }
 
         /* ══ Date-Range Filter Toolbar ═══════════════════════ */
-        .range-toolbar {
-            display: flex; gap: 0.4rem; flex-wrap: wrap;
-            padding: 0.75rem 1rem;
-            background: #f8fafc; border-bottom: 1px solid #e2e8f0;
+        .filter-bar-admin {
+            height: 50px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex; align-items: center; gap: 1rem;
+            padding: 0 1.5rem; overflow-x: auto; z-index: 190;
         }
+        .filter-bar-admin::-webkit-scrollbar { height: 2px; }
+        .filter-bar-admin::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 4px; }
+        .filter-label {
+            font-size: 0.63rem; font-weight: 700; color: #94a3b8;
+            text-transform: uppercase; letter-spacing: 0.08em; margin-right: 0.3rem; white-space: nowrap;
+        }
+        .filter-group { display: flex; align-items: center; gap: 0.4rem; }
         .range-btn {
             font-size: 0.72rem; font-weight: 700;
             padding: 0.38rem 0.85rem; border-radius: 9999px;
@@ -284,7 +293,7 @@
                 display: flex; 
                 flex-direction: column; 
                 height: auto; 
-                min-height: calc(100vh - 60px); 
+                min-height: calc(100vh - 110px); 
             }
             .map-col { height: 60vh; min-height: 400px; flex-shrink: 0; order: -1; border-bottom: 1px solid #e2e8f0; }
             .hm-panel { max-height: none !important; padding: 1.25rem 1rem; }
@@ -333,6 +342,36 @@
         @include('components.mobile-menu')
     </header>
 
+    {{-- ══ Full-width Filter Bar ════════════════════════════ --}}
+    <div class="filter-bar-admin">
+        <!-- Date Filter -->
+        <div class="filter-group" id="range-toolbar">
+            <span class="filter-label">তারিখ:</span>
+            <button class="range-btn {{ $dateRange === 'all_time' ? 'active' : '' }}" data-range="all_time">সকল সময়</button>
+            <button class="range-btn {{ $dateRange === 'today' ? 'active' : '' }}" data-range="today">আজকে</button>
+            <button class="range-btn {{ $dateRange === 'last_7_days' ? 'active' : '' }}" data-range="last_7_days">গত ৭ দিন</button>
+            <button class="range-btn {{ $dateRange === 'last_30_days' ? 'active' : '' }}" data-range="last_30_days">গত ৩০ দিন</button>
+        </div>
+
+        <div style="width: 1px; height: 24px; background: #e2e8f0;"></div>
+
+        <!-- Group Filter -->
+        <div class="filter-group" id="bg-toolbar">
+            <span class="filter-label">গ্রুপ:</span>
+            <button class="bg-btn {{ empty($bloodGroup) ? 'active' : '' }}" data-bg="">সব</button>
+            <button class="bg-btn {{ $bloodGroup === 'A+' ? 'active' : '' }}" data-bg="A+">A+</button>
+            <button class="bg-btn {{ $bloodGroup === 'A-' ? 'active' : '' }}" data-bg="A-">A-</button>
+            <button class="bg-btn {{ $bloodGroup === 'B+' ? 'active' : '' }}" data-bg="B+">B+</button>
+            <button class="bg-btn {{ $bloodGroup === 'B-' ? 'active' : '' }}" data-bg="B-">B-</button>
+            <button class="bg-btn {{ $bloodGroup === 'O+' ? 'active' : '' }}" data-bg="O+">O+</button>
+            <button class="bg-btn {{ $bloodGroup === 'O-' ? 'active' : '' }}" data-bg="O-">O-</button>
+            <button class="bg-btn {{ $bloodGroup === 'AB+' ? 'active' : '' }}" data-bg="AB+">AB+</button>
+            <button class="bg-btn {{ $bloodGroup === 'AB-' ? 'active' : '' }}" data-bg="AB-">AB-</button>
+        </div>
+
+        <span id="range-label" style="margin-left:auto;font-size:0.68rem;color:#94a3b8;font-weight:600;white-space:nowrap;"></span>
+    </div>
+
     {{-- 3-Column Heatmap Panel --}}
     <div class="hm-wrap">
 
@@ -362,31 +401,8 @@
             </div>
         </div>
 
-        {{-- CENTER: Date Filter Toolbar + Map --}}
+        {{-- CENTER: Map --}}
         <div class="map-col">
-            {{-- Date-range filter toolbar --}}
-            <div class="range-toolbar" id="range-toolbar">
-                <button class="range-btn {{ $dateRange === 'all_time' ? 'active' : '' }}" data-range="all_time">সকল সময়</button>
-                <button class="range-btn {{ $dateRange === 'today' ? 'active' : '' }}" data-range="today">আজকে</button>
-                <button class="range-btn {{ $dateRange === 'last_7_days' ? 'active' : '' }}" data-range="last_7_days">গত ৭ দিন</button>
-                <button class="range-btn {{ $dateRange === 'last_30_days' ? 'active' : '' }}" data-range="last_30_days">গত ৩০ দিন</button>
-                <span style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 0.5rem;"></span>
-                <span id="range-label" style="margin-left:auto;font-size:0.68rem;color:#94a3b8;font-weight:600;align-self:center;"></span>
-            </div>
-            
-            <div class="range-toolbar" id="bg-toolbar" style="padding-top: 0.25rem; border-top: none; overflow-x: auto;">
-                <span style="font-size: 0.68rem; font-weight: 700; color: #94a3b8; align-self: center; margin-right: 0.2rem;">গ্রুপ:</span>
-                <button class="bg-btn {{ empty($bloodGroup) ? 'active' : '' }}" data-bg="">সব</button>
-                <button class="bg-btn {{ $bloodGroup === 'A+' ? 'active' : '' }}" data-bg="A+">A+</button>
-                <button class="bg-btn {{ $bloodGroup === 'A-' ? 'active' : '' }}" data-bg="A-">A-</button>
-                <button class="bg-btn {{ $bloodGroup === 'B+' ? 'active' : '' }}" data-bg="B+">B+</button>
-                <button class="bg-btn {{ $bloodGroup === 'B-' ? 'active' : '' }}" data-bg="B-">B-</button>
-                <button class="bg-btn {{ $bloodGroup === 'O+' ? 'active' : '' }}" data-bg="O+">O+</button>
-                <button class="bg-btn {{ $bloodGroup === 'O-' ? 'active' : '' }}" data-bg="O-">O-</button>
-                <button class="bg-btn {{ $bloodGroup === 'AB+' ? 'active' : '' }}" data-bg="AB+">AB+</button>
-                <button class="bg-btn {{ $bloodGroup === 'AB-' ? 'active' : '' }}" data-bg="AB-">AB-</button>
-            </div>
-
             <div class="map-frame">
                 <div id="map-loading">
                     <div class="spinner"></div>
