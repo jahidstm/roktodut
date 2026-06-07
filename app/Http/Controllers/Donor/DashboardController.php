@@ -224,6 +224,12 @@ class DashboardController extends Controller
         $gamification = app(GamificationService::class);
         $myCode       = $gamification->generateReferralCode($user);
         $referralLink = url('/register?ref=' . $myCode);
+        
+        // ── ১০. Chronic Buddy Subscriptions ──────────────────────────────────
+        $buddySubscriptions = $user->buddySubscriptions()
+            ->with(['hospital', 'district', 'upazila'])
+            ->wherePivot('is_active', true)
+            ->get();
 
         // ── ১১. Welcome-back popup flag ───────────────────────────────────────
         $showInactivePopup = false;
@@ -250,7 +256,8 @@ class DashboardController extends Controller
             'pendingClaim',
             'myCode',
             'referralLink',
-            'showInactivePopup'
+            'showInactivePopup',
+            'buddySubscriptions'
         ));
     }
 

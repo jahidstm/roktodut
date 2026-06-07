@@ -165,6 +165,9 @@
                             <x-dropdown-link :href="route('requests.my-requests')" class="font-bold">
                                 আমার রিকোয়েস্ট
                             </x-dropdown-link>
+                            <x-dropdown-link :href="route('chronic.index')" class="font-bold">
+                                আমার দীর্ঘমেয়াদী রোগী
+                            </x-dropdown-link>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
                                 <x-dropdown-link :href="route('logout')" class="font-bold text-red-600"
@@ -241,6 +244,9 @@
                 </x-responsive-nav-link>
                 <x-responsive-nav-link :href="route('requests.my-requests')" class="font-bold">
                     আমার রিকোয়েস্ট
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('chronic.index')" class="font-bold">
+                    আমার দীর্ঘমেয়াদী রোগী
                 </x-responsive-nav-link>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

@@ -341,6 +341,21 @@ Route::get('/donor/blood-history', [DonorDashboardController::class, 'bloodHisto
     ->middleware(['auth', 'role:donor'])
     ->name('donor.blood_history');
 
+// ─────────────────────────────────────────────────────────────────────────
+// 🩸 Chronic Patient Registry (Thalassemia / Dialysis etc.)
+// ─────────────────────────────────────────────────────────────────────────
+Route::middleware(['auth'])->prefix('my-subscriptions')->name('chronic.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ChronicSubscriptionController::class, 'index'])->name('index');
+    Route::get('/create', [\App\Http\Controllers\ChronicSubscriptionController::class, 'create'])->name('create');
+    Route::post('/', [\App\Http\Controllers\ChronicSubscriptionController::class, 'store'])->name('store');
+    Route::get('/{subscription}', [\App\Http\Controllers\ChronicSubscriptionController::class, 'show'])->name('show');
+    Route::get('/{subscription}/edit', [\App\Http\Controllers\ChronicSubscriptionController::class, 'edit'])->name('edit');
+    Route::put('/{subscription}', [\App\Http\Controllers\ChronicSubscriptionController::class, 'update'])->name('update');
+    Route::post('/{subscription}/pause', [\App\Http\Controllers\ChronicSubscriptionController::class, 'pause'])->name('pause');
+    Route::delete('/{subscription}', [\App\Http\Controllers\ChronicSubscriptionController::class, 'destroy'])->name('destroy');
+    Route::delete('/{subscription}/buddies/{buddy}', [\App\Http\Controllers\ChronicSubscriptionController::class, 'removeBuddy'])->name('buddies.remove');
+});
+
 // Donor Availability Calendar
 Route::middleware(['auth', 'role:donor'])->group(function () {
     Route::get('/donor/availability', [AvailabilityCalendarController::class, 'index'])
@@ -352,7 +367,6 @@ Route::middleware(['auth', 'role:donor'])->group(function () {
     Route::patch('/donor/availability/{availability}/toggle', [AvailabilityCalendarController::class, 'toggle'])
         ->name('donor.availability.toggle');
 });
-
 
 // জেনেরিক ড্যাশবোর্ড (Recipient — বা donor হলে redirect করে donor.dashboard এ)
 Route::get('/dashboard', [DashboardController::class, 'index'])
@@ -367,6 +381,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/verification/organization-reviews', [AdminDashboardController::class, 'organizationReviews'])->name('admin.org.reviews');
     Route::get('/admin/analytics', [AnalyticsController::class, 'index'])->name('admin.analytics.index');
     Route::get('/admin/analytics/export', [AnalyticsController::class, 'export'])->name('admin.analytics.export');
+
+    // 🩸 Chronic Patients Admin Oversight
+    Route::prefix('admin/chronic')->name('admin.chronic.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\AdminChronicController::class, 'index'])->name('index');
+        Route::get('/{subscription}', [\App\Http\Controllers\Admin\AdminChronicController::class, 'show'])->name('show');
+        Route::post('/{subscription}/toggle', [\App\Http\Controllers\Admin\AdminChronicController::class, 'toggleActive'])->name('toggle');
+    });
 
     // 🗺️ Geo-Spatial Demand Heatmap (Admin — raw metrics visible)
     Route::get('/admin/heatmap', [AdminHeatmapController::class, 'index'])->name('admin.heatmap.index');
