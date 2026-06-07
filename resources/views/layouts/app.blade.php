@@ -470,7 +470,7 @@
     {{-- ── Floating Pulsating Button ─────────────────────────────── --}}
     <button @click="openModal()"
             aria-label="জরুরি রক্ত চাই SOS"
-            class="fixed bottom-24 right-5 z-[9990] flex items-center gap-2
+            class="fixed bottom-6 left-6 z-[9990] flex items-center gap-2
                    bg-red-600 hover:bg-red-700 active:scale-95
                    text-white text-sm font-black
                    px-4 py-3 rounded-full shadow-2xl

@@ -54,12 +54,13 @@ class EmergencySosController extends Controller
             'blood_group.in'       => 'অবৈধ রক্তের গ্রুপ।',
         ]);
 
-        // ── 3. Resolve location — GPS first, fallback to user district ─────
+        // ── 3. Resolve location — GPS first, fallback to user district (or 1 to prevent SQL crash) ─────
         $latitude   = isset($validated['latitude'])  ? (float) $validated['latitude']  : null;
         $longitude  = isset($validated['longitude']) ? (float) $validated['longitude'] : null;
-        $districtId = (int) $user->district_id;
-        $divisionId = (int) $user->division_id;
-        $upazilaId  = (int) $user->upazila_id;
+        
+        $divisionId = (int) $user->division_id > 0 ? (int) $user->division_id : 1;
+        $districtId = (int) $user->district_id > 0 ? (int) $user->district_id : 1;
+        $upazilaId  = (int) $user->upazila_id > 0  ? (int) $user->upazila_id  : 1;
 
         // ── 4. Resolve contact number ──────────────────────────────────────
         $rawPhone        = (string) ($user->phone ?? '');
