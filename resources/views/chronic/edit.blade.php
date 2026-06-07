@@ -103,7 +103,7 @@
         <div class="p-6 sm:p-8 border-b border-slate-100 bg-slate-50/50">
             <h2 class="text-lg font-black text-slate-800 mb-4">রক্তদানের শিডিউল</h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 items-start">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">পরবর্তী কবে রক্ত লাগবে? <span class="text-red-500">*</span></label>
                     <input type="date" name="next_needed_at" value="{{ old('next_needed_at', $subscription->next_needed_at?->format('Y-m-d')) }}" required class="w-full border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-sm">
@@ -111,22 +111,23 @@
                 
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">কত দিন পরপর লাগবে? <span class="text-red-500">*</span></label>
-                    <div class="relative">
-                        <input type="number" name="cadence_days" value="{{ old('cadence_days', $subscription->cadence_days) }}" min="14" max="90" required class="w-full border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-sm pr-12">
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <span class="text-sm font-bold text-slate-400">দিন</span>
-                        </div>
+                    <div class="flex shadow-sm rounded-xl">
+                        <input type="number" name="cadence_days" value="{{ old('cadence_days', $subscription->cadence_days) }}" min="14" max="90" required class="w-full border-slate-200 rounded-l-xl focus:ring-blue-500 focus:border-blue-500 border-r-0 focus:z-10">
+                        <span class="inline-flex items-center px-4 rounded-r-xl border border-l-0 border-slate-200 bg-slate-50 text-slate-500 text-sm font-bold">
+                            দিন
+                        </span>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1.5">কত দিন আগে ডোনার খুঁজবে? <span class="text-red-500">*</span></label>
-                    <div class="relative">
-                        <input type="number" name="lead_time_days" value="{{ old('lead_time_days', $subscription->lead_time_days) }}" min="1" max="7" required class="w-full border-slate-200 rounded-xl focus:ring-blue-500 focus:border-blue-500 shadow-sm pr-12">
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <span class="text-sm font-bold text-slate-400">দিন</span>
-                        </div>
+                    <div class="flex shadow-sm rounded-xl">
+                        <input type="number" name="lead_time_days" value="{{ old('lead_time_days', $subscription->lead_time_days) }}" min="1" max="7" required class="w-full border-slate-200 rounded-l-xl focus:ring-blue-500 focus:border-blue-500 border-r-0 focus:z-10">
+                        <span class="inline-flex items-center px-4 rounded-r-xl border border-l-0 border-slate-200 bg-slate-50 text-slate-500 text-sm font-bold">
+                            দিন
+                        </span>
                     </div>
+                    <p class="text-[10px] text-slate-500 mt-1.5">রক্ত লাগার কত দিন আগে অটো-রিকোয়েস্ট তৈরি হবে।</p>
                 </div>
             </div>
         </div>
