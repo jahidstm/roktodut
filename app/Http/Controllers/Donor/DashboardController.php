@@ -225,13 +225,7 @@ class DashboardController extends Controller
         $myCode       = $gamification->generateReferralCode($user);
         $referralLink = url('/register?ref=' . $myCode);
         
-        // ── ১০. Chronic Buddy Subscriptions ──────────────────────────────────
-        $buddySubscriptions = $user->buddySubscriptions()
-            ->with(['hospital', 'district', 'upazila'])
-            ->where('chronic_subscription_buddies.is_active', true)
-            ->get();
-
-        // ── ১১. Welcome-back popup flag ───────────────────────────────────────
+        // ── ১০. Welcome-back popup flag ───────────────────────────────────────
         $showInactivePopup = false;
         if ($user->is_onboarded && !$user->welcome_back_checked) {
             $accountAgeDays = $user->created_at ? $user->created_at->diffInDays(now()) : 0;
@@ -256,8 +250,7 @@ class DashboardController extends Controller
             'pendingClaim',
             'myCode',
             'referralLink',
-            'showInactivePopup',
-            'buddySubscriptions'
+            'showInactivePopup'
         ));
     }
 
@@ -270,5 +263,18 @@ class DashboardController extends Controller
         $districts = District::orderBy('name')->get(['id', 'name']);
 
         return view('donor.offline-claim', compact('districts'));
+    }
+
+    public function myBuddies(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->is_donor) return redirect()->route('dashboard');
+
+        $buddySubscriptions = $user->buddySubscriptions()
+            ->with(['hospital', 'district', 'upazila'])
+            ->where('chronic_subscription_buddies.is_active', true)
+            ->get();
+
+        return view('donor.my-buddies', compact('buddySubscriptions'));
     }
 }

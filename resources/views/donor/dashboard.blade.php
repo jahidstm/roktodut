@@ -324,73 +324,7 @@
     </div>
 
     {{-- ══ MY CHRONIC PATIENTS (BUDDY SUBSCRIPTIONS) ══ --}}
-    @if(isset($buddySubscriptions) && $buddySubscriptions->isNotEmpty())
-        <div class="bg-white rounded-3xl border border-purple-200 shadow-sm overflow-hidden scroll-reveal mb-6" data-scroll-reveal>
-            <div class="px-5 sm:px-6 py-4 bg-purple-50/80 border-b border-purple-100 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <span class="text-xl">🎗️</span>
-                    <div>
-                        <h2 class="text-sm font-black text-purple-900">আমার ব্লাড বাডি রোগী</h2>
-                        <p class="text-xs font-medium text-purple-700 mt-0.5">আপনি এই রোগীদের নিয়মিত রক্তদান করার জন্য প্রতিশ্রুতিবদ্ধ</p>
-                    </div>
-                </div>
-                <span class="bg-purple-100 text-purple-700 text-xs font-black px-2.5 py-1 rounded-full">{{ $buddySubscriptions->count() }} জন</span>
-            </div>
-            <div class="p-5 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-                @foreach($buddySubscriptions as $sub)
-                    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100 flex flex-col justify-between h-full relative overflow-hidden group">
-                        @if($sub->is_paused || !$sub->is_active)
-                            <div class="absolute inset-0 bg-slate-100/50 backdrop-blur-[1px] z-10 flex items-center justify-center">
-                                <span class="bg-white px-3 py-1 rounded-lg text-xs font-bold text-slate-500 shadow-sm">
-                                    {{ !$sub->is_active ? 'নিষ্ক্রিয়' : 'সাময়িক বিরতিতে' }}
-                                </span>
-                            </div>
-                        @endif
-                        
-                        <div>
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-sm font-black text-red-600 border border-slate-200 shrink-0">
-                                        {{ $sub->blood_group?->value ?? $sub->blood_group }}
-                                    </div>
-                                    <div>
-                                        <h3 class="text-sm font-black text-slate-900 leading-tight">{{ $sub->patient_name }}</h3>
-                                        <div class="flex items-center gap-2 mt-0.5">
-                                            <span class="text-[10px] font-bold text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded">{{ $sub->condition_label }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="space-y-1.5 text-xs text-slate-600 font-medium bg-white rounded-xl p-3 border border-slate-100">
-                                <p class="flex items-start gap-2">
-                                    <span class="mt-0.5 opacity-50">🏥</span> 
-                                    <span class="flex-1">{{ $sub->hospital?->display_name ?? 'হাসপাতাল নির্দিষ্ট নয়' }} ({{ $sub->district?->name }})</span>
-                                </p>
-                                <p class="flex items-center gap-2">
-                                    <span class="opacity-50">📅</span> 
-                                    <span>পরবর্তী রিকোয়েস্ট: 
-                                        @if($sub->next_needed_at)
-                                            <strong class="{{ $sub->days_until_next <= 5 ? 'text-red-600' : 'text-slate-800' }}">{{ $sub->next_needed_at->format('d M') }}</strong>
-                                        @else
-                                            --
-                                        @endif
-                                    </span>
-                                </p>
-                            </div>
-                            
-                            @if($sub->notes_for_donor)
-                                <div class="mt-3 text-[11px] font-medium text-amber-800 bg-amber-50 p-2.5 rounded-lg border border-amber-100 flex items-start gap-1.5">
-                                    <svg class="w-3.5 h-3.5 shrink-0 mt-0.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                    <span class="leading-relaxed">{{ $sub->notes_for_donor }}</span>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </div>
-    @endif
+
 
     {{-- ══ E) QUICK ACTIONS GRID ══ --}}
     <div class="grid grid-cols-2 lg:grid-cols-3 gap-4">

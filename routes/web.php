@@ -333,6 +333,10 @@ Route::get('/donor/offline-claim', [DonorDashboardController::class, 'offlineCla
     ->middleware(['auth', 'role:donor'])
     ->name('donor.offline-claim');
 
+Route::get('/donor/my-buddies', [DonorDashboardController::class, 'myBuddies'])
+    ->middleware(['auth', 'role:donor'])
+    ->name('donor.my_buddies');
+
 Route::get('/donor/recent-requests', [DonorDashboardController::class, 'recentRequests'])
     ->middleware(['auth', 'role:donor'])
     ->name('donor.recent_requests');
