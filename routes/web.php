@@ -257,6 +257,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/onboarding', [OnboardingController::class, 'store'])->name('onboarding.store');
 });
 
+// ─────────────────────────────────────────────────────────────────────────
+// 🆘 Emergency SOS — যেকোনো পেজ থেকে এক ক্লিকে ডোনার নোটিফাই
+// Rate: 1 SOS per 30 min per user (Cache Lock enforced in controller)
+// ─────────────────────────────────────────────────────────────────────────
+Route::post('/sos/trigger', [\App\Http\Controllers\EmergencySosController::class, 'trigger'])
+    ->name('sos.trigger')
+    ->middleware(['auth', 'throttle:2,30']);
+
 // --- ৪. ভেরিফাইড ইউজার কোর ফিচারস ---
 Route::middleware(['auth'])->group(function () {
     // Ambulance Submission (Crowdsourcing)

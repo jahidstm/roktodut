@@ -384,5 +384,218 @@
     })();
     </script>
 
+{{-- ══════════════════════════════════════════════════════════════════════
+     🆘 Emergency SOS Widget — শুধুমাত্র লগইন করা ইউজারদের জন্য
+     Floating pulsating button + modal with GPS + blood group dropdown
+══════════════════════════════════════════════════════════════════════ --}}
+@auth
+<div id="sos-widget"
+     x-data="{
+         open: false,
+         loading: false,
+         gpsStatus: 'idle',  {{-- idle | fetching | ready | denied --}}
+         lat: null,
+         lng: null,
+         bloodGroup: '{{ auth()->user()->blood_group instanceof \App\Enums\BloodGroup ? auth()->user()->blood_group->value : (string) auth()->user()->blood_group }}',
+         bloodGroups: ['A+','A-','B+','B-','AB+','AB-','O+','O-'],
+         resultMsg: '',
+         resultType: '',  {{-- '' | success | error --}}
+
+         openModal() {
+             this.open = true;
+             this.resultMsg = '';
+             this.resultType = '';
+             this.gpsStatus = 'fetching';
+             this.lat = null;
+             this.lng = null;
+             this.fetchGps();
+         },
+
+         fetchGps() {
+             if (!navigator.geolocation) {
+                 this.gpsStatus = 'denied';
+                 return;
+             }
+             navigator.geolocation.getCurrentPosition(
+                 (pos) => {
+                     this.lat = pos.coords.latitude;
+                     this.lng = pos.coords.longitude;
+                     this.gpsStatus = 'ready';
+                 },
+                 () => { this.gpsStatus = 'denied'; },
+                 { timeout: 8000, maximumAge: 60000 }
+             );
+         },
+
+         async sendSos() {
+             if (this.loading) return;
+             this.loading = true;
+             this.resultMsg = '';
+             try {
+                 const body = {
+                     blood_group: this.bloodGroup,
+                     _token: document.querySelector('meta[name=csrf-token]').content,
+                 };
+                 if (this.lat !== null) body.latitude  = this.lat;
+                 if (this.lng !== null) body.longitude = this.lng;
+
+                 const res  = await fetch('{{ route('sos.trigger') }}', {
+                     method: 'POST',
+                     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name=csrf-token]').content },
+                     body: JSON.stringify(body)
+                 });
+                 const data = await res.json();
+
+                 if (data.success) {
+                     this.resultType = 'success';
+                     this.resultMsg  = data.message;
+                     setTimeout(() => {
+                         this.open = false;
+                         window.location.href = data.redirect_url;
+                     }, 1800);
+                 } else {
+                     this.resultType = 'error';
+                     this.resultMsg  = data.message || 'কোনো সমস্যা হয়েছে। আবার চেষ্টা করুন।';
+                 }
+             } catch (e) {
+                 this.resultType = 'error';
+                 this.resultMsg  = 'নেটওয়ার্ক সমস্যা। অনুগ্রহ করে আবার চেষ্টা করুন।';
+             } finally {
+                 this.loading = false;
+             }
+         }
+     }">
+
+    {{-- ── Floating Pulsating Button ─────────────────────────────── --}}
+    <button @click="openModal()"
+            aria-label="জরুরি রক্ত চাই SOS"
+            class="fixed bottom-24 right-5 z-[9990] flex items-center gap-2
+                   bg-red-600 hover:bg-red-700 active:scale-95
+                   text-white text-sm font-black
+                   px-4 py-3 rounded-full shadow-2xl
+                   transition-all duration-200
+                   ring-4 ring-red-600/30 animate-[sos-pulse_2s_ease-in-out_infinite]">
+        <span class="text-base leading-none">🆘</span>
+        <span class="hidden sm:inline">জরুরি রক্ত চাই</span>
+    </button>
+
+    {{-- ── Modal Backdrop ───────────────────────────────────────── --}}
+    <div x-show="open"
+         x-transition:enter="transition ease-out duration-200"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-150"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         @click.self="open = false"
+         class="fixed inset-0 z-[9991] bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4"
+         x-cloak>
+
+        {{-- ── Modal Panel ──────────────────────────────────────── --}}
+        <div x-show="open"
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+             x-transition:leave-end="opacity-0 translate-y-4 scale-95"
+             class="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden">
+
+            {{-- Red header --}}
+            <div class="bg-red-600 px-6 py-5 text-white">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="text-3xl">🆘</span>
+                        <div>
+                            <h2 class="text-lg font-black leading-tight">Emergency SOS</h2>
+                            <p class="text-red-100 text-xs font-medium mt-0.5">কাছের ডোনারদের এখনই নোটিফাই করুন</p>
+                        </div>
+                    </div>
+                    <button @click="open = false" class="text-red-200 hover:text-white transition p-1 rounded-full hover:bg-red-500">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            {{-- Body --}}
+            <div class="px-6 py-5 space-y-4">
+
+                {{-- Blood Group Dropdown (editable!) --}}
+                <div>
+                    <label class="block text-xs font-black text-slate-600 uppercase tracking-wider mb-2">কোন রক্তের গ্রুপ প্রয়োজন?</label>
+                    <div class="grid grid-cols-4 gap-2">
+                        <template x-for="bg in bloodGroups" :key="bg">
+                            <button type="button"
+                                    @click="bloodGroup = bg"
+                                    :class="bloodGroup === bg
+                                        ? 'bg-red-600 text-white border-red-600 font-black shadow-md scale-105'
+                                        : 'bg-white text-slate-700 border-slate-200 hover:border-red-300 hover:text-red-600'"
+                                    class="border-2 rounded-xl py-2 text-sm font-bold transition-all duration-150">
+                                <span x-text="bg"></span>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                {{-- GPS Status --}}
+                <div class="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-xs font-semibold"
+                     :class="{
+                         'bg-amber-50 text-amber-700 border border-amber-200': gpsStatus === 'fetching',
+                         'bg-emerald-50 text-emerald-700 border border-emerald-200': gpsStatus === 'ready',
+                         'bg-slate-50 text-slate-500 border border-slate-200': gpsStatus === 'denied' || gpsStatus === 'idle',
+                     }">
+                    <span x-show="gpsStatus === 'fetching'" class="shrink-0">📡</span>
+                    <span x-show="gpsStatus === 'ready'"    class="shrink-0">📍</span>
+                    <span x-show="gpsStatus === 'denied'"   class="shrink-0">⚠️</span>
+                    <span x-show="gpsStatus === 'idle'"     class="shrink-0">🗺️</span>
+                    <span x-show="gpsStatus === 'fetching'">GPS লোকেশন নেওয়া হচ্ছে…</span>
+                    <span x-show="gpsStatus === 'ready'">GPS প্রস্তুত — সঠিক লোকেশন পাওয়া গেছে</span>
+                    <span x-show="gpsStatus === 'denied'">GPS পাওয়া যায়নি — আপনার নিবন্ধিত জেলা ব্যবহার হবে</span>
+                    <span x-show="gpsStatus === 'idle'">লোকেশন চেক করা হচ্ছে…</span>
+                </div>
+
+                {{-- Result Message --}}
+                <div x-show="resultMsg !== ''"
+                     x-transition
+                     :class="resultType === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800' : 'bg-red-50 border-red-200 text-red-700'"
+                     class="border rounded-xl px-4 py-3 text-sm font-semibold"
+                     x-text="resultMsg">
+                </div>
+
+                {{-- Info --}}
+                <p class="text-[11px] text-slate-400 font-medium leading-snug">
+                    🔒 আপনার নাম ও নম্বর স্বয়ংক্রিয়ভাবে যুক্ত হবে। কাছের সর্বোচ্চ ২০ জন ডোনারকে এখনই নোটিফাই করা হবে।
+                </p>
+            </div>
+
+            {{-- Footer --}}
+            <div class="px-6 pb-5 flex gap-3">
+                <button @click="open = false"
+                        class="flex-1 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition">
+                    বাতিল
+                </button>
+                <button @click="sendSos()"
+                        :disabled="loading"
+                        :class="loading ? 'opacity-60 cursor-not-allowed' : 'hover:bg-red-700 active:scale-95'"
+                        class="flex-1 py-3 rounded-xl bg-red-600 text-white font-black text-sm shadow-lg shadow-red-200 transition-all duration-150 flex items-center justify-center gap-2">
+                    <svg x-show="loading" class="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                    <span x-show="!loading">🩸 এখনই পাঠাও!</span>
+                    <span x-show="loading">পাঠানো হচ্ছে…</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes sos-pulse {
+        0%, 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5); }
+        50%       { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0); }
+    }
+    [x-cloak] { display: none !important; }
+</style>
+@endauth
+
 </body>
 </html>
