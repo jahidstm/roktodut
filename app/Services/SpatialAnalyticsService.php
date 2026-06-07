@@ -105,25 +105,33 @@ class SpatialAnalyticsService
      * হিটম্যাপের জন্য ডেটা তৈরি করে।
      *
      * @param string $dateRange  'all_time' | 'today' | 'last_7_days' | 'last_30_days'
-     * Public map always uses 'all_time' with 15-min cache.
-     * Admin calls with a specific range bypass cache for fresh data.
+     * @param string|null $bloodGroup  'A+' | 'B-' | ... | null (all groups)
+     *
+     * Cache Strategy (Synchronized):
+     *   - Server cache: 3 minutes (180s)
+     *   - Client auto-refresh: 3 minutes
+     *   → ক্লায়েন্ট যখন hit করে, তখনই cache expire হয় → সত্যিকারের fresh data।
      */
-    public function getHeatmapData(string $dateRange = 'all_time'): array
+    public function getHeatmapData(string $dateRange = 'all_time', ?string $bloodGroup = null): array
     {
-        // Public route: cache the all_time result
+        // Public route: cache the all_time result for exactly 3 minutes
         if ($dateRange === 'all_time') {
-            return Cache::remember('spatial_heatmap_data', now()->addMinutes(15), function () {
-                return $this->computeHeatmapData('all_time');
+            $cacheKey = $bloodGroup
+                ? "spatial_heatmap_data_{$bloodGroup}"
+                : 'spatial_heatmap_data';
+
+            return Cache::remember($cacheKey, now()->addMinutes(3), function () use ($bloodGroup) {
+                return $this->computeHeatmapData('all_time', $bloodGroup);
             });
         }
 
         // Admin filtered views: skip cache — data must be fresh
-        return $this->computeHeatmapData($dateRange);
+        return $this->computeHeatmapData($dateRange, $bloodGroup);
     }
 
-    private function computeHeatmapData(string $dateRange = 'all_time'): array
+    private function computeHeatmapData(string $dateRange = 'all_time', ?string $bloodGroup = null): array
     {
-        // 1. Date range filter
+        // ── 1. Date range filter ──────────────────────────────────────────
         $from = match ($dateRange) {
             'today'        => Carbon::today(),
             'last_7_days'  => Carbon::now()->subDays(7)->startOfDay(),
@@ -131,19 +139,35 @@ class SpatialAnalyticsService
             default        => null,   // 'all_time' — no date filter
         };
 
-        // 2. Active emergency demand — district অনুযায়ী গ্রুপ
-        $query = BloodRequest::whereIn('status', ['pending', 'in_progress'])
+        // ── 2. Blood group breakdown per district ─────────────────────────
+        // Uses composite index: idx_br_heatmap (district_id, status, blood_group)
+        $bgQuery = BloodRequest::whereIn('status', ['pending', 'in_progress'])
             ->join('districts', 'blood_requests.district_id', '=', 'districts.id')
-            ->selectRaw('districts.name as district_name, COUNT(*) as demand_count')
-            ->groupBy('districts.name');
+            ->selectRaw('districts.name as district_name, blood_group, COUNT(*) as cnt')
+            ->groupBy('districts.name', 'blood_group');
 
-        if ($from) {
-            $query->where('blood_requests.created_at', '>=', $from);
+        if ($bloodGroup) {
+            $bgQuery->where('blood_group', $bloodGroup);
         }
 
-        $demands = $query->pluck('demand_count', 'district_name')->toArray();
+        if ($from) {
+            $bgQuery->where('blood_requests.created_at', '>=', $from);
+        }
 
-        // 3. Pre-computed District Avg DFI — O(1) Redis Hash read
+        // Build: ['ঢাকা' => ['A+' => 3, 'B+' => 1], ...]
+        $bgRows = $bgQuery->get();
+        $bgByDistrict = [];
+        foreach ($bgRows as $row) {
+            $bgByDistrict[$row->district_name][$row->blood_group] = (int) $row->cnt;
+        }
+
+        // ── 3. Total demand per district (from the breakdown) ─────────────
+        $demands = [];
+        foreach ($bgByDistrict as $districtName => $groups) {
+            $demands[$districtName] = array_sum($groups);
+        }
+
+        // ── 4. Pre-computed District Avg DFI — O(1) Redis Hash read ───────
         try {
             $avgDfiScores = Redis::hgetall('district_avg_dfi');
         } catch (\Exception $e) {
@@ -151,17 +175,18 @@ class SpatialAnalyticsService
             $avgDfiScores = [];
         }
 
-        // 4. Normalization
+        // ── 5. Normalization ──────────────────────────────────────────────
         $maxDemand = max(1, empty($demands) ? 1 : max($demands));
         $maxDfi    = 100;
 
         $heatmapData = [];
 
         foreach (self::DISTRICT_MAP as $dbName => $geoJsonName) {
-            $demand = (int) ($demands[$dbName] ?? 0);
-            $avgDfi = (float) ($avgDfiScores[$dbName] ?? 0.0);
+            $demand   = (int) ($demands[$dbName] ?? 0);
+            $avgDfi   = (float) ($avgDfiScores[$dbName] ?? 0.0);
+            $bgGroups = $bgByDistrict[$dbName] ?? [];
 
-            // ✅ False Warning Fix: demand = 0 হলে CRS সবসময় 0
+            // ✅ demand = 0 হলে CRS সবসময় 0
             if ($demand === 0) {
                 $crsScore = 0;
             } else {
@@ -171,15 +196,25 @@ class SpatialAnalyticsService
                 $crsScore   = round($crs * 100, 2);
             }
 
+            // সর্বোচ্চ চাহিদার blood group বের করা
+            $topBloodGroup = null;
+            if (!empty($bgGroups)) {
+                arsort($bgGroups);
+                $topBloodGroup = array_key_first($bgGroups);
+            }
+
             $heatmapData[$geoJsonName] = [
-                'demand'  => $demand,
-                'avg_dfi' => round($avgDfi, 2),
-                'crs'     => $crsScore,
+                'demand'          => $demand,
+                'avg_dfi'         => round($avgDfi, 2),
+                'crs'             => $crsScore,
+                'blood_groups'    => $bgGroups,
+                'top_blood_group' => $topBloodGroup,
             ];
         }
 
         return $heatmapData;
     }
+
 
     /**
      * Public accessor for DISTRICT_MAP (used by CSV export).
