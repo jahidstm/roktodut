@@ -653,6 +653,8 @@
 })();
 </script>
 
+@include('layouts.chatbot-widget')
+
 @stack('scripts')
 
 </body>

@@ -39,7 +39,7 @@
          x-transition:leave-start="opacity-100 translate-y-0 scale-100"
          x-transition:leave-end="opacity-0 translate-y-2 scale-95"
          style="display:none;"
-         class="absolute bottom-16 right-0 w-[calc(100vw-2rem)] sm:w-[360px] bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col"
+         class="absolute bottom-16 right-0 w-[calc(100vw-2rem)] sm:w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden flex flex-col"
          @click.outside="open = false">
 
         {{-- Header --}}

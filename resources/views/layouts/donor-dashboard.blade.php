@@ -731,6 +731,7 @@
 })();
 </script>
 
+@include('layouts.chatbot-widget')
 
 {{-- FCM Push Notifications --}}
 @auth
