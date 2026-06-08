@@ -165,7 +165,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::post('/chatbot/ask', [ChatbotController::class, 'ask'])
-    ->middleware('throttle:30,1')
+    ->middleware('throttle:60,1')
     ->name('chatbot.ask');
 
 Route::get('/search', [SearchController::class, 'index'])->name('search');
