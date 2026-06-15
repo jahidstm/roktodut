@@ -84,7 +84,7 @@
         {{-- Action Buttons --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             {{-- Download --}}
-            <a href="{{ route('certificate.download', $token) }}"
+            <a href="{{ route('certificate.download', $token) }}?v={{ time() }}"
                id="btn-download-certificate"
                class="flex items-center justify-center gap-3 bg-red-600 hover:bg-red-700 text-white font-black py-4 px-6 rounded-2xl transition shadow-lg hover:shadow-red-700/30">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

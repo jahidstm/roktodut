@@ -66,7 +66,7 @@ class CertificateController extends Controller
 
         $shareTitle = "{$donorName} donated blood ({$bloodGroup}) on {$donationDate}";
         $shareDesc  = "This person has donated blood {$totalCount} time(s) through Roktodut Blood Donation Platform.";
-        $imageUrl   = route('certificate.download', $token);
+        $imageUrl   = route('certificate.download', $token) . '?v=' . time();
         $shareUrl   = route('certificate.show', $token);
 
         return view('certificate.show', compact(
@@ -102,7 +102,7 @@ class CertificateController extends Controller
 
         return response()->download($imagePath, $filename, [
             'Content-Type'  => 'image/png',
-            'Cache-Control' => 'public, max-age=86400',
+            'Cache-Control' => 'no-store, no-cache, must-revalidate, max-age=0',
         ]);
     }
 
@@ -124,9 +124,9 @@ class CertificateController extends Controller
         $date       = $donation->donation_date?->format('d F, Y') ?? now()->format('d F, Y');
         $certId     = 'RKDT-' . now()->format('Y') . '-' . str_pad($donation->id, 5, '0', STR_PAD_LEFT);
 
-        // Font paths (fallback to GD built-in if not present)
-        $fontBold = public_path('fonts/Inter-Black.ttf');
-        $fontReg  = public_path('fonts/Inter-Regular.ttf');
+        // Fonts (HindSiliguri supports Bengali)
+        $fontBold = public_path('fonts/HindSiliguri-Bold.ttf');
+        $fontReg  = public_path('fonts/HindSiliguri-Regular.ttf');
 
         $manager = new ImageManager(new Driver());
         $img     = $manager->read($templatePath);
