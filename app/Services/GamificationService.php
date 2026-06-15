@@ -167,8 +167,9 @@ class GamificationService
 
         $donor->update([
             'last_donated_at' => now()->toDateString(),
-            'cooldown_until' => now()->addDays($cooldownDays)->toDateString(),
-            'is_available' => false,
+            'cooldown_until'  => now()->addDays($cooldownDays)->toDateString(),
+            'is_available'    => false,
+            'reminder_stage'  => 0, // State machine reset: নতুন cooldown শুরু হলে পূর্ববর্তী reminder history মুছে যায়
         ]);
         $this->handleReadyNowBadge($donor, false);
         $donor->refresh();
@@ -256,8 +257,9 @@ class GamificationService
 
         $donor->update([
             'last_donated_at' => $donationDate->toDateString(),
-            'cooldown_until' => $donationDate->copy()->addDays($cooldownDays)->toDateString(),
-            'is_available' => false,
+            'cooldown_until'  => $donationDate->copy()->addDays($cooldownDays)->toDateString(),
+            'is_available'    => false,
+            'reminder_stage'  => 0, // State machine reset: offline donation approve হলেও reminder restart
         ]);
         $this->handleReadyNowBadge($donor, false);
         $donor->refresh();
