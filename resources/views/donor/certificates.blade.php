@@ -54,8 +54,8 @@
         @foreach($donations as $index => $donation)
         @php
             $certId     = 'RKDT-' . now()->format('Y') . '-' . str_pad($donation->id, 5, '0', STR_PAD_LEFT);
-            $bgColors   = ['from-red-900 to-red-800','from-slate-800 to-slate-700','from-rose-900 to-rose-800'];
-            $bg         = $bgColors[$index % count($bgColors)];
+            $bgClasses  = ['bg-gradient-to-br from-red-900 to-red-800', 'bg-gradient-to-br from-slate-800 to-slate-700', 'bg-gradient-to-br from-rose-900 to-rose-800'];
+            $bg         = $bgClasses[$index % count($bgClasses)];
             $donateDate = $donation->donation_date?->format('d M, Y') ?? ($donation->created_at?->format('d M, Y') ?? '—');
             $hospital   = $donation->bloodRequest?->hospital?->display_name ?? 'সরাসরি দান';
             $district   = $donation->bloodRequest?->district?->name ?? '';
@@ -64,7 +64,7 @@
         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 scroll-reveal" data-scroll-reveal>
 
             {{-- Certificate Preview Banner --}}
-            <div class="bg-gradient-to-br {{ $bg }} relative h-32 flex items-center justify-center overflow-hidden">
+            <div class="{{ $bg }} relative h-32 flex items-center justify-center overflow-hidden">
                 {{-- Background pattern --}}
                 <div class="absolute inset-0 opacity-10">
                     <svg width="100%" height="100%" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -127,7 +127,7 @@
 
                     {{-- Copy Link --}}
                     <button
-                        onclick="navigator.clipboard.writeText('{{ route('certificate.show', $donation->certificate_token) }}').then(() => { this.classList.add('bg-emerald-100','text-emerald-700'); this.title='কপি হয়েছে!'; setTimeout(() => this.classList.remove('bg-emerald-100','text-emerald-700'), 2000) })"
+                        onclick="copyCertLink('{{ route('certificate.show', $donation->certificate_token) }}', this)"
                         title="লিংক কপি করুন"
                         class="flex items-center justify-center w-9 h-9 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl transition">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
@@ -155,4 +155,42 @@
     @endif
 
 </div>
+
+@push('scripts')
+<script>
+    function copyCertLink(url, btn) {
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(url).then(() => showSuccess(btn)).catch(() => fallbackCopy(url, btn));
+        } else {
+            fallbackCopy(url, btn);
+        }
+
+        function showSuccess(button) {
+            button.classList.add('bg-emerald-100', 'text-emerald-700');
+            button.title = 'কপি হয়েছে!';
+            setTimeout(() => {
+                button.classList.remove('bg-emerald-100', 'text-emerald-700');
+                button.title = 'লিংক কপি করুন';
+            }, 2000);
+        }
+
+        function fallbackCopy(text, button) {
+            let textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showSuccess(button);
+            } catch (err) {
+                prompt('এই লিংকটি কপি করুন:', text);
+            }
+            document.body.removeChild(textArea);
+        }
+    }
+</script>
+@endpush
+
 @endsection

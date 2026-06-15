@@ -37,13 +37,13 @@ class CertificateController extends Controller
     private const DETAILS_SIZE = 24;
 
     // Bottom-left block (values only, labels are in template)
-    private const CERTID_X   = 220;
-    private const CERTID_Y   = 845;
-    private const VERIFY_X   = 185;
-    private const VERIFY_Y   = 895;
+    private const CERTID_X   = 260;
+    private const CERTID_Y   = 871;
+    private const VERIFY_X   = 210;
+    private const VERIFY_Y   = 912;
 
-    // QR Code placement (bottom-left, next to the cert ID block)
-    private const QR_X = 340;
+    // QR Code placement (centered in the bottom blank space)
+    private const QR_X = 470;
     private const QR_Y = 840;
     private const QR_SIZE = 130;
 
@@ -153,16 +153,20 @@ class CertificateController extends Controller
         // ── 3. Bottom-left: Certificate ID ────────────────────────────────
         $img->text($certId, self::CERTID_X, self::CERTID_Y, function ($font) use ($fontBold) {
             if (file_exists($fontBold)) $font->file($fontBold);
-            $font->size(16);
+            $font->size(18);
             $font->color('#fbbf24');
+            $font->align('left');
+            $font->valign('middle');
         });
 
         // ── 4. Verify at (shortened URL) ─────────────────────────────────
         $shortUrl = 'roktodut.com/c/' . substr($donation->certificate_token, 0, 8);
         $img->text($shortUrl, self::VERIFY_X, self::VERIFY_Y, function ($font) use ($fontReg) {
             if (file_exists($fontReg)) $font->file($fontReg);
-            $font->size(15);
+            $font->size(18);
             $font->color('#fca5a5');
+            $font->align('left');
+            $font->valign('middle');
         });
 
         // ── 6. QR Code overlay ────────────────────────────────────────────
