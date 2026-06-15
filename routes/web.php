@@ -354,6 +354,10 @@ Route::get('/donor/blood-history', [DonorDashboardController::class, 'bloodHisto
     ->middleware(['auth', 'role:donor'])
     ->name('donor.blood_history');
 
+Route::get('/donor/certificates', [DonorDashboardController::class, 'certificates'])
+    ->middleware(['auth', 'role:donor'])
+    ->name('donor.certificates');
+
 // ─────────────────────────────────────────────────────────────────────────
 // 🩸 Chronic Patient Registry (Thalassemia / Dialysis etc.)
 // ─────────────────────────────────────────────────────────────────────────

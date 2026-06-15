@@ -6,6 +6,7 @@ use App\Enums\BloodComponentType;
 use App\Http\Controllers\Controller;
 use App\Models\BloodRequest;
 use App\Models\BloodRequestResponse;
+use App\Models\Donation;
 use App\Models\District;
 use App\Services\GamificationService;
 use Illuminate\Http\Request;
@@ -263,6 +264,22 @@ class DashboardController extends Controller
         $districts = District::orderBy('name')->get(['id', 'name']);
 
         return view('donor.offline-claim', compact('districts'));
+    }
+
+    public function certificates(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user->is_donor) return redirect()->route('dashboard');
+
+        $donations = Donation::where('donor_id', $user->id)
+            ->whereNotNull('certificate_token')
+            ->with(['bloodRequest.hospital', 'bloodRequest.district'])
+            ->orderByDesc('certificate_generated_at')
+            ->get();
+
+        $totalCertificates = $donations->count();
+
+        return view('donor.certificates', compact('donations', 'totalCertificates'));
     }
 
     public function myBuddies(Request $request)
