@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Donation;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
@@ -12,15 +11,41 @@ use SimpleSoftwareIO\QrCode\Facades\QrCode;
 /**
  * CertificateController
  *
- * প্রতিটি verified donation-এর জন্য একটি আলাদা PNG certificate তৈরি করে।
- * - show()     : Public share page (OG meta tags সহ)
- * - download() : Certificate PNG direct download
+ * Loads a static premium template (PNG) and overlays
+ * only the dynamic donor data at fixed X,Y coordinates.
+ * No background rendering in code — designer controls the look.
  */
 class CertificateController extends Controller
 {
-    // Certificate canvas dimensions (A4 landscape ratio)
-    private const W = 1200;
-    private const H = 848;
+    // Path to the static template (designed in Canva/AI)
+    private const TEMPLATE = 'assets/images/certificate-template.png';
+
+    // Template actual size (1024×1024 from AI generation)
+    // All X,Y coordinates below are relative to this size.
+    private const TW = 1024;
+    private const TH = 1024;
+
+    // ─── Text Overlay Coordinates (measured from template) ───────────────────
+    // Donor Name
+    private const NAME_X = 512;
+    private const NAME_Y = 570;
+    private const NAME_SIZE = 64;
+
+    // Blood Group + Date
+    private const DETAILS_X = 512;
+    private const DETAILS_Y = 690;
+    private const DETAILS_SIZE = 24;
+
+    // Bottom-left block (values only, labels are in template)
+    private const CERTID_X   = 220;
+    private const CERTID_Y   = 845;
+    private const VERIFY_X   = 185;
+    private const VERIFY_Y   = 895;
+
+    // QR Code placement (bottom-left, next to the cert ID block)
+    private const QR_X = 340;
+    private const QR_Y = 840;
+    private const QR_SIZE = 130;
 
     // ─────────────────────────────────────────────────────────────────────────
     // Public share page — Facebook/WhatsApp শেয়ার করা যাবে
@@ -35,13 +60,9 @@ class CertificateController extends Controller
         $bloodGroup   = $donor->blood_group?->value ?? (string) $donor->blood_group ?? 'N/A';
         $donorName    = strtoupper($donor->name ?? 'DONOR');
         $districtName = $donor->district?->name ?? $donation->district ?? 'Bangladesh';
-        $donationDate = $donation->donation_date
-            ? $donation->donation_date->format('d F, Y')
-            : now()->format('d F, Y');
+        $donationDate = $donation->donation_date?->format('d F, Y') ?? now()->format('d F, Y');
         $totalCount   = $donor->total_verified_donations ?? 1;
-
-        // Certificate ID (e.g. RKDT-2026-00042)
-        $certId = 'RKDT-' . now()->format('Y') . '-' . str_pad($donation->id, 5, '0', STR_PAD_LEFT);
+        $certId       = 'RKDT-' . now()->format('Y') . '-' . str_pad($donation->id, 5, '0', STR_PAD_LEFT);
 
         $shareTitle = "{$donorName} donated blood ({$bloodGroup}) on {$donationDate}";
         $shareDesc  = "This person has donated blood {$totalCount} time(s) through Roktodut Blood Donation Platform.";
@@ -68,7 +89,6 @@ class CertificateController extends Controller
         $directory = storage_path('app/public/certificates');
         $imagePath = "{$directory}/cert-{$donation->id}.png";
 
-        // Serve from cache if already generated
         if (!File::exists($imagePath)) {
             if (!File::isDirectory($directory)) {
                 File::makeDirectory($directory, 0755, true, true);
@@ -77,7 +97,8 @@ class CertificateController extends Controller
         }
 
         $donor    = $donation->donor;
-        $filename = 'roktodut-certificate-' . ($donor->name ? strtolower(str_replace(' ', '-', $donor->name)) : $donation->id) . '.png';
+        $safeName = $donor->name ? strtolower(str_replace([' ', '.'], ['-', ''], $donor->name)) : $donation->id;
+        $filename = "roktodut-certificate-{$safeName}.png";
 
         return response()->download($imagePath, $filename, [
             'Content-Type'  => 'image/png',
@@ -86,252 +107,86 @@ class CertificateController extends Controller
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Core: Intervention/Image দিয়ে certificate generate করা
+    // Core: Load template → overlay text → save
     // ─────────────────────────────────────────────────────────────────────────
     private function generateCertificate(Donation $donation, string $savePath): void
     {
+        $templatePath = public_path(self::TEMPLATE);
+
+        if (!File::exists($templatePath)) {
+            throw new \RuntimeException('Certificate template not found at: ' . $templatePath);
+        }
+
         $donor      = $donation->donor;
         $bloodGroup = $donor->blood_group?->value ?? (string) $donor->blood_group ?? 'N/A';
         $donorName  = strtoupper($donor->name ?? 'DONOR');
         $district   = $donor->district?->name ?? $donation->district ?? 'Bangladesh';
         $date       = $donation->donation_date?->format('d F, Y') ?? now()->format('d F, Y');
-        $total      = $donor->total_verified_donations ?? 1;
         $certId     = 'RKDT-' . now()->format('Y') . '-' . str_pad($donation->id, 5, '0', STR_PAD_LEFT);
-        $hospital   = $donation->hospital ?? 'N/A';
 
-        $fontBold   = public_path('fonts/Inter-Black.ttf');
-        $fontReg    = public_path('fonts/Inter-Regular.ttf');
-        // Fallback: if fonts don't exist, GD will use built-in bitmap font
+        // Font paths (fallback to GD built-in if not present)
+        $fontBold = public_path('fonts/Inter-Black.ttf');
+        $fontReg  = public_path('fonts/Inter-Regular.ttf');
 
         $manager = new ImageManager(new Driver());
+        $img     = $manager->read($templatePath);
 
-        // ── Step 1: Base canvas (dark red gradient via layered rectangles) ──
-        $img = $manager->create(self::W, self::H);
-        $img->fill('#7f1d1d'); // dark red base
-
-        // Gradient simulation: draw progressively lighter horizontal strips
-        for ($i = 0; $i < self::H; $i++) {
-            $factor = $i / self::H;
-            $r = (int) (127 + ($factor * 80));  // 127→207 (dark red → medium red)
-            $g = (int) (29  + ($factor * 10));
-            $b = (int) (29  + ($factor * 5));
-            $hex = sprintf('#%02x%02x%02x', min(220, $r), min(39, $g), min(34, $b));
-            $img->drawLine(function ($line) use ($i, $hex) {
-                $line->from(0, $i)->to(self::W, $i)->color($hex);
-            });
-        }
-
-        // ── Step 2: Decorative elements ──────────────────────────────────────
-        // Top gold accent bar
-        $img->drawRectangle(0, 0, function ($rect) {
-            $rect->size(self::W, 8);
-            $rect->background('#fbbf24');
-        });
-        // Bottom gold accent bar
-        $img->drawRectangle(0, self::H - 8, function ($rect) {
-            $rect->size(self::W, 8);
-            $rect->background('#fbbf24');
-        });
-        // Left vertical gold accent
-        $img->drawRectangle(0, 0, function ($rect) {
-            $rect->size(8, self::H);
-            $rect->background('#fbbf24');
-        });
-        // Right vertical gold accent
-        $img->drawRectangle(self::W - 8, 0, function ($rect) {
-            $rect->size(8, self::H);
-            $rect->background('#fbbf24');
-        });
-
-        // Inner border (white, semi-transparent-ish via a lighter shade)
-        $img->drawLine(function ($line) { $line->from(20, 20)->to(self::W - 20, 20)->color('#ffffff'); });
-        $img->drawLine(function ($line) { $line->from(20, self::H - 20)->to(self::W - 20, self::H - 20)->color('#ffffff'); });
-        $img->drawLine(function ($line) { $line->from(20, 20)->to(20, self::H - 20)->color('#ffffff'); });
-        $img->drawLine(function ($line) { $line->from(self::W - 20, 20)->to(self::W - 20, self::H - 20)->color('#ffffff'); });
-
-        // ── Step 3: Header — Platform Branding ───────────────────────────────
-        // Blood drop emoji text + platform name
-        $img->text('ROKTODUT', (int)(self::W / 2), 60, function ($font) use ($fontBold) {
+        // ── 1. Donor Name (large, centered, gold/cream) ───────────────────
+        $img->text($donorName, self::NAME_X, self::NAME_Y, function ($font) use ($fontBold) {
             if (file_exists($fontBold)) $font->file($fontBold);
-            $font->size(28);
+            $font->size(self::NAME_SIZE);
             $font->color('#fbbf24'); // gold
             $font->align('center');
             $font->valign('middle');
         });
-        $img->text('BLOOD DONATION PLATFORM  |  roktodut.com', (int)(self::W / 2), 90, function ($font) use ($fontReg) {
+
+        // ── 2. Blood Group + Date (centered, white) ────────────────────────
+        $details = "Blood Group: {$bloodGroup}   |   Date: {$date}";
+        $img->text($details, self::DETAILS_X, self::DETAILS_Y, function ($font) use ($fontReg) {
             if (file_exists($fontReg)) $font->file($fontReg);
-            $font->size(14);
-            $font->color('#fca5a5'); // light red
-            $font->align('center');
-            $font->valign('middle');
-        });
-
-        // Separator line
-        $img->drawLine(function ($line) {
-            $line->from(60, 115)->to(self::W - 60, 115)->color('#ffffff')->width(1);
-        });
-
-        // ── Step 4: Title ─────────────────────────────────────────────────────
-        $img->text('Certificate of Appreciation', (int)(self::W / 2), 160, function ($font) use ($fontBold) {
-            if (file_exists($fontBold)) $font->file($fontBold);
-            $font->size(38);
+            $font->size(self::DETAILS_SIZE);
             $font->color('#ffffff');
             $font->align('center');
             $font->valign('middle');
         });
-        $img->text('Blood Donation Service Recognition', (int)(self::W / 2), 200, function ($font) use ($fontReg) {
-            if (file_exists($fontReg)) $font->file($fontReg);
+
+        // ── 3. Bottom-left: Certificate ID ────────────────────────────────
+        $img->text($certId, self::CERTID_X, self::CERTID_Y, function ($font) use ($fontBold) {
+            if (file_exists($fontBold)) $font->file($fontBold);
             $font->size(16);
+            $font->color('#fbbf24');
+        });
+
+        // ── 4. Verify at (shortened URL) ─────────────────────────────────
+        $shortUrl = 'roktodut.com/c/' . substr($donation->certificate_token, 0, 8);
+        $img->text($shortUrl, self::VERIFY_X, self::VERIFY_Y, function ($font) use ($fontReg) {
+            if (file_exists($fontReg)) $font->file($fontReg);
+            $font->size(15);
             $font->color('#fca5a5');
-            $font->align('center');
-            $font->valign('middle');
         });
 
-        // ── Step 5: "This certifies that" ────────────────────────────────────
-        $img->text('This certifies that', (int)(self::W / 2), 255, function ($font) use ($fontReg) {
-            if (file_exists($fontReg)) $font->file($fontReg);
-            $font->size(18);
-            $font->color('#fecaca');
-            $font->align('center');
-            $font->valign('middle');
-        });
-
-        // ── Step 6: Donor Name (large, gold) ─────────────────────────────────
-        $img->text('✦  ' . $donorName . '  ✦', (int)(self::W / 2), 310, function ($font) use ($fontBold) {
-            if (file_exists($fontBold)) $font->file($fontBold);
-            $font->size(46);
-            $font->color('#fbbf24');
-            $font->align('center');
-            $font->valign('middle');
-        });
-
-        // ── Step 7: Donation Details ──────────────────────────────────────────
-        $detailLine1 = "has successfully donated blood ({$bloodGroup}) on {$date}";
-        $img->text($detailLine1, (int)(self::W / 2), 370, function ($font) use ($fontReg) {
-            if (file_exists($fontReg)) $font->file($fontReg);
-            $font->size(19);
-            $font->color('#ffffff');
-            $font->align('center');
-            $font->valign('middle');
-        });
-
-        $detailLine2 = "at {$district}, contributing to save a human life.";
-        $img->text($detailLine2, (int)(self::W / 2), 400, function ($font) use ($fontReg) {
-            if (file_exists($fontReg)) $font->file($fontReg);
-            $font->size(19);
-            $font->color('#ffffff');
-            $font->align('center');
-            $font->valign('middle');
-        });
-
-        // Hospital info (if available)
-        if ($hospital && $hospital !== 'N/A') {
-            $img->text("Hospital: {$hospital}", (int)(self::W / 2), 430, function ($font) use ($fontReg) {
-                if (file_exists($fontReg)) $font->file($fontReg);
-                $font->size(15);
-                $font->color('#fca5a5');
-                $font->align('center');
-                $font->valign('middle');
-            });
-        }
-
-        // ── Step 8: Total Donations Badge ────────────────────────────────────
-        $badgeY   = 490;
-        $badgeText = "Total Lifetime Donations: {$total}  |  Blood Component: Whole Blood";
-        $badgeX = (int)((self::W - 600) / 2);
-        $badgeTopY = $badgeY - 18;
-        $img->drawRectangle($badgeX, $badgeTopY, function ($rect) {
-            $rect->size(600, 36);
-            $rect->background('#991b1b');
-        });
-        $img->drawLine(function($l) use($badgeX, $badgeTopY) { $l->from($badgeX, $badgeTopY)->to($badgeX + 600, $badgeTopY)->color('#fbbf24'); });
-        $img->drawLine(function($l) use($badgeX, $badgeTopY) { $l->from($badgeX, $badgeTopY + 36)->to($badgeX + 600, $badgeTopY + 36)->color('#fbbf24'); });
-        $img->drawLine(function($l) use($badgeX, $badgeTopY) { $l->from($badgeX, $badgeTopY)->to($badgeX, $badgeTopY + 36)->color('#fbbf24'); });
-        $img->drawLine(function($l) use($badgeX, $badgeTopY) { $l->from($badgeX + 600, $badgeTopY)->to($badgeX + 600, $badgeTopY + 36)->color('#fbbf24'); });
-        $img->text($badgeText, (int)(self::W / 2), $badgeY + 1, function ($font) use ($fontBold) {
-            if (file_exists($fontBold)) $font->file($fontBold);
-            $font->size(14);
-            $font->color('#fbbf24');
-            $font->align('center');
-            $font->valign('middle');
-        });
-
-        // Separator line
-        $img->drawLine(function ($line) {
-            $line->from(60, 540)->to(self::W - 60, 540)->color('#ffffff')->width(1);
-        });
-
-        // ── Step 9: QR Code (bottom-left) ────────────────────────────────────
+        // ── 6. QR Code overlay ────────────────────────────────────────────
         $verifyUrl  = route('certificate.show', $donation->certificate_token);
-        $qrTempPath = storage_path("app/public/temp-qr-cert-{$donation->id}.png");
+        $qrTempPath = storage_path("app/temp-qr-cert-{$donation->id}.png");
 
         try {
-            QrCode::format('png')->size(150)->margin(1)->generate($verifyUrl, $qrTempPath);
+            QrCode::format('png')->size(self::QR_SIZE)->margin(1)->generate($verifyUrl, $qrTempPath);
+
             if (File::exists($qrTempPath)) {
-                $qrImg = $manager->read($qrTempPath);
-                // White background box for QR
-                $img->drawRectangle(50, 560, function ($rect) {
-                    $rect->size(160, 160);
+                // White padding box behind QR for visibility on dark background
+                $img->drawRectangle(self::QR_X - 3, self::QR_Y - 3, function ($rect) {
+                    $rect->size(self::QR_SIZE + 6, self::QR_SIZE + 6);
                     $rect->background('#ffffff');
                 });
-                $img->place($qrImg, 'top-left', 55, 565);
+                $qrImg = $manager->read($qrTempPath);
+                $img->place($qrImg, 'top-left', self::QR_X, self::QR_Y);
                 File::delete($qrTempPath);
             }
         } catch (\Throwable $e) {
-            // QR generation failed — skip silently
+            // QR failure is non-fatal
         }
 
-        // ── Step 10: Certificate ID & Footer ─────────────────────────────────
-        $img->text('Certificate ID:', 230, 580, function ($font) use ($fontReg) {
-            if (file_exists($fontReg)) $font->file($fontReg);
-            $font->size(13);
-            $font->color('#fca5a5');
-        });
-        $img->text($certId, 230, 600, function ($font) use ($fontBold) {
-            if (file_exists($fontBold)) $font->file($fontBold);
-            $font->size(20);
-            $font->color('#fbbf24');
-        });
-
-        $img->text('Issued by: Roktodut Blood Donation Platform', 230, 635, function ($font) use ($fontReg) {
-            if (file_exists($fontReg)) $font->file($fontReg);
-            $font->size(13);
-            $font->color('#ffffff');
-        });
-
-        $img->text('Verify at: ' . $verifyUrl, 230, 658, function ($font) use ($fontReg) {
-            if (file_exists($fontReg)) $font->file($fontReg);
-            $font->size(12);
-            $font->color('#fca5a5');
-        });
-
-        $img->text('Issued on: ' . now()->format('d F, Y'), 230, 680, function ($font) use ($fontReg) {
-            if (file_exists($fontReg)) $font->file($fontReg);
-            $font->size(12);
-            $font->color('#fecaca');
-        });
-
-        // Right side: Platform tagline
-        $img->text('"Donate Blood, Save Lives"', self::W - 60, 595, function ($font) use ($fontBold) {
-            if (file_exists($fontBold)) $font->file($fontBold);
-            $font->size(20);
-            $font->color('#fbbf24');
-            $font->align('right');
-        });
-        $img->text('রক্তদূত — রক্তদান সেবা প্ল্যাটফর্ম', self::W - 60, 625, function ($font) use ($fontReg) {
-            if (file_exists($fontReg)) $font->file($fontReg);
-            $font->size(14);
-            $font->color('#fca5a5');
-            $font->align('right');
-        });
-        $img->text('Website: roktodut.com', self::W - 60, 655, function ($font) use ($fontReg) {
-            if (file_exists($fontReg)) $font->file($fontReg);
-            $font->size(13);
-            $font->color('#ffffff');
-            $font->align('right');
-        });
-
-        // ── Save ──────────────────────────────────────────────────────────────
+        // ── Save final PNG ─────────────────────────────────────────────────
         $img->toPng()->save($savePath);
     }
 }
