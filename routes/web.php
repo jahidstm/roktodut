@@ -51,6 +51,7 @@ use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\SmartCardImageController;
+use App\Http\Controllers\CertificateController;
 
 // ─────────────────────────────────────────────────────────────────────────
 // 🔐 Dynamic QR Smart Card — Public Verification (NO auth middleware)
@@ -62,6 +63,14 @@ Route::get('/verify/{token}/download-pass', [SmartCardImageController::class, 'd
     ->name('public.verify.download');
 Route::get('/verify/{token}/og-image.png', [SmartCardImageController::class, 'socialOg'])
     ->name('public.verify.og');
+
+// ── Blood Donation Certificate (Public — no auth required) ────────────────
+Route::get('/certificate/{token}',          [CertificateController::class, 'show'])
+    ->name('certificate.show')
+    ->middleware('throttle:60,1');
+Route::get('/certificate/{token}/download', [CertificateController::class, 'download'])
+    ->name('certificate.download')
+    ->middleware('throttle:30,1');
 
 Route::get('/offline-verify/{claim}', [ClaimVerificationController::class, 'show'])
     ->name('offline.verify')

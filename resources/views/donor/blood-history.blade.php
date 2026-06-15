@@ -22,7 +22,8 @@
                         <th class="px-6 py-4">তারিখ</th>
                         <th class="px-6 py-4">হাসপাতাল ও লোকেশন</th>
                         <th class="px-6 py-4">রিকোয়েস্ট রেফারেন্স</th>
-                        <th class="px-6 py-4 text-right">স্ট্যাটাস</th>
+                        <th class="px-6 py-4 text-center">স্ট্যাটাস</th>
+                        <th class="px-6 py-4 text-right">সার্টিফিকেট</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 text-sm">
@@ -40,8 +41,33 @@
                                 REQ-{{ str_pad($history->blood_request_id, 4, '0', STR_PAD_LEFT) }}
                             </span>
                         </td>
-                        <td class="px-6 py-4 text-right">
+                        <td class="px-6 py-4 text-center">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 uppercase tracking-widest">সম্পন্ন</span>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            @php
+                                // Find the matching Donation record for this response
+                                $donationRecord = \App\Models\Donation::where('donor_id', auth()->id())
+                                    ->where('blood_request_id', $history->blood_request_id)
+                                    ->latest()->first();
+                            @endphp
+                            @if($donationRecord?->certificate_token)
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="{{ route('certificate.show', $donationRecord->certificate_token) }}"
+                                       target="_blank"
+                                       title="সার্টিফিকেট দেখুন ও শেয়ার করুন"
+                                       class="inline-flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 px-2.5 py-1.5 rounded-lg transition">
+                                        📜 দেখুন
+                                    </a>
+                                    <a href="{{ route('certificate.download', $donationRecord->certificate_token) }}"
+                                       title="PNG ডাউনলোড করুন"
+                                       class="inline-flex items-center gap-1 text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 hover:bg-slate-200 px-2.5 py-1.5 rounded-lg transition">
+                                        ⬇
+                                    </a>
+                                </div>
+                            @else
+                                <span class="text-xs text-slate-400">—</span>
+                            @endif
                         </td>
                     </tr>
                     @empty

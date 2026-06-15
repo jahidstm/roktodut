@@ -232,6 +232,9 @@ class GamificationService
                 $this->checkAndAwardBadges($referrer);
             }
         }
+
+        // ─── ৬. Donation Certificate Issue ──────────────────────────────────
+        $this->issueCertificate($donor, $bloodRequest->id, null);
     }
 
     public function processOfflineDonationReward(
@@ -289,11 +292,67 @@ class GamificationService
         ));
 
         $this->checkAndAwardBadges($donor);
+
+        // ─── Certificate Issue (Offline) ──────────────────────────────────
+        $this->issueCertificate($donor, $bloodRequest?->id, $donationDate);
+    }
+
+    // ==========================================
+    // Certificate Issuance
+    // ==========================================
+
+    /**
+     * Donation verify হলে একটি unique certificate token assign করো এবং donor-কে notify করো।
+     * Idempotent: ইতোমধ্যে token থাকলে আর কিছু করবে না।
+     *
+     * @param User        $donor
+     * @param int|null    $bloodRequestId
+     * @param Carbon|null $donationDate  (offline claim-এর জন্য)
+     */
+    private function issueCertificate(User $donor, ?int $bloodRequestId, ?Carbon $donationDate): void
+    {
+        try {
+            // Find the most recent donation record for this donor + request
+            $donation = \App\Models\Donation::where('donor_id', $donor->id)
+                ->when($bloodRequestId, fn($q) => $q->where('blood_request_id', $bloodRequestId))
+                ->latest()
+                ->first();
+
+            if (!$donation || $donation->certificate_token) {
+                return; // Already issued or no donation record
+            }
+
+            // Collision-safe unique token (32-char hex)
+            do {
+                $token = bin2hex(random_bytes(16));
+            } while (\App\Models\Donation::where('certificate_token', $token)->exists());
+
+            $donation->update([
+                'certificate_token'          => $token,
+                'certificate_generated_at'   => now(),
+            ]);
+
+            // In-app notification
+            $donor->notify(new \App\Notifications\CertificateIssuedNotification($donation->fresh()));
+
+            Log::info('[Certificate] Issued for donation.', [
+                'donor_id'    => $donor->id,
+                'donation_id' => $donation->id,
+                'token'       => substr($token, 0, 8) . '...',
+            ]);
+        } catch (\Throwable $e) {
+            // Certificate failure should NOT break the donation flow
+            Log::error('[Certificate] Failed to issue certificate.', [
+                'donor_id' => $donor->id,
+                'error'    => $e->getMessage(),
+            ]);
+        }
     }
 
     // ==========================================
     // Anti-Cheat: কুলডাউন এনফোর্সমেন্ট
     // ==========================================
+
 
     /**
      * ১২০-দিনের জৈবিক কুলডাউন নিশ্চিত করে।
