@@ -107,6 +107,31 @@ class CertificateController extends Controller
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // Preview PNG — display inline in browser (for dashboard)
+    // ─────────────────────────────────────────────────────────────────────────
+    public function preview(string $token)
+    {
+        $donation = Donation::where('certificate_token', $token)
+            ->with(['donor.district', 'bloodRequest'])
+            ->firstOrFail();
+
+        $directory = storage_path('app/public/certificates');
+        $imagePath = "{$directory}/cert-{$donation->id}.png";
+
+        if (!File::exists($imagePath)) {
+            if (!File::isDirectory($directory)) {
+                File::makeDirectory($directory, 0755, true, true);
+            }
+            $this->generateCertificate($donation, $imagePath);
+        }
+
+        return response()->file($imagePath, [
+            'Content-Type'  => 'image/png',
+            'Cache-Control' => 'public, max-age=86400', // Cache for 1 day
+        ]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Core: Load template → overlay text → save
     // ─────────────────────────────────────────────────────────────────────────
     private function generateCertificate(Donation $donation, string $savePath): void

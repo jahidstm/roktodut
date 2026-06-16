@@ -68,6 +68,8 @@ Route::get('/verify/{token}/og-image.png', [SmartCardImageController::class, 'so
 Route::get('/certificate/{token}',          [CertificateController::class, 'show'])
     ->name('certificate.show')
     ->middleware('throttle:60,1');
+Route::get('/certificate/{token}/preview',  [CertificateController::class, 'preview'])
+    ->name('certificate.preview');
 Route::get('/certificate/{token}/download', [CertificateController::class, 'download'])
     ->name('certificate.download')
     ->middleware('throttle:30,1');

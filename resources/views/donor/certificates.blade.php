@@ -63,30 +63,12 @@
 
         <div class="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 scroll-reveal" data-scroll-reveal>
 
-            {{-- Certificate Preview Banner --}}
-            <div class="{{ $bg }} relative h-32 flex items-center justify-center overflow-hidden">
-                {{-- Background pattern --}}
-                <div class="absolute inset-0 opacity-10">
-                    <svg width="100%" height="100%" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <circle cx="20" cy="20" r="40" stroke="white" stroke-width="0.5" fill="none"/>
-                        <circle cx="180" cy="80" r="40" stroke="white" stroke-width="0.5" fill="none"/>
-                        <circle cx="100" cy="50" r="60" stroke="white" stroke-width="0.3" fill="none"/>
-                    </svg>
-                </div>
-                {{-- Certificate Icon & Title --}}
-                <div class="relative text-center z-10 px-4">
-                    <div class="flex items-center justify-center gap-2 mb-1">
-                        <svg class="w-4 h-4 text-amber-300 opacity-80" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                        <span class="text-xs font-bold text-amber-200 uppercase tracking-widest">Certificate of Appreciation</span>
-                        <svg class="w-4 h-4 text-amber-300 opacity-80" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
-                    </div>
-                    <p class="text-2xl font-black text-white tracking-tight">{{ strtoupper(auth()->user()->name) }}</p>
-                    <p class="text-xs text-white/60 font-semibold mt-1">has successfully donated blood</p>
-                </div>
-                {{-- Cert ID badge --}}
-                <div class="absolute bottom-2 right-3">
-                    <span class="text-[9px] font-bold text-white/40 font-mono">{{ $certId }}</span>
-                </div>
+            {{-- Real Certificate Image Preview --}}
+            <div class="relative w-full aspect-square bg-slate-100 overflow-hidden group">
+                <img src="{{ route('certificate.preview', $donation->certificate_token) }}?v={{ $donation->updated_at?->timestamp ?? time() }}" 
+                     alt="Certificate for {{ $donation->donation_date?->format('d M, Y') }}"
+                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors duration-300"></div>
             </div>
 
             {{-- Card Body --}}
