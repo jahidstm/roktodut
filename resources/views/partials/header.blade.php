@@ -61,7 +61,7 @@
                              x-transition:leave-start="opacity-100 translate-y-0 scale-100"
                              x-transition:leave-end="opacity-0 translate-y-2 scale-95"
                              class="absolute top-full left-1/2 -translate-x-1/2 pt-2 w-64 z-50"
-                             x-cloak>
+                             style="display: none;">
                              <div class="bg-white rounded-2xl shadow-xl ring-1 ring-slate-900/5 p-2 overflow-hidden">
                                  
                                  {{-- Link 1: রক্তের অনুরোধ --}}
