@@ -62,7 +62,8 @@ class SocialAuthController extends Controller
             return redirect()->intended(route('requests.index'));
 
         } catch (Exception $e) {
-            dd($e->getMessage());
+            Log::error('Social Auth Error: ' . $e->getMessage());
+            return redirect()->route('login')->withErrors(['error' => 'সোশ্যাল লগইন এ কোনো সমস্যা হয়েছে। দয়া করে আবার চেষ্টা করুন।']);
         }
     }
 }
