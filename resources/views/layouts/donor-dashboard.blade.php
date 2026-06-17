@@ -269,7 +269,7 @@
             --sr-x: 0px;
             --sr-y: 24px;
             transform: translate3d(var(--sr-x), var(--sr-y), 0);
-            transition: opacity 0.65s ease, transform 0.65s ease;
+            transition: opacity 0.45s ease-out, transform 0.45s ease-out;
             will-change: opacity, transform;
         }
         .scroll-reveal.is-visible,

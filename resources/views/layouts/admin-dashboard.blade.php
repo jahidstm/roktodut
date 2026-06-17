@@ -208,7 +208,7 @@
             opacity: 0;
             --sr-y: 20px;
             transform: translateY(var(--sr-y));
-            transition: opacity 0.55s ease, transform 0.55s ease;
+            transition: opacity 0.45s ease-out, transform 0.45s ease-out;
             will-change: opacity, transform;
         }
         .scroll-reveal.is-visible,
