@@ -9,7 +9,7 @@ class VerifyInternalSecret
 {
     public function handle(Request $request, Closure $next)
     {
-        $expected = (string) env('INTERNAL_WEBHOOK_SECRET', 'ROKTODUT_INTERNAL_SECRET');
+        $expected = (string) config('services.roktodut_ml.internal_secret');
         $provided = (string) $request->header('X-Internal-Secret', '');
 
         if ($expected === '' || $provided === '' || !hash_equals($expected, $provided)) {

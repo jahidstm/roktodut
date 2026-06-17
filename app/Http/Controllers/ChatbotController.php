@@ -45,9 +45,9 @@ class ChatbotController extends Controller
             return response()->json(['reply' => 'প্রশ্নটি একটু ছোট করে লিখুন (সর্বোচ্চ ১০০০ অক্ষর)।'], 422);
         }
 
-        $apiKey = (string) env('GEMINI_API_KEY', '');
-        $model  = trim((string) env('GEMINI_MODEL', 'gemini-2.5-flash'));
-        $maxOutputTokens = max(256, min((int) env('GEMINI_MAX_OUTPUT_TOKENS', 768), 4096));
+        $apiKey = (string) config('services.gemini.api_key');
+        $model  = trim((string) config('services.gemini.model', 'gemini-2.5-flash'));
+        $maxOutputTokens = max(256, min((int) config('services.gemini.max_output_tokens', 768), 4096));
 
         if ($apiKey === '') {
             return response()->json(['reply' => 'GEMINI_API_KEY সেট করা নেই।'], 500);

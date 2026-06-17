@@ -50,7 +50,7 @@ class InternalNlpRequestController extends Controller
             'upazila_id' => $locationIds['upazila_id'],
             'address' => $validated['location_text'],
             'contact_name' => 'NLP Intake',
-            'contact_number' => (string) env('NLP_PLACEHOLDER_PHONE', '00000000000'),
+            'contact_number' => (string) config('services.roktodut_ml.nlp_placeholder_phone'),
             'contact_number_normalized' => null,
             'urgency' => $validated['urgency'],
             'status' => 'nlp_pending',

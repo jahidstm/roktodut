@@ -122,12 +122,12 @@ class OpsCheckCommand extends Command
         }
 
         $required = [
-            'REVERB_APP_ID' => env('REVERB_APP_ID'),
-            'REVERB_APP_KEY' => env('REVERB_APP_KEY'),
-            'REVERB_APP_SECRET' => env('REVERB_APP_SECRET'),
-            'REVERB_HOST' => env('REVERB_HOST'),
-            'REVERB_PORT' => env('REVERB_PORT'),
-            'REVERB_SCHEME' => env('REVERB_SCHEME'),
+            'REVERB_APP_ID' => config('broadcasting.connections.reverb.app_id'),
+            'REVERB_APP_KEY' => config('broadcasting.connections.reverb.key'),
+            'REVERB_APP_SECRET' => config('broadcasting.connections.reverb.secret'),
+            'REVERB_HOST' => config('broadcasting.connections.reverb.options.host'),
+            'REVERB_PORT' => config('broadcasting.connections.reverb.options.port'),
+            'REVERB_SCHEME' => config('broadcasting.connections.reverb.options.scheme'),
         ];
 
         $missing = collect($required)

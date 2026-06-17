@@ -141,7 +141,7 @@ class DonorMatchingService
         try {
             $response = Http::timeout(2)
                 ->withHeaders([
-                    'X-API-Key' => env('ROKTODUT_AI_SECRET', 'ROKTODUT_AI_SECRET'),
+                    'X-API-Key' => config('services.roktodut_ml.api_key'),
                 ])
                 ->post(self::FASTAPI_RANKING_URL, [
                     'request_details' => [

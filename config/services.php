@@ -52,6 +52,13 @@ return [
         'base_url' => env('ROKTODUT_ML_BASE_URL', 'http://127.0.0.1:8001'),
         'api_key' => env('ROKTODUT_AI_SECRET', 'ROKTODUT_AI_SECRET'),
         'internal_secret' => env('INTERNAL_WEBHOOK_SECRET', 'ROKTODUT_INTERNAL_SECRET'),
+        'nlp_placeholder_phone' => env('NLP_PLACEHOLDER_PHONE', '00000000000'),
+    ],
+
+    'gemini' => [
+        'api_key' => env('GEMINI_API_KEY', ''),
+        'model' => env('GEMINI_MODEL', 'gemini-2.5-flash'),
+        'max_output_tokens' => env('GEMINI_MAX_OUTPUT_TOKENS', 768),
     ],
 
 ];
