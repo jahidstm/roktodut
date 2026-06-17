@@ -49,7 +49,7 @@
         .scroll-reveal {
             opacity: 0;
             transform: translateY(24px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            transition: opacity 0.45s ease-out, transform 0.45s ease-out;
             will-change: opacity, transform;
         }
         .scroll-reveal--left {
