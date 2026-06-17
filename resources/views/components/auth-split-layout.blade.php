@@ -15,6 +15,8 @@
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('images/image_14.png') }}" type="image/png" sizes="any">
     
     <style>
         body {
@@ -122,14 +124,10 @@
             <div class="lg:hidden absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-red-100/50 to-transparent"></div>
             <div class="lg:hidden absolute w-72 h-72 bg-red-600/10 rounded-full blur-3xl -top-20 -right-10"></div>
             
-            <!-- Mobile Logo -->
             <div class="lg:hidden mb-8 relative z-10 flex flex-col items-center">
-                <div class="w-16 h-16 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-red-600/20 mb-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M12 2.5C12 2.5 4.5 9 4.5 15.5C4.5 19.6421 7.85786 23 12 23C16.1421 23 19.5 19.6421 19.5 15.5C19.5 9 12 2.5 12 2.5Z"/>
-                    </svg>
-                </div>
-                <h2 class="text-2xl font-bold text-slate-800">রক্তদূত</h2>
+                <a href="{{ route('home') }}" aria-label="রক্তদূত">
+                    <x-logo size="lg" variant="full" />
+                </a>
             </div>
             
             <div class="w-full {{ $maxWidth ?? 'max-w-[28rem]' }} relative z-10 glass-card rounded-3xl p-8 sm:p-10 shadow-xl shadow-slate-200 scroll-reveal"

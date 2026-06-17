@@ -11,7 +11,8 @@
     <meta name="apple-mobile-web-app-title" content="রক্তদূত" />
     <title>@yield('title', 'রক্তদূত')</title>
     <link rel="manifest" href="/manifest.json" />
-    <link rel="icon" href="{{ asset('images/image_14.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('images/image_14.png') }}" type="image/png" sizes="any">
     <link rel="apple-touch-icon" href="{{ asset('images/image_14.png') }}">
     {{-- JS globals for Alpine + Echo (auth'd users only) --}}
     @auth

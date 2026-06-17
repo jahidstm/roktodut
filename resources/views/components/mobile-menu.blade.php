@@ -30,11 +30,8 @@
              class="fixed inset-y-0 left-0 w-72 bg-white shadow-2xl flex flex-col pointer-events-auto">
              
             <div class="flex items-center justify-between px-5 py-5 border-b border-slate-100">
-                <a href="{{ route('home') }}" class="flex items-center gap-3">
-                    <div class="h-9 w-9 rounded-xl border border-slate-100 flex items-center justify-center overflow-hidden bg-white shadow-sm">
-                        <img src="{{ asset('images/image_14.png') }}" class="w-full h-full object-contain p-1" alt="Logo">
-                    </div>
-                    <span class="font-extrabold text-slate-900 text-lg tracking-tight">রক্তদূত</span>
+                <a href="{{ route('home') }}" class="inline-flex" aria-label="রক্তদূত">
+                    <x-logo size="md" variant="full" />
                 </a>
                 <button @click="mobileMenuOpen = false" class="text-slate-400 hover:text-red-600 focus:outline-none p-1 bg-slate-50 rounded-full transition-colors">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>

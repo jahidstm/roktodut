@@ -15,14 +15,11 @@
             </button>
 
             {{-- 🩸 Logo & Brand --}}
-            <a href="{{ route('home') }}" class="flex items-center gap-3 group">
-                <div class="h-9 w-9 sm:h-10 sm:w-10 rounded-xl border border-slate-100 flex items-center justify-center overflow-hidden bg-white shadow-sm group-hover:shadow-md transition-shadow">
-                    <img src="{{ asset('images/image_14.png') }}" alt="RoktoDut Logo" class="w-full h-full object-contain p-1" loading="lazy" decoding="async">
-                </div>
-                <div class="leading-tight hidden sm:block">
-                    <div class="font-extrabold tracking-tight text-slate-900 group-hover:text-red-600 transition-colors">রক্তদূত</div>
-                    <div class="text-[10px] sm:text-xs text-slate-500 font-semibold uppercase tracking-wider">Blood Donation Platform</div>
-                </div>
+            <a href="{{ route('home') }}"
+               class="group inline-flex items-center focus:outline-none"
+               aria-label="রক্তদূত — হোম">
+                <x-logo size="md" variant="full"
+                        class="[&_.transition-colors]:group-hover:!text-red-600" />
             </a>
         </div>
 
