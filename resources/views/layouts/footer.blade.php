@@ -11,7 +11,7 @@
             {{-- Column 1: Brand & Trust --}}
             <div class="space-y-5 sm:col-span-2 lg:col-span-2 lg:pr-12 flex flex-col items-center sm:items-start text-center sm:text-left mb-2 lg:mb-0">
                 <a href="{{ route('home') }}" class="inline-flex" aria-label="রক্তদূত — হোম">
-                    <x-logo size="md" variant="full" class="dark:text-white" />
+                    <x-logo size="md" variant="full" :inverted="true" />
                 </a>
                 <p class="text-sm text-slate-400 font-medium leading-relaxed max-w-md">
                     জরুরি মুহূর্তে রক্তের সন্ধানে বাংলাদেশের সবচেয়ে নির্ভরযোগ্য ভেরিফায়েড <br> প্ল্যাটফর্ম। এক ফোঁটা রক্ত, বাঁচাতে পারে একটি প্রাণ।
