@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Geo-Spatial Demand Heatmap — Admin — রক্তদূত</title>
-    <link rel="icon" href="{{ asset('images/image_14.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
 
     {{-- Leaflet --}}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -314,7 +314,7 @@
                 <svg style="width:24px; height:24px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
             </button>
             <a href="{{ route('admin.dashboard') }}" class="topbar-brand">
-                <div class="topbar-logo"><img src="{{ asset('images/image_14.png') }}" alt="Roktodut"></div>
+                <div class="topbar-logo"><x-logo size="sm" variant="full" :inverted="true" /></div>
                 <div>
                     <div class="topbar-name">রক্তদূত</div>
                     <div class="topbar-sub">Blood Donation Platform</div>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ইন্টারনেট সংযোগ নেই — রক্তদূত</title>
-    <link rel="icon" href="/images/image_14.png" type="image/png">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
@@ -124,7 +124,7 @@
 <body>
     <div class="card">
         <div class="icon-wrap">
-            <img src="/images/image_14.png" alt="রক্তদূত">
+            <x-logo size="xl" variant="full" />
         </div>
 
         <h1>ইন্টারনেট সংযোগ নেই</h1>

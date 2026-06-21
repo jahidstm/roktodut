@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>লাইভ রক্তের চাহিদা মানচিত্র — রক্তদূত</title>
     <meta name="description" content="বাংলাদেশের জেলাভিত্তিক রিয়েল-টাইম রক্তের জরুরি চাহিদার ইন্টারেক্টিভ মানচিত্র।">
-    <link rel="icon" href="{{ asset('images/image_14.png') }}" type="image/png">
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
 
     {{-- Leaflet --}}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
@@ -393,7 +393,7 @@
         </button>
         <a href="{{ route('home') }}" class="topbar-brand">
             <div class="topbar-logo">
-                <img src="{{ asset('images/image_14.png') }}" alt="রক্তদূত লোগো">
+                <x-logo size="md" variant="full" />
             </div>
             <div>
                 <div class="topbar-name">রক্তদূত</div>

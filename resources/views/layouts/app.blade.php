@@ -286,7 +286,9 @@
          class="fixed bottom-0 left-0 right-0 z-[9990] p-4 sm:p-0 sm:bottom-6 sm:right-6 sm:left-auto">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 sm:p-5 sm:w-80 flex items-start gap-4">
             <div class="shrink-0 w-12 h-12 rounded-xl overflow-hidden border border-slate-100">
-                <img src="/images/image_14.png" alt="রক্তদূত" class="w-full h-full object-contain p-1">
+                <div class="animate-pulse">
+                    <x-logo size="xl" variant="icon" />
+                </div>
             </div>
             <div class="flex-1 min-w-0">
                 <p class="font-black text-slate-900 text-sm leading-tight">রক্তদূত ইনস্টল করুন</p>

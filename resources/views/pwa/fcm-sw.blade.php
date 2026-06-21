@@ -13,8 +13,8 @@ if (hasConfig) {
         const title = payload?.notification?.title ?? 'নতুন নোটিফিকেশন';
         const options = {
             body: payload?.notification?.body ?? '',
-            icon: payload?.notification?.icon ?? '/images/image_14.png',
-            badge: payload?.notification?.badge ?? '/images/image_14.png',
+            icon: payload?.notification?.icon ?? '/favicon.svg',
+            badge: payload?.notification?.badge ?? '/favicon.svg',
             data: payload?.data ?? {},
         };
 
