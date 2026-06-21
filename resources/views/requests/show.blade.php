@@ -10,7 +10,7 @@
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8 scroll-reveal" data-scroll-reveal>
         <div>
             <h1 class="text-3xl font-black text-slate-900 tracking-tight">রিকোয়েস্ট ডিটেইলস</h1>
-            <p class="text-slate-500 font-medium mt-1">Accepted ডোনার লিস্ট এবং স্ট্যাটাস</p>
+            <p class="text-slate-500 font-medium mt-1">অ্যাকসেপ্টেড ডোনার তালিকা এবং স্ট্যাটাস</p>
         </div>
         
         <a href="{{ route('requests.index') }}" class="shrink-0 bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-extrabold py-2.5 px-5 rounded-xl shadow-sm transition-colors flex items-center gap-2">
@@ -37,7 +37,7 @@
                         x-data
                         @click="$dispatch('open-modal', 'report-blood-request')"
                         class="inline-flex items-center rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-black text-red-700 hover:bg-red-50">
-                    Report
+                    রিপোর্ট করুন
                 </button>
             </div>
         </div>
@@ -146,7 +146,7 @@
                 <form method="POST" action="{{ route('requests.fulfill', $bloodRequest) }}">
                     @csrf
                     <button class="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black shadow-sm transition">
-                        Mark as Fulfilled
+                        রক্তদান সম্পন্ন হিসেবে চিহ্নিত করুন
                     </button>
                 </form>
             @endif
@@ -190,7 +190,7 @@
                         @csrf
                         <input type="hidden" name="status" value="declined" />
                         <button class="px-8 py-3 rounded-xl border-2 border-slate-200 bg-white hover:bg-slate-50 text-slate-800 font-black transition">
-                            Decline
+                            ডিক্লাইন
                         </button>
                     </form>
                     @endif
@@ -258,7 +258,7 @@
             
             @if(strtolower($bloodRequest->status) === 'fulfilled')
                 <div class="px-8 py-3 rounded-xl bg-emerald-100 text-emerald-800 font-black border border-emerald-200">
-                    এই রিকোয়েস্টটি সম্পন্ন হয়েছে (Fulfilled)
+                    এই রিকোয়েস্টটি সম্পন্ন হয়েছে
                 </div>
             @endif
         </div>
@@ -301,7 +301,7 @@
 
                         <div class="pt-1 flex items-center justify-end gap-2">
                             <button type="button" @click="renewOpen = false" class="px-4 py-2 rounded-lg border border-slate-200 bg-white text-slate-700 text-sm font-bold hover:bg-slate-50">
-                                Cancel
+                                বাতিল
                             </button>
                             <button type="submit" class="px-5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-black">
                                 রিনিউ সাবমিট
@@ -532,7 +532,7 @@
 
                                 <div class="text-sm font-semibold text-slate-700 mb-3 p-3 bg-white border border-emerald-100 rounded-lg flex items-center gap-2">
                                     <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>
-                                    <span id="phone-{{ $resp->user_id }}" class="font-black text-slate-900 tracking-wider">Hidden</span>
+                                    <span id="phone-{{ $resp->user_id }}" class="font-black text-slate-900 tracking-wider">লুকানো</span>
                                 </div>
 
                                 {{-- 🎯 রোগীর লোকের জন্য PIN Display Box --}}
@@ -544,11 +544,11 @@
                                     </div>
                                     <div class="text-right">
                                         @if($resp->verification_status === 'verified')
-                                            <span class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wide">Verified</span>
+                                            <span class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wide">সত্যায়িত</span>
                                         @elseif($resp->verification_status === 'claimed')
-                                            <span class="bg-amber-100 text-amber-700 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wide">Reviewing</span>
+                                            <span class="bg-amber-100 text-amber-700 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wide">রিভিউয়ে</span>
                                         @else
-                                            <span class="bg-slate-200 text-slate-500 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wide">Pending</span>
+                                            <span class="bg-slate-200 text-slate-500 text-[10px] font-black px-2 py-1 rounded uppercase tracking-wide">অপেক্ষমাণ</span>
                                         @endif
                                     </div>
                                 </div>

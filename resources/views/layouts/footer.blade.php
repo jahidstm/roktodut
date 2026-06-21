@@ -38,7 +38,8 @@
                     </a>
                 </div>
 
-                {{-- Social Icons --}}
+                {{-- Social Icons — লিংক পাওয়া গেলে এখানে যোগ করুন --}}
+                {{--
                 <div class="flex items-center justify-center sm:justify-start gap-4 pt-3 w-full">
                     <a href="#" aria-label="Facebook" class="text-slate-500 hover:text-[#1877F2] transition-colors">
                         <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -61,6 +62,7 @@
                         </svg>
                     </a>
                 </div>
+                --}}
             </div>
 
             {{-- Column 2: Quick Links (B2C) --}}

@@ -3,7 +3,7 @@
     x-init="scrolled = window.scrollY > 8; window.addEventListener('scroll', () => scrolled = window.scrollY > 8)"
     :class="scrolled ? 'bg-white/80 backdrop-blur-md border-slate-200 shadow-sm' : 'bg-white border-slate-100'"
     class="sticky top-0 z-50 border-b transition-all duration-300">
-    <div class="mx-auto max-w-6xl px-4 py-4 sm:py-5 relative flex items-center justify-between">
+    <div class="mx-auto max-w-7xl px-4 py-4 sm:py-5 relative flex items-center justify-between">
         @php
             $requestsRoute = \Illuminate\Support\Facades\Route::has('requests') ? route('requests') : route('requests.index');
         @endphp

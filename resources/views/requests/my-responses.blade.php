@@ -59,11 +59,11 @@
                         </td>
                         <td class="px-6 py-4">
                             @if($res->status === 'pending')
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800">Pending</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-800">অপেক্ষমাণ</span>
                             @elseif($res->status === 'accepted')
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">Accepted</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800">অনুমোদিত</span>
                             @elseif($res->status === 'declined' || $res->status === 'rejected')
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-red-100 text-red-800">Declined</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-red-100 text-red-800">ডিক্লাইনড</span>
                             @else
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-slate-100 text-slate-800">{{ ucfirst($res->status) }}</span>
                             @endif

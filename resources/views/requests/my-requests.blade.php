@@ -59,10 +59,10 @@
                     $canRenew = $isExpiredStatus || ($isPastNeededAt && $isPendingLikeStatus);
 
                     $statusMap = [
-                        'pending' => ['label' => 'Pending', 'cls' => 'bg-amber-100 text-amber-800 border-amber-200'],
-                        'in_progress' => ['label' => 'In Progress', 'cls' => 'bg-indigo-100 text-indigo-800 border-indigo-200'],
-                        'expired' => ['label' => 'Expired', 'cls' => 'bg-rose-100 text-rose-800 border-rose-200'],
-                        'fulfilled' => ['label' => 'Fulfilled', 'cls' => 'bg-emerald-100 text-emerald-800 border-emerald-200'],
+                        'pending'     => ['label' => 'অপেক্ষমাণ', 'cls' => 'bg-amber-100 text-amber-800 border-amber-200'],
+                        'in_progress' => ['label' => 'প্রক্রিয়াধীন', 'cls' => 'bg-indigo-100 text-indigo-800 border-indigo-200'],
+                        'expired'     => ['label' => 'মেয়াদোত্তীর্ণ', 'cls' => 'bg-rose-100 text-rose-800 border-rose-200'],
+                        'fulfilled'   => ['label' => 'সম্পন্ন', 'cls' => 'bg-emerald-100 text-emerald-800 border-emerald-200'],
                     ];
                     $statusInfo = $statusMap[$currentStatus] ?? ['label' => strtoupper((string) $req->status), 'cls' => 'bg-slate-100 text-slate-700 border-slate-200'];
                 @endphp
@@ -106,7 +106,7 @@
 
                         <a href="{{ route('requests.show', $req->id) }}"
                            class="inline-flex h-10 items-center justify-center rounded-xl border border-slate-300 bg-white px-4 text-sm font-bold text-slate-700 transition hover:bg-slate-50">
-                            View Details
+                            বিস্তারিত দেখুন
                         </a>
                     </div>
 
