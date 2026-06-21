@@ -156,33 +156,6 @@
 
 
 
-{{-- ═══════════════════════════════════════════════════════════════
-     SECTION 3 — STATS COUNTER
-═══════════════════════════════════════════════════════════════ --}}
-<section class="bg-[#18181b] py-16 sm:py-20 border-t border-[#2a2a30]">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
-            <div class="text-center px-8 py-6 sm:py-0 scroll-reveal" data-scroll-reveal>
-                <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">
-                    <span class="counter" data-target="{{ $totalDonors }}">0</span><span class="text-[#e11d48]">+</span>
-                </div>
-                <div class="text-sm sm:text-[15px] font-bold text-slate-400">রেজিস্টার্ড ডোনার</div>
-            </div>
-            <div class="text-center px-8 py-6 sm:py-0 scroll-reveal" data-scroll-reveal>
-                <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">
-                    <span class="counter" data-target="{{ $verifiedDonors }}">0</span><span class="text-[#e11d48]">+</span>
-                </div>
-                <div class="text-sm sm:text-[15px] font-bold text-slate-400">ভেরিফাইড ডোনার</div>
-            </div>
-            <div class="text-center px-8 py-6 sm:py-0 scroll-reveal" data-scroll-reveal>
-                <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">
-                    <span class="counter" data-target="{{ $totalDonations }}">0</span><span class="text-[#e11d48]">+</span>
-                </div>
-                <div class="text-sm sm:text-[15px] font-bold text-slate-400">সফল রক্তদান</div>
-            </div>
-        </div>
-    </div>
-</section>
 
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 4 — FEATURES (Red)
@@ -255,9 +228,143 @@
     </div>
 </section>
 
+
+{{-- ═══════════════════════════════════════════════════════════════
+     SECTION 7 — LIVE MAP CTA (Red Compact)
+═══════════════════════════════════════════════════════════════ --}}
+<section class="bg-[#c82128] py-14 relative overflow-hidden">
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 text-3xl mb-6 scroll-reveal" data-scroll-reveal>🗺️</div>
+        
+        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4 tracking-tight scroll-reveal" data-scroll-reveal>
+            লাইভ রক্তের চাহিদা মানচিত্র
+        </h2>
+        
+        <p class="text-white/90 text-sm sm:text-base font-medium max-w-2xl mx-auto mb-8 leading-relaxed scroll-reveal" data-scroll-reveal>
+            কোন জেলায় রক্তের সংকট সবচেয়ে বেশি? রিয়েল-টাইম হিটম্যাপে দেখুন এবং সবচেয়ে প্রয়োজনীয় জায়গায় রক্তদান করুন।
+        </p>
+        
+        <a href="{{ route('live-demand.index') }}"
+           class="{{ $btnSecondary }} px-7 py-3.5 text-sm sm:text-base scroll-reveal" data-scroll-reveal>
+            লাইভ ম্যাপ দেখুন
+            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </a>
+        
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════
+     SECTION 8 — TOP DONORS (Podium)
+═══════════════════════════════════════════════════════════════ --}}
+<section class="py-24 bg-white">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+
+        <div class="text-center mb-16">
+            <div class="inline-flex items-center gap-2 bg-amber-50 border border-amber-100 text-amber-600 text-xs font-bold px-4 py-2 rounded-full mb-5 scroll-reveal" data-scroll-reveal>🦸 রিয়েল লাইফ সুপারহিরো</div>
+            <h2 class="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-4 scroll-reveal" data-scroll-reveal>আমাদের সেরা রক্তদাতাগণ</h2>
+            <p class="text-slate-500 font-medium max-w-xl mx-auto scroll-reveal" data-scroll-reveal>যারা সবচেয়ে বেশি মানুষের জীবন বাঁচিয়েছেন, তাদের প্রতি আমাদের কৃতজ্ঞতা।</p>
+        </div>
+
+        @if($topDonors->isNotEmpty())
+            @php
+                $orderedDonors = collect();
+                if($topDonors->has(0)) $orderedDonors->push(['donor'=>$topDonors[0],'rank'=>1,'emoji'=>'🥇','label'=>'১ম স্থান']);
+                if($topDonors->has(1)) $orderedDonors->push(['donor'=>$topDonors[1],'rank'=>2,'emoji'=>'🥈','label'=>'২য় স্থান']);
+                if($topDonors->has(2)) $orderedDonors->push(['donor'=>$topDonors[2],'rank'=>3,'emoji'=>'🥉','label'=>'৩য় স্থান']);
+            @endphp
+
+            <div class="flex flex-col lg:flex-row items-end justify-center gap-5 mt-8">
+                @foreach($orderedDonors as $item)
+                    @php
+                        $d = $item['donor'];
+                        $rank = $item['rank'];
+                        $initial = mb_strtoupper(mb_substr($d->name, 0, 1));
+                        $isFirst = $rank === 1;
+                        $cardClasses = $isFirst
+                            ? "border-amber-200 shadow-[0_20px_60px_rgba(251,191,36,0.12)] lg:scale-110 pb-8 pt-12"
+                            : "border-slate-100 shadow-sm pb-6 pt-10 mt-0 lg:mt-8";
+                        $avatarRing = match($rank) { 1=>"ring-4 ring-amber-100 border-amber-300", 2=>"border-slate-200", 3=>"border-orange-200", default=>"border-slate-100" };
+                        $orderClass = match($rank) { 1=>"order-1 lg:order-2", 2=>"order-2 lg:order-1", 3=>"order-3 lg:order-3", default=>"order-4" };
+                    @endphp
+
+                    <div class="bg-white rounded-3xl px-6 w-full max-w-xs mx-auto lg:mx-0 flex flex-col items-center relative border-2 {{ $cardClasses }} {{ $orderClass }} transition-all duration-300 hover:-translate-y-2 scroll-reveal" data-scroll-reveal>
+                        <div class="absolute -top-5 bg-slate-900 text-white text-xs font-black px-5 py-2 rounded-full flex items-center gap-1.5 shadow-lg">
+                            {{ $item['emoji'] }} {{ $item['label'] }}
+                        </div>
+                        <div class="w-20 h-20 rounded-full border-[3px] {{ $avatarRing }} flex items-center justify-center text-3xl font-black mb-5 bg-gradient-to-br from-red-50 to-rose-100 text-red-600">{{ $initial }}</div>
+                        <h3 class="text-lg font-black text-slate-900 text-center mb-2 truncate w-full">{{ $d->name }}</h3>
+                        @if($d->blood_group)
+                        <div class="bg-red-50 text-red-600 font-bold text-[10px] px-3 py-1 rounded-lg mb-5 uppercase tracking-widest border border-red-100">{{ $d->blood_group?->value ?? $d->blood_group }} ডোনার</div>
+                        @else
+                        <div class="h-6 mb-5"></div>
+                        @endif
+                        <div class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-center divide-x divide-slate-200 mb-5">
+                            <div class="flex-1 text-center pr-4">
+                                <div class="text-2xl font-black text-slate-900">{{ $d->total_verified_donations ?? 0 }}</div>
+                                <div class="text-[10px] font-bold text-slate-400 mt-1">রক্তদান</div>
+                            </div>
+                            <div class="flex-1 text-center pl-4">
+                                <div class="text-2xl font-black text-slate-900">{{ number_format($d->points ?? 0) }}</div>
+                                <div class="text-[10px] font-bold text-slate-400 mt-1">পয়েন্ট</div>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 justify-center">
+                            @if($d->badges->isNotEmpty())
+                                @foreach($d->badges->take(3) as $badge)
+                                    @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
+                                    <span class="text-xl drop-shadow-sm hover:scale-125 transition-transform cursor-help" title="{{ $bd['bn'] }}">{{ $bd['emoji'] }}</span>
+                                @endforeach
+                            @else
+                                <span class="text-xl opacity-20 grayscale">🎖️</span><span class="text-xl opacity-20 grayscale">🎖️</span><span class="text-xl opacity-20 grayscale">🎖️</span>
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div class="mt-16 text-center scroll-reveal" data-scroll-reveal>
+                <a href="{{ route('leaderboard') }}" class="{{ $btnSecondary }} px-7 py-3.5 text-sm sm:text-base">
+                    সম্পূর্ণ লিডারবোর্ড দেখুন
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            </div>
+        @endif
+    </div>
+</section>
+
+{{-- ═══════════════════════════════════════════════════════════════
+     SECTION 3 — STATS COUNTER
+═══════════════════════════════════════════════════════════════ --}}
+<section class="bg-[#18181b] py-16 sm:py-20 border-t border-[#2a2a30]">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/10">
+            <div class="text-center px-8 py-6 sm:py-0 scroll-reveal" data-scroll-reveal>
+                <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">
+                    <span class="counter" data-target="{{ $totalDonors }}">0</span><span class="text-[#e11d48]">+</span>
+                </div>
+                <div class="text-sm sm:text-[15px] font-bold text-slate-400">রেজিস্টার্ড ডোনার</div>
+            </div>
+            <div class="text-center px-8 py-6 sm:py-0 scroll-reveal" data-scroll-reveal>
+                <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">
+                    <span class="counter" data-target="{{ $verifiedDonors }}">0</span><span class="text-[#e11d48]">+</span>
+                </div>
+                <div class="text-sm sm:text-[15px] font-bold text-slate-400">ভেরিফাইড ডোনার</div>
+            </div>
+            <div class="text-center px-8 py-6 sm:py-0 scroll-reveal" data-scroll-reveal>
+                <div class="text-4xl sm:text-5xl lg:text-[56px] font-black text-white mb-3 tabular-nums">
+                    <span class="counter" data-target="{{ $totalDonations }}">0</span><span class="text-[#e11d48]">+</span>
+                </div>
+                <div class="text-sm sm:text-[15px] font-bold text-slate-400">সফল রক্তদান</div>
+            </div>
+        </div>
+    </div>
+</section>
+
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 6 — DONATION JOURNEY
 ═══════════════════════════════════════════════════════════════ --}}
+@guest
 <section class="py-24 bg-slate-50 relative overflow-hidden border-t border-slate-100">
     <div class="absolute -top-24 right-10 w-72 h-72 bg-red-500/5 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute bottom-0 left-6 w-80 h-80 bg-emerald-400/5 rounded-full blur-3xl pointer-events-none"></div>
@@ -381,110 +488,7 @@
         </div>
     </div>
 </section>
-
-{{-- ═══════════════════════════════════════════════════════════════
-     SECTION 7 — LIVE MAP CTA (Red Compact)
-═══════════════════════════════════════════════════════════════ --}}
-<section class="bg-[#c82128] py-14 relative overflow-hidden">
-    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-        
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 text-3xl mb-6 scroll-reveal" data-scroll-reveal>🗺️</div>
-        
-        <h2 class="text-3xl sm:text-4xl lg:text-5xl font-black text-white mb-4 tracking-tight scroll-reveal" data-scroll-reveal>
-            লাইভ রক্তের চাহিদা মানচিত্র
-        </h2>
-        
-        <p class="text-white/90 text-sm sm:text-base font-medium max-w-2xl mx-auto mb-8 leading-relaxed scroll-reveal" data-scroll-reveal>
-            কোন জেলায় রক্তের সংকট সবচেয়ে বেশি? রিয়েল-টাইম হিটম্যাপে দেখুন এবং সবচেয়ে প্রয়োজনীয় জায়গায় রক্তদান করুন।
-        </p>
-        
-        <a href="{{ route('live-demand.index') }}"
-           class="{{ $btnSecondary }} px-7 py-3.5 text-sm sm:text-base scroll-reveal" data-scroll-reveal>
-            লাইভ ম্যাপ দেখুন
-            <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-        </a>
-        
-    </div>
-</section>
-
-{{-- ═══════════════════════════════════════════════════════════════
-     SECTION 8 — TOP DONORS (Podium)
-═══════════════════════════════════════════════════════════════ --}}
-<section class="py-24 bg-white">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-
-        <div class="text-center mb-16">
-            <div class="inline-flex items-center gap-2 bg-amber-50 border border-amber-100 text-amber-600 text-xs font-bold px-4 py-2 rounded-full mb-5 scroll-reveal" data-scroll-reveal>🦸 রিয়েল লাইফ সুপারহিরো</div>
-            <h2 class="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight mb-4 scroll-reveal" data-scroll-reveal>আমাদের সেরা রক্তদাতাগণ</h2>
-            <p class="text-slate-500 font-medium max-w-xl mx-auto scroll-reveal" data-scroll-reveal>যারা সবচেয়ে বেশি মানুষের জীবন বাঁচিয়েছেন, তাদের প্রতি আমাদের কৃতজ্ঞতা।</p>
-        </div>
-
-        @if($topDonors->isNotEmpty())
-            @php
-                $orderedDonors = collect();
-                if($topDonors->has(0)) $orderedDonors->push(['donor'=>$topDonors[0],'rank'=>1,'emoji'=>'🥇','label'=>'১ম স্থান']);
-                if($topDonors->has(1)) $orderedDonors->push(['donor'=>$topDonors[1],'rank'=>2,'emoji'=>'🥈','label'=>'২য় স্থান']);
-                if($topDonors->has(2)) $orderedDonors->push(['donor'=>$topDonors[2],'rank'=>3,'emoji'=>'🥉','label'=>'৩য় স্থান']);
-            @endphp
-
-            <div class="flex flex-col lg:flex-row items-end justify-center gap-5 mt-8">
-                @foreach($orderedDonors as $item)
-                    @php
-                        $d = $item['donor'];
-                        $rank = $item['rank'];
-                        $initial = mb_strtoupper(mb_substr($d->name, 0, 1));
-                        $isFirst = $rank === 1;
-                        $cardClasses = $isFirst
-                            ? "border-amber-200 shadow-[0_20px_60px_rgba(251,191,36,0.12)] lg:scale-110 pb-8 pt-12"
-                            : "border-slate-100 shadow-sm pb-6 pt-10 mt-0 lg:mt-8";
-                        $avatarRing = match($rank) { 1=>"ring-4 ring-amber-100 border-amber-300", 2=>"border-slate-200", 3=>"border-orange-200", default=>"border-slate-100" };
-                        $orderClass = match($rank) { 1=>"order-1 lg:order-2", 2=>"order-2 lg:order-1", 3=>"order-3 lg:order-3", default=>"order-4" };
-                    @endphp
-
-                    <div class="bg-white rounded-3xl px-6 w-full max-w-xs mx-auto lg:mx-0 flex flex-col items-center relative border-2 {{ $cardClasses }} {{ $orderClass }} transition-all duration-300 hover:-translate-y-2 scroll-reveal" data-scroll-reveal>
-                        <div class="absolute -top-5 bg-slate-900 text-white text-xs font-black px-5 py-2 rounded-full flex items-center gap-1.5 shadow-lg">
-                            {{ $item['emoji'] }} {{ $item['label'] }}
-                        </div>
-                        <div class="w-20 h-20 rounded-full border-[3px] {{ $avatarRing }} flex items-center justify-center text-3xl font-black mb-5 bg-gradient-to-br from-red-50 to-rose-100 text-red-600">{{ $initial }}</div>
-                        <h3 class="text-lg font-black text-slate-900 text-center mb-2 truncate w-full">{{ $d->name }}</h3>
-                        @if($d->blood_group)
-                        <div class="bg-red-50 text-red-600 font-bold text-[10px] px-3 py-1 rounded-lg mb-5 uppercase tracking-widest border border-red-100">{{ $d->blood_group?->value ?? $d->blood_group }} ডোনার</div>
-                        @else
-                        <div class="h-6 mb-5"></div>
-                        @endif
-                        <div class="w-full bg-slate-50 border border-slate-100 rounded-2xl p-4 flex items-center divide-x divide-slate-200 mb-5">
-                            <div class="flex-1 text-center pr-4">
-                                <div class="text-2xl font-black text-slate-900">{{ $d->total_verified_donations ?? 0 }}</div>
-                                <div class="text-[10px] font-bold text-slate-400 mt-1">রক্তদান</div>
-                            </div>
-                            <div class="flex-1 text-center pl-4">
-                                <div class="text-2xl font-black text-slate-900">{{ number_format($d->points ?? 0) }}</div>
-                                <div class="text-[10px] font-bold text-slate-400 mt-1">পয়েন্ট</div>
-                            </div>
-                        </div>
-                        <div class="flex gap-2 justify-center">
-                            @if($d->badges->isNotEmpty())
-                                @foreach($d->badges->take(3) as $badge)
-                                    @php $bd = \App\Services\GamificationService::getBadgeDisplayData($badge->name); @endphp
-                                    <span class="text-xl drop-shadow-sm hover:scale-125 transition-transform cursor-help" title="{{ $bd['bn'] }}">{{ $bd['emoji'] }}</span>
-                                @endforeach
-                            @else
-                                <span class="text-xl opacity-20 grayscale">🎖️</span><span class="text-xl opacity-20 grayscale">🎖️</span><span class="text-xl opacity-20 grayscale">🎖️</span>
-                            @endif
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-
-            <div class="mt-16 text-center scroll-reveal" data-scroll-reveal>
-                <a href="{{ route('leaderboard') }}" class="{{ $btnSecondary }} px-7 py-3.5 text-sm sm:text-base">
-                    সম্পূর্ণ লিডারবোর্ড দেখুন
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
-                </a>
-            </div>
-        @endif
-    </div>
-</section>
+@endguest
 
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 9 — BLOG
