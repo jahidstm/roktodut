@@ -228,6 +228,134 @@
     </div>
 </section>
 
+{{-- ═══════════════════════════════════════════════════════════════
+     SECTION 6 — DONATION JOURNEY
+═══════════════════════════════════════════════════════════════ --}}
+@guest
+<section class="py-24 bg-slate-50 relative overflow-hidden border-t border-slate-100">
+    <div class="absolute -top-24 right-10 w-72 h-72 bg-red-500/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute bottom-0 left-6 w-80 h-80 bg-emerald-400/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-14">
+            <div class="inline-flex items-center gap-2 bg-white border border-red-100 text-red-600 text-xs font-bold px-4 py-2 rounded-full mb-5 shadow-sm scroll-reveal" data-scroll-reveal>
+                রক্তদানের জার্নি
+            </div>
+            <h2 class="text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tight leading-tight scroll-reveal" data-scroll-reveal>
+                মাত্র ৩ ধাপে<br>রক্ত দিন বা নিন
+            </h2>
+            <p class="text-slate-500 font-medium text-lg scroll-reveal" data-scroll-reveal>
+                স্মার্ট ফিল্টার, ভেরিফায়েড ডোনার এবং নিরাপদ যোগাযোগ — সবকিছু এক প্ল্যাটফর্মে।
+            </p>
+        </div>
+
+        @php
+            $journeySteps = [
+                [
+                    'num' => '০১',
+                    'title' => 'প্রোফাইল ও যাচাই সম্পন্ন করুন',
+                    'desc' => 'রক্তের গ্রুপ, ঠিকানা ও NID দিয়ে ফ্রি অ্যাকাউন্ট খুলুন।',
+                    'bullets' => ['ফোন নম্বর গোপন থাকে', 'NID ভেরিফাইড ডোনার', 'ডোনার অ্যাভেইলেবিলিটি সেট করুন'],
+                    'cardClass' => 'bg-red-50/70 border-red-100',
+                    'pillClass' => 'bg-red-100 text-red-600',
+                    'badgeClass' => 'bg-red-500 text-white',
+                    'dotClass' => 'text-red-500',
+                    'icon' => '🩸',
+                ],
+                [
+                    'num' => '০২',
+                    'title' => 'সঠিক ডোনার বা রিকোয়েস্ট ম্যাচ করুন',
+                    'desc' => 'স্মার্ট ফিল্টার ও লোকেশন দিয়ে দ্রুত উপযুক্ত ম্যাচ খুঁজুন।',
+                    'bullets' => ['রক্তের গ্রুপ ও এলাকা ফিল্টার', 'রিয়েল-টাইম স্ট্যাটাস দেখা যায়', 'প্রয়োজনীয় নোট যুক্ত করুন'],
+                    'cardClass' => 'bg-amber-50/70 border-amber-100',
+                    'pillClass' => 'bg-amber-100 text-amber-600',
+                    'badgeClass' => 'bg-amber-500 text-white',
+                    'dotClass' => 'text-amber-500',
+                    'icon' => '🧭',
+                ],
+                [
+                    'num' => '০৩',
+                    'title' => 'সাড়া দিন ও জীবন বাঁচান',
+                    'desc' => 'প্ল্যাটফর্মে যোগাযোগ করে নিরাপদে রক্তদান সম্পন্ন করুন।',
+                    'bullets' => ['রিকোয়েস্ট ট্র্যাক করা যায়', 'সেফ যোগাযোগ ব্যবস্থাপনা', 'কমিউনিটি কৃতজ্ঞতা শেয়ার'],
+                    'cardClass' => 'bg-emerald-50/70 border-emerald-100',
+                    'pillClass' => 'bg-emerald-100 text-emerald-600',
+                    'badgeClass' => 'bg-emerald-500 text-white',
+                    'dotClass' => 'text-emerald-500',
+                    'icon' => '🤝',
+                ],
+            ];
+        @endphp
+
+        <div class="relative">
+            <div class="absolute left-1/2 top-0 hidden lg:block -translate-x-1/2 h-full w-px border-l-2 border-dashed border-slate-200"></div>
+            <div class="space-y-10">
+                @foreach($journeySteps as $step)
+                    <div class="relative grid lg:grid-cols-[1fr_auto_1fr] items-center gap-8">
+                        @if($loop->odd)
+                            <div class="lg:col-start-1 flex lg:justify-end scroll-reveal scroll-reveal--left" data-scroll-reveal>
+                                <div class="w-full max-w-md rounded-3xl border {{ $step['cardClass'] }} p-6 sm:p-7 shadow-[0_15px_45px_rgba(0,0,0,0.06)]">
+                                    <div class="flex items-center justify-between gap-3 mb-4">
+                                        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold {{ $step['pillClass'] }}">ধাপ {{ $step['num'] }}</span>
+                                        <span class="text-xl">{{ $step['icon'] }}</span>
+                                    </div>
+                                    <h3 class="text-xl font-black text-slate-900 mb-2">{{ $step['title'] }}</h3>
+                                    <p class="text-slate-600 font-medium leading-relaxed">{{ $step['desc'] }}</p>
+                                    <ul class="mt-4 space-y-2 text-sm font-semibold text-slate-600">
+                                        @foreach($step['bullets'] as $bullet)
+                                            <li class="flex items-start gap-2">
+                                                <span class="mt-1 text-xs {{ $step['dotClass'] }}">●</span>
+                                                <span>{{ $bullet }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="hidden lg:flex items-center justify-center scroll-reveal" data-scroll-reveal>
+                                <div class="w-16 h-16 rounded-full border-4 border-white shadow-lg {{ $step['badgeClass'] }} flex items-center justify-center font-black text-lg">
+                                    {{ $step['num'] }}
+                                </div>
+                            </div>
+                            <div class="lg:col-start-3"></div>
+                        @else
+                            <div class="lg:col-start-1"></div>
+                            <div class="hidden lg:flex items-center justify-center scroll-reveal" data-scroll-reveal>
+                                <div class="w-16 h-16 rounded-full border-4 border-white shadow-lg {{ $step['badgeClass'] }} flex items-center justify-center font-black text-lg">
+                                    {{ $step['num'] }}
+                                </div>
+                            </div>
+                            <div class="lg:col-start-3 flex lg:justify-start scroll-reveal scroll-reveal--right" data-scroll-reveal>
+                                <div class="w-full max-w-md rounded-3xl border {{ $step['cardClass'] }} p-6 sm:p-7 shadow-[0_15px_45px_rgba(0,0,0,0.06)]">
+                                    <div class="flex items-center justify-between gap-3 mb-4">
+                                        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold {{ $step['pillClass'] }}">ধাপ {{ $step['num'] }}</span>
+                                        <span class="text-xl">{{ $step['icon'] }}</span>
+                                    </div>
+                                    <h3 class="text-xl font-black text-slate-900 mb-2">{{ $step['title'] }}</h3>
+                                    <p class="text-slate-600 font-medium leading-relaxed">{{ $step['desc'] }}</p>
+                                    <ul class="mt-4 space-y-2 text-sm font-semibold text-slate-600">
+                                        @foreach($step['bullets'] as $bullet)
+                                            <li class="flex items-start gap-2">
+                                                <span class="mt-1 text-xs {{ $step['dotClass'] }}">●</span>
+                                                <span>{{ $bullet }}</span>
+                                            </li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="mt-14 flex justify-center scroll-reveal" data-scroll-reveal>
+            <a href="{{ route('register') }}" class="{{ $btnPrimary }} px-7 py-3.5 text-sm sm:text-base">
+                আজই যুক্ত হোন
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+        </div>
+    </div>
+</section>
+@endguest
 
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 7 — LIVE MAP CTA (Red Compact)
@@ -361,134 +489,7 @@
     </div>
 </section>
 
-{{-- ═══════════════════════════════════════════════════════════════
-     SECTION 6 — DONATION JOURNEY
-═══════════════════════════════════════════════════════════════ --}}
-@guest
-<section class="py-24 bg-slate-50 relative overflow-hidden border-t border-slate-100">
-    <div class="absolute -top-24 right-10 w-72 h-72 bg-red-500/5 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute bottom-0 left-6 w-80 h-80 bg-emerald-400/5 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-3xl mx-auto mb-14">
-            <div class="inline-flex items-center gap-2 bg-white border border-red-100 text-red-600 text-xs font-bold px-4 py-2 rounded-full mb-5 shadow-sm scroll-reveal" data-scroll-reveal>
-                রক্তদানের জার্নি
-            </div>
-            <h2 class="text-4xl lg:text-5xl font-black text-slate-900 mb-4 tracking-tight leading-tight scroll-reveal" data-scroll-reveal>
-                মাত্র ৩ ধাপে<br>রক্ত দিন বা নিন
-            </h2>
-            <p class="text-slate-500 font-medium text-lg scroll-reveal" data-scroll-reveal>
-                স্মার্ট ফিল্টার, ভেরিফায়েড ডোনার এবং নিরাপদ যোগাযোগ — সবকিছু এক প্ল্যাটফর্মে।
-            </p>
-        </div>
 
-        @php
-            $journeySteps = [
-                [
-                    'num' => '০১',
-                    'title' => 'প্রোফাইল ও যাচাই সম্পন্ন করুন',
-                    'desc' => 'রক্তের গ্রুপ, ঠিকানা ও NID দিয়ে ফ্রি অ্যাকাউন্ট খুলুন।',
-                    'bullets' => ['ফোন নম্বর গোপন থাকে', 'NID ভেরিফাইড ডোনার', 'ডোনার অ্যাভেইলেবিলিটি সেট করুন'],
-                    'cardClass' => 'bg-red-50/70 border-red-100',
-                    'pillClass' => 'bg-red-100 text-red-600',
-                    'badgeClass' => 'bg-red-500 text-white',
-                    'dotClass' => 'text-red-500',
-                    'icon' => '🩸',
-                ],
-                [
-                    'num' => '০২',
-                    'title' => 'সঠিক ডোনার বা রিকোয়েস্ট ম্যাচ করুন',
-                    'desc' => 'স্মার্ট ফিল্টার ও লোকেশন দিয়ে দ্রুত উপযুক্ত ম্যাচ খুঁজুন।',
-                    'bullets' => ['রক্তের গ্রুপ ও এলাকা ফিল্টার', 'রিয়েল-টাইম স্ট্যাটাস দেখা যায়', 'প্রয়োজনীয় নোট যুক্ত করুন'],
-                    'cardClass' => 'bg-amber-50/70 border-amber-100',
-                    'pillClass' => 'bg-amber-100 text-amber-600',
-                    'badgeClass' => 'bg-amber-500 text-white',
-                    'dotClass' => 'text-amber-500',
-                    'icon' => '🧭',
-                ],
-                [
-                    'num' => '০৩',
-                    'title' => 'সাড়া দিন ও জীবন বাঁচান',
-                    'desc' => 'প্ল্যাটফর্মে যোগাযোগ করে নিরাপদে রক্তদান সম্পন্ন করুন।',
-                    'bullets' => ['রিকোয়েস্ট ট্র্যাক করা যায়', 'সেফ যোগাযোগ ব্যবস্থাপনা', 'কমিউনিটি কৃতজ্ঞতা শেয়ার'],
-                    'cardClass' => 'bg-emerald-50/70 border-emerald-100',
-                    'pillClass' => 'bg-emerald-100 text-emerald-600',
-                    'badgeClass' => 'bg-emerald-500 text-white',
-                    'dotClass' => 'text-emerald-500',
-                    'icon' => '🤝',
-                ],
-            ];
-        @endphp
-
-        <div class="relative">
-            <div class="absolute left-1/2 top-0 hidden lg:block -translate-x-1/2 h-full w-px border-l-2 border-dashed border-slate-200"></div>
-            <div class="space-y-10">
-                @foreach($journeySteps as $step)
-                    <div class="relative grid lg:grid-cols-[1fr_auto_1fr] items-center gap-8">
-                        @if($loop->odd)
-                            <div class="lg:col-start-1 flex lg:justify-end scroll-reveal scroll-reveal--left" data-scroll-reveal>
-                                <div class="w-full max-w-md rounded-3xl border {{ $step['cardClass'] }} p-6 sm:p-7 shadow-[0_15px_45px_rgba(0,0,0,0.06)]">
-                                    <div class="flex items-center justify-between gap-3 mb-4">
-                                        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold {{ $step['pillClass'] }}">ধাপ {{ $step['num'] }}</span>
-                                        <span class="text-xl">{{ $step['icon'] }}</span>
-                                    </div>
-                                    <h3 class="text-xl font-black text-slate-900 mb-2">{{ $step['title'] }}</h3>
-                                    <p class="text-slate-600 font-medium leading-relaxed">{{ $step['desc'] }}</p>
-                                    <ul class="mt-4 space-y-2 text-sm font-semibold text-slate-600">
-                                        @foreach($step['bullets'] as $bullet)
-                                            <li class="flex items-start gap-2">
-                                                <span class="mt-1 text-xs {{ $step['dotClass'] }}">●</span>
-                                                <span>{{ $bullet }}</span>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="hidden lg:flex items-center justify-center scroll-reveal" data-scroll-reveal>
-                                <div class="w-16 h-16 rounded-full border-4 border-white shadow-lg {{ $step['badgeClass'] }} flex items-center justify-center font-black text-lg">
-                                    {{ $step['num'] }}
-                                </div>
-                            </div>
-                            <div class="lg:col-start-3"></div>
-                        @else
-                            <div class="lg:col-start-1"></div>
-                            <div class="hidden lg:flex items-center justify-center scroll-reveal" data-scroll-reveal>
-                                <div class="w-16 h-16 rounded-full border-4 border-white shadow-lg {{ $step['badgeClass'] }} flex items-center justify-center font-black text-lg">
-                                    {{ $step['num'] }}
-                                </div>
-                            </div>
-                            <div class="lg:col-start-3 flex lg:justify-start scroll-reveal scroll-reveal--right" data-scroll-reveal>
-                                <div class="w-full max-w-md rounded-3xl border {{ $step['cardClass'] }} p-6 sm:p-7 shadow-[0_15px_45px_rgba(0,0,0,0.06)]">
-                                    <div class="flex items-center justify-between gap-3 mb-4">
-                                        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold {{ $step['pillClass'] }}">ধাপ {{ $step['num'] }}</span>
-                                        <span class="text-xl">{{ $step['icon'] }}</span>
-                                    </div>
-                                    <h3 class="text-xl font-black text-slate-900 mb-2">{{ $step['title'] }}</h3>
-                                    <p class="text-slate-600 font-medium leading-relaxed">{{ $step['desc'] }}</p>
-                                    <ul class="mt-4 space-y-2 text-sm font-semibold text-slate-600">
-                                        @foreach($step['bullets'] as $bullet)
-                                            <li class="flex items-start gap-2">
-                                                <span class="mt-1 text-xs {{ $step['dotClass'] }}">●</span>
-                                                <span>{{ $bullet }}</span>
-                                            </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
-                        @endif
-                    </div>
-                @endforeach
-            </div>
-        </div>
-
-        <div class="mt-14 flex justify-center scroll-reveal" data-scroll-reveal>
-            <a href="{{ route('register') }}" class="{{ $btnPrimary }} px-7 py-3.5 text-sm sm:text-base">
-                আজই যুক্ত হোন
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-            </a>
-        </div>
-    </div>
-</section>
-@endguest
 
 {{-- ═══════════════════════════════════════════════════════════════
      SECTION 9 — BLOG
